@@ -1,7 +1,6 @@
 using System.Collections;
 using UnityEngine;
 
-
 public class BattleManager : MonoBehaviour
 {
     public Character player;
@@ -23,11 +22,11 @@ public class BattleManager : MonoBehaviour
     {
         if (state == BattleState.PlayerTurn && !player.isAttacking && !enemy.isAttacking)
         {
-            StartCoroutine(PlayerAttackCoroutine());
+            StartCoroutine(PlayerAttackCoroutine(null));
         }
     }
 
-    IEnumerator PlayerAttackCoroutine()
+    public IEnumerator PlayerAttackCoroutine(System.Action successCallback)
     {
         player.isAttacking = true;
         StartCoroutine(player.MoveToTarget());
@@ -41,13 +40,19 @@ public class BattleManager : MonoBehaviour
         else
         {
             // Perform standard attack
+            Debug.Log("Standard Attack Performed - This should not happen");
             enemy.TakeDamage(player.damage);
         }
+
+        successCallback?.Invoke(); // Invoke the success callback
+        player.isAttacking = false;
 
         if (enemy.health > 0)
         {
             state = BattleState.EnemyTurn;  // Set the state to enemy's turn
             EnemyAttack();
+            Debug.Log(player.isAttacking);
+            Debug.Log("this is voer");
         }
         else
         {
@@ -56,20 +61,25 @@ public class BattleManager : MonoBehaviour
     }
 
     IEnumerator EnemyAttackCoroutine()
-{
-    enemy.isAttacking = true;
-    StartCoroutine(enemy.MoveToTarget());
-    yield return new WaitUntil(() => enemy.isAttacking == false);
+    {
+        enemy.isAttacking = true;
+        StartCoroutine(enemy.MoveToTarget());
+        yield return new WaitUntil(() => enemy.isAttacking == false);
 
-    player.TakeDamage(enemy.damage);
+        player.TakeDamage(enemy.damage);
 
-    state = BattleState.PlayerTurn;  // Set the state back to player's turn after enemy's attack
-}
+        state = BattleState.PlayerTurn;  // Set the state back to player's turn after enemy's attack
 
+        // Check if the player is still alive after the enemy's attack
+        if (player.health > 0)
+        {
+            state = BattleState.PlayerTurn;  // Trigger player's attack
+        }
+    }
 
     public void EnemyAttack()
     {
-        if (state == BattleState.EnemyTurn)
+        if (!player.isAttacking && !enemy.isAttacking && state == BattleState.EnemyTurn)
         {
             StartCoroutine(EnemyAttackCoroutine());
         }
@@ -84,10 +94,9 @@ public class BattleManager : MonoBehaviour
             // Set the state to EnemyTurn after skill execution
             state = BattleState.EnemyTurn;
         }
-
     }
 
-   public float activeTimeWindowDuration = 0.0f; // Default active time window duration
+    public float activeTimeWindowDuration = 0.0f; // Default active time window duration
 
     public void SetActiveTimeWindow(float windowDuration)
     {
@@ -95,48 +104,47 @@ public class BattleManager : MonoBehaviour
     }
 
     public IEnumerator PlayerActiveTimeEvent(float[] windowStarts, float[] windowEnds, System.Action<bool> callback)
-{
-    float totalWindowDuration = windowEnds[windowEnds.Length - 1];  // Total duration is determined by the end time of the last window
-    float timer = totalWindowDuration;
-    int currentWindowIndex = 0;
-
-    while (timer > 0)
     {
-        if (Input.GetMouseButtonDown(0))
+        float totalWindowDuration = windowEnds[windowEnds.Length - 1];  // Total duration is determined by the end time of the last window
+        float timer = totalWindowDuration;
+        int currentWindowIndex = 0;
+
+        while (timer > 0)
         {
-            // Check the timing window for this skill
-            float elapsedTime = totalWindowDuration - timer;
-            Debug.Log(elapsedTime);
+            if (Input.GetMouseButtonDown(0))
+            {
+                // Check the timing window for this skill
+                float elapsedTime = totalWindowDuration - timer;
+                Debug.Log(elapsedTime);
 
-            if (elapsedTime >= windowStarts[currentWindowIndex] && elapsedTime <= windowEnds[currentWindowIndex])
-            {
-                callback?.Invoke(true);  // Success within the timing window
-                currentWindowIndex++;  // Move to the next timing window
-            }
-            else
-            {
-                callback?.Invoke(false);  // Failed outside the timing window
-                yield break;  // Exit the coroutine
+                if (elapsedTime >= windowStarts[currentWindowIndex] && elapsedTime <= windowEnds[currentWindowIndex])
+                {
+                    callback?.Invoke(true);  // Success within the timing window
+                    currentWindowIndex++;  // Move to the next timing window
+                }
+                else
+                {
+                    callback?.Invoke(false);  // Failed outside the timing window
+                    yield break;  // Exit the coroutine
+                }
+
+                if (currentWindowIndex >= windowStarts.Length)
+                {
+                    yield break;  // Exit the coroutine if all timing windows have been successfully hit
+                }
             }
 
-            if (currentWindowIndex >= windowStarts.Length)
+            timer -= Time.deltaTime;
+
+            //Flash white to indicate tapping at this moment will be a success
+            if (timer >= windowStarts[currentWindowIndex] && timer <= windowEnds[currentWindowIndex])
             {
-                yield break;  // Exit the coroutine if all timing windows have been successfully hit
+                StartCoroutine(FlashWhite(player));
             }
+
+            yield return null;
         }
-
-        timer -= Time.deltaTime;
-
-        if (timer >= windowStarts[currentWindowIndex] && timer <= windowEnds[currentWindowIndex])
-        {
-            StartCoroutine(FlashWhite(player));
-        }
-
-        yield return null;
     }
-}
-
-
 
     public IEnumerator FlashWhite(Character character)
     {
@@ -145,7 +153,7 @@ public class BattleManager : MonoBehaviour
         character.spriteRenderer.color = Color.cyan;
     }
 
-     public BattleState GetState()
+    public BattleState GetState()
     {
         return state;
     }

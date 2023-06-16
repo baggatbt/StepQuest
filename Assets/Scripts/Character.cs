@@ -36,27 +36,30 @@ public class Character : MonoBehaviour
 
     public IEnumerator MoveToTarget()
     {
-        originalPosition = transform.position; 
+        originalPosition = transform.position;
         isAttacking = true;
 
-        float speed = 4.0f; 
-        float startTime = Time.time; 
-        Vector3 startPosition = transform.position; 
+        float speed = 4.0f;
+        float startTime = Time.time;
+        Vector3 startPosition = transform.position;
 
-        float offset = 1.5f; 
+        float offset = 1.5f;
         Vector3 adjustedTarget = attackTarget.position - (transform.position - attackTarget.position).normalized * (GetComponent<CapsuleCollider2D>().size.x / 2 - offset);
 
-        float journeyLength = Vector3.Distance(startPosition, adjustedTarget); 
+        float journeyLength = Vector3.Distance(startPosition, adjustedTarget);
 
         while (transform.position != adjustedTarget)
         {
             float distCovered = (Time.time - startTime) * speed;
-            float fractionOfJourney = distCovered / journeyLength; 
+            float fractionOfJourney = distCovered / journeyLength;
 
             transform.position = Vector3.Lerp(startPosition, adjustedTarget, fractionOfJourney);
 
             yield return null;
         }
+
+        // Wait for the skill execution to complete
+        yield return new WaitUntil(() => currentSkill.skillExecutionComplete);  //PROBLEM HERE, ENEMY DOESNT USE SKILL. MUST IMPLEMENT EXAMPLE ENEMY SKILL FOR THIS TO WORK ACROSS CHARACTERS
 
         yield return StartCoroutine(ReturnToPosition());
     }
@@ -78,24 +81,5 @@ public class Character : MonoBehaviour
         }
 
         isAttacking = false;
-    }
-
-    public IEnumerator MoveForward(float distance)
-    {
-        originalPosition = transform.position;  // Store the original position
-        Vector3 targetPosition = transform.position + transform.forward * distance;
-        float duration = 1.0f; // Adjust the duration as needed
-
-        float elapsedTime = 0.0f;
-        while (elapsedTime < duration)
-        {
-            float t = elapsedTime / duration;
-            transform.position = Vector3.Lerp(originalPosition, targetPosition, t);
-
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
-
-        transform.position = targetPosition;
     }
 }

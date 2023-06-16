@@ -9,39 +9,47 @@ public class TripleHitSkill : Skill
         description = "Hits the enemy 3 times with timing checks before each hit";
     }
 
-   public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
-{
-    int hitCount = 2;
-    int successfulHits = 0;  // Number of successful hits by the player
-
-    // Set the desired timing windows for each hit
-    float[] windowStarts = { 0.0f, 0.0f, 0.0f };
-    float[] windowEnds = { 5.0f, 5.0f, 5.0f };
-
-    //The damage of the first hit
-    target.TakeDamage(1);
-
-    // Pass the arrays of window starts and ends to PlayerActiveTimeEvent
-    yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(windowStarts, windowEnds, (result) =>
+    public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
-        if (result)
+        int hitCount = 2;
+        int successfulHits = 0;  // Number of successful hits by the player
+        bool skillExecutionComplete = false; // Flag to track skill execution completion
+
+        // Set the desired timing windows for each hit
+        float[] windowStarts = { 0.0f, 0.0f };
+        float[] windowEnds = { 5.0f, 5.0f };
+
+        // The damage of the first hit
+        target.TakeDamage(1);
+
+        // Pass the arrays of window starts and ends to PlayerActiveTimeEvent
+        yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(windowStarts, windowEnds, (result) =>
         {
-            successfulHits++;
-            Debug.Log(successfulHits);
-            target.TakeDamage(1);
-        }
-    }));
+            if (result)
+            {
+                successfulHits++;
+                Debug.Log(successfulHits);
+                target.TakeDamage(1);
+            }
+        }));
 
-    if (successfulHits == hitCount)
-    {
-        // Player successfully hit all the times
-        // Perform any necessary actions here
-        battleManager.EnemyAttack();
+        if (successfulHits == hitCount)
+        {
+            // Player successfully hit all the times
+            // Perform any necessary actions here
+            skillExecutionComplete = true;
+            battleManager.EnemyAttack();
+            Debug.Log("Skill execution complete");
+        }
+        else
+        {
+            // Player missed at least once
+            battleManager.EnemyAttack();
+            Debug.Log("Skill execution interrupted");
+        }
+
+        skillExecutionComplete = true; // Set the flag to indicate skill execution is complete
+
+       
     }
-    else
-    {
-        // Player missed at least once
-        battleManager.EnemyAttack();
-    }
-}
 }
