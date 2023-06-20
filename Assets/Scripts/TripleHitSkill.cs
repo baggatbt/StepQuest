@@ -13,7 +13,7 @@ public class TripleHitSkill : Skill
     {
         int hitCount = 2;
         int successfulHits = 0;  // Number of successful hits by the player
-        bool skillExecutionComplete = false; // Flag to track skill execution completion
+        
 
         // Set the desired timing windows for each hit
         float[] windowStarts = { 0.0f, 0.0f };
@@ -37,13 +37,14 @@ public class TripleHitSkill : Skill
         {
             // Player successfully hit all the times
             // Perform any necessary actions here
-            skillExecutionComplete = true;
+            user.currentSkill.skillExecutionComplete = true; // Set the flag on the user
             battleManager.EnemyAttack();
             Debug.Log("Skill execution complete");
         }
         else
         {
             // Player missed at least once
+            user.currentSkill.skillExecutionComplete = true; // Set the flag on the user
             battleManager.EnemyAttack();
             Debug.Log("Skill execution interrupted");
         }

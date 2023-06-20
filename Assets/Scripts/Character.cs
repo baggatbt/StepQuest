@@ -12,7 +12,7 @@ public class Character : MonoBehaviour
     public Transform attackTarget; 
     public Vector3 originalPosition;
     public bool isAttacking = false;
-    public SpriteRenderer spriteRenderer; 
+    public SpriteRenderer spriteRenderer;
     public Skill currentSkill; // Property to store the current skill being used by the character
 
 
@@ -21,7 +21,14 @@ public class Character : MonoBehaviour
         health = maxHealth;
         healthBar.maxValue = maxHealth;
         healthBar.value = health;
+        if (currentSkill != null)
+        {
+            currentSkill.skillExecutionComplete = false;
+        }
+
+
     }
+
 
     public void TakeDamage(int damage) 
     {
@@ -58,11 +65,11 @@ public class Character : MonoBehaviour
             yield return null;
         }
 
-        // Wait for the skill execution to complete
-        yield return new WaitUntil(() => currentSkill.skillExecutionComplete);  //PROBLEM HERE, ENEMY DOESNT USE SKILL. MUST IMPLEMENT EXAMPLE ENEMY SKILL FOR THIS TO WORK ACROSS CHARACTERS
+        Debug.Log("DEBUG 1 - Enemy reached target");
 
-        yield return StartCoroutine(ReturnToPosition());
+        isAttacking = false;
     }
+
 
     public IEnumerator ReturnToPosition()
     {

@@ -29,8 +29,7 @@ public class BattleManager : MonoBehaviour
     public IEnumerator PlayerAttackCoroutine(System.Action successCallback)
     {
         player.isAttacking = true;
-        StartCoroutine(player.MoveToTarget());
-        yield return new WaitUntil(() => player.isAttacking == false);
+        yield return StartCoroutine(player.MoveToTarget());
 
         // Check if the player is using a skill
         if (player.currentSkill != null)
@@ -60,27 +59,54 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+
     IEnumerator EnemyAttackCoroutine()
     {
-        enemy.isAttacking = true;
+        // Enemy begins movement to target
         StartCoroutine(enemy.MoveToTarget());
-        yield return new WaitUntil(() => enemy.isAttacking == false);
+        Debug.Log("Enemy is moving towards target");
+        yield return new WaitUntil(() => enemy.isAttacking == false);  // Wait until enemy has reached the target
 
-        player.TakeDamage(enemy.damage);
+        Debug.Log("Enemy has reached target");
 
+        // If the enemy has a skill, execute it
+        if (enemy.currentSkill != null)
+        {
+            Debug.Log("Enemy begins executing skill");
+            yield return enemy.currentSkill.Execute(enemy, player, this);  // Execute enemy's skill
+            Debug.Log("Enemy has finished executing skill");
+        }
+        else
+        {
+            // If the enemy has no skill, deal damage directly
+            player.TakeDamage(enemy.damage);
+        }
+
+        Debug.Log("Enemy begins return to original position");
+        yield return StartCoroutine(enemy.ReturnToPosition());  // Enemy returns to its position
+       
         state = BattleState.PlayerTurn;  // Set the state back to player's turn after enemy's attack
 
         // Check if the player is still alive after the enemy's attack
-        if (player.health > 0)
+        if (player.health <= 0)
         {
-            state = BattleState.PlayerTurn;  // Trigger player's attack
+            // Game over, player is defeated
+            Debug.Log("Game Over. Player is defeated.");
+        }
+        else
+        {
+            // If player is still alive, start player's turn
+            state = BattleState.PlayerTurn;
         }
     }
+
+
 
     public void EnemyAttack()
     {
         if (!player.isAttacking && !enemy.isAttacking && state == BattleState.EnemyTurn)
         {
+            
             StartCoroutine(EnemyAttackCoroutine());
         }
     }
