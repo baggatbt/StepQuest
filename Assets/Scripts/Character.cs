@@ -43,6 +43,7 @@ public class Character : MonoBehaviour
 
     public IEnumerator MoveToTarget()
     {
+        Debug.Log("I am moving");
         originalPosition = transform.position;
         isAttacking = true;
 

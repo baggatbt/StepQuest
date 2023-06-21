@@ -27,37 +27,40 @@ public class BattleManager : MonoBehaviour
     }
 
     public IEnumerator PlayerAttackCoroutine(System.Action successCallback)
+{
+    StartCoroutine(player.MoveToTarget());
+    Debug.Log("Player is moving towards target");
+
+    // Wait until player has reached the target
+    yield return new WaitUntil(() => player.isAttacking == false);
+    Debug.Log("Player has reached target");
+
+    // Check if the player is using a skill
+    if (player.currentSkill != null)
     {
-        player.isAttacking = true;
-        yield return StartCoroutine(player.MoveToTarget());
-
-        // Check if the player is using a skill
-        if (player.currentSkill != null)
-        {
-            yield return player.currentSkill.Execute(player, enemy, this);
-        }
-        else
-        {
-            // Perform standard attack
-            Debug.Log("Standard Attack Performed - This should not happen");
-            enemy.TakeDamage(player.damage);
-        }
-
-        successCallback?.Invoke(); // Invoke the success callback
-        player.isAttacking = false;
-
-        if (enemy.health > 0)
-        {
-            state = BattleState.EnemyTurn;  // Set the state to enemy's turn
-            EnemyAttack();
-            Debug.Log(player.isAttacking);
-            Debug.Log("this is voer");
-        }
-        else
-        {
-            state = BattleState.PlayerTurn;  // Set the state back to player's turn as enemy is defeated
-        }
+        yield return player.currentSkill.Execute(player, enemy, this);
     }
+    else
+    {
+        // Perform standard attack
+        Debug.Log("Standard Attack Performed - This should not happen");
+        enemy.TakeDamage(player.damage);
+    }
+
+    yield return StartCoroutine(player.ReturnToPosition());  // Player returns to its position
+
+    if (enemy.health <= 0)
+    {
+        // Player wins the fight
+        Debug.Log("You win, let's celebrate");
+    }
+    else
+    {
+        state = BattleState.EnemyTurn;  // Set the state back to the enemy's turn as the enemy is still alive
+        EnemyAttack();
+    }
+}
+
 
 
     IEnumerator EnemyAttackCoroutine()

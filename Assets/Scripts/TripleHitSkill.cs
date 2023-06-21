@@ -37,15 +37,13 @@ public class TripleHitSkill : Skill
         {
             // Player successfully hit all the times
             // Perform any necessary actions here
-            user.currentSkill.skillExecutionComplete = true; // Set the flag on the user
-            battleManager.EnemyAttack();
+            skillExecutionComplete = true; // Set the flag on the user
             Debug.Log("Skill execution complete");
         }
         else
         {
             // Player missed at least once
-            user.currentSkill.skillExecutionComplete = true; // Set the flag on the user
-            battleManager.EnemyAttack();
+            skillExecutionComplete = true; // Set the flag on the user
             Debug.Log("Skill execution interrupted");
         }
 
