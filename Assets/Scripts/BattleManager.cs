@@ -28,12 +28,13 @@ public class BattleManager : MonoBehaviour
 
     public IEnumerator PlayerAttackCoroutine(System.Action successCallback)
 {
-    StartCoroutine(player.MoveToTarget());
-    Debug.Log("Player is moving towards target");
+    yield return StartCoroutine(player.MoveToTarget());
+
+    
 
     // Wait until player has reached the target
     yield return new WaitUntil(() => player.isAttacking == false);
-    Debug.Log("Player has reached target");
+    
 
     // Check if the player is using a skill
     if (player.currentSkill != null)
@@ -66,12 +67,12 @@ public class BattleManager : MonoBehaviour
     IEnumerator EnemyAttackCoroutine()
     {
         // Enemy begins movement to target
-        StartCoroutine(enemy.MoveToTarget());
-        Debug.Log("Enemy is moving towards target");
+        yield return StartCoroutine(enemy.MoveToTarget());
+
+     
         yield return new WaitUntil(() => enemy.isAttacking == false);  // Wait until enemy has reached the target
 
-        Debug.Log("Enemy has reached target");
-
+       
         // If the enemy has a skill, execute it
         if (enemy.currentSkill != null)
         {
@@ -85,7 +86,7 @@ public class BattleManager : MonoBehaviour
             player.TakeDamage(enemy.damage);
         }
 
-        Debug.Log("Enemy begins return to original position");
+        
         yield return StartCoroutine(enemy.ReturnToPosition());  // Enemy returns to its position
        
         state = BattleState.PlayerTurn;  // Set the state back to player's turn after enemy's attack
@@ -114,6 +115,7 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+/****DEPRECIATED
     public void UseSkill(Skill skill, Character user, Character target)
     {
         if (state == BattleState.PlayerTurn && !user.isAttacking && !target.isAttacking)
@@ -124,7 +126,9 @@ public class BattleManager : MonoBehaviour
             state = BattleState.EnemyTurn;
         }
     }
+    */
 
+/** DEPRECIATED
     public float activeTimeWindowDuration = 0.0f; // Default active time window duration
 
     public void SetActiveTimeWindow(float windowDuration)
@@ -132,48 +136,47 @@ public class BattleManager : MonoBehaviour
         activeTimeWindowDuration = windowDuration;
     }
 
-    public IEnumerator PlayerActiveTimeEvent(float[] windowStarts, float[] windowEnds, System.Action<bool> callback)
+    */
+
+    public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<bool> callback)
+{
+    float totalWindowDuration = windowEnd;  // Total duration is determined by the end time of the last window
+    float timer = totalWindowDuration;
+
+    while (timer > 0)
     {
-        float totalWindowDuration = windowEnds[windowEnds.Length - 1];  // Total duration is determined by the end time of the last window
-        float timer = totalWindowDuration;
-        int currentWindowIndex = 0;
-
-        while (timer > 0)
+        if (Input.GetMouseButtonDown(0))
         {
-            if (Input.GetMouseButtonDown(0))
+            // Check the timing window for this skill
+            float elapsedTime = totalWindowDuration - timer;
+            Debug.Log(elapsedTime);
+
+            if (elapsedTime >= windowStart && elapsedTime <= windowEnd)
             {
-                // Check the timing window for this skill
-                float elapsedTime = totalWindowDuration - timer;
+                Debug.Log("Within window");
                 Debug.Log(elapsedTime);
-
-                if (elapsedTime >= windowStarts[currentWindowIndex] && elapsedTime <= windowEnds[currentWindowIndex])
-                {
-                    callback?.Invoke(true);  // Success within the timing window
-                    currentWindowIndex++;  // Move to the next timing window
-                }
-                else
-                {
-                    callback?.Invoke(false);  // Failed outside the timing window
-                    yield break;  // Exit the coroutine
-                }
-
-                if (currentWindowIndex >= windowStarts.Length)
-                {
-                    yield break;  // Exit the coroutine if all timing windows have been successfully hit
-                }
+                callback?.Invoke(true);  // Success within the timing window
             }
-
-            timer -= Time.deltaTime;
-
-            //Flash white to indicate tapping at this moment will be a success
-            if (timer >= windowStarts[currentWindowIndex] && timer <= windowEnds[currentWindowIndex])
+            else
             {
-                StartCoroutine(FlashWhite(player));
+                callback?.Invoke(false);  // Failed outside the timing window
+                yield break;  // Exit the coroutine
             }
-
-            yield return null;
         }
+
+        timer -= Time.deltaTime;
+
+        // Flash white to indicate tapping at this moment will be a success
+        if (timer >= windowStart && timer <= windowEnd)
+        {
+            Debug.Log("Starting Flash");
+            StartCoroutine(FlashWhite(player));
+        }
+
+        yield return null;
     }
+}
+
 
     public IEnumerator FlashWhite(Character character)
     {

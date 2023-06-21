@@ -11,44 +11,31 @@ public class TripleHitSkill : Skill
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
-        int hitCount = 2;
-        int successfulHits = 0;  // Number of successful hits by the player
-        
+        // Reset the skillExecutionComplete flag at the start
+        skillExecutionComplete = false;
 
-        // Set the desired timing windows for each hit
-        float[] windowStarts = { 0.0f, 0.0f };
-        float[] windowEnds = { 5.0f, 5.0f };
+        user.animator.SetTrigger("TripleHitTrigger");
+        yield return TimingWindow(user, target, battleManager, 0.2f, 0.5f);
 
-        // The damage of the first hit
-        target.TakeDamage(1);
+        user.animator.SetTrigger("TripleHitTrigger2");
+        yield return TimingWindow(user, target, battleManager, 1.5f, 1.8f);
 
-        // Pass the arrays of window starts and ends to PlayerActiveTimeEvent
-        yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(windowStarts, windowEnds, (result) =>
+       // user.animator.SetTrigger("TripleHitTrigger");
+       // yield return TimingWindow(user, target, battleManager, 2.5f, 2.8f);
+
+        // Set the skillExecutionComplete flag to true at the end
+        skillExecutionComplete = true;
+    }
+
+    private IEnumerator TimingWindow(Character user, Character target, BattleManager battleManager, float windowStart, float windowEnd)
+    {
+        yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(windowStart, windowEnd, (result) =>
         {
             if (result)
             {
-                successfulHits++;
-                Debug.Log(successfulHits);
+                Debug.Log("Successful Hit!");
                 target.TakeDamage(1);
             }
         }));
-
-        if (successfulHits == hitCount)
-        {
-            // Player successfully hit all the times
-            // Perform any necessary actions here
-            skillExecutionComplete = true; // Set the flag on the user
-            Debug.Log("Skill execution complete");
-        }
-        else
-        {
-            // Player missed at least once
-            skillExecutionComplete = true; // Set the flag on the user
-            Debug.Log("Skill execution interrupted");
-        }
-
-        skillExecutionComplete = true; // Set the flag to indicate skill execution is complete
-
-       
     }
 }

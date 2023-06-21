@@ -13,11 +13,13 @@ public class Character : MonoBehaviour
     public Vector3 originalPosition;
     public bool isAttacking = false;
     public SpriteRenderer spriteRenderer;
+    public Animator animator;
     public Skill currentSkill; // Property to store the current skill being used by the character
 
 
     private void Start()
     {
+        animator = GetComponent<Animator>();
         health = maxHealth;
         healthBar.maxValue = maxHealth;
         healthBar.value = health;
@@ -43,51 +45,30 @@ public class Character : MonoBehaviour
 
     public IEnumerator MoveToTarget()
     {
-        Debug.Log("I am moving");
         originalPosition = transform.position;
         isAttacking = true;
-
-        float speed = 4.0f;
-        float startTime = Time.time;
-        Vector3 startPosition = transform.position;
 
         float offset = 1.5f;
         Vector3 adjustedTarget = attackTarget.position - (transform.position - attackTarget.position).normalized * (GetComponent<CapsuleCollider2D>().size.x / 2 - offset);
 
-        float journeyLength = Vector3.Distance(startPosition, adjustedTarget);
-
-        while (transform.position != adjustedTarget)
-        {
-            float distCovered = (Time.time - startTime) * speed;
-            float fractionOfJourney = distCovered / journeyLength;
-
-            transform.position = Vector3.Lerp(startPosition, adjustedTarget, fractionOfJourney);
-
-            yield return null;
-        }
-
-        Debug.Log("DEBUG 1 - Enemy reached target");
+        yield return StartCoroutine(Move(adjustedTarget, 4f));
 
         isAttacking = false;
     }
 
-
     public IEnumerator ReturnToPosition()
     {
-        float speed = 4.0f;
-        float startTime = Time.time;
-        Vector3 startPosition = transform.position;
-        float journeyLength = Vector3.Distance(startPosition, originalPosition);
-
-        while (transform.position != originalPosition)
-        {
-            float distCovered = (Time.time - startTime) * speed;
-            float fractionOfJourney = distCovered / journeyLength;
-            transform.position = Vector3.Lerp(startPosition, originalPosition, fractionOfJourney);
-
-            yield return null;
-        }
+        yield return StartCoroutine(Move(originalPosition, 4f));
 
         isAttacking = false;
+    }
+
+    private IEnumerator Move(Vector3 targetPosition, float speed)
+    {
+        while ((transform.position - targetPosition).sqrMagnitude > Mathf.Epsilon)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
+            yield return null;
+        }
     }
 }
