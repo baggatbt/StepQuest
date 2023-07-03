@@ -15,17 +15,17 @@ public class TripleHitSkill : Skill
     skillExecutionComplete = false;
 
     user.animator.SetTrigger("TripleHitTrigger");
-    yield return TimingWindow(user, target, battleManager, 0.2f, 0.5f);
+    yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f); //How long the window is for a success timing
     if (!timingSuccess)
         yield break; // Stop skill execution if timing event failed
 
     user.animator.SetTrigger("TripleHitTrigger2");
-    yield return TimingWindow(user, target, battleManager, 1.5f, 1.8f);
+    yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
     if (!timingSuccess)
         yield break; // Stop skill execution if timing event failed
 
     user.animator.SetTrigger("TripleHitTrigger3");
-    yield return TimingWindow(user, target, battleManager, 2.8f, 3.3f);
+    yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
     if (!timingSuccess)
         yield break; // Stop skill execution if timing event failed
 

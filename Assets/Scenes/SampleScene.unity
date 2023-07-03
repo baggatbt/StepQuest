@@ -580,6 +580,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &738052046 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2802515525468606963, guid: a1b2f0ba1dfee4d468262d452bef0ec7, type: 3}
+  m_PrefabInstance: {fileID: 2802515526947790951}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &759510882
 GameObject:
   m_ObjectHideFlags: 0
@@ -621,6 +626,8 @@ MonoBehaviour:
   isAttacking: 0
   spriteRenderer: {fileID: 759510884}
   animator: {fileID: 759510887}
+  attacksBeforeSpecial: 0
+  isAnimationDone: 0
 --- !u!212 &759510884
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -906,6 +913,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 759510883}
   enemy: {fileID: 1479520665}
+  enemyAttackCount: 0
 --- !u!4 &1020165694
 Transform:
   m_ObjectHideFlags: 0
@@ -1164,12 +1172,33 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2802515525468606974, guid: a1b2f0ba1dfee4d468262d452bef0ec7, type: 3}
   m_PrefabInstance: {fileID: 2802515526947790951}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 738052046}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f3adc8d17cb8c74498552c557a7adc8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!95 &1479520668
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 738052046}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 252e3bf5712eb944ab49034afd4bc089, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1718233612
 GameObject:
   m_ObjectHideFlags: 0
@@ -1861,6 +1890,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemy
       objectReference: {fileID: 0}
+    - target: {fileID: 2802515525468606974, guid: a1b2f0ba1dfee4d468262d452bef0ec7, type: 3}
+      propertyPath: animator
+      value: 
+      objectReference: {fileID: 1479520668}
     - target: {fileID: 2802515525468606974, guid: a1b2f0ba1dfee4d468262d452bef0ec7, type: 3}
       propertyPath: healthBar
       value: 
