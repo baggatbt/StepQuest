@@ -6,6 +6,7 @@ public class BattleManager : MonoBehaviour
     public Character player;
     public Character enemy;
     private BattleState state;  // State manager for player turns and enemy turns
+     public int enemyAttackCount = 0; //Counts how many times enemy has attacked, using for special skill activation testing
 
     public enum BattleState
     {
@@ -67,16 +68,15 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
+            Debug.Log("test enemy attack performed - THis should not happen");
             player.TakeDamage(enemy.damage);
         }
 
         yield return StartCoroutine(enemy.ReturnToPosition());
 
-        state = BattleState.PlayerTurn;
-
         if (player.health <= 0)
         {
-            Debug.Log("Game Over. Player is defeated.");
+            Debug.Log("You lose ya jabroni");
         }
         else
         {
@@ -85,12 +85,28 @@ public class BattleManager : MonoBehaviour
     }
 
     public void EnemyAttack()
+{
+    if (!player.isAttacking && !enemy.isAttacking && state == BattleState.EnemyTurn)
     {
-        if (!player.isAttacking && !enemy.isAttacking && state == BattleState.EnemyTurn)
+        if (enemyAttackCount == 2)
         {
-            StartCoroutine(EnemyAttackCoroutine());
+            // Use special skill if the attack count is a multiple of attacksBeforeSpecial
+            enemy.currentSkill = enemy.specialSkill;
         }
+        else
+        {
+            // Otherwise, use normal skill
+            enemy.currentSkill = enemy.normalSkill;
+        }
+
+        StartCoroutine(EnemyAttackCoroutine());
+
+        enemyAttackCount++; // Increase the attack count after each attack
     }
+}
+
+
+
 
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<bool> callback)
     {
