@@ -11,7 +11,6 @@ public class SlimeAttackSkill : Skill
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
-
         Debug.Log("using basic attack");
         // Start the attack animation
         user.animator.SetTrigger("SlimeAttackTrigger");
@@ -19,19 +18,23 @@ public class SlimeAttackSkill : Skill
         // Create a timing window for the player to reduce damage
         yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(0.2f, 0.5f, (result) =>
         {
-            if (result)
+            if (result == TimingEventResult.Success)
             {
-                // The player succeeded the timing event - reduce the damage of the attack
                 Debug.Log("Damage reduced!");
-                target.TakeDamage(user.damage - 1 ); // Reduce damage by 1
+                target.TakeDamage(user.damage - 1);
+            }
+            else if (result == TimingEventResult.RightClickSuccess)
+            {
+                Debug.Log("Damage dodged!");
+                target.TakeDamage(user.damage - user.damage);
             }
             else
             {
-                // The player missed the timing event - take full damage
                 target.TakeDamage(user.damage);
             }
 
-            user.currentSkill.skillExecutionComplete = true;  // Signal that skill execution is complete
+            user.currentSkill.skillExecutionComplete = true;
         }));
     }
+
 }

@@ -108,7 +108,7 @@ public class BattleManager : MonoBehaviour
 
 
 
-    public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<bool> callback)
+    public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<TimingEventResult> callback)
     {
         float totalWindowDuration = windowEnd;
         float timer = totalWindowDuration;
@@ -125,12 +125,31 @@ public class BattleManager : MonoBehaviour
                 {
                     Debug.Log("Within window");
                     Debug.Log(elapsedTime);
-                    callback?.Invoke(true);
+                    callback?.Invoke(TimingEventResult.Success);
                     successCallbackCalled = true;
                 }
                 else
                 {
-                    callback?.Invoke(false);
+                    callback?.Invoke(TimingEventResult.Failure);
+                    yield break;
+                }
+            }
+
+            if (Input.GetMouseButtonDown(1))
+            {
+                float elapsedTime = totalWindowDuration - timer;
+                Debug.Log(elapsedTime);
+
+                if (elapsedTime >= windowStart && elapsedTime <= windowEnd)
+                {
+                    Debug.Log("Within window");
+                    Debug.Log(elapsedTime);
+                    callback?.Invoke(TimingEventResult.RightClickSuccess);
+                    successCallbackCalled = true;
+                }
+                else
+                {
+                    callback?.Invoke(TimingEventResult.Failure);
                     yield break;
                 }
             }
@@ -149,9 +168,10 @@ public class BattleManager : MonoBehaviour
         // If timer has expired and success callback wasn't called, trigger failure callback
         if (timer <= 0 && !successCallbackCalled)
         {
-            callback?.Invoke(false);
+            callback?.Invoke(TimingEventResult.Failure);
         }
     }
+
 
     public IEnumerator FlashWhite(Character character)
     {

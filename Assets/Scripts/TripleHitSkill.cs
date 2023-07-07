@@ -36,23 +36,30 @@ public class TripleHitSkill : Skill
 
 private bool timingSuccess = false;
 
-private IEnumerator TimingWindow(Character user, Character target, BattleManager battleManager, float windowStart, float windowEnd)
-{
-    timingSuccess = false;
-    yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(windowStart, windowEnd, (result) =>
+    private IEnumerator TimingWindow(Character user, Character target, BattleManager battleManager, float windowStart, float windowEnd)
     {
-        timingSuccess = result;
-        if (result)
-        {
-            Debug.Log("Successful Hit!");
-            target.TakeDamage(1);
-        }
-        else
-        {
-            Debug.Log("Attempting to cancel animation!");
-            user.animator.SetTrigger("CancelAnimation"); //trigger to cancel anim in case of time event failure
-        }
-    }));
-}
+        timingSuccess = false;
+        yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(windowStart, windowEnd,
+            (result) =>
+            {
+                if (result == TimingEventResult.Success)
+                {
+                    Debug.Log("Successful Hit!");
+                    target.TakeDamage(1);
+                    timingSuccess = true;
+                }
+                else if (result == TimingEventResult.RightClickSuccess)
+                {
+                    Debug.Log("Right click success!");
+                // Handle the right click success case (for now it will have none, only useful for enemy attacks)
+            }
+                else
+                {
+                    Debug.Log("Attempting to cancel animation!");
+                    user.animator.SetTrigger("CancelAnimation");
+                }
+            }));
+    }
+
 
 }

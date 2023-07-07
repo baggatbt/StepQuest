@@ -22,13 +22,12 @@ public class SlimeSpecialAttackSkill : Skill
 
     private int CalculateBlockedDamage(Character user)
     {
-        // Insert your damage calculation logic here. For now, let's return a simple value.
+        
         return user.damage;
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
-
         Debug.Log("using special attack");
 
         // Reset the skillExecutionComplete flag at the start
@@ -36,16 +35,16 @@ public class SlimeSpecialAttackSkill : Skill
 
         user.animator.SetTrigger("SlimeSpecialAttackTrigger");
 
-        bool timingSuccess = false;
+        TimingEventResult timingResult = TimingEventResult.Failure;
 
         // Player has a chance to block the attack
         yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(WINDOW_START, WINDOW_END, (result) =>
         {
-            timingSuccess = result;
+            timingResult = result;
         }));
 
         // If the player blocked successfully, do less damage
-        if (timingSuccess)
+        if (timingResult == TimingEventResult.Success)
         {
             Debug.Log("Attack blocked!");
             target.TakeDamage(CalculateBlockedDamage(user));
@@ -61,4 +60,5 @@ public class SlimeSpecialAttackSkill : Skill
         // Set the skillExecutionComplete flag to true at the end
         skillExecutionComplete = true;
     }
+
 }
