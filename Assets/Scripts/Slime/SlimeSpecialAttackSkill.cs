@@ -4,8 +4,10 @@ using UnityEngine;
 public class SlimeSpecialAttackSkill : Skill
 {
     // Constants for the timing window for player block
-    private const float WINDOW_START = 0.5f;
-    private const float WINDOW_END = 1.5f;
+    private const float LEFT_CLICK_START = 0.5f;
+    private const float LEFT_CLICK_END = 1.5f;
+    private const float RIGHT_CLICK_START = 0.8f;
+    private const float RIGHT_CLICK_END = 1.2f;
 
     public SlimeSpecialAttackSkill()
     {
@@ -39,20 +41,30 @@ public class SlimeSpecialAttackSkill : Skill
         bool timingSuccess = false;
 
         // Player has a chance to block the attack
-        yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(WINDOW_START, WINDOW_END, (result) =>
+        yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(
+        LEFT_CLICK_START, LEFT_CLICK_END, RIGHT_CLICK_START, RIGHT_CLICK_END, (result) =>
         {
             timingSuccess = result;
         }));
 
         // If the player blocked successfully, do less damage
+<<<<<<< Updated upstream
         if (timingSuccess)
+=======
+        if (timingResult == TimingEventResult.LeftClickSuccess)
+>>>>>>> Stashed changes
         {
-            Debug.Log("Attack blocked!");
+            Debug.Log("Left click succeeded - Attack blocked!");
             target.TakeDamage(CalculateBlockedDamage(user));
+        }
+        else if (timingResult == TimingEventResult.RightClickSuccess)
+        {
+            Debug.Log("Right click succeeded - Attack dodged!");
+            // Handle the dodge action here
         }
         else
         {
-            // Otherwise, do full damage
+            // Attack was not blocked or dodged
             target.TakeDamage(CalculateUnblockedDamage(user));
         }
 

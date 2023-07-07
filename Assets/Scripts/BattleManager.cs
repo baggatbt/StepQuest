@@ -108,38 +108,75 @@ public class BattleManager : MonoBehaviour
 
 
 
+<<<<<<< Updated upstream
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<bool> callback)
+=======
+    public IEnumerator PlayerActiveTimeEvent(float leftClickStart, float leftClickEnd, float rightClickStart, float rightClickEnd, System.Action<TimingEventResult> callback)
+>>>>>>> Stashed changes
     {
-        float totalWindowDuration = windowEnd;
+        float totalWindowDuration = Mathf.Max(leftClickEnd, rightClickEnd);
         float timer = totalWindowDuration;
         bool successCallbackCalled = false;
 
         while (timer > 0)
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0)) // Left click for block attempt
             {
                 float elapsedTime = totalWindowDuration - timer;
                 Debug.Log(elapsedTime);
 
-                if (elapsedTime >= windowStart && elapsedTime <= windowEnd)
+                if (elapsedTime >= leftClickStart && elapsedTime <= leftClickEnd)
                 {
-                    Debug.Log("Within window");
+                    Debug.Log("Left click within window");
                     Debug.Log(elapsedTime);
+<<<<<<< Updated upstream
                     callback?.Invoke(true);
+=======
+                    callback?.Invoke(TimingEventResult.LeftClickSuccess);
+>>>>>>> Stashed changes
                     successCallbackCalled = true;
                 }
                 else
                 {
+<<<<<<< Updated upstream
                     callback?.Invoke(false);
+=======
+                    callback?.Invoke(TimingEventResult.Failure);
+                    yield break;
+                }
+            }
+
+            if (Input.GetMouseButtonDown(1)) // Right click for dodge attempt
+            {
+                float elapsedTime = totalWindowDuration - timer;
+                Debug.Log(elapsedTime);
+
+                if (elapsedTime >= rightClickStart && elapsedTime <= rightClickEnd)
+                {
+                    Debug.Log("Right click within window");
+                    Debug.Log(elapsedTime);
+                    callback?.Invoke(TimingEventResult.RightClickSuccess);
+                    successCallbackCalled = true;
+                }
+                else
+                {
+                    callback?.Invoke(TimingEventResult.Failure);
+>>>>>>> Stashed changes
                     yield break;
                 }
             }
 
             timer -= Time.deltaTime;
 
-            if (timer >= windowStart && timer <= windowEnd)
+            if (timer >= leftClickStart && timer <= leftClickEnd)
             {
-                Debug.Log("Starting Flash");
+                Debug.Log("Starting Flash for left click");
+                StartCoroutine(FlashWhite(player));
+            }
+
+            if (timer >= rightClickStart && timer <= rightClickEnd)
+            {
+                Debug.Log("Starting Flash for right click");
                 StartCoroutine(FlashWhite(player));
             }
 
@@ -153,6 +190,11 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+<<<<<<< Updated upstream
+=======
+
+
+>>>>>>> Stashed changes
     public IEnumerator FlashWhite(Character character)
     {
         character.spriteRenderer.color = Color.white;
