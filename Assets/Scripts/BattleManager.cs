@@ -1,22 +1,30 @@
 using System.Collections;
+using System;
 using UnityEngine;
 
 public class BattleManager : MonoBehaviour
 {
     public Character player;
     public Character enemy;
-    private BattleState state;  // State manager for player turns and enemy turns
-     public int enemyAttackCount = 0; //Counts how many times enemy has attacked, using for special skill activation testing
-
+    private BattleState state;
+    public int enemyAttackCount = 0;
     public enum BattleState
     {
         PlayerTurn,
         EnemyTurn
     }
 
+    public GameObject outerCircle;
+    public GameObject innerCircle;
+
+    private Vector3 outerCircleInitialScale;
+    private Vector3 innerCircleInitialScale;
+
     private void Start()
     {
-        state = BattleState.PlayerTurn;  // Start with the player's turn
+        state = BattleState.PlayerTurn;
+        outerCircleInitialScale = outerCircle.transform.localScale;
+        innerCircleInitialScale = innerCircle.transform.localScale;
     }
 
     public void PlayerAttack()
@@ -68,7 +76,7 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("test enemy attack performed - THis should not happen");
+            Debug.Log("test enemy attack performed - This should not happen");
             player.TakeDamage(enemy.damage);
         }
 
@@ -85,93 +93,89 @@ public class BattleManager : MonoBehaviour
     }
 
     public void EnemyAttack()
-{
-    if (!player.isAttacking && !enemy.isAttacking && state == BattleState.EnemyTurn)
     {
-        if (enemyAttackCount == 2)
+        if (!player.isAttacking && !enemy.isAttacking && state == BattleState.EnemyTurn)
         {
-            // Use special skill if the attack count is a multiple of attacksBeforeSpecial
-            enemy.currentSkill = enemy.specialSkill;
-        }
-        else
-        {
-            // Otherwise, use normal skill
             enemy.currentSkill = enemy.normalSkill;
+            StartCoroutine(EnemyAttackCoroutine());
+            enemyAttackCount++;
         }
-
-        StartCoroutine(EnemyAttackCoroutine());
-
-        enemyAttackCount++; // Increase the attack count after each attack
     }
-}
-
-
-
 
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<TimingEventResult> callback)
     {
-        float totalWindowDuration = windowEnd;
-        float timer = totalWindowDuration;
-        bool successCallbackCalled = false;
+        float totalWindowDuration = windowEnd - windowStart;
+        float timer = 0;
+        bool buttonClicked = false;
 
-        while (timer > 0)
+        // Start the inner circle at a very small size
+        Vector3 innerCircleInitialScale = new Vector3(0.01f, 0.01f, 0.01f);
+
+        try
         {
-            if (Input.GetMouseButtonDown(0))
+            while (timer < totalWindowDuration)
             {
-                float elapsedTime = totalWindowDuration - timer;
-                Debug.Log(elapsedTime);
+                float progress = timer / totalWindowDuration;
+                innerCircle.transform.localScale = Vector3.Lerp(innerCircleInitialScale, outerCircleInitialScale, progress);
 
-                if (elapsedTime >= windowStart && elapsedTime <= windowEnd)
+                if (Input.GetMouseButtonDown(0))
                 {
-                    Debug.Log("Within window");
-                    Debug.Log(elapsedTime);
-                    callback?.Invoke(TimingEventResult.Success);
-                    successCallbackCalled = true;
+                    buttonClicked = true;
                 }
-                else
-                {
-                    callback?.Invoke(TimingEventResult.Failure);
-                    yield break;
-                }
+
+                timer += Time.deltaTime;
+                yield return null;
             }
 
-            if (Input.GetMouseButtonDown(1))
+            TimingEventResult result;
+            if (buttonClicked)
             {
-                float elapsedTime = totalWindowDuration - timer;
-                Debug.Log(elapsedTime);
-
-                if (elapsedTime >= windowStart && elapsedTime <= windowEnd)
-                {
-                    Debug.Log("Within window");
-                    Debug.Log(elapsedTime);
-                    callback?.Invoke(TimingEventResult.RightClickSuccess);
-                    successCallbackCalled = true;
-                }
-                else
-                {
-                    callback?.Invoke(TimingEventResult.Failure);
-                    yield break;
-                }
+                result = GetTimingAccuracy(innerCircle.transform.localScale, outerCircle.transform.localScale);
+            }
+            else
+            {
+                Debug.Log("Timing Missed!");
+                result = TimingEventResult.Miss;
             }
 
-            timer -= Time.deltaTime;
-
-            if (timer >= windowStart && timer <= windowEnd)
-            {
-                Debug.Log("Starting Flash");
-                StartCoroutine(FlashWhite(player));
-            }
-
-            yield return null;
+            callback(result);
         }
-
-        // If timer has expired and success callback wasn't called, trigger failure callback
-        if (timer <= 0 && !successCallbackCalled)
+        finally
         {
-            callback?.Invoke(TimingEventResult.Failure);
+            // Reset the scale of the inner circle, ensuring it always happens even if the coroutine is interrupted
+            innerCircle.transform.localScale = innerCircleInitialScale;
         }
     }
 
+
+
+
+
+
+    private TimingEventResult GetTimingAccuracy(Vector3 innerCircleScale, Vector3 outerCircleScale)
+    {
+        float scaleRatio = innerCircleScale.x / outerCircleScale.x;
+        float perfectThreshold = 0.9f;
+        float greatThreshold = 0.75f;
+        float goodThreshold = 0.5f;
+
+        if (scaleRatio >= perfectThreshold)
+        {
+            return TimingEventResult.Perfect;
+        }
+        else if (scaleRatio >= greatThreshold)
+        {
+            return TimingEventResult.Great;
+        }
+        else if (scaleRatio >= goodThreshold)
+        {
+            return TimingEventResult.Good;
+        }
+        else
+        {
+            return TimingEventResult.Miss;
+        }
+    }
 
     public IEnumerator FlashWhite(Character character)
     {

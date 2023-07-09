@@ -4,10 +4,12 @@ using UnityEngine;
 
 
 
-    public enum TimingEventResult
+public enum TimingEventResult
 {
-    Success,
-    RightClickSuccess,
-    Failure
+    Perfect,
+    Great,
+    Good,
+    Miss
 }
+
 
