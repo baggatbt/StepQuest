@@ -47,6 +47,7 @@ public class Character : MonoBehaviour
         }
     }
 
+    /*
     public IEnumerator MoveToTarget()
     {
         originalPosition = transform.position;
@@ -75,6 +76,7 @@ public class Character : MonoBehaviour
             yield return null;
         }
     }
+    */
 
     public bool isAnimationDone = false;
 
