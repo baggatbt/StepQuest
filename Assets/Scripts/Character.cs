@@ -21,6 +21,7 @@ public class Character : MonoBehaviour
     public Skill specialSkill; //Enemies special skills
 
 
+
     private void Start()
     {
         animator = GetComponent<Animator>();
@@ -47,18 +48,6 @@ public class Character : MonoBehaviour
         }
     }
 
-
-    public bool isAnimationDone = false;
-
-    public void AnimationDone()
-    {
-        isAnimationDone = true;
-    }
-
-
-}
-
-/*
 public IEnumerator MoveToTarget()
 {
     originalPosition = transform.position;
@@ -87,5 +76,5 @@ private IEnumerator Move(Vector3 targetPosition, float speed)
         yield return null;
     }
 }
-*/
+}
 

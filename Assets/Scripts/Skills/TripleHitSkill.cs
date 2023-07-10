@@ -14,27 +14,27 @@ public class TripleHitSkill : Skill
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
         // First Timing Event
-        yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
+        yield return TimingWindow("Attack1Trigger",user, target, battleManager, 0.0f, 1.0f);
         HandleTimingResult(user, target);
         if (result == TimingEventResult.Miss)
             yield break;
 
         // Second Timing Event
-        yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
+        yield return TimingWindow("Attack2Trigger",user, target, battleManager, 0.0f, 1.0f);
         HandleTimingResult(user, target);
         if (result == TimingEventResult.Miss)
             yield break;
 
         // Third Timing Event
-        yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
+        yield return TimingWindow("Attack3Trigger",user, target, battleManager, 0.0f, 1.0f);
         HandleTimingResult(user, target);
-        // No need for a break here as we want the skill execution to end after this timing window regardless of the result
+        
     }
 
 
-    private IEnumerator TimingWindow(Character user, Character target, BattleManager battleManager, float windowStart, float windowEnd)
+    private IEnumerator TimingWindow(string trigger,Character user, Character target, BattleManager battleManager, float windowStart, float windowEnd)
     {
-        user.animator.SetTrigger("Attack1");
+        user.animator.SetTrigger(trigger);
         yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(windowStart, windowEnd, (timingResult) =>
         {
             result = timingResult;

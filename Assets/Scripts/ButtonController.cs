@@ -8,12 +8,12 @@ public class ButtonController : MonoBehaviour
 
     public void OnButtonClick()
 {
-    Debug.Log("Button clicked");
+  
     // Only initiate an attack if it's the player's turn and neither the player nor the enemy is currently attacking
     if (!battleManager.player.isAttacking && !battleManager.enemy.isAttacking)
     {
         // Set the current skill of the player
-        battleManager.player.currentSkill = new TripleHitSkill();
+        battleManager.player.currentSkill = new Slash();
         
         // Start the player's attack sequence
         battleManager.PlayerAttack();

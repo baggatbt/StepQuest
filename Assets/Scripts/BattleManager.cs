@@ -37,20 +37,22 @@ public class BattleManager : MonoBehaviour
 
     public IEnumerator PlayerAttackCoroutine(System.Action successCallback)
     {
-      //  yield return StartCoroutine(player.MoveToTarget());
+        yield return StartCoroutine(player.MoveToTarget());
         yield return new WaitUntil(() => player.isAttacking == false);
 
         if (player.currentSkill != null)
         {
+           
             yield return player.currentSkill.Execute(player, enemy, this);
+           
         }
         else
         {
             Debug.Log("Standard Attack Performed - This should not happen");
-            enemy.TakeDamage(player.damage);
+            
         }
 
-       // yield return StartCoroutine(player.ReturnToPosition());
+        yield return StartCoroutine(player.ReturnToPosition());
 
         if (enemy.health <= 0)
         {
@@ -65,7 +67,7 @@ public class BattleManager : MonoBehaviour
 
     public IEnumerator EnemyAttackCoroutine()
     {
-       // yield return StartCoroutine(enemy.MoveToTarget());
+        yield return StartCoroutine(enemy.MoveToTarget());
         yield return new WaitUntil(() => enemy.isAttacking == false);
 
         if (enemy.currentSkill != null)
@@ -80,7 +82,7 @@ public class BattleManager : MonoBehaviour
             player.TakeDamage(enemy.damage);
         }
 
-       // yield return StartCoroutine(enemy.ReturnToPosition());
+        yield return StartCoroutine(enemy.ReturnToPosition());
 
         if (player.health <= 0)
         {
