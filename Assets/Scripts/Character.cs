@@ -47,43 +47,45 @@ public class Character : MonoBehaviour
         }
     }
 
-    /*
-    public IEnumerator MoveToTarget()
-    {
-        originalPosition = transform.position;
-        isAttacking = true;
-
-        float offset = 1.5f;
-        Vector3 adjustedTarget = attackTarget.position - (transform.position - attackTarget.position).normalized * (GetComponent<CapsuleCollider2D>().size.x / 2 - offset);
-
-        yield return StartCoroutine(Move(adjustedTarget, 4f));
-
-        isAttacking = false;
-    }
-
-    public IEnumerator ReturnToPosition()
-    {
-        yield return StartCoroutine(Move(originalPosition, 4f));
-
-        isAttacking = false;
-    }
-
-    private IEnumerator Move(Vector3 targetPosition, float speed)
-    {
-        while ((transform.position - targetPosition).sqrMagnitude > Mathf.Epsilon)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
-            yield return null;
-        }
-    }
-    */
 
     public bool isAnimationDone = false;
 
     public void AnimationDone()
-    {   
-     isAnimationDone = true;
+    {
+        isAnimationDone = true;
     }
 
 
 }
+
+/*
+public IEnumerator MoveToTarget()
+{
+    originalPosition = transform.position;
+    isAttacking = true;
+
+    float offset = 1.5f;
+    Vector3 adjustedTarget = attackTarget.position - (transform.position - attackTarget.position).normalized * (GetComponent<CapsuleCollider2D>().size.x / 2 - offset);
+
+    yield return StartCoroutine(Move(adjustedTarget, 4f));
+
+    isAttacking = false;
+}
+
+public IEnumerator ReturnToPosition()
+{
+    yield return StartCoroutine(Move(originalPosition, 4f));
+
+    isAttacking = false;
+}
+
+private IEnumerator Move(Vector3 targetPosition, float speed)
+{
+    while ((transform.position - targetPosition).sqrMagnitude > Mathf.Epsilon)
+    {
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
+        yield return null;
+    }
+}
+*/
+
