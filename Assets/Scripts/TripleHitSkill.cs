@@ -34,7 +34,7 @@ public class TripleHitSkill : Skill
 
     private IEnumerator TimingWindow(Character user, Character target, BattleManager battleManager, float windowStart, float windowEnd)
     {
-        user.animator.SetTrigger("TripleHitTrigger");
+        user.animator.SetTrigger("Attack1");
         yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(windowStart, windowEnd, (timingResult) =>
         {
             result = timingResult;
