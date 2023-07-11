@@ -48,33 +48,39 @@ public class Character : MonoBehaviour
         }
     }
 
-public IEnumerator MoveToTarget()
-{
-    originalPosition = transform.position;
-    isAttacking = true;
+    /*public IEnumerator MoveToTarget()
+    {
+        originalPosition = transform.position;
+        isAttacking = true;
 
-    float offset = 1.5f;
-    Vector3 adjustedTarget = attackTarget.position - (transform.position - attackTarget.position).normalized * (GetComponent<CapsuleCollider2D>().size.x / 2 - offset);
+        Vector3 targetPosition = new Vector3(attackTarget.position.x, attackTarget.position.y, transform.position.z);
 
-    yield return StartCoroutine(Move(adjustedTarget, 4f));
+        yield return StartCoroutine(Move(targetPosition, 4f));
 
-    isAttacking = false;
-}
+        isAttacking = false;
+    }
 
-public IEnumerator ReturnToPosition()
+
+
+
+
+    public IEnumerator ReturnToPosition()
 {
     yield return StartCoroutine(Move(originalPosition, 4f));
 
     isAttacking = false;
 }
 
-private IEnumerator Move(Vector3 targetPosition, float speed)
-{
-    while ((transform.position - targetPosition).sqrMagnitude > Mathf.Epsilon)
+    private IEnumerator Move(Vector3 targetPosition, float speed)
     {
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
-        yield return null;
+        while ((transform.position - targetPosition).sqrMagnitude > 0.01f) // using sqrMagnitude for performance reasons
+        {
+            Vector3 direction = (targetPosition - transform.position).normalized;
+            transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
+            yield return null;
+        }
     }
-}
+    */
+
 }
 

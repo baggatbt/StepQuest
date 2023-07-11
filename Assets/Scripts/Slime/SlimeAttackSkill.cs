@@ -16,7 +16,7 @@ public class SlimeAttackSkill : Skill
         user.animator.SetTrigger("SlimeAttackTrigger");
 
         // Create a timing window for the player to reduce damage
-        yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(0.2f, 0.5f, (result) =>
+        yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(0.0f, 1.0f, (result) =>
         {
             if (result == TimingEventResult.Perfect)
             {
