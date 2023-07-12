@@ -13,6 +13,7 @@ public class TripleHitSkill : Skill
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
+        
         // First Timing Event
         yield return TimingWindow("Attack1Trigger",user, target, battleManager, 0.0f, 1.0f);
         HandleTimingResult(user, target);
@@ -32,18 +33,19 @@ public class TripleHitSkill : Skill
         // Third Timing Event
         yield return TimingWindow("Attack3Trigger",user, target, battleManager, 0.0f, 1.0f);
         HandleTimingResult(user, target);
-        yield return user.animationEnded == false;
+        yield return user.animationEnded == false; //Resets the animation flag
         
     }
 
 
     private IEnumerator TimingWindow(string trigger,Character user, Character target, BattleManager battleManager, float windowStart, float windowEnd)
     {
-        user.animator.SetTrigger(trigger);
+       
         yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(windowStart, windowEnd, (timingResult) =>
         {
             result = timingResult;
         }));
+         user.animator.SetTrigger(trigger);
     }
 
 

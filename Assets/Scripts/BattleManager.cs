@@ -26,6 +26,10 @@ public class BattleManager : MonoBehaviour
         state = BattleState.PlayerTurn;
         outerCircleInitialScale = outerCircle.transform.localScale;
         innerCircleInitialScale = innerCircle.transform.localScale;
+
+         // Dont show the timing circle yet
+        outerCircle.SetActive(false);
+        innerCircle.SetActive(false);
     }
 
     public void PlayerAttack()
@@ -100,6 +104,10 @@ public class BattleManager : MonoBehaviour
 
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<TimingEventResult> callback)
 {
+      // Enable the timing circles when the event starts
+        outerCircle.SetActive(true);
+        innerCircle.SetActive(true);
+
     float totalWindowDuration = windowEnd - windowStart;
     float timer = 0;
     bool buttonClicked = false;
@@ -150,6 +158,9 @@ public class BattleManager : MonoBehaviour
         // Reset the scale of the inner circle, ensuring it always happens even if the coroutine is interrupted
         innerCircle.transform.localScale = innerCircleInitialScale;
     }
+    // Disable the timing circles when the event ends
+        outerCircle.SetActive(false);
+        innerCircle.SetActive(false);
 }
 
 
