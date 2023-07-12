@@ -107,55 +107,50 @@ public class BattleManager : MonoBehaviour
     }
 
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<TimingEventResult> callback)
+{
+    float totalWindowDuration = windowEnd - windowStart;
+    float timer = 0;
+
+    // Start the inner circle at a very small size
+    Vector3 innerCircleInitialScale = new Vector3(0.01f, 0.01f, 0.01f);
+
+    try
     {
-        float totalWindowDuration = windowEnd - windowStart;
-        float timer = 0;
-        bool buttonClicked = false;
-
-        // Start the inner circle at a very small size
-        Vector3 innerCircleInitialScale = new Vector3(0.01f, 0.01f, 0.01f);
-
-        try
+        while (timer < totalWindowDuration)
         {
-            while (timer < totalWindowDuration)
+            float progress = timer / totalWindowDuration;
+            innerCircle.transform.localScale = Vector3.Lerp(innerCircleInitialScale, outerCircleInitialScale, progress);
+
+            if (Input.GetMouseButtonDown(0))
             {
-                float progress = timer / totalWindowDuration;
-                innerCircle.transform.localScale = Vector3.Lerp(innerCircleInitialScale, outerCircleInitialScale, progress);
-
-                if (Input.GetMouseButtonDown(0))
-                {
-                    buttonClicked = true;
-                }
-
-                timer += Time.deltaTime;
-                yield return null;
+                break;
             }
 
-            TimingEventResult result;
-            if (buttonClicked)
-            {
-                result = GetTimingAccuracy(innerCircle.transform.localScale, outerCircle.transform.localScale);
-            }
-            else
-            {
-                Debug.Log("Timing Missed!");
-                result = TimingEventResult.Miss;
-            }
-
-            callback(result);
+            timer += Time.deltaTime;
+            yield return null;
         }
-        finally
+
+        TimingEventResult result;
+        if (timer >= windowStart)
         {
-            // Reset the scale of the inner circle, ensuring it always happens even if the coroutine is interrupted
-            innerCircle.transform.localScale = innerCircleInitialScale;
+            result = GetTimingAccuracy(innerCircle.transform.localScale, outerCircle.transform.localScale);
         }
+        else
+        {
+            Debug.Log("Timing Missed!");
+            result = TimingEventResult.Miss;
+        }
+
+        callback(result);
     }
+    finally
+    {
+        // Reset the scale of the inner circle, ensuring it always happens even if the coroutine is interrupted
+        innerCircle.transform.localScale = innerCircleInitialScale;
+    }
+}
 
-
-
-
-
-
+    
     private TimingEventResult GetTimingAccuracy(Vector3 innerCircleScale, Vector3 outerCircleScale)
     {
         float scaleRatio = innerCircleScale.x / outerCircleScale.x;

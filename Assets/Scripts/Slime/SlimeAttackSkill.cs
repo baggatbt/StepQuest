@@ -16,7 +16,7 @@ public class SlimeAttackSkill : Skill
         user.animator.SetTrigger("SlimeAttackTrigger");
 
         // Create a timing window for the player to reduce damage
-        yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(0.0f, 1.0f, (result) =>
+        yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(0.5f, 1.0f, (result) =>
         {
             if (result == TimingEventResult.Perfect)
             {
@@ -26,12 +26,12 @@ public class SlimeAttackSkill : Skill
             else if (result == TimingEventResult.Great)
             {
                 Debug.Log("Great Timing! Damage reduced, but not as much.");
-                target.TakeDamage(user.damage - 2);
+                target.TakeDamage(user.damage -1);
             }
             else if (result == TimingEventResult.Good)
             {
                 Debug.Log("Good Timing! Damage reduced, but not by much.");
-                target.TakeDamage(user.damage - 1);
+                target.TakeDamage(user.damage);
             }
             else if (result == TimingEventResult.Miss)
             {
