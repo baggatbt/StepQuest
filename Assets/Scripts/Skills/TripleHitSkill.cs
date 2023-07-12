@@ -19,11 +19,15 @@ public class TripleHitSkill : Skill
         if (result == TimingEventResult.Miss)
             yield break;
 
+            yield return new WaitForSeconds(1.0f); // delay before next timing event
+
         // Second Timing Event
         yield return TimingWindow("Attack2Trigger",user, target, battleManager, 0.0f, 1.0f);
         HandleTimingResult(user, target);
         if (result == TimingEventResult.Miss)
             yield break;
+
+            yield return new WaitForSeconds(1.0f); // delay before next timing event
 
         // Third Timing Event
         yield return TimingWindow("Attack3Trigger",user, target, battleManager, 0.0f, 1.0f);
@@ -50,17 +54,13 @@ public class TripleHitSkill : Skill
                 Debug.Log("Perfect Hit!");
                 target.TakeDamage(1);
                 break;
-            case TimingEventResult.Great:
-                Debug.Log("Great Hit!");
-                target.TakeDamage(1);
-                break;
             case TimingEventResult.Good:
                 Debug.Log("Good Hit!");
                 target.TakeDamage(1);
                 break;
             case TimingEventResult.Miss:
                 Debug.Log("Missed!");
-                user.animator.SetTrigger("CancelAnimation");
+                user.animator.SetTrigger("AttackFailTrigger");
                 break;
         }
     }

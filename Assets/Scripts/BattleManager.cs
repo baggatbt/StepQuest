@@ -19,6 +19,7 @@ public class BattleManager : MonoBehaviour
 
     private Vector3 outerCircleInitialScale;
     private Vector3 innerCircleInitialScale;
+    
 
     private void Start()
     {
@@ -31,28 +32,24 @@ public class BattleManager : MonoBehaviour
     {
         if (state == BattleState.PlayerTurn && !player.isAttacking && !enemy.isAttacking)
         {
+            
             StartCoroutine(PlayerAttackCoroutine(null));
+            
         }
     }
 
-    public IEnumerator PlayerAttackCoroutine(System.Action successCallback)
+     public IEnumerator PlayerAttackCoroutine(System.Action successCallback)
     {
-       // yield return StartCoroutine(player.MoveToTarget());
-        yield return new WaitUntil(() => player.isAttacking == false);
+        yield return new WaitUntil(() => enemy.isAttacking == false);
 
         if (player.currentSkill != null)
         {
-           
             yield return player.currentSkill.Execute(player, enemy, this);
-           
         }
         else
         {
             Debug.Log("Standard Attack Performed - This should not happen");
-            
         }
-
-       // yield return StartCoroutine(player.ReturnToPosition());
 
         if (enemy.health <= 0)
         {
@@ -66,24 +63,19 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    public IEnumerator EnemyAttackCoroutine()
+     public IEnumerator EnemyAttackCoroutine()
     {
-        //yield return StartCoroutine(enemy.MoveToTarget());
-        yield return new WaitUntil(() => enemy.isAttacking == false);
+        yield return new WaitUntil(() => player.isAttacking == false);
 
         if (enemy.currentSkill != null)
         {
-            Debug.Log("Enemy begins executing skill");
             yield return enemy.currentSkill.Execute(enemy, player, this);
-            Debug.Log("Enemy has finished executing skill");
         }
         else
         {
-            Debug.Log("test enemy attack performed - This should not happen");
+            Debug.Log("Standard Attack Performed - This should not happen");
             player.TakeDamage(enemy.damage);
         }
-
-       // yield return StartCoroutine(enemy.ReturnToPosition());
 
         if (player.health <= 0)
         {
@@ -110,6 +102,7 @@ public class BattleManager : MonoBehaviour
 {
     float totalWindowDuration = windowEnd - windowStart;
     float timer = 0;
+    bool buttonClicked = false;
 
     // Start the inner circle at a very small size
     Vector3 innerCircleInitialScale = new Vector3(0.01f, 0.01f, 0.01f);
@@ -123,6 +116,7 @@ public class BattleManager : MonoBehaviour
 
             if (Input.GetMouseButtonDown(0))
             {
+                buttonClicked = true;
                 break;
             }
 
@@ -131,13 +125,21 @@ public class BattleManager : MonoBehaviour
         }
 
         TimingEventResult result;
-        if (timer >= windowStart)
+        if (buttonClicked)
         {
-            result = GetTimingAccuracy(innerCircle.transform.localScale, outerCircle.transform.localScale);
+            if (timer >= windowStart)
+            {
+                result = GetTimingAccuracy(innerCircle.transform.localScale, outerCircle.transform.localScale);
+            }
+            else
+            {
+                Debug.Log("Timing Missed!");
+                result = TimingEventResult.Miss;
+            }
         }
         else
         {
-            Debug.Log("Timing Missed!");
+            Debug.Log("No input detected. Missed!");
             result = TimingEventResult.Miss;
         }
 
@@ -150,21 +152,17 @@ public class BattleManager : MonoBehaviour
     }
 }
 
+
     
     private TimingEventResult GetTimingAccuracy(Vector3 innerCircleScale, Vector3 outerCircleScale)
     {
         float scaleRatio = innerCircleScale.x / outerCircleScale.x;
         float perfectThreshold = 0.9f;
-        float greatThreshold = 0.75f;
         float goodThreshold = 0.5f;
 
         if (scaleRatio >= perfectThreshold)
         {
             return TimingEventResult.Perfect;
-        }
-        else if (scaleRatio >= greatThreshold)
-        {
-            return TimingEventResult.Great;
         }
         else if (scaleRatio >= goodThreshold)
         {

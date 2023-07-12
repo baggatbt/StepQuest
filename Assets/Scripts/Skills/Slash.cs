@@ -16,7 +16,7 @@ public class Slash : Skill
     {
         user.animator.SetTrigger("Attack1Trigger");
 
-        if (result == TimingEventResult.Perfect || result == TimingEventResult.Great || result == TimingEventResult.Good)
+        if (result == TimingEventResult.Perfect || result == TimingEventResult.Good)
         {
             target.TakeDamage(2);
             Debug.Log("Slash successful! " + target.name + " takes 2 damage.");

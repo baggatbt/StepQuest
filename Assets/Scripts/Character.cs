@@ -14,6 +14,8 @@ public class Character : MonoBehaviour
     public bool isAttacking = false;
     public SpriteRenderer spriteRenderer;
     public Animator animator;
+
+    public bool animationEnded = false;
     public Skill currentSkill; // Property to store the current skill being used by the character
     public List<Skill> skills = new List<Skill>(); //List of the skills available to the character
     public int attacksBeforeSpecial; //Number of attacks that must be used before enemy uses a special
@@ -48,7 +50,13 @@ public class Character : MonoBehaviour
         }
     }
 
-    /*public IEnumerator MoveToTarget()
+     public void AnimationEnded()
+    {
+        animationEnded = true;
+    }
+
+/*
+    public IEnumerator MoveToTarget()
     {
         originalPosition = transform.position;
         isAttacking = true;
@@ -80,7 +88,7 @@ public class Character : MonoBehaviour
             yield return null;
         }
     }
-    */
-
+    
+*/
 }
 

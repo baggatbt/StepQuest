@@ -7,7 +7,6 @@ using UnityEngine;
 public enum TimingEventResult
 {
     Perfect,
-    Great,
     Good,
     Miss
 }
