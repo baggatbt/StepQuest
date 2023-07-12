@@ -15,7 +15,7 @@ public class Character : MonoBehaviour
     public SpriteRenderer spriteRenderer;
     public Animator animator;
 
-    public bool animationEnded = false;
+    public bool animationEnded;
     public Skill currentSkill; // Property to store the current skill being used by the character
     public List<Skill> skills = new List<Skill>(); //List of the skills available to the character
     public int attacksBeforeSpecial; //Number of attacks that must be used before enemy uses a special

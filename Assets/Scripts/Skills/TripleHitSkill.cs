@@ -19,7 +19,7 @@ public class TripleHitSkill : Skill
         if (result == TimingEventResult.Miss)
             yield break;
 
-            yield return new WaitForSeconds(1.0f); // delay before next timing event
+            yield return  user.animationEnded == true;
 
         // Second Timing Event
         yield return TimingWindow("Attack2Trigger",user, target, battleManager, 0.0f, 1.0f);
@@ -27,11 +27,12 @@ public class TripleHitSkill : Skill
         if (result == TimingEventResult.Miss)
             yield break;
 
-            yield return new WaitForSeconds(1.0f); // delay before next timing event
+            yield return  user.animationEnded == true;
 
         // Third Timing Event
         yield return TimingWindow("Attack3Trigger",user, target, battleManager, 0.0f, 1.0f);
         HandleTimingResult(user, target);
+        yield return user.animationEnded == false;
         
     }
 
