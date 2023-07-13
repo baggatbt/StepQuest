@@ -12,7 +12,7 @@ public class Slash : Skill
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
 {
-    yield return battleManager.PlayerActiveTimeEvent(0.5f, 1.0f, (result) =>
+    yield return battleManager.PlayerActiveTimeEvent(0.0f, 1.0f, (result) =>
     {
         user.animator.SetTrigger("Attack1Trigger");
 
@@ -20,11 +20,13 @@ public class Slash : Skill
         {
             target.TakeDamage(2);
             Debug.Log("Slash successful! " + target.name + " takes 2 damage.");
+            user.animator.SetTrigger("AttackFailTrigger");
         }
         else
         {
             target.TakeDamage(1);
             Debug.Log("Slash missed! " + target.name + " takes 1 damage.");
+            user.animator.SetTrigger("AttackFailTrigger");
         }
     });
 
