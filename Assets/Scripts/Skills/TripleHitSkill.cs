@@ -15,50 +15,52 @@ public class TripleHitSkill : Skill
     {
         
         // First Timing Event
-        yield return TimingWindow("Attack1Trigger",user, target, battleManager, 0.0f, 1.0f);
-        HandleTimingResult(user, target);
+        yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
+        HandleTimingResult(user, target, "Attack1Trigger");
         if (result == TimingEventResult.Miss)
             yield break;
 
             yield return  user.animationEnded == true;
 
         // Second Timing Event
-        yield return TimingWindow("Attack2Trigger",user, target, battleManager, 0.0f, 1.0f);
-        HandleTimingResult(user, target);
+        yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
+        HandleTimingResult(user, target,"Attack2Trigger");
         if (result == TimingEventResult.Miss)
             yield break;
 
             yield return  user.animationEnded == true;
 
         // Third Timing Event
-        yield return TimingWindow("Attack3Trigger",user, target, battleManager, 0.0f, 1.0f);
-        HandleTimingResult(user, target);
+        yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
+        HandleTimingResult(user, target, "Attack3Trigger");
         yield return user.animationEnded == false; //Resets the animation flag
         
     }
 
 
-    private IEnumerator TimingWindow(string trigger,Character user, Character target, BattleManager battleManager, float windowStart, float windowEnd)
+    private IEnumerator TimingWindow(Character user, Character target, BattleManager battleManager, float windowStart, float windowEnd)
     {
        
         yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(windowStart, windowEnd, (timingResult) =>
         {
             result = timingResult;
         }));
-         user.animator.SetTrigger(trigger);
+         
     }
 
 
-    private void HandleTimingResult(Character user, Character target)
+    private void HandleTimingResult(Character user, Character target, string trigger)
     {
         switch (result)
         {
             case TimingEventResult.Perfect:
                 Debug.Log("Perfect Hit!");
+                user.animator.SetTrigger(trigger);
                 target.TakeDamage(1);
                 break;
             case TimingEventResult.Good:
                 Debug.Log("Good Hit!");
+                user.animator.SetTrigger(trigger);
                 target.TakeDamage(1);
                 break;
             case TimingEventResult.Miss:
