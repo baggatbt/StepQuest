@@ -8,6 +8,9 @@ public class BattleManager : MonoBehaviour
     public Character enemy;
     private BattleState state;
     public int enemyAttackCount = 0;
+
+    public HoldReleaseSlider holdReleaseSlider;
+
     public enum BattleState
     {
         PlayerTurn,
@@ -194,6 +197,8 @@ public class BattleManager : MonoBehaviour
     bool buttonHeld = false;
     bool buttonReleased = false;
 
+    holdReleaseSlider.ResetSlider(); // Reset the slider at the start of the hold and release event
+
     while (holdTimer < totalHoldDuration)
     {
         if (Input.GetMouseButtonDown(0))
@@ -203,6 +208,10 @@ public class BattleManager : MonoBehaviour
         }
 
         holdTimer += Time.deltaTime;
+
+        // Update the slider value as the hold time increases
+        holdReleaseSlider.UpdateSlider(holdTimer / totalHoldDuration);
+
         yield return null;
     }
 
@@ -224,6 +233,10 @@ public class BattleManager : MonoBehaviour
             }
 
             releaseTimer += Time.deltaTime;
+
+            // Update the slider value as the release time increases
+            holdReleaseSlider.UpdateSlider(releaseTimer / totalReleaseDuration);
+
             yield return null;
         }
 
@@ -248,6 +261,7 @@ public class BattleManager : MonoBehaviour
     }
 
     callback(result);
+    holdReleaseSlider.ResetSlider(); // Reset the slider at the end of the hold and release event
 }
 
     public IEnumerator FlashWhite(Character character)
