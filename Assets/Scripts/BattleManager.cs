@@ -185,6 +185,71 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    public IEnumerator PlayerHoldReleaseTimeEvent(float holdStart, float releaseStart, float releaseEnd, Action<TimingEventResult> callback)
+{
+    float totalHoldDuration = releaseEnd - holdStart;
+    float totalReleaseDuration = releaseEnd - releaseStart;
+    float holdTimer = 0;
+    float releaseTimer = 0;
+    bool buttonHeld = false;
+    bool buttonReleased = false;
+
+    while (holdTimer < totalHoldDuration)
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            buttonHeld = true;
+            break;
+        }
+
+        holdTimer += Time.deltaTime;
+        yield return null;
+    }
+
+    TimingEventResult result;
+
+    if (!buttonHeld)
+    {
+        Debug.Log("Button was not held. Missed!");
+        result = TimingEventResult.Miss;
+    }
+    else
+    {
+        while (releaseTimer < totalReleaseDuration)
+        {
+            if (Input.GetMouseButtonUp(0))
+            {
+                buttonReleased = true;
+                break;
+            }
+
+            releaseTimer += Time.deltaTime;
+            yield return null;
+        }
+
+        if (!buttonReleased)
+        {
+            Debug.Log("Button was not released. Good!");
+            result = TimingEventResult.Good;
+        }
+        else
+        {
+            if (releaseTimer < totalReleaseDuration / 2)
+            {
+                Debug.Log("Button was released early. Miss!");
+                result = TimingEventResult.Miss;
+            }
+            else
+            {
+                Debug.Log("Button was released at perfect time. Perfect!");
+                result = TimingEventResult.Perfect;
+            }
+        }
+    }
+
+    callback(result);
+}
+
     public IEnumerator FlashWhite(Character character)
     {
         character.spriteRenderer.color = Color.white;

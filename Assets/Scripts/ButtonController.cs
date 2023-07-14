@@ -11,6 +11,7 @@ public class ButtonController : MonoBehaviour
     {
         Slash,
         TripleHit, // Add more as needed...
+        SwordWave,
     }
 
     private Skill skill;
@@ -25,6 +26,10 @@ public class ButtonController : MonoBehaviour
 
             case SkillType.TripleHit:
                 skill = new TripleHitSkill();
+                break;
+
+            case SkillType.SwordWave:
+                skill = new SwordWave();
                 break;
 
             // Add more cases as needed...
