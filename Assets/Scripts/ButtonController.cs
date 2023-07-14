@@ -6,6 +6,8 @@ public class ButtonController : MonoBehaviour
 {
     public BattleManager battleManager;
     public SkillType skillType; // Skill type that this button will trigger.
+    public GameObject swordWavePrefab; // assign this in the Inspector
+
 
     public enum SkillType
     {
@@ -29,8 +31,9 @@ public class ButtonController : MonoBehaviour
                 break;
 
             case SkillType.SwordWave:
-                skill = new SwordWave();
+                skill = new SwordWave(swordWavePrefab);
                 break;
+
 
             // Add more cases as needed...
 
