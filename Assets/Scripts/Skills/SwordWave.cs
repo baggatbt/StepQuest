@@ -10,12 +10,16 @@ public class SwordWave : Skill
         description = "Release a powerful wave from your sword.";
     }
 
+    public GameObject swordWavePrefab; //Assign this in the Inspector 
+
+
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
-        yield return user.MoveToTarget();
-        yield return battleManager.PlayerHoldReleaseTimeEvent(0.0f, 0.5f, 1.0f, (result) =>
+        
+        yield return battleManager.PlayerHoldReleaseTimeEvent(0.0f, 0.0f, 1.0f, (result) =>
         {
-            user.animator.SetTrigger("Attack1Trigger");
+            user.animator.SetTrigger("SwordWaveTrigger");
+           
 
             switch (result)
             {
@@ -38,8 +42,8 @@ public class SwordWave : Skill
             }
         });
 
-        yield return new WaitForSeconds(0.5f);
-        yield return user.ReturnToPosition();
+      
+  
         skillExecutionComplete = true;
     }
 }
