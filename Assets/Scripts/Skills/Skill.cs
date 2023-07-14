@@ -19,4 +19,8 @@ public abstract class Skill
     public List<AttackStage> attackStages;
 
     public abstract IEnumerator Execute(Character user, Character target, BattleManager battleManager);
+
+
+
+    
 }
