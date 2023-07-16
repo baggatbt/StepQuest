@@ -24,7 +24,7 @@ public class Character : MonoBehaviour
 
 
 
-    private void Start()
+    protected virtual void Start()
     {
         animator = GetComponent<Animator>();
         health = maxHealth;
