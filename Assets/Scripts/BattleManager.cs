@@ -188,81 +188,53 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    public IEnumerator PlayerHoldReleaseTimeEvent(float holdStart, float releaseStart, float releaseEnd, Action<TimingEventResult> callback)
-{
-    float totalHoldDuration = releaseEnd - holdStart;
-    float totalReleaseDuration = releaseEnd - releaseStart;
-    float holdTimer = 0;
-    float releaseTimer = 0;
-    bool buttonHeld = false;
-    bool buttonReleased = false;
-
-    holdReleaseSlider.ResetSlider(); // Reset the slider at the start of the hold and release event
-
-    while (holdTimer < totalHoldDuration)
+    public IEnumerator PlayerHoldReleaseTimeEvent(float holdStart, float holdEnd, Action<TimingEventResult> callback)
     {
-        if (Input.GetMouseButtonDown(0))
+        float totalHoldDuration = holdEnd - holdStart;
+        float holdTimer = 0;
+
+        holdReleaseSlider.ResetSlider(); // Reset the slider at the start of the hold event
+
+        while (holdTimer < totalHoldDuration)
         {
-            buttonHeld = true;
-            break;
-        }
-
-        holdTimer += Time.deltaTime;
-
-        // Update the slider value as the hold time increases
-        holdReleaseSlider.UpdateSlider(holdTimer / totalHoldDuration);
-
-        yield return null;
-    }
-
-    TimingEventResult result;
-
-    if (!buttonHeld)
-    {
-        Debug.Log("Button was not held. Missed!");
-        result = TimingEventResult.Miss;
-    }
-    else
-    {
-        while (releaseTimer < totalReleaseDuration)
-        {
-            if (Input.GetMouseButtonUp(0))
+            if (Input.GetMouseButton(0)) // Button is currently held down
             {
-                buttonReleased = true;
-                break;
+                holdTimer += Time.deltaTime;
+
+                // Update the slider value as the hold time increases
+                holdReleaseSlider.UpdateSlider(holdTimer / totalHoldDuration);
             }
 
-            releaseTimer += Time.deltaTime;
-
-            // Update the slider value as the release time increases
-            holdReleaseSlider.UpdateSlider(releaseTimer / totalReleaseDuration);
+            if (Input.GetMouseButtonUp(0)) // Button was just released
+            {
+                break;
+            }
 
             yield return null;
         }
 
-        if (!buttonReleased)
+        TimingEventResult result;
+
+        if (holdTimer < totalHoldDuration / 3)
         {
-            Debug.Log("Button was not released. Good!");
+            Debug.Log("Button was released too early. Miss!");
+            result = TimingEventResult.Miss;
+        }
+        else if (holdTimer < 2 * totalHoldDuration / 3)
+        {
+            Debug.Log("Button was released early. Good!");
             result = TimingEventResult.Good;
         }
         else
         {
-            if (releaseTimer < totalReleaseDuration / 2)
-            {
-                Debug.Log("Button was released early. Miss!");
-                result = TimingEventResult.Miss;
-            }
-            else
-            {
-                Debug.Log("Button was released at perfect time. Perfect!");
-                result = TimingEventResult.Perfect;
-            }
+            Debug.Log("Button was held for the full duration. Perfect!");
+            result = TimingEventResult.Perfect;
         }
+
+        callback(result);
+        holdReleaseSlider.ResetSlider(); // Reset the slider at the end of the hold event
     }
 
-    callback(result);
-    holdReleaseSlider.ResetSlider(); // Reset the slider at the end of the hold and release event
-}
 
     public IEnumerator FlashWhite(Character character)
     {
