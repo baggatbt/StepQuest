@@ -58,34 +58,54 @@ public class Character : MonoBehaviour
 
 
     public IEnumerator MoveToTarget()
-    {
-        originalPosition = transform.position;
-        isAttacking = true;
-
-        Vector3 targetPosition = new Vector3(attackTarget.position.x, attackTarget.position.y, transform.position.z);
-
-        yield return StartCoroutine(Move(targetPosition, 6.0f));
-
-        isAttacking = false;
-    }
-
-
-    public IEnumerator ReturnToPosition()
 {
-    yield return StartCoroutine(Move(originalPosition, 6.0f));
+    originalPosition = transform.position;
+   
+    Vector3 targetPosition = new Vector3(attackTarget.position.x, transform.position.y, transform.position.z);
 
-    isAttacking = false;
+    yield return StartCoroutine(Move(targetPosition, 6.0f));
+
+
+
+    
 }
 
-    private IEnumerator Move(Vector3 targetPosition, float speed)
+public IEnumerator ReturnToPosition()
+{
+    yield return StartCoroutine(Move(originalPosition, 6.0f));
+}
+
+ private IEnumerator Move(Vector3 targetPosition, float speed)
+{
+    
+    float stoppingDistance = 0.1f; // Adjust this value to control the stopping distance
+
+    while ((transform.position - targetPosition).sqrMagnitude > stoppingDistance * stoppingDistance)
     {
-        while ((transform.position - targetPosition).sqrMagnitude > 0.01f) // using sqrMagnitude for performance reasons
+        Vector3 direction = (targetPosition - transform.position).normalized;
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
+
+        // Check for collision with enemy
+        Collider2D[] colliders = Physics2D.OverlapCapsuleAll(transform.position, GetComponent<CapsuleCollider2D>().size, GetComponent<CapsuleCollider2D>().direction, 0f);
+        foreach (Collider2D collider in colliders)
         {
-            Vector3 direction = (targetPosition - transform.position).normalized;
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
-            yield return null;
+            if (collider.CompareTag("Enemy"))
+            {
+                StopMoving();
+                yield break; // Exit the coroutine
+            }
         }
+
+        yield return null;
     }
+}
+
+
+public void StopMoving()
+{
+    StopAllCoroutines();
+}
+
     
 
 }

@@ -8,13 +8,15 @@ public class Slash : Skill
     {
         name = "Slash";
         description = "A powerful slashing attack.";
+        requiresMovement = true;
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
-{   // yield return user.MoveToTarget();
+{   
     yield return battleManager.PlayerActiveTimeEvent(0.0f, 1.0f, (result) =>
     {
         user.animator.SetTrigger("Attack1Trigger");
+        user.isAttacking = true;
 
         if (result == TimingEventResult.Perfect || result == TimingEventResult.Good)
         {
@@ -33,7 +35,8 @@ public class Slash : Skill
         }
     });
     yield return new WaitForSeconds(0.5f); //The delay util the player attacks
-   // yield return user.ReturnToPosition();
+    
     skillExecutionComplete = true;
+    user.isAttacking = false;
 }
 }

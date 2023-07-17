@@ -48,32 +48,45 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-     public IEnumerator PlayerAttackCoroutine(System.Action successCallback)
+    public IEnumerator PlayerAttackCoroutine(System.Action successCallback)
+{
+    yield return new WaitUntil(() => enemy.isAttacking == false);
+
+    if (player.currentSkill != null)
     {
-        yield return new WaitUntil(() => enemy.isAttacking == false);
+        // Move to the target before executing the attack
+        
+        if (player.currentSkill.requiresMovement){
+        yield return player.MoveToTarget();
+        }
+        
+        // Execute the attack
+        yield return player.currentSkill.Execute(player, enemy, this);
 
-        if (player.currentSkill != null)
-        {
-            yield return player.currentSkill.Execute(player, enemy, this);
-        }
-        else
-        {
-            Debug.Log("Standard Attack Performed - This should not happen");
-        }
+        yield return new WaitUntil(() => !player.isAttacking);
 
-        if (enemy.health <= 0)
-        {
-            Debug.Log("You win, let's celebrate");
-            endOfBattlePanel.SetActive(true);
-        }
-        else
-        {
-            
-            state = BattleState.EnemyTurn;
-           yield return new WaitForSeconds(1.0f); //The delay util the enemy attacks
-            EnemyAttack();
-        }
+        // Return to the original position after the attack
+        yield return player.ReturnToPosition();
     }
+    else
+    {
+        Debug.Log("Standard Attack Performed - This should not happen");
+    }
+
+    if (enemy.health <= 0)
+    {
+        Debug.Log("You win, let's celebrate");
+        endOfBattlePanel.SetActive(true);
+    }
+    else
+    {
+        state = BattleState.EnemyTurn;
+        yield return new WaitForSeconds(1.0f); // The delay until the enemy attacks
+        EnemyAttack();
+    }
+}
+
+
 
      public IEnumerator EnemyAttackCoroutine()
     {
