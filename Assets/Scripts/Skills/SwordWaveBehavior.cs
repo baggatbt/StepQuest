@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SwordWaveBehavior : MonoBehaviour
 {
-    public float speed = 25f; // You can adjust the speed to whatever you like.
+    public float speed = 10f; // You can adjust the speed to whatever you like.
 
     void Update()
     {

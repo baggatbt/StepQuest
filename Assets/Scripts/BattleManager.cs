@@ -1,5 +1,6 @@
 using System.Collections;
 using System;
+using UnityEngine.SceneManagement;
 using UnityEngine;
 
 public class BattleManager : MonoBehaviour
@@ -19,6 +20,8 @@ public class BattleManager : MonoBehaviour
 
     public GameObject outerCircle;
     public GameObject innerCircle;
+
+    public GameObject endOfBattlePanel;
 
     private Vector3 outerCircleInitialScale;
     private Vector3 innerCircleInitialScale;
@@ -61,11 +64,13 @@ public class BattleManager : MonoBehaviour
         if (enemy.health <= 0)
         {
             Debug.Log("You win, let's celebrate");
+            endOfBattlePanel.SetActive(true);
         }
         else
         {
+            
             state = BattleState.EnemyTurn;
-            yield return new WaitForSeconds(1.5f); //The delay util the enemy attacks
+           yield return new WaitForSeconds(1.0f); //The delay util the enemy attacks
             EnemyAttack();
         }
     }
@@ -87,6 +92,7 @@ public class BattleManager : MonoBehaviour
         if (player.health <= 0)
         {
             Debug.Log("You lose ya jabroni");
+            SceneManager.LoadScene("CharacterInfoPage");
         }
         else
         {

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Character : MonoBehaviour 
 {
@@ -43,10 +44,10 @@ public class Character : MonoBehaviour
     {
         health -= damage;
         healthBar.value = health;
-        animator.SetTrigger("Attack1Trigger");
         if (health <= 0) 
         {
             Destroy(gameObject);
+            
         }
     }
 
