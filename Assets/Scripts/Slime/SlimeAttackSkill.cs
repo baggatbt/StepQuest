@@ -15,7 +15,7 @@ public class SlimeAttackSkill : Skill
 
         Debug.Log("Using basic attack");
         // Start the attack animation
-        user.animator.SetTrigger("SlimeAttackTrigger");
+        user.animator.SetTrigger("SlimeAttack1Trigger");
 
         // Create a timing window for the player to reduce damage
         yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(0.0f, 1.0f, (result) =>

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Slime : Character
+public class Slime : Enemy
 {
     // Constructor
     public Slime()
@@ -12,7 +12,8 @@ public class Slime : Character
 
        // this.skills.Add(new SlimeSpecialAttackSkill()); // New skill i need to implement
         
-
+       this.expReward = 5;  //TODO: Add scaling
+       this.goldReward = 2;
        this.attacksBeforeSpecial = 2;
     }
 
