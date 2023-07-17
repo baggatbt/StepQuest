@@ -1,5 +1,6 @@
 using System.Collections;
 using System;
+using UnityEngine.SceneManagement;
 using UnityEngine;
 
 public class BattleManager : MonoBehaviour
@@ -8,6 +9,9 @@ public class BattleManager : MonoBehaviour
     public Character enemy;
     private BattleState state;
     public int enemyAttackCount = 0;
+
+    public HoldReleaseSlider holdReleaseSlider;
+
     public enum BattleState
     {
         PlayerTurn,
@@ -17,28 +21,36 @@ public class BattleManager : MonoBehaviour
     public GameObject outerCircle;
     public GameObject innerCircle;
 
+    public GameObject endOfBattlePanel;
+
     private Vector3 outerCircleInitialScale;
     private Vector3 innerCircleInitialScale;
+    
 
     private void Start()
     {
         state = BattleState.PlayerTurn;
         outerCircleInitialScale = outerCircle.transform.localScale;
         innerCircleInitialScale = innerCircle.transform.localScale;
+
+         // Dont show the timing circle yet
+        outerCircle.SetActive(false);
+        innerCircle.SetActive(false);
     }
 
     public void PlayerAttack()
     {
         if (state == BattleState.PlayerTurn && !player.isAttacking && !enemy.isAttacking)
         {
+            
             StartCoroutine(PlayerAttackCoroutine(null));
+            
         }
     }
 
-    public IEnumerator PlayerAttackCoroutine(System.Action successCallback)
+     public IEnumerator PlayerAttackCoroutine(System.Action successCallback)
     {
-        yield return StartCoroutine(player.MoveToTarget());
-        yield return new WaitUntil(() => player.isAttacking == false);
+        yield return new WaitUntil(() => enemy.isAttacking == false);
 
         if (player.currentSkill != null)
         {
@@ -47,47 +59,44 @@ public class BattleManager : MonoBehaviour
         else
         {
             Debug.Log("Standard Attack Performed - This should not happen");
-            enemy.TakeDamage(player.damage);
         }
-
-        yield return StartCoroutine(player.ReturnToPosition());
 
         if (enemy.health <= 0)
         {
             Debug.Log("You win, let's celebrate");
+            endOfBattlePanel.SetActive(true);
         }
         else
         {
+            
             state = BattleState.EnemyTurn;
+           yield return new WaitForSeconds(1.0f); //The delay util the enemy attacks
             EnemyAttack();
         }
     }
 
-    public IEnumerator EnemyAttackCoroutine()
+     public IEnumerator EnemyAttackCoroutine()
     {
-        yield return StartCoroutine(enemy.MoveToTarget());
-        yield return new WaitUntil(() => enemy.isAttacking == false);
+        yield return new WaitUntil(() => player.isAttacking == false);
 
         if (enemy.currentSkill != null)
         {
-            Debug.Log("Enemy begins executing skill");
             yield return enemy.currentSkill.Execute(enemy, player, this);
-            Debug.Log("Enemy has finished executing skill");
         }
         else
         {
-            Debug.Log("test enemy attack performed - This should not happen");
+            Debug.Log("Standard Attack Performed - This should not happen");
             player.TakeDamage(enemy.damage);
         }
-
-        yield return StartCoroutine(enemy.ReturnToPosition());
 
         if (player.health <= 0)
         {
             Debug.Log("You lose ya jabroni");
+            SceneManager.LoadScene("CharacterInfoPage");
         }
         else
         {
+            yield return new WaitForSeconds(1.5f); //The delay util the player attacks
             state = BattleState.PlayerTurn;
         }
     }
@@ -103,32 +112,39 @@ public class BattleManager : MonoBehaviour
     }
 
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<TimingEventResult> callback)
+{
+      // Enable the timing circles when the event starts
+        outerCircle.SetActive(true);
+        innerCircle.SetActive(true);
+
+    float totalWindowDuration = windowEnd - windowStart;
+    float timer = 0;
+    bool buttonClicked = false;
+
+    // Start the inner circle at a very small size
+    Vector3 innerCircleInitialScale = new Vector3(0.01f, 0.01f, 0.01f);
+
+    try
     {
-        float totalWindowDuration = windowEnd - windowStart;
-        float timer = 0;
-        bool buttonClicked = false;
-
-        // Start the inner circle at a very small size
-        Vector3 innerCircleInitialScale = new Vector3(0.01f, 0.01f, 0.01f);
-
-        try
+        while (timer < totalWindowDuration)
         {
-            while (timer < totalWindowDuration)
+            float progress = timer / totalWindowDuration;
+            innerCircle.transform.localScale = Vector3.Lerp(innerCircleInitialScale, outerCircleInitialScale, progress);
+
+            if (Input.GetMouseButtonDown(0))
             {
-                float progress = timer / totalWindowDuration;
-                innerCircle.transform.localScale = Vector3.Lerp(innerCircleInitialScale, outerCircleInitialScale, progress);
-
-                if (Input.GetMouseButtonDown(0))
-                {
-                    buttonClicked = true;
-                }
-
-                timer += Time.deltaTime;
-                yield return null;
+                buttonClicked = true;
+                break;
             }
 
-            TimingEventResult result;
-            if (buttonClicked)
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        TimingEventResult result;
+        if (buttonClicked)
+        {
+            if (timer >= windowStart)
             {
                 result = GetTimingAccuracy(innerCircle.transform.localScale, outerCircle.transform.localScale);
             }
@@ -137,35 +153,36 @@ public class BattleManager : MonoBehaviour
                 Debug.Log("Timing Missed!");
                 result = TimingEventResult.Miss;
             }
-
-            callback(result);
         }
-        finally
+        else
         {
-            // Reset the scale of the inner circle, ensuring it always happens even if the coroutine is interrupted
-            innerCircle.transform.localScale = innerCircleInitialScale;
+            Debug.Log("No input detected. Missed!");
+            result = TimingEventResult.Miss;
         }
+
+        callback(result);
     }
+    finally
+    {
+        // Reset the scale of the inner circle, ensuring it always happens even if the coroutine is interrupted
+        innerCircle.transform.localScale = innerCircleInitialScale;
+    }
+    // Disable the timing circles when the event ends
+        outerCircle.SetActive(false);
+        innerCircle.SetActive(false);
+}
 
 
-
-
-
-
+    
     private TimingEventResult GetTimingAccuracy(Vector3 innerCircleScale, Vector3 outerCircleScale)
     {
         float scaleRatio = innerCircleScale.x / outerCircleScale.x;
         float perfectThreshold = 0.9f;
-        float greatThreshold = 0.75f;
         float goodThreshold = 0.5f;
 
         if (scaleRatio >= perfectThreshold)
         {
             return TimingEventResult.Perfect;
-        }
-        else if (scaleRatio >= greatThreshold)
-        {
-            return TimingEventResult.Great;
         }
         else if (scaleRatio >= goodThreshold)
         {
@@ -176,6 +193,54 @@ public class BattleManager : MonoBehaviour
             return TimingEventResult.Miss;
         }
     }
+
+    public IEnumerator PlayerHoldReleaseTimeEvent(float holdStart, float holdEnd, Action<TimingEventResult> callback)
+    {
+        float totalHoldDuration = holdEnd - holdStart;
+        float holdTimer = 0;
+
+        holdReleaseSlider.ResetSlider(); // Reset the slider at the start of the hold event
+
+        while (holdTimer < totalHoldDuration)
+        {
+            if (Input.GetMouseButton(0)) // Button is currently held down
+            {
+                holdTimer += Time.deltaTime;
+
+                // Update the slider value as the hold time increases
+                holdReleaseSlider.UpdateSlider(holdTimer / totalHoldDuration);
+            }
+
+            if (Input.GetMouseButtonUp(0)) // Button was just released
+            {
+                break;
+            }
+
+            yield return null;
+        }
+
+        TimingEventResult result;
+
+        if (holdTimer < totalHoldDuration / 3)
+        {
+            Debug.Log("Button was released too early. Miss!");
+            result = TimingEventResult.Miss;
+        }
+        else if (holdTimer < 2 * totalHoldDuration / 3)
+        {
+            Debug.Log("Button was released early. Good!");
+            result = TimingEventResult.Good;
+        }
+        else
+        {
+            Debug.Log("Button was held for the full duration. Perfect!");
+            result = TimingEventResult.Perfect;
+        }
+
+        callback(result);
+        holdReleaseSlider.ResetSlider(); // Reset the slider at the end of the hold event
+    }
+
 
     public IEnumerator FlashWhite(Character character)
     {
