@@ -2,6 +2,9 @@ using System.Collections;
 using System;
 using UnityEngine.SceneManagement;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+
 
 public class BattleManager : MonoBehaviour
 {
@@ -9,6 +12,8 @@ public class BattleManager : MonoBehaviour
     public Character enemy;
     private BattleState state;
     public int enemyAttackCount = 0;
+
+
 
     public HoldReleaseSlider holdReleaseSlider;
 
@@ -20,6 +25,8 @@ public class BattleManager : MonoBehaviour
 
     public GameObject outerCircle;
     public GameObject innerCircle;
+    public GameObject ExpGainedText;
+    public GameObject GoldGainedText;
 
     public GameObject endOfBattlePanel;
 
@@ -77,13 +84,16 @@ public class BattleManager : MonoBehaviour
         Debug.Log("Standard Attack Performed - This should not happen");
     }
 
-    if (enemy.health <= 0)
-    {
-        Debug.Log("You win, let's celebrate");
-        endOfBattlePanel.SetActive(true);
-    }
-    else
-    {
+        if (enemy.health <= 0)
+        {
+            Debug.Log("You win, let's celebrate");
+            endOfBattlePanel.SetActive(true);
+            Debug.Log("enemy before EndOfBattleRewards: " + enemy);
+            EndOfBattleRewards((Enemy)enemy);
+        }
+
+        else
+        {
         state = BattleState.EnemyTurn;
         yield return new WaitForSeconds(1.0f); // The delay until the enemy attacks
         EnemyAttack();
@@ -280,4 +290,20 @@ public class BattleManager : MonoBehaviour
     {
         return state;
     }
+
+    public void EndOfBattleRewards(Enemy enemy)
+    {
+       
+        TextMeshProUGUI expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
+        Debug.Log(enemy.expReward);
+        expGainedTextComponent.text = enemy.expReward.ToString();
+
+        TextMeshProUGUI goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
+        goldGainedTextComponent.text = enemy.goldReward.ToString();
+    }
+
+
+     
+
+
 }

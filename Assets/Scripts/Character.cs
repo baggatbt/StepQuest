@@ -40,18 +40,18 @@ public class Character : MonoBehaviour
     }
 
 
-    public void TakeDamage(int damage) 
+    public void TakeDamage(int damage)
     {
         health -= damage;
         healthBar.value = health;
-        if (health <= 0) 
+        if (health <= 0)
         {
-            Destroy(gameObject);
-            
+            this.gameObject.SetActive(false);
         }
     }
 
-     public void AnimationEnded()
+
+    public void AnimationEnded()
     {
         animationEnded = true;
     }
