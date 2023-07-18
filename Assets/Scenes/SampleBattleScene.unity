@@ -1598,6 +1598,8 @@ MonoBehaviour:
   holdReleaseSlider: {fileID: 590349167}
   outerCircle: {fileID: 1626096152}
   innerCircle: {fileID: 1227564317}
+  ExpGainedText: {fileID: 1778247465}
+  GoldGainedText: {fileID: 1153100819}
   endOfBattlePanel: {fileID: 1663765536}
 --- !u!4 &1020165694
 Transform:
@@ -2465,7 +2467,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -4, y: 28}
+  m_AnchoredPosition: {x: -4, y: 88.79999}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1663765538
@@ -3771,8 +3773,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3adc8d17cb8c74498552c557a7adc8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 20
-  maxHealth: 20
+  health: 2
+  maxHealth: 2
   damage: 2
   healthBar: {fileID: 1299554119}
   attackTarget: {fileID: 759510885}
