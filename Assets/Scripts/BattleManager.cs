@@ -56,7 +56,8 @@ public class BattleManager : MonoBehaviour
     {
         // Move to the target before executing the attack
         
-        if (player.currentSkill.requiresMovement){
+        if (player.currentSkill.requiresMovement)
+        {
         yield return player.MoveToTarget();
         }
         
@@ -65,8 +66,11 @@ public class BattleManager : MonoBehaviour
 
         yield return new WaitUntil(() => !player.isAttacking);
 
-        // Return to the original position after the attack
-        yield return player.ReturnToPosition();
+            // Return to the original position after the attack
+            if (player.currentSkill.requiresMovement)
+            {
+                yield return player.ReturnToPosition();
+            }
     }
     else
     {
@@ -94,12 +98,22 @@ public class BattleManager : MonoBehaviour
 
         if (enemy.currentSkill != null)
         {
+            if (enemy.currentSkill.requiresMovement)
+            {
+                yield return enemy.MoveToTarget();
+            }
             yield return enemy.currentSkill.Execute(enemy, player, this);
+
+            if (enemy.currentSkill.requiresMovement)
+            {
+                yield return enemy.ReturnToPosition();
+            }
         }
         else
         {
             Debug.Log("Standard Attack Performed - This should not happen");
             player.TakeDamage(enemy.damage);
+            
         }
 
         if (player.health <= 0)

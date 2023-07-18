@@ -7,11 +7,14 @@ public class SlimeAttackSkill : Skill
     {
         name = "Slime Attack";
         description = "The slime attacks the player. The damage can be reduced by timely action.";
+        requiresMovement = true;
+
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
         user.isAttacking = true;
+        user.MoveToTarget();
 
         Debug.Log("Using basic attack");
         // Start the attack animation
@@ -40,5 +43,6 @@ public class SlimeAttackSkill : Skill
             user.currentSkill.skillExecutionComplete = true;
         }));
         user.isAttacking = false;
+        
     }
 }

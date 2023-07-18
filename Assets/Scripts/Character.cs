@@ -64,21 +64,21 @@ public class Character : MonoBehaviour
     Vector3 targetPosition = new Vector3(attackTarget.position.x, transform.position.y, transform.position.z);
 
     yield return StartCoroutine(Move(targetPosition, 6.0f));
-
-
-
-    
+  
 }
 
 public IEnumerator ReturnToPosition()
 {
     yield return StartCoroutine(Move(originalPosition, 6.0f));
-}
+        animator.SetTrigger("StopMovementAnimationTrigger");
+
+    }
 
  private IEnumerator Move(Vector3 targetPosition, float speed)
 {
-    
-    float stoppingDistance = 0.1f; // Adjust this value to control the stopping distance
+        Debug.Log("I moved");
+        animator.SetTrigger("MovementAnimationTrigger");
+        float stoppingDistance = 0.1f; // Adjust this value to control the stopping distance
 
     while ((transform.position - targetPosition).sqrMagnitude > stoppingDistance * stoppingDistance)
     {
@@ -87,24 +87,29 @@ public IEnumerator ReturnToPosition()
 
         // Check for collision with enemy
         Collider2D[] colliders = Physics2D.OverlapCapsuleAll(transform.position, GetComponent<CapsuleCollider2D>().size, GetComponent<CapsuleCollider2D>().direction, 0f);
-        foreach (Collider2D collider in colliders)
-        {
-            if (collider.CompareTag("Enemy"))
+            foreach (Collider2D collider in colliders)
             {
-                StopMoving();
-                yield break; // Exit the coroutine
+                if (collider.gameObject.GetInstanceID() != gameObject.GetInstanceID() && ( collider.CompareTag("Enemy") || collider.CompareTag("Player")))
+                {
+                    animator.SetTrigger("StopMovementAnimationTrigger");
+                    yield break; // Exit the coroutine
+                }
             }
-        }
 
-        yield return null;
+
+            yield return null;
     }
 }
+
+    
 
 
 public void StopMoving()
 {
-    StopAllCoroutines();
-}
+        
+        StopAllCoroutines();
+    
+    }
 
     
 

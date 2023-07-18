@@ -9,6 +9,7 @@ public class TripleHitSkill : Skill
     {
         name = "Triple Hit";
         description = "Hits the enemy 3 times with timing checks before each hit";
+        requiresMovement = true;
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
