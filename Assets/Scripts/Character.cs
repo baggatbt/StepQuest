@@ -15,6 +15,7 @@ public class Character : MonoBehaviour
     public bool isAttacking = false;
     public SpriteRenderer spriteRenderer;
     public Animator animator;
+    
 
     public bool animationEnded;
     public Skill currentSkill; // Property to store the current skill being used by the character
@@ -44,10 +45,16 @@ public class Character : MonoBehaviour
     {
         health -= damage;
         healthBar.value = health;
+        IsHit();
+        
         if (health <= 0)
         {
             this.gameObject.SetActive(false);
         }
+    }
+
+    public void IsHit(){
+        animator.SetTrigger("IsHurtTrigger");
     }
 
 
