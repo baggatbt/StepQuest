@@ -45,7 +45,10 @@ public class Character : MonoBehaviour
     {
         health -= damage;
         healthBar.value = health;
+        
+        if (damage > 0){
         IsHit();
+        }
         
         if (health <= 0)
         {

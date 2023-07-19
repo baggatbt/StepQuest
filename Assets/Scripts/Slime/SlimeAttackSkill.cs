@@ -27,11 +27,13 @@ public class SlimeAttackSkill : Skill
             {
                 Debug.Log("Perfect Timing! Damage dodged.");
                 target.TakeDamage(user.damage - user.damage);
+                target.animator.SetTrigger("BlockTrigger");
             }
             else if (result == TimingEventResult.Good)
             {
                 Debug.Log("Good Timing! Damage reduced, but not by much.");
-                target.TakeDamage(user.damage);
+                target.TakeDamage(user.damage - 1);
+                
             }
             else if (result == TimingEventResult.Miss)
             {
