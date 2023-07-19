@@ -12,9 +12,7 @@ public class BattleManager : MonoBehaviour
     public Character enemy;
     private BattleState state;
     public int enemyAttackCount = 0;
-
-
-
+    public GameObject currentTarget;
     public HoldReleaseSlider holdReleaseSlider;
 
     public enum BattleState
@@ -279,13 +277,6 @@ public class BattleManager : MonoBehaviour
     }
 
 
-    public IEnumerator FlashWhite(Character character)
-    {
-        character.spriteRenderer.color = Color.white;
-        yield return new WaitForSeconds(0.1f);
-        character.spriteRenderer.color = Color.cyan;
-    }
-
     public BattleState GetState()
     {
         return state;
@@ -302,8 +293,31 @@ public class BattleManager : MonoBehaviour
         goldGainedTextComponent.text = enemy.goldReward.ToString();
     }
 
+   
+    
+    private void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            // Cast a ray from the mouse position
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            
+            // Perform the raycast and get the hit information
+            RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
+            
+            
+            // Check if the raycast hits an enemy object
+            if (hit.collider != null && hit.collider.CompareTag("Enemy"))
+            {
+                // Set the enemy object as the currentTarget
+                currentTarget = hit.collider.gameObject;
 
-     
+                // Do something with the currentTarget
+                Debug.Log("Current target: " + currentTarget.name);
+            }
+        }
+    }
+
 
 
 }
