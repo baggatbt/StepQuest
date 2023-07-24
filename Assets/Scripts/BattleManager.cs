@@ -25,11 +25,16 @@ public class BattleManager : MonoBehaviour
     public GameObject innerCircle;
     public GameObject ExpGainedText;
     public GameObject GoldGainedText;
-
     public GameObject endOfBattlePanel;
+
+    public EnemySpawnController enemySpawnController;
 
     private Vector3 outerCircleInitialScale;
     private Vector3 innerCircleInitialScale;
+
+    public Transform enemySpawnPoint1;
+    public Transform enemySpawnPoint2;
+
     
 
     private void Start()
@@ -37,6 +42,9 @@ public class BattleManager : MonoBehaviour
         state = BattleState.PlayerTurn;
         outerCircleInitialScale = outerCircle.transform.localScale;
         innerCircleInitialScale = innerCircle.transform.localScale;
+        enemySpawnController.SpawnEnemiesFromPool("Slimes", 1, enemySpawnPoint1);
+        enemySpawnController.SpawnEnemiesFromPool("Slimes", 1, enemySpawnPoint2);
+
 
          // Dont show the timing circle yet
         outerCircle.SetActive(false);
