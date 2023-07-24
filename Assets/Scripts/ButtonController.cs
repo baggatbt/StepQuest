@@ -44,11 +44,12 @@ public class ButtonController : MonoBehaviour
     }
 
     public void OnButtonClick()
+{
+    if (!battleManager.player.isAttacking && !battleManager.IsAnyEnemyAttacking())
     {
-        if (!battleManager.player.isAttacking && !battleManager.enemy.isAttacking)
-        {
-            battleManager.player.currentSkill = skill;
-            battleManager.PlayerAttack();
-        }
+        battleManager.player.currentSkill = skill;
+        battleManager.PlayerAttack();
     }
+}
+
 }

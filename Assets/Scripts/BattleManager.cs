@@ -4,12 +4,12 @@ using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-
+using System.Collections.Generic;
 
 public class BattleManager : MonoBehaviour
 {
     public Character player;
-    public Character enemy;
+    public List<Character> enemies = new List<Character>();
     private BattleState state;
     public int enemyAttackCount = 0;
     public GameObject currentTarget;
@@ -35,101 +35,106 @@ public class BattleManager : MonoBehaviour
     public Transform enemySpawnPoint1;
     public Transform enemySpawnPoint2;
 
-    
-
     private void Start()
     {
         state = BattleState.PlayerTurn;
         outerCircleInitialScale = outerCircle.transform.localScale;
         innerCircleInitialScale = innerCircle.transform.localScale;
-        enemySpawnController.SpawnEnemiesFromPool("Slimes", 1, enemySpawnPoint1);
-        enemySpawnController.SpawnEnemiesFromPool("Slimes", 1, enemySpawnPoint2);
 
+        enemies.Add(enemySpawnController.SpawnEnemiesFromPool("Slimes", 1, enemySpawnPoint1));
+        enemies.Add(enemySpawnController.SpawnEnemiesFromPool("Slimes", 1, enemySpawnPoint2));
 
-         // Dont show the timing circle yet
         outerCircle.SetActive(false);
         innerCircle.SetActive(false);
     }
 
     public void PlayerAttack()
     {
-        if (state == BattleState.PlayerTurn && !player.isAttacking && !enemy.isAttacking)
+        if (state == BattleState.PlayerTurn && !player.isAttacking && currentTarget && !currentTarget.GetComponent<Character>().isAttacking)
         {
-            
             StartCoroutine(PlayerAttackCoroutine(null));
-            
         }
     }
 
     public IEnumerator PlayerAttackCoroutine(System.Action successCallback)
-{
-    yield return new WaitUntil(() => enemy.isAttacking == false);
-
-    if (player.currentSkill != null)
     {
-        // Move to the target before executing the attack
-        
-        if (player.currentSkill.requiresMovement)
+        Character targetEnemy = currentTarget.GetComponent<Character>();
+        yield return new WaitUntil(() => targetEnemy.isAttacking == false);
+
+        if (player.currentSkill != null)
         {
-        yield return player.MoveToTarget();
-        }
-        
-        // Execute the attack
-        yield return player.currentSkill.Execute(player, enemy, this);
+            if (player.currentSkill.requiresMovement)
+            {
+                yield return player.MoveToTarget();
+            }
+            
+            yield return player.currentSkill.Execute(player, targetEnemy, this);
 
-        yield return new WaitUntil(() => !player.isAttacking);
+            yield return new WaitUntil(() => !player.isAttacking);
 
-            // Return to the original position after the attack
             if (player.currentSkill.requiresMovement)
             {
                 yield return player.ReturnToPosition();
-            }
-    }
-    else
-    {
-        Debug.Log("Standard Attack Performed - This should not happen");
-    }
-
-        if (enemy.health <= 0)
-        {
-            Debug.Log("You win, let's celebrate");
-            endOfBattlePanel.SetActive(true);
-            Debug.Log("enemy before EndOfBattleRewards: " + enemy);
-            EndOfBattleRewards((Enemy)enemy);
-        }
-
-        else
-        {
-        state = BattleState.EnemyTurn;
-        yield return new WaitForSeconds(1.0f); // The delay until the enemy attacks
-        EnemyAttack();
-    }
-}
-
-
-
-     public IEnumerator EnemyAttackCoroutine()
-    {
-        yield return new WaitUntil(() => player.isAttacking == false);
-
-        if (enemy.currentSkill != null)
-        {
-            if (enemy.currentSkill.requiresMovement)
-            {
-                yield return enemy.MoveToTarget();
-            }
-            yield return enemy.currentSkill.Execute(enemy, player, this);
-
-            if (enemy.currentSkill.requiresMovement)
-            {
-                yield return enemy.ReturnToPosition();
             }
         }
         else
         {
             Debug.Log("Standard Attack Performed - This should not happen");
-            player.TakeDamage(enemy.damage);
+        }
+
+        if (targetEnemy.health <= 0)
+        {
+            Debug.Log(targetEnemy.name + " is defeated!");
+            enemies.Remove(targetEnemy);
+
+            if (enemies.Count == 0)
+            {
+                Debug.Log("You win, let's celebrate");
+                endOfBattlePanel.SetActive(true);
+                EndOfBattleRewards((Enemy)targetEnemy);
+            }
+            else
+            {
+                state = BattleState.EnemyTurn;
+                yield return new WaitForSeconds(1.0f);
+                EnemyAttack();
+            }
+        }
+    }
+
+    public void EnemyAttack()
+    {
+        Character attackingEnemy = enemies[UnityEngine.Random.Range(0, enemies.Count)];
+        
+        if (!player.isAttacking && !attackingEnemy.isAttacking && state == BattleState.EnemyTurn)
+        {
+            attackingEnemy.currentSkill = attackingEnemy.normalSkill;
+            StartCoroutine(EnemyAttackCoroutine(attackingEnemy));
+        }
+    }
+
+    public IEnumerator EnemyAttackCoroutine(Character attackingEnemy)
+    {
+        yield return new WaitUntil(() => player.isAttacking == false);
+
+        if (attackingEnemy.currentSkill != null)
+        {
+            if (attackingEnemy.currentSkill.requiresMovement)
+            {
+                yield return attackingEnemy.MoveToTarget();
+            }
             
+            yield return attackingEnemy.currentSkill.Execute(attackingEnemy, player, this);
+
+            if (attackingEnemy.currentSkill.requiresMovement)
+            {
+                yield return attackingEnemy.ReturnToPosition();
+            }
+        }
+        else
+        {
+            Debug.Log("Standard Attack Performed - This should not happen");
+            player.TakeDamage(attackingEnemy.damage);
         }
 
         if (player.health <= 0)
@@ -139,20 +144,11 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            yield return new WaitForSeconds(1.5f); //The delay util the player attacks
+            yield return new WaitForSeconds(1.5f);
             state = BattleState.PlayerTurn;
         }
     }
-
-    public void EnemyAttack()
-    {
-        if (!player.isAttacking && !enemy.isAttacking && state == BattleState.EnemyTurn)
-        {
-            enemy.currentSkill = enemy.normalSkill;
-            StartCoroutine(EnemyAttackCoroutine());
-            enemyAttackCount++;
-        }
-    }
+   
 
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<TimingEventResult> callback)
 {
@@ -290,42 +286,40 @@ public class BattleManager : MonoBehaviour
         return state;
     }
 
-    public void EndOfBattleRewards(Enemy enemy)
+    public void EndOfBattleRewards(Enemy defeatedEnemy)
     {
-       
         TextMeshProUGUI expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
-        Debug.Log(enemy.expReward);
-        expGainedTextComponent.text = enemy.expReward.ToString();
+        Debug.Log(defeatedEnemy.expReward);
+        expGainedTextComponent.text = defeatedEnemy.expReward.ToString();
 
         TextMeshProUGUI goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
-        goldGainedTextComponent.text = enemy.goldReward.ToString();
+        goldGainedTextComponent.text = defeatedEnemy.goldReward.ToString();
     }
 
-   
-    
     private void Update()
     {
         if (Input.GetMouseButtonDown(0))
         {
-            // Cast a ray from the mouse position
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            
-            // Perform the raycast and get the hit information
             RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
-            
-            
-            // Check if the raycast hits an enemy object
+
             if (hit.collider != null && hit.collider.CompareTag("Enemy"))
             {
-                // Set the enemy object as the currentTarget
                 currentTarget = hit.collider.gameObject;
-
-                // Do something with the currentTarget
                 Debug.Log("Current target: " + currentTarget.name);
             }
         }
     }
 
+    public bool IsAnyEnemyAttacking()
+{
+    foreach (var enemy in enemies)
+    {
+        if (enemy.isAttacking)
+            return true;
+    }
+    return false;
+}
 
 
 }

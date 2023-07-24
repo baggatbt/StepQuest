@@ -28,7 +28,10 @@ public class Character : MonoBehaviour
 
     protected virtual void Start()
     {
-        
+        animator = GetComponent<Animator>();
+        health = maxHealth;
+        healthBar.maxValue = maxHealth;
+        healthBar.value = health;
         if (currentSkill != null)
         {
             currentSkill.skillExecutionComplete = false;
