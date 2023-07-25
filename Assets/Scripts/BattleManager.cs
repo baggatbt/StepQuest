@@ -41,8 +41,8 @@ public class BattleManager : MonoBehaviour
         outerCircleInitialScale = outerCircle.transform.localScale;
         innerCircleInitialScale = innerCircle.transform.localScale;
 
-        enemies.Add(enemySpawnController.SpawnEnemiesFromPool("Slimes", 1, enemySpawnPoint1));
-        enemies.Add(enemySpawnController.SpawnEnemiesFromPool("Slimes", 1, enemySpawnPoint2));
+      enemies.Add(enemySpawnController.SpawnEnemiesFromPool("Slimes", 1, enemySpawnPoint1));
+      enemies.Add(enemySpawnController.SpawnEnemiesFromPool("Slimes", 1, enemySpawnPoint2));
 
         outerCircle.SetActive(false);
         innerCircle.SetActive(false);
@@ -76,6 +76,7 @@ public class BattleManager : MonoBehaviour
             {
                 yield return player.ReturnToPosition();
             }
+            Debug.Log("Got this far, 1"); // Add this
         }
         else
         {
@@ -93,25 +94,37 @@ public class BattleManager : MonoBehaviour
                 endOfBattlePanel.SetActive(true);
                 EndOfBattleRewards((Enemy)targetEnemy);
             }
-            else
-            {
-                state = BattleState.EnemyTurn;
-                yield return new WaitForSeconds(1.0f);
-                EnemyAttack();
-            }
+            
+        }
+        else
+        {
+            Debug.Log("Got this far, 2"); // Add this
+            state = BattleState.EnemyTurn;
+            Debug.Log("Changed state to EnemyTurn"); // Add this
+            yield return new WaitForSeconds(1.0f);
+            EnemyAttack();
         }
     }
 
     public void EnemyAttack()
     {
+        if (enemies.Count == 0)
+        {
+            Debug.LogError("There are no enemies left to attack!");
+            return;
+        }
+
         Character attackingEnemy = enemies[UnityEngine.Random.Range(0, enemies.Count)];
-        
+        Debug.Log(attackingEnemy);
+
         if (!player.isAttacking && !attackingEnemy.isAttacking && state == BattleState.EnemyTurn)
         {
             attackingEnemy.currentSkill = attackingEnemy.normalSkill;
+            Debug.Log("The enemy is starting to attack");
             StartCoroutine(EnemyAttackCoroutine(attackingEnemy));
         }
     }
+
 
     public IEnumerator EnemyAttackCoroutine(Character attackingEnemy)
     {

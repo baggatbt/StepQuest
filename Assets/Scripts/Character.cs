@@ -116,8 +116,8 @@ public IEnumerator ReturnToPosition()
 
 public void StopMoving()
 {
-        
-        StopAllCoroutines();
+        Debug.Log("Stop moving is blocked");
+        //StopAllCoroutines();
     
     }
 
