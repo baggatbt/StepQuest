@@ -47,9 +47,10 @@ public class EnemySpawnController : MonoBehaviour
             lastSpawnedCharacter = spawnedEnemy.GetComponent<Character>();
 
          // Link this character to the health bar
-            lastSpawnedCharacter.healthBar = associatedHealthBarSlider;
-            associatedHealthBarSlider.maxValue = lastSpawnedCharacter.maxHealth;  
-            associatedHealthBarSlider.value = lastSpawnedCharacter.health; 
+        lastSpawnedCharacter.healthBar = associatedHealthBarSlider;
+        associatedHealthBarSlider.gameObject.SetActive(true);  // Activate the health bar
+        associatedHealthBarSlider.maxValue = lastSpawnedCharacter.maxHealth;  
+        associatedHealthBarSlider.value = lastSpawnedCharacter.health; 
 
         }
 

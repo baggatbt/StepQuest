@@ -64,17 +64,23 @@ public class BattleManager : MonoBehaviour
 
     public void StartBattle(BattleConfig config)
 {
-    // Use config.enemyType and config.maxEnemiesToSpawn to set up your battle
+    // Use config.poolName and config.maxEnemiesToSpawn to set up your battle
     // You can use the enemySpawnController to spawn the desired enemy type and number
     
     for (int i = 0; i < config.maxEnemiesToSpawn; i++)
     {
-        // Spawn enemies based on the config.enemyType
-       enemySpawnController.SpawnEnemiesFromPool(config.poolName, 1, enemySpawnPoints[i], healthBars[i]);
+        // Spawn enemies based on the config.poolName
+        Character spawnedEnemy = enemySpawnController.SpawnEnemiesFromPool(config.poolName, 1, enemySpawnPoints[i], healthBars[i]);
 
+        // Add spawned enemy to the list
+        if (spawnedEnemy != null)
+        {
+            enemies.Add(spawnedEnemy);
+        }
     }
-    // Continue with any other setup like setting backgrounds, play music, etc.
+    // TODO: Continue with any other setup like setting backgrounds, play music, etc.
 }
+
 
 
 
