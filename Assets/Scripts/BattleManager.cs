@@ -354,7 +354,9 @@ public class BattleManager : MonoBehaviour
 
             if (hit.collider != null && hit.collider.CompareTag("Enemy"))
             {
+                
                 currentTarget = hit.collider.gameObject;
+                player.attackTarget = currentTarget.transform; //For movement purposes sets the target to the players target
                 Debug.Log("Current target: " + currentTarget.name);
             }
         }

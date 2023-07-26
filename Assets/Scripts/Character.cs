@@ -70,12 +70,17 @@ public class Character : MonoBehaviour
     public IEnumerator MoveToTarget()
 {
     originalPosition = transform.position;
+    
    
-    Vector3 targetPosition = new Vector3(attackTarget.position.x, transform.position.y, transform.position.z);
+    float offset = 1.0f; // The distance to stop from the enemy. Adjust this value as needed.
+    Vector3 direction = (attackTarget.position - transform.position).normalized;
+    Vector3 targetPosition = attackTarget.position - direction * offset;
+   
+    
 
     yield return StartCoroutine(Move(targetPosition, 6.0f));
-  
 }
+
 
 public IEnumerator ReturnToPosition()
 {
@@ -86,6 +91,8 @@ public IEnumerator ReturnToPosition()
 
  private IEnumerator Move(Vector3 targetPosition, float speed)
 {
+    Debug.Log("Moving to position: " + targetPosition);
+
         Debug.Log("I moved");
         animator.SetTrigger("MovementAnimationTrigger");
         float stoppingDistance = 0.1f; // Adjust this value to control the stopping distance
