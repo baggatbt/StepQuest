@@ -14,6 +14,8 @@ public class BattleManager : MonoBehaviour
     public int enemyAttackCount = 0;
     public GameObject currentTarget;
     public HoldReleaseSlider holdReleaseSlider;
+    public Slider[] healthBars; //set these in the inspector
+
 
     public enum BattleState
     {
@@ -32,21 +34,49 @@ public class BattleManager : MonoBehaviour
     private Vector3 outerCircleInitialScale;
     private Vector3 innerCircleInitialScale;
 
-    public Transform enemySpawnPoint1;
-    public Transform enemySpawnPoint2;
+    public Transform[] enemySpawnPoints; // enemySpawnPoint1, enemySpawnPoint2....
 
-    private void Start()
+    [SerializeField]
+    private BattleConfig currentBattleConfig;
+
+
+   private void Start()
+{
+    state = BattleState.PlayerTurn;
+    outerCircleInitialScale = outerCircle.transform.localScale;
+    innerCircleInitialScale = innerCircle.transform.localScale;
+
+    outerCircle.SetActive(false);
+    innerCircle.SetActive(false);
+
+    if (currentBattleConfig != null)
     {
-        state = BattleState.PlayerTurn;
-        outerCircleInitialScale = outerCircle.transform.localScale;
-        innerCircleInitialScale = innerCircle.transform.localScale;
-
-      enemies.Add(enemySpawnController.SpawnEnemiesFromPool("Slimes", 1, enemySpawnPoint1));
-      enemies.Add(enemySpawnController.SpawnEnemiesFromPool("Slimes", 1, enemySpawnPoint2));
-
-        outerCircle.SetActive(false);
-        innerCircle.SetActive(false);
+        StartBattle(currentBattleConfig);
     }
+    else
+    {
+        Debug.LogError("No battle configuration set!");
+        // Handle error or default configuration
+    }
+}
+
+
+
+    public void StartBattle(BattleConfig config)
+{
+    // Use config.enemyType and config.maxEnemiesToSpawn to set up your battle
+    // You can use the enemySpawnController to spawn the desired enemy type and number
+    
+    for (int i = 0; i < config.maxEnemiesToSpawn; i++)
+    {
+        // Spawn enemies based on the config.enemyType
+       enemySpawnController.SpawnEnemiesFromPool(config.poolName, 1, enemySpawnPoints[i], healthBars[i]);
+
+    }
+    // Continue with any other setup like setting backgrounds, play music, etc.
+}
+
+
 
     public void PlayerAttack()
     {

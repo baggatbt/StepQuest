@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class EnemySpawnController : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class EnemySpawnController : MonoBehaviour
     {
         public string poolName;
         public List<GameObject> enemies;
+        
     }
     
 
@@ -25,8 +27,8 @@ public class EnemySpawnController : MonoBehaviour
         }
     }
 
-    public Character SpawnEnemiesFromPool(string poolName, int numberToSpawn, Transform spawnPoint)
-    {
+    public Character SpawnEnemiesFromPool(string poolName, int numberToSpawn, Transform spawnPoint, Slider associatedHealthBarSlider)
+{
         // Check if the pool exists
         if (!poolDictionary.ContainsKey(poolName))
         {
@@ -43,6 +45,12 @@ public class EnemySpawnController : MonoBehaviour
             // Instantiate the enemy at the position of spawnPoint and with its rotation
             GameObject spawnedEnemy = Instantiate(enemyToSpawn, spawnPoint.position, spawnPoint.rotation);
             lastSpawnedCharacter = spawnedEnemy.GetComponent<Character>();
+
+         // Link this character to the health bar
+            lastSpawnedCharacter.healthBar = associatedHealthBarSlider;
+            associatedHealthBarSlider.maxValue = lastSpawnedCharacter.maxHealth;  
+            associatedHealthBarSlider.value = lastSpawnedCharacter.health; 
+
         }
 
         return lastSpawnedCharacter;
