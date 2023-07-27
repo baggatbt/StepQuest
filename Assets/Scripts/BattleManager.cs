@@ -92,6 +92,7 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+
     public IEnumerator PlayerAttackCoroutine(System.Action successCallback)
     {
         Character targetEnemy = currentTarget.GetComponent<Character>();

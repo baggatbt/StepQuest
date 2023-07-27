@@ -78,13 +78,13 @@ public class Character : MonoBehaviour
    
     
 
-    yield return StartCoroutine(Move(targetPosition, 6.0f));
+    yield return StartCoroutine(Move(targetPosition, 10.0f));
 }
 
 
 public IEnumerator ReturnToPosition()
 {
-    yield return StartCoroutine(Move(originalPosition, 6.0f));
+    yield return StartCoroutine(Move(originalPosition, 10.0f));
         animator.SetTrigger("StopMovementAnimationTrigger");
 
     }

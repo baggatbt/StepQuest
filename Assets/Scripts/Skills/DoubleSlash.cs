@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 
 
-
+/*
 public class DoubleSlash : Skill
 {
     public DoubleSlash()
@@ -44,3 +44,4 @@ public class DoubleSlash : Skill
         user.isAttacking = false;
     }
 }
+*/

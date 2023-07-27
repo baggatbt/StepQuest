@@ -18,25 +18,34 @@ public class Slash : Skill
         user.animator.SetTrigger("Attack1Trigger");
         user.isAttacking = true;
 
-        if (result == TimingEventResult.Perfect || result == TimingEventResult.Good)
+        if (result == TimingEventResult.Perfect)
+        {
+            target.TakeDamage(2);
+            Debug.Log("Perfect Slash successful! " + target.name + " takes 2 damage.");
+            canChain = true;
+            user.animator.SetTrigger("AttackFailTrigger");
+            
+        }
+        else if (result == TimingEventResult.Good)
         {
             target.TakeDamage(2);
             Debug.Log("Slash successful! " + target.name + " takes 2 damage.");
-            
             user.animator.SetTrigger("AttackFailTrigger");
-            
+            user.isAttacking = false;
+
         }
         else
         {
             target.TakeDamage(1);
             Debug.Log("Slash missed! " + target.name + " takes 1 damage.");
             user.animator.SetTrigger("AttackFailTrigger");
+            user.isAttacking = false;
            
         }
     });
     yield return new WaitForSeconds(0.5f); //The delay util the player attacks
     
     skillExecutionComplete = true;
-    user.isAttacking = false;
+   
 }
 }
