@@ -46,9 +46,9 @@ public class ButtonController : MonoBehaviour
 
     private Skill requestedSkill; // This skill is the one that the player chooses next during an ongoing attack.
 
-    public void OnButtonClick()
+   public void OnButtonClick()
 {
-    if (!battleManager.player.isAttacking && !battleManager.IsAnyEnemyAttacking())
+    if ((!battleManager.player.isAttacking && !battleManager.IsAnyEnemyAttacking()) || battleManager.player.currentSkill.canChain)
     {
         // Set the skill to execute and start the attack
         battleManager.player.currentSkill = skill;
@@ -56,8 +56,9 @@ public class ButtonController : MonoBehaviour
     }
     else if (battleManager.player.isAttacking) // If the player is currently attacking and chooses another skill
     {
-        requestedSkill = skill;
+        battleManager.requestedSkill = skill;
     }
 }
+
 
 }

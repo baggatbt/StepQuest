@@ -16,7 +16,7 @@ public abstract class Skill
     public string name;
     public string description;
     public bool skillExecutionComplete; // Flag to track the completion of skill execution 
-    public bool canChain;
+    public bool canChain = false;
     public bool requiresMovement; // Indicates if the attack requires movement towards the target
 
 

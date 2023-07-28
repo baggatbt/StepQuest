@@ -45,7 +45,7 @@ public class Slash : Skill
     });
     yield return new WaitForSeconds(0.5f); //The delay util the player attacks
     
-    skillExecutionComplete = true;
+    
    
 }
 }

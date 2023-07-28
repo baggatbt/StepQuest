@@ -15,6 +15,8 @@ public class BattleManager : MonoBehaviour
     public GameObject currentTarget;
     public HoldReleaseSlider holdReleaseSlider;
     public Slider[] healthBars; //set these in the inspector
+    public Skill requestedSkill; // The skill the player chooses next during an ongoing attack.
+
 
 
     public enum BattleState
@@ -35,6 +37,10 @@ public class BattleManager : MonoBehaviour
     private Vector3 innerCircleInitialScale;
 
     public Transform[] enemySpawnPoints; // enemySpawnPoint1, enemySpawnPoint2....
+
+
+    //public PlayerSpawnController playerSpawnController;
+   // public Transform playerSpawnPoint;
 
     [SerializeField]
     private BattleConfig currentBattleConfig;
@@ -66,7 +72,8 @@ public class BattleManager : MonoBehaviour
 {
     // Use config.poolName and config.maxEnemiesToSpawn to set up your battle
     // You can use the enemySpawnController to spawn the desired enemy type and number
-    
+   // player = playerSpawnController.SpawnPlayer(playerSpawnPoint, healthBars[0]); // Assuming healthBars[0] is the player's health bar
+
     for (int i = 0; i < config.maxEnemiesToSpawn; i++)
     {
         // Spawn enemies based on the config.poolName
@@ -86,8 +93,9 @@ public class BattleManager : MonoBehaviour
 
     public void PlayerAttack()
     {
-        if (state == BattleState.PlayerTurn && !player.isAttacking && currentTarget && !currentTarget.GetComponent<Character>().isAttacking)
+        if ((state == BattleState.PlayerTurn  && currentTarget) || player.currentSkill.canChain)
         {
+            Debug.Log("PlayerAttack() being called");
             StartCoroutine(PlayerAttackCoroutine(null));
         }
     }
@@ -100,16 +108,28 @@ public class BattleManager : MonoBehaviour
 
         if (player.currentSkill != null)
         {
-            if (player.currentSkill.requiresMovement)
+            if (player.currentSkill.requiresMovement && !player.currentSkill.canChain)
             {
+                Debug.Log("Passing check 4");
                 yield return player.MoveToTarget();
             }
             
             yield return player.currentSkill.Execute(player, targetEnemy, this);
 
-            yield return new WaitUntil(() => !player.isAttacking);
+            if (player.currentSkill.canChain && requestedSkill != null)
+            {
+                Debug.Log("Passing check 5");
+                player.currentSkill = requestedSkill;
+                requestedSkill = null;
+                yield return player.currentSkill.Execute(player, targetEnemy, this);
+            }
 
-            if (player.currentSkill.requiresMovement)
+            Debug.Log(player.isAttacking);
+            Debug.Log(player.currentSkill.canChain);
+            yield return new WaitUntil(() => !player.isAttacking || !player.currentSkill.canChain);
+            Debug.Log(player.isAttacking);
+            Debug.Log(player.currentSkill.canChain);
+            if (player.currentSkill.requiresMovement && !player.currentSkill.canChain)
             {
                 yield return player.ReturnToPosition();
             }
@@ -133,13 +153,17 @@ public class BattleManager : MonoBehaviour
             }
             
         }
-        else
+        else if (!player.currentSkill.canChain)
         {
             Debug.Log("Got this far, 2"); // Add this
             state = BattleState.EnemyTurn;
             Debug.Log("Changed state to EnemyTurn"); // Add this
             yield return new WaitForSeconds(1.0f);
             EnemyAttack();
+        }
+        else
+        {
+            Debug.Log("Skipping enemy state cause i can chain");
         }
     }
 
