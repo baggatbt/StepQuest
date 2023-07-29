@@ -35,6 +35,8 @@ public class BattleManager : MonoBehaviour
 
     private Vector3 outerCircleInitialScale;
     private Vector3 innerCircleInitialScale;
+    private bool isInChain = false;
+
 
     public Transform[] enemySpawnPoints; // enemySpawnPoint1, enemySpawnPoint2....
 
@@ -90,15 +92,46 @@ public class BattleManager : MonoBehaviour
 
 
 
-
-    public void PlayerAttack()
-    {
-        if ((state == BattleState.PlayerTurn  && currentTarget) || player.currentSkill.canChain)
+    /*
+        public void PlayerAttack()
         {
-            Debug.Log("PlayerAttack() being called");
-            StartCoroutine(PlayerAttackCoroutine(null));
+            if ((state == BattleState.PlayerTurn  && currentTarget) || player.currentSkill.canChain)
+            {
+                Debug.Log("PlayerAttack() being called");
+                StartCoroutine(PlayerAttackCoroutine(null));
+            }
+        }
+    */
+
+    public void PlayerAction()
+    {
+        if (state == BattleState.PlayerTurn && currentTarget)
+        {
+            Debug.Log("PlayerAction() being called");
+
+            if (!isInChain && player.currentSkill.requiresMovement)
+            {
+                StartCoroutine(PlayerMoveAndAttackCoroutine());
+            }
+            else
+            {
+                StartCoroutine(PlayerAttackCoroutine(null));
+            }
         }
     }
+
+
+    public IEnumerator PlayerMoveAndAttackCoroutine()
+    {
+        yield return player.MoveToTarget();
+        yield return StartCoroutine(PlayerAttackCoroutine(null));
+
+        yield return player.ReturnToPosition();
+        EnemyAttack();
+    }
+
+    
+
 
 
     public IEnumerator PlayerAttackCoroutine(System.Action successCallback)
@@ -108,75 +141,41 @@ public class BattleManager : MonoBehaviour
 
         if (player.currentSkill != null)
         {
-            if (player.currentSkill.requiresMovement && !player.currentSkill.canChain)
-            {
-                Debug.Log("Passing check 4");
-                yield return player.MoveToTarget();
-            }
-            
             yield return player.currentSkill.Execute(player, targetEnemy, this);
-
-            if (player.currentSkill.canChain && requestedSkill != null)
-            {
-                Debug.Log("Passing check 5");
-                player.currentSkill = requestedSkill;
-                requestedSkill = null;
-                yield return player.currentSkill.Execute(player, targetEnemy, this);
-            }
-
-            Debug.Log(player.isAttacking);
-            Debug.Log(player.currentSkill.canChain);
-            yield return new WaitUntil(() => !player.isAttacking || !player.currentSkill.canChain);
-            Debug.Log(player.isAttacking);
-            Debug.Log(player.currentSkill.canChain);
-            if (player.currentSkill.requiresMovement && !player.currentSkill.canChain)
-            {
-                yield return player.ReturnToPosition();
-            }
-            Debug.Log("Got this far, 1"); // Add this
-        }
-        else
-        {
-            Debug.Log("Standard Attack Performed - This should not happen");
-        }
-
-        if (targetEnemy.health <= 0)
-        {
-            Debug.Log(targetEnemy.name + " is defeated!");
-            enemies.Remove(targetEnemy);
-
-            if (enemies.Count == 0)
-            {
-                Debug.Log("You win, let's celebrate");
-                endOfBattlePanel.SetActive(true);
-                EndOfBattleRewards((Enemy)targetEnemy);
-            }
-            
-        }
-        else if (!player.currentSkill.canChain)
-        {
-            Debug.Log("Got this far, 2"); // Add this
+            yield return new WaitForSeconds(0.5f); //Waiting for animations to finish
             state = BattleState.EnemyTurn;
-            Debug.Log("Changed state to EnemyTurn"); // Add this
-            yield return new WaitForSeconds(1.0f);
-            EnemyAttack();
-        }
+            Debug.Log("Changed state to EnemyTurn");
+            
+         }
         else
         {
-            Debug.Log("Skipping enemy state cause i can chain");
+            Debug.Log("currentSkill  - This should not happen");
         }
     }
 
+
+    private Queue<Character> enemyTurnQueue = new Queue<Character>();
+
     public void EnemyAttack()
     {
-        if (enemies.Count == 0)
+        // If the queue is empty (or at the start of the enemy turn phase), populate it.
+        if (enemyTurnQueue.Count == 0)
         {
-            Debug.LogError("There are no enemies left to attack!");
+            foreach (var enemy in enemies)
+            {
+                if (enemy.health > 0) // Assuming you have some isDead flag on enemies
+                    enemyTurnQueue.Enqueue(enemy);
+            }
+        }
+
+        // If all enemies had their turns, it's the player's turn next.
+        if (enemyTurnQueue.Count == 0)
+        {
+            state = BattleState.PlayerTurn;
             return;
         }
 
-        Character attackingEnemy = enemies[UnityEngine.Random.Range(0, enemies.Count)];
-        Debug.Log(attackingEnemy);
+        Character attackingEnemy = enemyTurnQueue.Dequeue();
 
         if (!player.isAttacking && !attackingEnemy.isAttacking && state == BattleState.EnemyTurn)
         {
@@ -219,10 +218,19 @@ public class BattleManager : MonoBehaviour
         else
         {
             yield return new WaitForSeconds(1.5f);
-            state = BattleState.PlayerTurn;
+
+            // Check if there are more enemies to take their turns
+            if (enemyTurnQueue.Count > 0)
+            {
+                EnemyAttack();  // Next enemy's turn
+            }
+            else
+            {
+                state = BattleState.PlayerTurn;  // If all enemies had their turns, it's the player's turn next.
+            }
         }
     }
-   
+
 
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<TimingEventResult> callback)
 {

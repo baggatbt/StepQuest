@@ -22,7 +22,7 @@ public class Slash : Skill
         {
             target.TakeDamage(2);
             Debug.Log("Perfect Slash successful! " + target.name + " takes 2 damage.");
-            canChain = true;
+            //canChain = true;
             user.animator.SetTrigger("AttackFailTrigger");
             
         }
@@ -43,7 +43,7 @@ public class Slash : Skill
            
         }
     });
-    yield return new WaitForSeconds(0.5f); //The delay util the player attacks
+   
     
     
    

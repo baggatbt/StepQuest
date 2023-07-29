@@ -52,7 +52,7 @@ public class ButtonController : MonoBehaviour
     {
         // Set the skill to execute and start the attack
         battleManager.player.currentSkill = skill;
-        battleManager.PlayerAttack();
+        battleManager.PlayerAction();
     }
     else if (battleManager.player.isAttacking) // If the player is currently attacking and chooses another skill
     {

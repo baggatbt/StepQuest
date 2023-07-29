@@ -15,7 +15,8 @@ public class Character : MonoBehaviour
     public bool isAttacking = false;
     public SpriteRenderer spriteRenderer;
     public Animator animator;
-    
+    public Transform originalSpawnPoint; // Assign in inspector
+
 
     public bool animationEnded;
     public Skill currentSkill; // Property to store the current skill being used by the character
@@ -68,21 +69,23 @@ public class Character : MonoBehaviour
 
 
     public IEnumerator MoveToTarget()
-{
-    originalPosition = transform.position;
-    
-   
-    float offset = 1.0f; // The distance to stop from the enemy. Adjust this value as needed.
-    Vector3 direction = (attackTarget.position - transform.position).normalized;
-    Vector3 targetPosition = attackTarget.position - direction * offset;
-   
-    
+    {
+        if (gameObject.CompareTag("Player"))
+        {
+            Debug.Log("I am a player who will move");
+        }
 
-    yield return StartCoroutine(Move(targetPosition, 10.0f));
-}
+        originalPosition = transform.position;
+        float offset = 1.0f;
+        Vector3 direction = (attackTarget.position - transform.position).normalized;
+        Vector3 targetPosition = attackTarget.position - direction * offset;
+
+        yield return StartCoroutine(Move(targetPosition, 10.0f));
+    }
 
 
-public IEnumerator ReturnToPosition()
+
+    public IEnumerator ReturnToPosition()
 {
     yield return StartCoroutine(Move(originalPosition, 10.0f));
         animator.SetTrigger("StopMovementAnimationTrigger");

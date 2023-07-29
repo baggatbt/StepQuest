@@ -10,6 +10,7 @@ public class Player : Character
     public int exp; 
     public int gold; 
     public int stamina;
+    public Transform playerSpawnPoint; // You can assign this directly in the inspector
 
     // Start is called before the first frame update
     protected override void Start()
