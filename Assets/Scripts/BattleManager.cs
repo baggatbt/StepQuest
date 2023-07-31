@@ -9,6 +9,7 @@ using System.Collections.Generic;
 public class BattleManager : MonoBehaviour
 {
     public Character player;
+    public PlayerStats playerStats; 
     public List<Character> enemies = new List<Character>();
     private BattleState state;
     public int enemyAttackCount = 0;
@@ -72,10 +73,9 @@ public class BattleManager : MonoBehaviour
 
     public void StartBattle(BattleConfig config)
 {
-    // Use config.poolName and config.maxEnemiesToSpawn to set up your battle
-    // You can use the enemySpawnController to spawn the desired enemy type and number
-   // player = playerSpawnController.SpawnPlayer(playerSpawnPoint, healthBars[0]); // Assuming healthBars[0] is the player's health bar
-
+    // Use config.poolName and config.maxEnemiesToSpawn to set up battle
+    // use the enemySpawnController to spawn the desired enemy type and number
+   
     for (int i = 0; i < config.maxEnemiesToSpawn; i++)
     {
         // Spawn enemies based on the config.poolName
@@ -90,18 +90,6 @@ public class BattleManager : MonoBehaviour
     // TODO: Continue with any other setup like setting backgrounds, play music, etc.
 }
 
-
-
-    /*
-        public void PlayerAttack()
-        {
-            if ((state == BattleState.PlayerTurn  && currentTarget) || player.currentSkill.canChain)
-            {
-                Debug.Log("PlayerAttack() being called");
-                StartCoroutine(PlayerAttackCoroutine(null));
-            }
-        }
-    */
 
     public void PlayerAction()
     {
@@ -369,15 +357,29 @@ public class BattleManager : MonoBehaviour
         return state;
     }
 
-    public void EndOfBattleRewards(Enemy defeatedEnemy)
-    {
-        TextMeshProUGUI expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
-        Debug.Log(defeatedEnemy.expReward);
-        expGainedTextComponent.text = defeatedEnemy.expReward.ToString();
+    public void EndOfBattleRewards(List<Character> enemies)
+{
+    int totalExp = 0;
+    int totalGold = 0;
 
-        TextMeshProUGUI goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
-        goldGainedTextComponent.text = defeatedEnemy.goldReward.ToString();
+    foreach (Enemy enemy in enemies)
+    {
+        totalExp += enemy.expReward;
+        totalGold += enemy.goldReward;
     }
+
+    playerStats.exp += totalExp;
+    playerStats.gold += totalGold;
+    TextMeshProUGUI expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
+    expGainedTextComponent.text = totalExp.ToString();
+
+    TextMeshProUGUI goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
+    goldGainedTextComponent.text = totalGold.ToString();
+
+    Debug.Log($"Total EXP gained: {totalExp}");
+    Debug.Log($"Total Gold gained: {totalGold}");
+}
+
 
     private void Update()
     {
@@ -421,6 +423,7 @@ public void CheckBattleEnd()
 
     if (allEnemiesDefeated)
     {
+        EndOfBattleRewards(enemies);
         endOfBattlePanel.SetActive(true);
         
     }
