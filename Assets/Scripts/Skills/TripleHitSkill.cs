@@ -7,7 +7,7 @@ public class TripleHitSkill : Skill
 
     public TripleHitSkill()
     {
-        name = "Triple Hit";
+        skillName = "Triple Hit";
         description = "Hits the enemy 3 times with timing checks before each hit";
         requiresMovement = true;
     }

@@ -9,7 +9,7 @@ public class SwordWave : Skill
 
     public SwordWave(GameObject swordWavePrefab)
     {
-        name = "SwordWave";
+        skillName = "SwordWave";
         description = "Release a powerful wave from your sword.";
         this.swordWavePrefab = swordWavePrefab;
         requiresMovement = false;

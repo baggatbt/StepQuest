@@ -6,7 +6,7 @@ public class Slash : Skill
 {
     public Slash()
     {
-        name = "Slash";
+        skillName = "Slash";
         description = "A powerful slashing attack.";
         requiresMovement = true;
     }

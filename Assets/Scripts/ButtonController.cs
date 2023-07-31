@@ -1,64 +1,48 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+
+
 
 public class ButtonController : MonoBehaviour
 {
+    public TextMeshProUGUI buttonText;
     public BattleManager battleManager;
-    public SkillType skillType; // Skill type that this button will trigger.
-    public GameObject swordWavePrefab; // assign this in the Inspector
+    public int slotIndex; // Add this line. This indicates which slot this button corresponds to.
+    
 
-
-    public enum SkillType
-    {
-        Slash,
-        TripleHit, // Add more as needed...
-        SwordWave,
-    }
+    
 
     private Skill skill;
 
-    void Awake()
-    {
-        switch (skillType)
-        {
-            case SkillType.Slash:
-                skill = new Slash();
-                break;
-
-            case SkillType.TripleHit:
-                skill = new TripleHitSkill();
-                break;
-
-            case SkillType.SwordWave:
-                skill = new SwordWave(swordWavePrefab);
-                break;
-
-
-            // Add more cases as needed...
-
-            default:
-                Debug.LogError("Invalid skill type: " + skillType);
-                break;
-        }
-    }
-
-
-    private Skill requestedSkill; // This skill is the one that the player chooses next during an ongoing attack.
-
-   public void OnButtonClick()
+   void Start()
 {
-    if (!battleManager.player.isAttacking && !battleManager.IsAnyEnemyAttacking())
+    skill = SkillAssignmentManager.Instance.GetSkillForSlot(slotIndex);
+    if(skill != null)
     {
-        // Set the skill to execute and start the attack
-        battleManager.player.currentSkill = skill;
-        battleManager.PlayerAction();
+        buttonText.text = skill.skillName; // Adjust based on your Skill class.
     }
-    else if (battleManager.player.isAttacking) // If the player is currently attacking and chooses another skill
+    else
     {
-        battleManager.requestedSkill = skill;
+        Debug.LogError("No skill assigned to slot " + slotIndex);
+        buttonText.text = "Unassigned"; // Or another default text.
     }
 }
 
 
+    public void OnButtonClick()
+    {
+        if (!battleManager.player.isAttacking && !battleManager.IsAnyEnemyAttacking())
+        {
+            // Set the skill to execute and start the attack
+            battleManager.player.currentSkill = skill;
+            battleManager.PlayerAction();
+        }
+        else 
+        {
+            Debug.Log("Error, no skill selected or another condition preventing skill execution.");
+        }
+    }
 }
