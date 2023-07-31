@@ -11,16 +11,26 @@ public struct AttackStage
     public int damage;
 }
 
+public enum SkillType
+{
+    SingleTarget,
+    AreaOfEffect
+}
+
+
 public abstract class Skill
 {
     public string name;
     public string description;
-    public bool skillExecutionComplete; // Flag to track the completion of skill execution 
-    public bool canChain = false;
+    public bool skillExecutionComplete; // Flag to track the completion of skill execution
     public bool requiresMovement; // Indicates if the attack requires movement towards the target
+    public SkillType skillType = SkillType.SingleTarget;
 
 
     public abstract IEnumerator Execute(Character user, Character target, BattleManager battleManager);
+
+    
+
 
 
 

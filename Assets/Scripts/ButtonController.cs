@@ -48,7 +48,7 @@ public class ButtonController : MonoBehaviour
 
    public void OnButtonClick()
 {
-    if ((!battleManager.player.isAttacking && !battleManager.IsAnyEnemyAttacking()) || battleManager.player.currentSkill.canChain)
+    if (!battleManager.player.isAttacking && !battleManager.IsAnyEnemyAttacking())
     {
         // Set the skill to execute and start the attack
         battleManager.player.currentSkill = skill;

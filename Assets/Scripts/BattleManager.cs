@@ -145,7 +145,7 @@ public class BattleManager : MonoBehaviour
             yield return new WaitForSeconds(0.5f); //Waiting for animations to finish
             state = BattleState.EnemyTurn;
             Debug.Log("Changed state to EnemyTurn");
-            
+            CheckBattleEnd();
          }
         else
         {
@@ -217,17 +217,18 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            yield return new WaitForSeconds(1.5f);
+            yield return new WaitForSeconds(1.0f);
 
-            // Check if there are more enemies to take their turns
-            if (enemyTurnQueue.Count > 0)
-            {
-                EnemyAttack();  // Next enemy's turn
-            }
-            else
-            {
-                state = BattleState.PlayerTurn;  // If all enemies had their turns, it's the player's turn next.
-            }
+           // Check if there are more enemies to take their turns
+        if (enemyTurnQueue.Count > 0)
+        {
+            EnemyAttack();  // Next enemy's turn
+        }
+        else
+        {
+            state = BattleState.PlayerTurn;  // If all enemies had their turns, it's the player's turn next.
+        }
+        CheckBattleEnd();
         }
     }
 
@@ -404,6 +405,27 @@ public class BattleManager : MonoBehaviour
     }
     return false;
 }
+
+public void CheckBattleEnd()
+{
+    bool allEnemiesDefeated = true;
+
+    foreach (var enemy in enemies)
+    {
+        if (enemy.health > 0)  
+        {
+            allEnemiesDefeated = false;
+            break;
+        }
+    }
+
+    if (allEnemiesDefeated)
+    {
+        endOfBattlePanel.SetActive(true);
+        
+    }
+}
+
 
 
 }
