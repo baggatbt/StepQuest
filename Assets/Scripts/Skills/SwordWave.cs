@@ -13,6 +13,7 @@ public class SwordWave : Skill
         description = "Release a powerful wave from your sword.";
         this.swordWavePrefab = swordWavePrefab;
         requiresMovement = false;
+        energyCost = 2;
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)

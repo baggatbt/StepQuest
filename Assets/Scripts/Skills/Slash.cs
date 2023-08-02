@@ -9,6 +9,7 @@ public class Slash : Skill
         skillName = "Slash";
         description = "A powerful slashing attack.";
         requiresMovement = true;
+        energyCost = 1;
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)

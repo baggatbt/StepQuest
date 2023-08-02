@@ -30,16 +30,31 @@ public class ButtonController : MonoBehaviour
 
 
     public void OnButtonClick()
+{
+    Debug.Log("Button clicked for skill: " + skill.skillName);
+
+    if(skill.energyCost <= battleManager.player.energy)
     {
         if (!battleManager.player.isAttacking && !battleManager.IsAnyEnemyAttacking())
         {
-            // Set the skill to execute and start the attack
-            battleManager.player.currentSkill = skill;
-            battleManager.PlayerAction();
+           battleManager.player.SpendEnergy(skill.energyCost);
+            Debug.Log("Energy after deduction: " + battleManager.player.energy);
+
+            battleManager.skillQueue.Enqueue(skill); 
+            Debug.Log("Skill " + skill.skillName + " added to queue. Current queue size: " + battleManager.skillQueue.Count);
+
+            // Maybe give some visual feedback that the skill is queued?
         }
         else 
         {
-            Debug.Log("Error, no skill selected or another condition preventing skill execution.");
+            Debug.Log("Cannot queue skill due to some condition (isAttacking or IsAnyEnemyAttacking).");
         }
     }
+    else
+    {
+        Debug.Log("Not enough energy to queue this skill!");
+    }
+}
+
+
 }

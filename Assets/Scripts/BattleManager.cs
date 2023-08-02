@@ -17,6 +17,8 @@ public class BattleManager : MonoBehaviour
     public HoldReleaseSlider holdReleaseSlider;
     public Slider[] healthBars; //set these in the inspector
     public Skill requestedSkill; // The skill the player chooses next during an ongoing attack.
+    public Queue<Skill> skillQueue = new Queue<Skill>();
+
 
 
 
@@ -36,7 +38,8 @@ public class BattleManager : MonoBehaviour
 
     private Vector3 outerCircleInitialScale;
     private Vector3 innerCircleInitialScale;
-   
+    private TextMeshProUGUI expGainedTextComponent;
+    private TextMeshProUGUI goldGainedTextComponent;
 
 
     public Transform[] enemySpawnPoints; // enemySpawnPoint1, enemySpawnPoint2....
@@ -48,15 +51,39 @@ public class BattleManager : MonoBehaviour
     [SerializeField]
     private BattleConfig currentBattleConfig;
 
+    public BattleState State
+    {
+        get { return state; }
+        private set 
+        {
+            state = value;
+            switch (state)
+            {
+                case BattleState.PlayerTurn:
+                    Debug.Log("Player Turn Started!");
+                    break;
+                case BattleState.EnemyTurn:
+                    Debug.Log("Enemy Turn Started!");
+                    StartEnemyTurn();
+                    break;
+            }
+        }
+    }
+
 
    private void Start()
 {
-    state = BattleState.PlayerTurn;
+     State = BattleState.PlayerTurn;
     outerCircleInitialScale = outerCircle.transform.localScale;
     innerCircleInitialScale = innerCircle.transform.localScale;
 
     outerCircle.SetActive(false);
     innerCircle.SetActive(false);
+
+     // Cache the components
+        expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
+        goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
+   
 
     if (currentBattleConfig != null)
     {
@@ -69,80 +96,121 @@ public class BattleManager : MonoBehaviour
     }
 }
 
-
-
-    public void StartBattle(BattleConfig config)
+    private void StartEnemyTurn()
 {
-    // Use config.poolName and config.maxEnemiesToSpawn to set up battle
-    // use the enemySpawnController to spawn the desired enemy type and number
-   
-    for (int i = 0; i < config.maxEnemiesToSpawn; i++)
-    {
-        // Spawn enemies based on the config.poolName
-        Character spawnedEnemy = enemySpawnController.SpawnEnemiesFromPool(config.poolName, 1, enemySpawnPoints[i], healthBars[i]);
-
-        // Add spawned enemy to the list
-        if (spawnedEnemy != null)
-        {
-            enemies.Add(spawnedEnemy);
-        }
-    }
-    // TODO: Continue with any other setup like setting backgrounds, play music, etc.
+    EnemyAttack();
 }
 
-   
-    public void PlayerAction()
-    {
-        if (state == BattleState.PlayerTurn && currentTarget)
-        {
-            Debug.Log("PlayerAction() being called");
 
-            if (player.currentSkill.requiresMovement)
+    private void ChangeState(BattleState newState)
+    {
+        State = newState;
+    }
+
+
+
+
+        public void StartBattle(BattleConfig config)
+    {
+        // Use config.poolName and config.maxEnemiesToSpawn to set up battle
+        // use the enemySpawnController to spawn the desired enemy type and number
+    
+        for (int i = 0; i < config.maxEnemiesToSpawn; i++)
+        {
+            // Spawn enemies based on the config.poolName
+            Character spawnedEnemy = enemySpawnController.SpawnEnemiesFromPool(config.poolName, 1, enemySpawnPoints[i], healthBars[i]);
+
+            // Add spawned enemy to the list
+            if (spawnedEnemy != null)
             {
-                StartCoroutine(PlayerMoveAndAttackCoroutine());
-                
-            }
-            else
-            {
-                StartCoroutine(PlayerAttackCoroutine(null));
-                
+                enemies.Add(spawnedEnemy);
             }
         }
-        //Modifty button controller to "Queue up" moves. At the cost of energy, check before launching attack. 
+        // TODO: Continue with any other setup like setting backgrounds, play music, etc.
     }
+
+        public void ExecuteQueuedSkills()
+    {
+        StartCoroutine(ExecuteAllSkillsCoroutine());
+    }
+
+    public int skillsExecuted = 0;
+    private IEnumerator ExecuteAllSkillsCoroutine()
+    {
+        Debug.Log("Executing queued skills. Current queue size before execution: " + skillQueue.Count);
+
+        // Dequeue skills one by one and execute them
+        Debug.Log("Starting skill execution loop");
+        int skillsExecuted = 0;
+        while(skillQueue.Count > 0)
+        {
+            Debug.Log("Skill execution of  " + skillQueue.Count);
+            Skill skill = skillQueue.Dequeue();
+            Debug.Log("Executing skill: " + skill.skillName);
+            player.currentSkill = skill;
+            skillsExecuted++;
+            yield return StartCoroutine(PlayerAction());
+            
+        }
+        
+        
+        Debug.Log("Cleared the skill queue after execution.");
+        skillsExecuted = 0;
+
+        // Move player back to their original position after all skills executed.
+        yield return player.ReturnToPosition();
+        
+
+        ChangeState(BattleState.EnemyTurn);
+    }
+
+
+    public IEnumerator PlayerAction()
+{
+    if (state == BattleState.PlayerTurn && currentTarget)
+    {
+        Debug.Log("PlayerAction() being called");
+
+        if (player.currentSkill.requiresMovement && skillsExecuted == 0)
+        {
+            yield return StartCoroutine(PlayerMoveAndAttackCoroutine());
+        }
+        else
+        {
+            yield return StartCoroutine(PlayerAttackCoroutine(null));
+        }
+    }
+}
 
 
     public IEnumerator PlayerMoveAndAttackCoroutine()
+{
+    // Only move if the player is not already at the target
+    if (player.transform.position != currentTarget.transform.position)
     {
         yield return player.MoveToTarget();
-        yield return StartCoroutine(PlayerAttackCoroutine(null));
-
-        yield return player.ReturnToPosition();
-        EnemyAttack();
     }
 
-    
-
-
+    yield return StartCoroutine(PlayerAttackCoroutine(null));
+}
 
     public IEnumerator PlayerAttackCoroutine(System.Action successCallback)
-    {
-        Character targetEnemy = currentTarget.GetComponent<Character>();
-        yield return new WaitUntil(() => targetEnemy.isAttacking == false);
+{
+    Character targetEnemy = currentTarget.GetComponent<Character>();
+    yield return new WaitUntil(() => targetEnemy.isAttacking == false);
 
-        if (player.currentSkill != null)
-        {
-            yield return player.currentSkill.Execute(player, targetEnemy, this);
-            yield return new WaitForSeconds(0.5f); //Waiting for animations to finish
-            state = BattleState.EnemyTurn;
-            Debug.Log("Changed state to EnemyTurn");
-            CheckBattleEnd();
-         }
-        else
-        {
-            Debug.Log("currentSkill  - This should not happen");
-        }
+    if (player.currentSkill != null)
+    {
+        yield return player.currentSkill.Execute(player, targetEnemy, this);
+        yield return new WaitForSeconds(0.5f);
+        CheckBattleEnd();
     }
+    else
+    {
+        Debug.Log("currentSkill  - This should not happen");
+    }
+}
+
 
 
     private Queue<Character> enemyTurnQueue = new Queue<Character>();

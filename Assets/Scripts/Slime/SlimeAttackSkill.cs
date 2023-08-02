@@ -8,6 +8,7 @@ public class SlimeAttackSkill : Skill
         skillName = "Slime Attack";
         description = "The slime attacks the player. The damage can be reduced by timely action.";
         requiresMovement = true;
+        energyCost = 0;
 
     }
 

@@ -6,6 +6,7 @@ public class PlayerSpawnController : MonoBehaviour
     public GameObject playerPrefab;
     public Transform playerSpawnPoint; // You can assign this directly in the inspector
     public Slider associatedHealthBarSlider; // Reference to the slider
+    public Slider associatedEnergyBarSlider;
 
    
 
@@ -27,5 +28,10 @@ public class PlayerSpawnController : MonoBehaviour
         associatedHealthBarSlider.gameObject.SetActive(true); // Activate the health bar
         associatedHealthBarSlider.maxValue = spawnedPlayer.maxHealth;
         associatedHealthBarSlider.value = spawnedPlayer.health;
+
+        spawnedPlayer.energyBar = associatedEnergyBarSlider;
+        associatedEnergyBarSlider.gameObject.SetActive(true); // Activate the energy bar
+        associatedEnergyBarSlider.maxValue = spawnedPlayer.maxEnergy;
+        associatedEnergyBarSlider.value = spawnedPlayer.energy;
     }
 }
