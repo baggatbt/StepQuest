@@ -11,25 +11,22 @@ public class ButtonController : MonoBehaviour
     public TextMeshProUGUI buttonText;
     public BattleManager battleManager;
     public int slotIndex; // Add this line. This indicates which slot this button corresponds to.
-    
-
-    
-
+   
     private Skill skill;
 
-   void Start()
-{
-    skill = SkillAssignmentManager.Instance.GetSkillForSlot(slotIndex);
-    if(skill != null)
+       void Start()
     {
-        buttonText.text = skill.skillName; // Adjust based on your Skill class.
+        skill = SkillAssignmentManager.Instance.GetSkillForSlot(slotIndex);
+        if(skill != null)
+        {
+            buttonText.text = skill.skillName; // Adjust based on your Skill class.
+        }
+        else
+        {
+            Debug.LogError("No skill assigned to slot " + slotIndex);
+            buttonText.text = "Unassigned"; // Or another default text.
+        }
     }
-    else
-    {
-        Debug.LogError("No skill assigned to slot " + slotIndex);
-        buttonText.text = "Unassigned"; // Or another default text.
-    }
-}
 
 
     public void OnButtonClick()

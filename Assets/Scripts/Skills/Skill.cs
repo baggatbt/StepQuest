@@ -26,6 +26,7 @@ public abstract class Skill
     public string description;
     public bool skillExecutionComplete; // Flag to track the completion of skill execution
     public bool requiresMovement; // Indicates if the attack requires movement towards the target
+    public bool comboEnergyRequirement;
     
 
 

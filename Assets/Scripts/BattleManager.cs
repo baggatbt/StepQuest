@@ -36,7 +36,7 @@ public class BattleManager : MonoBehaviour
 
     private Vector3 outerCircleInitialScale;
     private Vector3 innerCircleInitialScale;
-    private bool isInChain = false;
+   
 
 
     public Transform[] enemySpawnPoints; // enemySpawnPoint1, enemySpawnPoint2....
@@ -90,22 +90,25 @@ public class BattleManager : MonoBehaviour
     // TODO: Continue with any other setup like setting backgrounds, play music, etc.
 }
 
-
+   
     public void PlayerAction()
     {
         if (state == BattleState.PlayerTurn && currentTarget)
         {
             Debug.Log("PlayerAction() being called");
 
-            if (!isInChain && player.currentSkill.requiresMovement)
+            if (player.currentSkill.requiresMovement)
             {
                 StartCoroutine(PlayerMoveAndAttackCoroutine());
+                
             }
             else
             {
                 StartCoroutine(PlayerAttackCoroutine(null));
+                
             }
         }
+        //Modifty button controller to "Queue up" moves. At the cost of energy, check before launching attack. 
     }
 
 
