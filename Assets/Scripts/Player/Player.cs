@@ -5,28 +5,32 @@ using UnityEngine.UI;
 
 public class Player : Character
 {
-    public string playerClass; // Player's class e.g. "Warrior", "Mage", etc.
-    public int level; // Player's level
-    public int exp; // Player's experience points
-    public int gold; // Player's gold
+    public string playerClass; //Warrior Mage Etc etc..
+    public int level; 
+    public int exp; 
+    public int gold; 
+    public int stamina;
+    public Transform playerSpawnPoint; // assign this directly in the inspector
 
     // Start is called before the first frame update
     protected override void Start()
-    {
-        base.Start(); // Call the Start function of the base class (Character)
+{
+    base.Start(); 
 
-        // Initialize player specific stats
-        level = 1;
-        exp = 0;
-        gold = 0;
-    }
+    // Initialize player specific stats
+    level = 1;
+    exp = 0;
+    gold = 0;
+   
+}
+
 
     // Method to add experience points to the player and level up if necessary
     public void GainExp(int amount)
     {
         exp += amount;
 
-        // Simple level up logic: level up every 100 exp points
+        // Simple level up logic TO BE REPLACED: level up every 100 exp points
         while (exp >= 100)
         {
             exp -= 100;
@@ -55,4 +59,7 @@ public class Player : Character
             Debug.Log("Not enough gold. Need " + (amount - gold) + " more gold");
         }
     }
+
+    
+
 }

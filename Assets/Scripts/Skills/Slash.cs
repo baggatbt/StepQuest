@@ -6,34 +6,47 @@ public class Slash : Skill
 {
     public Slash()
     {
-        name = "Slash";
+        skillName = "Slash";
         description = "A powerful slashing attack.";
+        requiresMovement = true;
+        energyCost = 1;
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
-{   // yield return user.MoveToTarget();
+{   
     yield return battleManager.PlayerActiveTimeEvent(0.0f, 1.0f, (result) =>
     {
         user.animator.SetTrigger("Attack1Trigger");
+        user.isAttacking = true;
 
-        if (result == TimingEventResult.Perfect || result == TimingEventResult.Good)
+        if (result == TimingEventResult.Perfect)
+        {
+            target.TakeDamage(2);
+            Debug.Log("Perfect Slash successful! " + target.name + " takes 2 damage.");
+            //canChain = true;
+            user.animator.SetTrigger("AttackFailTrigger");
+            
+        }
+        else if (result == TimingEventResult.Good)
         {
             target.TakeDamage(2);
             Debug.Log("Slash successful! " + target.name + " takes 2 damage.");
-            
             user.animator.SetTrigger("AttackFailTrigger");
-            
+            user.isAttacking = false;
+
         }
         else
         {
             target.TakeDamage(1);
             Debug.Log("Slash missed! " + target.name + " takes 1 damage.");
             user.animator.SetTrigger("AttackFailTrigger");
+            user.isAttacking = false;
            
         }
     });
-    yield return new WaitForSeconds(0.5f); //The delay util the player attacks
-   // yield return user.ReturnToPosition();
-    skillExecutionComplete = true;
+   
+    
+    
+   
 }
 }

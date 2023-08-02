@@ -11,14 +11,29 @@ public struct AttackStage
     public int damage;
 }
 
+public enum SkillType
+    {
+        None,
+        Slash,
+        TripleHit,
+        SwordWave,
+    }
+
+
 public abstract class Skill
 {
-    public string name;
+    public string skillName;
     public string description;
-    public bool skillExecutionComplete; // Flag to track the completion of skill execution 
-    public List<AttackStage> attackStages;
+    public bool skillExecutionComplete; // Flag to track the completion of skill execution
+    public bool requiresMovement; // Indicates if the attack requires movement towards the target
+    public int energyCost;
+    
+
 
     public abstract IEnumerator Execute(Character user, Character target, BattleManager battleManager);
+
+    
+
 
 
 

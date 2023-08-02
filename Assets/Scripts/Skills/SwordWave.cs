@@ -5,16 +5,21 @@ using UnityEngine;
 public class SwordWave : Skill
 {
     private GameObject swordWavePrefab;
+    
 
     public SwordWave(GameObject swordWavePrefab)
     {
-        name = "SwordWave";
+        skillName = "SwordWave";
         description = "Release a powerful wave from your sword.";
         this.swordWavePrefab = swordWavePrefab;
+        requiresMovement = false;
+        energyCost = 2;
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
+        user.isAttacking = true;
+
         yield return battleManager.PlayerHoldReleaseTimeEvent(0.0f, 1.0f, (result) =>
         {
             user.animator.SetTrigger("SwordWaveTrigger");
@@ -47,6 +52,10 @@ public class SwordWave : Skill
         });
 
         skillExecutionComplete = true;
+        user.isAttacking = false;
     }
+
+
+
 }
 
