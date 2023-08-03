@@ -9,8 +9,9 @@ using System.Collections.Generic;
 public class BattleManager : MonoBehaviour
 {
     public Character player;
-    public PlayerStats playerStats; 
+    public Player playerStats; 
     public List<Character> enemies = new List<Character>();
+    public GameObject playerPrefab;
     private BattleState state;
     public int enemyAttackCount = 0;
     public GameObject currentTarget;
@@ -73,17 +74,17 @@ public class BattleManager : MonoBehaviour
 
    private void Start()
 {
-     State = BattleState.PlayerTurn;
+    State = BattleState.PlayerTurn;
     outerCircleInitialScale = outerCircle.transform.localScale;
     innerCircleInitialScale = innerCircle.transform.localScale;
 
     outerCircle.SetActive(false);
     innerCircle.SetActive(false);
 
-     // Cache the components
-        expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
-        goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
-   
+    // Cache the components
+    expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
+    goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
+
 
     if (currentBattleConfig != null)
     {
@@ -332,13 +333,15 @@ public class BattleManager : MonoBehaviour
             else
             {
                 Debug.Log("Timing Missed!");
-                result = TimingEventResult.Miss;
+                result = TimingEventResult.Miss; //Breaks the queue'd chain if anything misses.
+                skillQueue.Clear();
             }
         }
         else
         {
             Debug.Log("No input detected. Missed!");
             result = TimingEventResult.Miss;
+            skillQueue.Clear();
         }
 
         callback(result);

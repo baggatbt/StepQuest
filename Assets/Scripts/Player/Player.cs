@@ -2,64 +2,55 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro; // Namespace for TextMeshPro
 
+
+[System.Serializable]
 public class Player : Character
 {
-    public string playerClass; //Warrior Mage Etc etc..
-    public int level; 
-    public int exp; 
-    public int gold; 
-    public int stamina;
-    public Transform playerSpawnPoint; // assign this directly in the inspector
+    public Transform playerSpawnPoint;
+    public PlayerStats playerStats;
+    // The TextMeshProUGUI references.
+    public TextMeshProUGUI levelText;
+    public TextMeshProUGUI expText;
+    public TextMeshProUGUI goldText;
+    public int exp;
+    public int gold;
+    public int level;
 
-    // Start is called before the first frame update
-    protected override void Start()
+    protected override void Awake()
 {
-    base.Start(); 
-
-    // Initialize player specific stats
-    level = 1;
-    exp = 0;
-    gold = 0;
-   
-}
-
-
-    // Method to add experience points to the player and level up if necessary
-    public void GainExp(int amount)
-    {
-        exp += amount;
-
-        // Simple level up logic TO BE REPLACED: level up every 100 exp points
-        while (exp >= 100)
-        {
-            exp -= 100;
-            level++;
-            Debug.Log("Level up! Now at level " + level);
-        }
-    }
-
-    // Method to add gold to the player
-    public void GainGold(int amount)
-    {
-        gold += amount;
-        Debug.Log("Gained " + amount + " gold. Now have " + gold + " gold");
-    }
-
-    // Method to deduct gold from the player
-    public void SpendGold(int amount)
-    {
-        if (gold >= amount)
-        {
-            gold -= amount;
-            Debug.Log("Spent " + amount + " gold. Now have " + gold + " gold");
-        }
-        else
-        {
-            Debug.Log("Not enough gold. Need " + (amount - gold) + " more gold");
-        }
-    }
-
+    base.Awake();
+        
+        this.attackPower = 2;
+        this.maxHealth = 10;
+        this.health = maxHealth;
+        this.maxEnergy = 10;
+        this.energy = maxEnergy;
+        this.defensePower = 0;
     
+    }
 
+    void Update()
+{
+    // Convert the level, exp, and gold int values to strings and update the text fields.
+    if(levelText != null)
+    {
+        levelText.text = "Level: " + level.ToString();
+    }
+
+    if(expText != null)
+    {
+        expText.text = "EXP: " + exp.ToString();
+    }
+
+    if(goldText != null)
+    {
+        goldText.text = "Gold: " + gold.ToString();
+    }
 }
+}
+
+
+   
+

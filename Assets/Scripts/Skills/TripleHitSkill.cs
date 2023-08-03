@@ -63,6 +63,7 @@ public class TripleHitSkill : Skill
                 Debug.Log("Perfect Hit!");
                 user.animator.SetTrigger(trigger);
                 target.TakeDamage(1);
+                user.GainEnergy((energyCost / 2));
                 break;
             case TimingEventResult.Good:
                 Debug.Log("Good Hit!");

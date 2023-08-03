@@ -29,6 +29,7 @@ public class SwordWave : Skill
                 case TimingEventResult.Perfect:
                     target.TakeDamage(2);
                     Debug.Log("SwordWave Perfect! " + target.name + " takes 2 damage.");
+                    user.GainEnergy((energyCost / 2));
                     user.animator.SetTrigger("AttackFailTrigger");
 
                     // Use Object.Instantiate to spawn the sword wave
