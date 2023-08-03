@@ -9,11 +9,12 @@ using TMPro; // Namespace for TextMeshPro
 public class Player : Character
 {
     public Transform playerSpawnPoint;
-    public PlayerStats playerStats;
     // The TextMeshProUGUI references.
     public TextMeshProUGUI levelText;
     public TextMeshProUGUI expText;
     public TextMeshProUGUI goldText;
+    public TextMeshProUGUI attackPowerText;
+    public TextMeshProUGUI defensePowerText;
     public int exp;
     public int gold;
     public int level;
@@ -21,7 +22,7 @@ public class Player : Character
     protected override void Awake()
 {
     base.Awake();
-        
+        this.level = 1;
         this.attackPower = 2;
         this.maxHealth = 10;
         this.health = maxHealth;
@@ -47,6 +48,14 @@ public class Player : Character
     if(goldText != null)
     {
         goldText.text = "Gold: " + gold.ToString();
+    }
+    if(attackPowerText != null)
+    {
+        attackPowerText.text = "AP: " + attackPower.ToString();
+    }
+    if(defensePowerText != null)
+    {
+        defensePowerText.text = "DP: " + defensePower.ToString();
     }
 }
 }
