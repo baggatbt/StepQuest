@@ -203,7 +203,7 @@ public class BattleManager : MonoBehaviour
     if (player.currentSkill != null)
     {
         yield return player.currentSkill.Execute(player, targetEnemy, this);
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.3f);
         CheckBattleEnd();
     }
     else
@@ -311,6 +311,9 @@ public class BattleManager : MonoBehaviour
     // Start the inner circle at a very small size
     Vector3 innerCircleInitialScale = new Vector3(0.01f, 0.01f, 0.01f);
 
+    float speedFactor = 1.5f;  // Change this value to adjust speed. Higher means faster.
+
+
     try
     {
         while (timer < totalWindowDuration)
@@ -324,7 +327,7 @@ public class BattleManager : MonoBehaviour
                 break;
             }
 
-            timer += Time.deltaTime;
+            timer += Time.deltaTime * speedFactor;
             yield return null;
         }
 

@@ -114,13 +114,13 @@ public void GainEnergy(int energyGained)
     {
         Vector3 targetPosition = GetTargetPosition(1.0f);
         checkCollisionsDuringMovement = true;
-        yield return StartCoroutine(Move(targetPosition, 10.0f));
+        yield return StartCoroutine(Move(targetPosition, 15.0f));
     }
 
     public IEnumerator ReturnToPosition()
     {
         checkCollisionsDuringMovement = false;
-        yield return StartCoroutine(Move(originalPosition, 10.0f));
+        yield return StartCoroutine(Move(originalPosition, 15.0f));
         animator.SetTrigger("StopMovementAnimationTrigger");
     }
 
