@@ -13,6 +13,7 @@ public class PlayerData : MonoBehaviour
     public int defensePower;
     public Dictionary<string, int> skillLevels; // Keep track of each skill's level
     public Dictionary<string, int> skillExp; // Keep track of each skill's experience
+    public bool isInitialized = false;
 
 
     private void Awake()
@@ -31,6 +32,8 @@ public class PlayerData : MonoBehaviour
     // Initialization method to setup data
     public void Initialize(Player player)
     {
+        if (isInitialized) return; // Skip if already initialized
+        
         level = player.level;
         exp = player.exp;
         gold = player.gold;
@@ -40,6 +43,8 @@ public class PlayerData : MonoBehaviour
         // Initialize the skillLevels dictionary
         skillLevels = new Dictionary<string, int>();
         skillExp = new Dictionary<string, int>();
+
+        isInitialized = true; // Mark as initialized
     }
 
     // Method to increase the level of a skill
