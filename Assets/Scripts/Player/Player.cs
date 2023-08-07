@@ -17,21 +17,27 @@ public class Player : Character
     public TextMeshProUGUI defensePowerText;
     public Button saveButton;
     public Button loadButton;
+    public int level;
     public int exp;
     public int gold;
-    public int level;
 
-    protected override void Awake()
-{
-    base.Awake();
+   protected override void Awake()
+    {
+        base.Awake();
         this.level = 1;
+        this.exp = 0; // initialize exp
+        this.gold = 0; // initialize gold
         this.attackPower = 2;
         this.maxHealth = 10;
         this.health = maxHealth;
         this.maxEnergy = 10;
         this.energy = maxEnergy;
         this.defensePower = 0;
-    
+
+        // Initialize PlayerData with the current Player values
+        PlayerData.Instance.Initialize(this);
+        
+        
     }
 
     void Update()

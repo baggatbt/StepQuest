@@ -2003,6 +2003,55 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   thisSkillType: 1
+--- !u!1 &937494368
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 937494370}
+  - component: {fileID: 937494369}
+  m_Layer: 0
+  m_Name: PlayerData
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &937494369
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 937494368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b28ae2aeb9ce5e04eab0528e33297d88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  level: 0
+  exp: 0
+  gold: 0
+  attackPower: 0
+  defensePower: 0
+--- !u!4 &937494370
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 937494368}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 513.251, y: 343.80322, z: 54.17184}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &951623231
 GameObject:
   m_ObjectHideFlags: 0
@@ -2896,7 +2945,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1211663000}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1274183894}
+        m_TargetAssemblyTypeName: Player, Assembly-CSharp
+        m_MethodName: SavePlayerData
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1211663000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3085,8 +3146,9 @@ GameObject:
   - component: {fileID: 1274183892}
   - component: {fileID: 1274183893}
   - component: {fileID: 1274183894}
+  - component: {fileID: 1274183896}
   m_Layer: 0
-  m_Name: EventSystem
+  m_Name: EventSystemMainMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3218,9 +3280,21 @@ MonoBehaviour:
   defensePowerText: {fileID: 1663805952}
   saveButton: {fileID: 1211662999}
   loadButton: {fileID: 1477607124}
+  level: 0
   exp: 0
   gold: 0
-  level: 0
+--- !u!114 &1274183896
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1274183887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6b88ec8e2e05e749a0a7086bdc91951, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1392520626
 GameObject:
   m_ObjectHideFlags: 0
@@ -3573,7 +3647,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1477607125}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1274183894}
+        m_TargetAssemblyTypeName: Player, Assembly-CSharp
+        m_MethodName: LoadPlayerData
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1477607125
 MonoBehaviour:
   m_ObjectHideFlags: 0
