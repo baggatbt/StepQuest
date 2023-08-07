@@ -9,7 +9,7 @@ using System.Collections.Generic;
 public class BattleManager : MonoBehaviour
 {
     public Character player;
-    public Player playerStats; 
+    public PlayerData playerCharacterData;
     public List<Character> enemies = new List<Character>();
     public GameObject playerPrefab;
     private BattleState state;
@@ -216,6 +216,7 @@ public class BattleManager : MonoBehaviour
 
     private Queue<Character> enemyTurnQueue = new Queue<Character>();
 
+
     public void EnemyAttack()
     {
         // If the queue is empty (or at the start of the enemy turn phase), populate it.
@@ -286,12 +287,16 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
+            player.energy += energyRegenAmount;
+            Debug.Log(energyRegenAmount + "Regen'd");
             state = BattleState.PlayerTurn;  // If all enemies had their turns, it's the player's turn next.
         }
         CheckBattleEnd();
         }
     }
-
+    
+    public int energyRegenAmount = 5;
+   
 
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<TimingEventResult> callback)
 {
@@ -442,8 +447,9 @@ public class BattleManager : MonoBehaviour
         totalGold += enemy.goldReward;
     }
 
-    playerStats.exp += totalExp;
-    playerStats.gold += totalGold;
+    PlayerData.Instance.exp += totalExp;
+    PlayerData.Instance.gold += totalGold;
+
     TextMeshProUGUI expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
     expGainedTextComponent.text = totalExp.ToString();
 
@@ -453,6 +459,7 @@ public class BattleManager : MonoBehaviour
     Debug.Log($"Total EXP gained: {totalExp}");
     Debug.Log($"Total Gold gained: {totalGold}");
 }
+
 
 
     private void Update()

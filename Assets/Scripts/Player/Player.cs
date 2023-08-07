@@ -15,6 +15,8 @@ public class Player : Character
     public TextMeshProUGUI goldText;
     public TextMeshProUGUI attackPowerText;
     public TextMeshProUGUI defensePowerText;
+    public Button saveButton;
+    public Button loadButton;
     public int exp;
     public int gold;
     public int level;
@@ -34,30 +36,64 @@ public class Player : Character
 
     void Update()
 {
+    // Get the data from the PlayerData instance.
+    PlayerData data = PlayerData.Instance;
+
     // Convert the level, exp, and gold int values to strings and update the text fields.
     if(levelText != null)
     {
-        levelText.text = "Level: " + level.ToString();
+        levelText.text = "Level: " + data.level.ToString();
     }
 
     if(expText != null)
     {
-        expText.text = "EXP: " + exp.ToString();
+        expText.text = "EXP: " + data.exp.ToString();
     }
 
     if(goldText != null)
     {
-        goldText.text = "Gold: " + gold.ToString();
+        goldText.text = "Gold: " + data.gold.ToString();
     }
+
     if(attackPowerText != null)
     {
-        attackPowerText.text = "AP: " + attackPower.ToString();
+        attackPowerText.text = "AP: " + data.attackPower.ToString();
     }
+
     if(defensePowerText != null)
     {
-        defensePowerText.text = "DP: " + defensePower.ToString();
+        defensePowerText.text = "DP: " + data.defensePower.ToString();
     }
 }
+
+
+
+
+
+
+
+    /* Implement the saving and loading functions
+    public void SavePlayerData()
+    {
+        SaveSystem.SavePlayer(this);
+    }
+
+    public void LoadPlayerData()
+    {
+        PlayerData data = SaveSystem.LoadPlayer();
+        if (data != null)
+        {
+            level = data.level;
+            exp = data.exp;
+            gold = data.gold;
+            attackPower = data.attackPower;
+            defensePower = data.defensePower;
+        }
+        Update();
+    }
+    */
+
+
 }
 
 
