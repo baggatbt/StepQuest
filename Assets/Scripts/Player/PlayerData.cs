@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using System.Collections.Generic;  
 
 public class PlayerData : MonoBehaviour
 {
@@ -10,6 +11,9 @@ public class PlayerData : MonoBehaviour
     public int gold;
     public int attackPower;
     public int defensePower;
+    public Dictionary<string, int> skillLevels; // Keep track of each skill's level
+    public Dictionary<string, int> skillExp; // Keep track of each skill's experience
+
 
     private void Awake()
     {
@@ -24,7 +28,7 @@ public class PlayerData : MonoBehaviour
         }
     }
 
-    // Initialization method to setup your data
+    // Initialization method to setup data
     public void Initialize(Player player)
     {
         level = player.level;
@@ -32,5 +36,36 @@ public class PlayerData : MonoBehaviour
         gold = player.gold;
         attackPower = player.attackPower;
         defensePower = player.defensePower;
+        
+        // Initialize the skillLevels dictionary
+        skillLevels = new Dictionary<string, int>();
+        skillExp = new Dictionary<string, int>();
+    }
+
+    // Method to increase the level of a skill
+    public void IncreaseSkillLevel(string skillName, int amount)
+    {
+        if (skillLevels.ContainsKey(skillName))
+        {
+            skillLevels[skillName] += amount; // PlayerData.Instance.IncreaseSkillLevel("Slash", 1);  // Increase the level of Slash skill by 1
+
+        }
+        else
+        {
+            skillLevels[skillName] = amount;
+        }
+    }
+
+     // Method to increase the experience of a skill
+    public void IncreaseSkillExp(string skillName, int amount)
+    {
+        if (skillExp.ContainsKey(skillName))
+        {
+            skillExp[skillName] += amount;
+        }
+        else
+        {
+            skillExp[skillName] = amount;
+        }
     }
 }
