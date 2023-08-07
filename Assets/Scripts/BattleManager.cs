@@ -287,15 +287,14 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            player.energy += energyRegenAmount;
-            Debug.Log(energyRegenAmount + "Regen'd");
+            player.GainEnergy(5); //TODO: Instead of hard value, use player stat energyRegenValue
             state = BattleState.PlayerTurn;  // If all enemies had their turns, it's the player's turn next.
         }
         CheckBattleEnd();
         }
     }
     
-    public int energyRegenAmount = 5;
+   
    
 
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<TimingEventResult> callback)

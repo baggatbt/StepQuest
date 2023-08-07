@@ -92,18 +92,29 @@ protected virtual void Start()
 
 public void GainEnergy(int energyGained)
 {
-    energy += energyGained;
     if (energyGained % 2 != 0) //Checks to make sure energy values stay rounded 
     {
         energyGained--;
     }
+
+    if (energy + energyGained > maxEnergy) // If the gained energy will bring the total over the max
+    {
+        energy = maxEnergy; // Set energy to the max
+    }
+    else // If the gained energy will not bring the total over the max
+    {
+        energy += energyGained; // Add the gained energy to the total
+    }
+    
     Debug.Log("Current Energy: " + energy); 
+    
     if (energyBar != null)
     {
         energyBar.value = energy;
         energyText.text = "MP: " + energy;
     }
 }
+
 
     
 

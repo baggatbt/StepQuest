@@ -43,7 +43,7 @@ public class ButtonController : MonoBehaviour
             battleManager.skillQueue.Enqueue(skill); 
             Debug.Log("Skill " + skill.skillName + " added to queue. Current queue size: " + battleManager.skillQueue.Count);
 
-            // Maybe give some visual feedback that the skill is queued?
+            // Add the skill icon to the top of the screen to show its position in queue. Eventually let the user tap it to remove it
         }
         else 
         {
