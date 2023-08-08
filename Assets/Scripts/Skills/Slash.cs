@@ -28,6 +28,7 @@ public class Slash : Skill
         if (result == TimingEventResult.Perfect)
         {
             target.TakeDamage(damage);
+            AudioManager.instance.PlaySlashSound();
             Debug.Log("Slash perfect! " + target.name + " takes " + damage + " damage.");
             user.GainEnergy((energyCost / 2));
             user.animator.SetTrigger("AttackFailTrigger");
@@ -40,6 +41,7 @@ public class Slash : Skill
         else if (result == TimingEventResult.Good)
         {
             target.TakeDamage(damage);
+            AudioManager.instance.PlaySlashSound();
             Debug.Log("Slash successful! " + target.name + " takes " + damage + " damage.");
             user.animator.SetTrigger("AttackFailTrigger");
             user.isAttacking = false;

@@ -63,12 +63,14 @@ public class TripleHitSkill : Skill
                 Debug.Log("Perfect Hit!");
                 user.animator.SetTrigger(trigger);
                 target.TakeDamage(1);
+                AudioManager.instance.PlaySlashSound();
                 user.GainEnergy((energyCost / 2));
                 break;
             case TimingEventResult.Good:
                 Debug.Log("Good Hit!");
                 user.animator.SetTrigger(trigger);
                 target.TakeDamage(1);
+                AudioManager.instance.PlaySlashSound();
                 break;
             case TimingEventResult.Miss:
                 Debug.Log("Missed!");
