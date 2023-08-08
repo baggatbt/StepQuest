@@ -52,6 +52,7 @@ public class SwordWave : Skill
             }
         });
 
+        yield return new WaitForSeconds(1.0f);
         skillExecutionComplete = true;
         user.isAttacking = false;
     }

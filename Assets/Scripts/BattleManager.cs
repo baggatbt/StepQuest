@@ -19,6 +19,8 @@ public class BattleManager : MonoBehaviour
     public Slider[] healthBars; //set these in the inspector
     public Skill requestedSkill; // The skill the player chooses next during an ongoing attack.
     public Queue<Skill> skillQueue = new Queue<Skill>();
+    public Button[] skillButtons; // An array of buttons representing skill slots
+    public Button launchAttacksButton; 
 
 
 
@@ -106,12 +108,31 @@ public class BattleManager : MonoBehaviour
     private void ChangeState(BattleState newState)
     {
         State = newState;
+        if (State == BattleState.PlayerTurn)
+        {
+            EnableAllButtons();
+        }
     }
 
+    public void DisableAllButtons()
+    {
+        foreach (Button btn in skillButtons)
+        {
+            btn.interactable = false;
+        }
+        launchAttacksButton.interactable = false;
+    }
+   
+    public void EnableAllButtons()
+    {
+        foreach (Button btn in skillButtons)
+        {
+            btn.interactable = true;
+        }
+        launchAttacksButton.interactable = true;
+    }
 
-
-
-        public void StartBattle(BattleConfig config)
+    public void StartBattle(BattleConfig config)
     {
         // Use config.poolName and config.maxEnemiesToSpawn to set up battle
         // use the enemySpawnController to spawn the desired enemy type and number
@@ -132,6 +153,7 @@ public class BattleManager : MonoBehaviour
 
         public void ExecuteQueuedSkills()
     {
+        DisableAllButtons();
         StartCoroutine(ExecuteAllSkillsCoroutine());
     }
 
@@ -232,7 +254,7 @@ public class BattleManager : MonoBehaviour
         // If all enemies had their turns, it's the player's turn next.
         if (enemyTurnQueue.Count == 0)
         {
-            state = BattleState.PlayerTurn;
+            ChangeState(BattleState.PlayerTurn);
             return;
         }
 
@@ -288,8 +310,8 @@ public class BattleManager : MonoBehaviour
         else
         {
             player.GainEnergy(5); //TODO: Instead of hard value, use player stat energyRegenValue
-            state = BattleState.PlayerTurn;  // If all enemies had their turns, it's the player's turn next.
-        }
+            ChangeState(BattleState.PlayerTurn);  // If all enemies had their turns, it's the player's turn next.
+         }
         CheckBattleEnd();
         }
     }
