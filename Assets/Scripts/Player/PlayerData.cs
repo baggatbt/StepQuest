@@ -11,10 +11,13 @@ public class PlayerData : MonoBehaviour
     public int gold;
     public int attackPower;
     public int defensePower;
+    public int steps;
     public Dictionary<string, int> skillLevels; // Keep track of each skill's level
     public Dictionary<string, int> skillExp; // Keep track of each skill's experience
     public bool isInitialized = false;
 
+
+    private StepCounterController stepCounterController;
 
     private void Awake()
     {
@@ -29,6 +32,16 @@ public class PlayerData : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        stepCounterController = FindObjectOfType<StepCounterController>();
+        
+        if (stepCounterController != null)
+        {
+            steps = stepCounterController.GetStepsSinceStart();
+        }
+    }
+
     // Initialization method to setup data
     public void Initialize(Player player)
     {
@@ -39,6 +52,7 @@ public class PlayerData : MonoBehaviour
         gold = player.gold;
         attackPower = player.attackPower;
         defensePower = player.defensePower;
+        steps = player.steps;
         
         // Initialize the skillLevels dictionary
         skillLevels = new Dictionary<string, int>();
@@ -52,7 +66,7 @@ public class PlayerData : MonoBehaviour
     {
         if (skillLevels.ContainsKey(skillName))
         {
-            skillLevels[skillName] += amount; // PlayerData.Instance.IncreaseSkillLevel("Slash", 1);  // Increase the level of Slash skill by 1
+            skillLevels[skillName] += amount; // Usage: PlayerData.Instance.IncreaseSkillLevel("Slash", 1);  // Increase the level of Slash skill by 1
 
         }
         else
@@ -73,4 +87,10 @@ public class PlayerData : MonoBehaviour
             skillExp[skillName] = amount;
         }
     }
+
+
+
+    
 }
+
+
