@@ -27,7 +27,10 @@ public class SwordWave : Skill
             switch (result)
             {
                 case TimingEventResult.Perfect:
-                    target.TakeDamage(2);
+                     foreach (var enemy in battleManager.enemies)
+                    {
+                    enemy.TakeDamage(2);
+                    }
                     Debug.Log("SwordWave Perfect! " + target.name + " takes 2 damage.");
                     user.GainEnergy((energyCost / 2));
                     user.animator.SetTrigger("AttackFailTrigger");
@@ -40,9 +43,9 @@ public class SwordWave : Skill
                     break;
 
                 case TimingEventResult.Good:
-                    target.TakeDamage(1);
                     Debug.Log("SwordWave Good! " + target.name + " takes 1 damage.");
                     user.animator.SetTrigger("AttackFailTrigger");
+                    target.TakeDamage(1);
                     break;
 
                 case TimingEventResult.Miss:

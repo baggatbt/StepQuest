@@ -15,62 +15,63 @@ public class Player : Character
     public TextMeshProUGUI goldText;
     public TextMeshProUGUI attackPowerText;
     public TextMeshProUGUI defensePowerText;
+    public TextMeshProUGUI stepsText;
     public Button saveButton;
     public Button loadButton;
     public int level;
     public int exp;
     public int gold;
+    public int steps;
 
    protected override void Awake()
     {
         base.Awake();
-        this.level = 1;
-        this.exp = 0; // initialize exp
-        this.gold = 0; // initialize gold
-        this.attackPower = 2;
-        this.maxHealth = 10;
-        this.health = maxHealth;
-        this.maxEnergy = 10;
-        this.energy = maxEnergy;
-        this.defensePower = 0;
+        InitializePlayer();
 
         // Initialize PlayerData with the current Player values
         PlayerData.Instance.Initialize(this);
         
-        
     }
 
-    void Update()
-{
-    // Get the data from the PlayerData instance.
-    PlayerData data = PlayerData.Instance;
-
-    // Convert the level, exp, and gold int values to strings and update the text fields.
-    if(levelText != null)
+    private void InitializePlayer()
     {
-        levelText.text = "Level: " + data.level.ToString();
+        level = 1;
+        exp = 0;
+        gold = 0;
+        attackPower = 2;
+        maxHealth = 10;
+        health = maxHealth;
+        maxEnergy = 5;
+        energy = maxEnergy;
+        defensePower = 0;
+        steps = 0;
     }
 
-    if(expText != null)
+    
+     void Update()
     {
-        expText.text = "EXP: " + data.exp.ToString();
+        UpdateUI();
     }
 
-    if(goldText != null)
+    public void UpdateSteps(int newSteps)
     {
-        goldText.text = "Gold: " + data.gold.ToString();
+        this.steps = newSteps;
+        PlayerData.Instance.steps = this.steps;
     }
 
-    if(attackPowerText != null)
+    private void UpdateUI()
     {
-        attackPowerText.text = "AP: " + data.attackPower.ToString();
-    }
+        PlayerData data = PlayerData.Instance;
 
-    if(defensePowerText != null)
-    {
-        defensePowerText.text = "DP: " + data.defensePower.ToString();
+        if (levelText) levelText.text = "Level: " + data.level;
+        if (expText) expText.text = "EXP: " + data.exp;
+        if (goldText) goldText.text = "Gold: " + data.gold;
+        if (attackPowerText) attackPowerText.text = "AP: " + data.attackPower;
+        if (defensePowerText) defensePowerText.text = "DP: " + data.defensePower;
+        if (stepsText) stepsText.text = "Steps: " + data.steps;
     }
 }
+
 
 
 
@@ -101,7 +102,7 @@ public class Player : Character
     */
 
 
-}
+
 
 
    

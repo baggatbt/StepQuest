@@ -2,6 +2,8 @@ using System.Collections;
 using System;
 using UnityEngine.SceneManagement;
 using UnityEngine;
+using UnityEngine.InputSystem;
+
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
@@ -153,8 +155,15 @@ public class BattleManager : MonoBehaviour
 
         public void ExecuteQueuedSkills()
     {
+        if (currentTarget != null)
+        {
         DisableAllButtons();
         StartCoroutine(ExecuteAllSkillsCoroutine());
+        }
+        else
+        {
+        Debug.Log("No target selected");
+        }
     }
 
     public int skillsExecuted = 0;
@@ -487,21 +496,22 @@ public class BattleManager : MonoBehaviour
 
 
     private void Update()
-    {
-        if (Input.GetMouseButtonDown(0))
+{
+    if (Input.GetMouseButtonDown(0))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
 
-            if (hit.collider != null && hit.collider.CompareTag("Enemy"))
+        if (hit.collider != null && hit.collider.CompareTag("Enemy"))
             {
                 
                 currentTarget = hit.collider.gameObject;
                 player.attackTarget = currentTarget.transform; //For movement purposes sets the target to the players target
                 Debug.Log("Current target: " + currentTarget.name);
             }
-        }
     }
+}
+
 
     public bool IsAnyEnemyAttacking()
 {
