@@ -2,6 +2,8 @@ using System.Collections;
 using System;
 using UnityEngine.SceneManagement;
 using UnityEngine;
+using UnityEngine.InputSystem;
+
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
@@ -9,8 +11,9 @@ using System.Collections.Generic;
 public class BattleManager : MonoBehaviour
 {
     public Character player;
-    public PlayerStats playerStats; 
+    public PlayerData playerCharacterData;
     public List<Character> enemies = new List<Character>();
+    public GameObject playerPrefab;
     private BattleState state;
     public int enemyAttackCount = 0;
     public GameObject currentTarget;
@@ -18,6 +21,8 @@ public class BattleManager : MonoBehaviour
     public Slider[] healthBars; //set these in the inspector
     public Skill requestedSkill; // The skill the player chooses next during an ongoing attack.
     public Queue<Skill> skillQueue = new Queue<Skill>();
+    public Button[] skillButtons; // An array of buttons representing skill slots
+    public Button launchAttacksButton; 
 
 
 
@@ -73,17 +78,17 @@ public class BattleManager : MonoBehaviour
 
    private void Start()
 {
-     State = BattleState.PlayerTurn;
+    State = BattleState.PlayerTurn;
     outerCircleInitialScale = outerCircle.transform.localScale;
     innerCircleInitialScale = innerCircle.transform.localScale;
 
     outerCircle.SetActive(false);
     innerCircle.SetActive(false);
 
-     // Cache the components
-        expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
-        goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
-   
+    // Cache the components
+    expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
+    goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
+
 
     if (currentBattleConfig != null)
     {
@@ -105,12 +110,31 @@ public class BattleManager : MonoBehaviour
     private void ChangeState(BattleState newState)
     {
         State = newState;
+        if (State == BattleState.PlayerTurn)
+        {
+            EnableAllButtons();
+        }
     }
 
+    public void DisableAllButtons()
+    {
+        foreach (Button btn in skillButtons)
+        {
+            btn.interactable = false;
+        }
+        launchAttacksButton.interactable = false;
+    }
+   
+    public void EnableAllButtons()
+    {
+        foreach (Button btn in skillButtons)
+        {
+            btn.interactable = true;
+        }
+        launchAttacksButton.interactable = true;
+    }
 
-
-
-        public void StartBattle(BattleConfig config)
+    public void StartBattle(BattleConfig config)
     {
         // Use config.poolName and config.maxEnemiesToSpawn to set up battle
         // use the enemySpawnController to spawn the desired enemy type and number
@@ -131,7 +155,15 @@ public class BattleManager : MonoBehaviour
 
         public void ExecuteQueuedSkills()
     {
+        if (currentTarget != null)
+        {
+        DisableAllButtons();
         StartCoroutine(ExecuteAllSkillsCoroutine());
+        }
+        else
+        {
+        Debug.Log("No target selected");
+        }
     }
 
     public int skillsExecuted = 0;
@@ -202,7 +234,7 @@ public class BattleManager : MonoBehaviour
     if (player.currentSkill != null)
     {
         yield return player.currentSkill.Execute(player, targetEnemy, this);
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.3f);
         CheckBattleEnd();
     }
     else
@@ -214,6 +246,7 @@ public class BattleManager : MonoBehaviour
 
 
     private Queue<Character> enemyTurnQueue = new Queue<Character>();
+
 
     public void EnemyAttack()
     {
@@ -230,7 +263,7 @@ public class BattleManager : MonoBehaviour
         // If all enemies had their turns, it's the player's turn next.
         if (enemyTurnQueue.Count == 0)
         {
-            state = BattleState.PlayerTurn;
+            ChangeState(BattleState.PlayerTurn);
             return;
         }
 
@@ -285,12 +318,15 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            state = BattleState.PlayerTurn;  // If all enemies had their turns, it's the player's turn next.
-        }
+            player.GainEnergy(5); //TODO: Instead of hard value, use player stat energyRegenValue
+            ChangeState(BattleState.PlayerTurn);  // If all enemies had their turns, it's the player's turn next.
+         }
         CheckBattleEnd();
         }
     }
-
+    
+   
+   
 
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<TimingEventResult> callback)
 {
@@ -305,6 +341,9 @@ public class BattleManager : MonoBehaviour
     // Start the inner circle at a very small size
     Vector3 innerCircleInitialScale = new Vector3(0.01f, 0.01f, 0.01f);
 
+    float speedFactor = 1.5f;  // Change this value to adjust speed. Higher means faster.
+
+
     try
     {
         while (timer < totalWindowDuration)
@@ -318,7 +357,7 @@ public class BattleManager : MonoBehaviour
                 break;
             }
 
-            timer += Time.deltaTime;
+            timer += Time.deltaTime * speedFactor;
             yield return null;
         }
 
@@ -332,13 +371,15 @@ public class BattleManager : MonoBehaviour
             else
             {
                 Debug.Log("Timing Missed!");
-                result = TimingEventResult.Miss;
+                result = TimingEventResult.Miss; //Breaks the queue'd chain if anything misses.
+                skillQueue.Clear();
             }
         }
         else
         {
             Debug.Log("No input detected. Missed!");
             result = TimingEventResult.Miss;
+            skillQueue.Clear();
         }
 
         callback(result);
@@ -439,8 +480,9 @@ public class BattleManager : MonoBehaviour
         totalGold += enemy.goldReward;
     }
 
-    playerStats.exp += totalExp;
-    playerStats.gold += totalGold;
+    PlayerData.Instance.exp += totalExp;
+    PlayerData.Instance.gold += totalGold;
+
     TextMeshProUGUI expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
     expGainedTextComponent.text = totalExp.ToString();
 
@@ -452,22 +494,24 @@ public class BattleManager : MonoBehaviour
 }
 
 
+
     private void Update()
-    {
-        if (Input.GetMouseButtonDown(0))
+{
+    if (Input.GetMouseButtonDown(0))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
 
-            if (hit.collider != null && hit.collider.CompareTag("Enemy"))
+        if (hit.collider != null && hit.collider.CompareTag("Enemy"))
             {
                 
                 currentTarget = hit.collider.gameObject;
                 player.attackTarget = currentTarget.transform; //For movement purposes sets the target to the players target
                 Debug.Log("Current target: " + currentTarget.name);
             }
-        }
     }
+}
+
 
     public bool IsAnyEnemyAttacking()
 {

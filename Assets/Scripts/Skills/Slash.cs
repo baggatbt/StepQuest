@@ -9,7 +9,9 @@ public class Slash : Skill
         skillName = "Slash";
         description = "A powerful slashing attack.";
         requiresMovement = true;
-        energyCost = 1;
+        energyCost = 2;
+        skillLevel = 1; // You could set a default level or fetch it from the player's saved data
+  
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
@@ -19,28 +21,41 @@ public class Slash : Skill
         user.animator.SetTrigger("Attack1Trigger");
         user.isAttacking = true;
 
+        int damage = (int)System.Math.Round(user.attackPower * (1 + GetSkillLevel() / 10.0));
+
+
+
         if (result == TimingEventResult.Perfect)
         {
-            target.TakeDamage(2);
-            Debug.Log("Perfect Slash successful! " + target.name + " takes 2 damage.");
-            //canChain = true;
+            target.TakeDamage(damage);
+            AudioManager.instance.PlaySlashSound();
+            Debug.Log("Slash perfect! " + target.name + " takes " + damage + " damage.");
+            user.GainEnergy((energyCost / 2));
             user.animator.SetTrigger("AttackFailTrigger");
+            user.isAttacking = false;
+             // Gain +5 skillEXP on perfect
+            PlayerData.Instance.IncreaseSkillExp(skillName, 5);
+            
             
         }
         else if (result == TimingEventResult.Good)
         {
-            target.TakeDamage(2);
-            Debug.Log("Slash successful! " + target.name + " takes 2 damage.");
+            target.TakeDamage(damage);
+            AudioManager.instance.PlaySlashSound();
+            Debug.Log("Slash successful! " + target.name + " takes " + damage + " damage.");
             user.animator.SetTrigger("AttackFailTrigger");
             user.isAttacking = false;
+            PlayerData.Instance.IncreaseSkillExp(skillName, 3);
 
         }
         else
         {
-            target.TakeDamage(1);
-            Debug.Log("Slash missed! " + target.name + " takes 1 damage.");
+            target.TakeDamage(0);
+            Debug.Log("Slash missed! " + target.name + " takes 0 damage.");
             user.animator.SetTrigger("AttackFailTrigger");
             user.isAttacking = false;
+            PlayerData.Instance.IncreaseSkillExp(skillName, 0);
+            
            
         }
     });

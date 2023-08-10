@@ -7,10 +7,10 @@ public class TripleHitSkill : Skill
 
     public TripleHitSkill()
     {
-        skillName = "Triple Hit";
+        skillName = "Triple Slash";
         description = "Hits the enemy 3 times with timing checks before each hit";
         requiresMovement = true;
-        energyCost = 3;
+        energyCost = 1;
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
@@ -63,11 +63,14 @@ public class TripleHitSkill : Skill
                 Debug.Log("Perfect Hit!");
                 user.animator.SetTrigger(trigger);
                 target.TakeDamage(1);
+                AudioManager.instance.PlaySlashSound();
+                user.GainEnergy((energyCost / 2));
                 break;
             case TimingEventResult.Good:
                 Debug.Log("Good Hit!");
                 user.animator.SetTrigger(trigger);
                 target.TakeDamage(1);
+                AudioManager.instance.PlaySlashSound();
                 break;
             case TimingEventResult.Miss:
                 Debug.Log("Missed!");

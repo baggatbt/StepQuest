@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Slime : Enemy
 {
-    private void Awake()
+    protected override void Start()
     {
         // Assign the skills to this specific type of character
         this.skills = new List<Skill> // Make sure to initialize the skills list before adding to it
@@ -16,6 +16,7 @@ public class Slime : Enemy
         this.expReward = 5;  //TODO: Add scaling
         this.goldReward = 2;
         this.attacksBeforeSpecial = 2;
+        this.damage = 3;
 
         // Assign the skills
         this.normalSkill = this.skills[0]; // Normal skill

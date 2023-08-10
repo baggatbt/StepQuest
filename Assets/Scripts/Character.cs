@@ -9,9 +9,11 @@ public class Character : MonoBehaviour
 {
     public int health;
     public int maxHealth;
-    public int damage;
+    public int damage; //This is for the slime, so the next time you forget and wonder, what is this for again? Thats what.
     public int energy;
     public int maxEnergy;
+    public int attackPower;
+    public int defensePower;
     public Slider healthBar;
     public Slider energyBar;
     public Transform attackTarget;
@@ -32,29 +34,33 @@ public class Character : MonoBehaviour
 
     private bool checkCollisionsDuringMovement = true;
 
-    protected virtual void Start()
+    protected virtual void Awake()
 {
     animator = GetComponent<Animator>();
-    health = maxHealth;
+    health = maxHealth; 
+    originalPosition = transform.position;
+}
+
+protected virtual void Start()
+{
     if (healthBar != null)
     {
         healthBar.maxValue = maxHealth;
         healthBar.value = health;
-        if (healthText !=null && energyText !=null) //This check can eventually be removed once everyone has a HP bar. For now it stays
+        if (healthText !=null && energyText !=null)
         {
-        healthText.text = "HP: " + health; 
-        energyText.text = "HP: " + energy;
+            healthText.text = "HP: " + health; 
+            energyText.text = "HP: " + energy;
         }
     }
-
 
     if (energyBar != null)
     {
         energyBar.maxValue = maxEnergy;
         energyBar.value = energy;
     }
-    originalPosition = transform.position;
 }
+
 
 
     public void TakeDamage(int damage)
@@ -76,13 +82,39 @@ public class Character : MonoBehaviour
     public void SpendEnergy(int energySpent)
 {
     energy -= energySpent;
-    Debug.Log("Current Energy: " + energy);  // Add this
+    Debug.Log("Current Energy: " + energy); 
     if (energyBar != null)
     {
         energyBar.value = energy;
         energyText.text = "MP: " + energy;
     }
 }
+
+public void GainEnergy(int energyGained)
+{
+    if (energyGained % 2 != 0) //Checks to make sure energy values stay rounded 
+    {
+        energyGained--;
+    }
+
+    if (energy + energyGained > maxEnergy) // If the gained energy will bring the total over the max
+    {
+        energy = maxEnergy; // Set energy to the max
+    }
+    else // If the gained energy will not bring the total over the max
+    {
+        energy += energyGained; // Add the gained energy to the total
+    }
+    
+    Debug.Log("Current Energy: " + energy); 
+    
+    if (energyBar != null)
+    {
+        energyBar.value = energy;
+        energyText.text = "MP: " + energy;
+    }
+}
+
 
     
 
@@ -93,13 +125,13 @@ public class Character : MonoBehaviour
     {
         Vector3 targetPosition = GetTargetPosition(1.0f);
         checkCollisionsDuringMovement = true;
-        yield return StartCoroutine(Move(targetPosition, 10.0f));
+        yield return StartCoroutine(Move(targetPosition, 15.0f));
     }
 
     public IEnumerator ReturnToPosition()
     {
         checkCollisionsDuringMovement = false;
-        yield return StartCoroutine(Move(originalPosition, 10.0f));
+        yield return StartCoroutine(Move(originalPosition, 15.0f));
         animator.SetTrigger("StopMovementAnimationTrigger");
     }
 

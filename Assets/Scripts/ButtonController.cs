@@ -10,7 +10,8 @@ public class ButtonController : MonoBehaviour
 {
     public TextMeshProUGUI buttonText;
     public BattleManager battleManager;
-    public int slotIndex; // Add this line. This indicates which slot this button corresponds to.
+    public Button[] skillButtons; // An array of buttons. Assign these in the Unity Editor.
+    public int slotIndex; //This indicates which slot this button corresponds to.
    
     private Skill skill;
 
@@ -29,6 +30,8 @@ public class ButtonController : MonoBehaviour
     }
 
 
+
+
     public void OnButtonClick()
 {
     Debug.Log("Button clicked for skill: " + skill.skillName);
@@ -40,10 +43,12 @@ public class ButtonController : MonoBehaviour
            battleManager.player.SpendEnergy(skill.energyCost);
             Debug.Log("Energy after deduction: " + battleManager.player.energy);
 
-            battleManager.skillQueue.Enqueue(skill); 
+            battleManager.skillQueue.Enqueue(skill);
+            // After adding skill to the queue, disable the button using its slot index
+            battleManager.skillButtons[slotIndex].interactable = false;
             Debug.Log("Skill " + skill.skillName + " added to queue. Current queue size: " + battleManager.skillQueue.Count);
 
-            // Maybe give some visual feedback that the skill is queued?
+            // Add the skill icon to the top of the screen to show its position in queue. Eventually let the user tap it to remove it
         }
         else 
         {

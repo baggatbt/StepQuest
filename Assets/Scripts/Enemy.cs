@@ -6,6 +6,7 @@ public class Enemy : Character
 {
     public int expReward;
     public int goldReward;
+    
    
 
     // Additional enemy-specific properties and behavior

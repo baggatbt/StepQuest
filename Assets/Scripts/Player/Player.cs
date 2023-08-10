@@ -2,64 +2,108 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro; // Namespace for TextMeshPro
 
+
+[System.Serializable]
 public class Player : Character
 {
-    public string playerClass; //Warrior Mage Etc etc..
-    public int level; 
-    public int exp; 
-    public int gold; 
-    public int stamina;
-    public Transform playerSpawnPoint; // assign this directly in the inspector
+    public Transform playerSpawnPoint;
+    // The TextMeshProUGUI references.
+    public TextMeshProUGUI levelText;
+    public TextMeshProUGUI expText;
+    public TextMeshProUGUI goldText;
+    public TextMeshProUGUI attackPowerText;
+    public TextMeshProUGUI defensePowerText;
+    public TextMeshProUGUI stepsText;
+    public Button saveButton;
+    public Button loadButton;
+    public int level;
+    public int exp;
+    public int gold;
+    public int steps;
 
-    // Start is called before the first frame update
-    protected override void Start()
-{
-    base.Start(); 
-
-    // Initialize player specific stats
-    level = 1;
-    exp = 0;
-    gold = 0;
-   
-}
-
-
-    // Method to add experience points to the player and level up if necessary
-    public void GainExp(int amount)
+   protected override void Awake()
     {
-        exp += amount;
+        base.Awake();
+        InitializePlayer();
 
-        // Simple level up logic TO BE REPLACED: level up every 100 exp points
-        while (exp >= 100)
-        {
-            exp -= 100;
-            level++;
-            Debug.Log("Level up! Now at level " + level);
-        }
+        // Initialize PlayerData with the current Player values
+        PlayerData.Instance.Initialize(this);
+        
     }
 
-    // Method to add gold to the player
-    public void GainGold(int amount)
+    private void InitializePlayer()
     {
-        gold += amount;
-        Debug.Log("Gained " + amount + " gold. Now have " + gold + " gold");
-    }
-
-    // Method to deduct gold from the player
-    public void SpendGold(int amount)
-    {
-        if (gold >= amount)
-        {
-            gold -= amount;
-            Debug.Log("Spent " + amount + " gold. Now have " + gold + " gold");
-        }
-        else
-        {
-            Debug.Log("Not enough gold. Need " + (amount - gold) + " more gold");
-        }
+        level = 1;
+        exp = 0;
+        gold = 0;
+        attackPower = 2;
+        maxHealth = 10;
+        health = maxHealth;
+        maxEnergy = 5;
+        energy = maxEnergy;
+        defensePower = 0;
+        steps = 0;
     }
 
     
+     void Update()
+    {
+        UpdateUI();
+    }
 
+    public void UpdateSteps(int newSteps)
+    {
+        this.steps = newSteps;
+        PlayerData.Instance.steps = this.steps;
+    }
+
+    private void UpdateUI()
+    {
+        PlayerData data = PlayerData.Instance;
+
+        if (levelText) levelText.text = "Level: " + data.level;
+        if (expText) expText.text = "EXP: " + data.exp;
+        if (goldText) goldText.text = "Gold: " + data.gold;
+        if (attackPowerText) attackPowerText.text = "AP: " + data.attackPower;
+        if (defensePowerText) defensePowerText.text = "DP: " + data.defensePower;
+        if (stepsText) stepsText.text = "Steps: " + data.steps;
+    }
 }
+
+
+
+
+
+
+
+
+
+    /* Implement the saving and loading functions
+    public void SavePlayerData()
+    {
+        SaveSystem.SavePlayer(this);
+    }
+
+    public void LoadPlayerData()
+    {
+        PlayerData data = SaveSystem.LoadPlayer();
+        if (data != null)
+        {
+            level = data.level;
+            exp = data.exp;
+            gold = data.gold;
+            attackPower = data.attackPower;
+            defensePower = data.defensePower;
+        }
+        Update();
+    }
+    */
+
+
+
+
+
+   
+
