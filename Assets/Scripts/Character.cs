@@ -39,10 +39,12 @@ public class Character : MonoBehaviour
     animator = GetComponent<Animator>();
     health = maxHealth; 
     originalPosition = transform.position;
+    Debug.Log(gameObject.name + " original position: " + originalPosition);
 }
 
 protected virtual void Start()
 {
+    
     if (healthBar != null)
     {
         healthBar.maxValue = maxHealth;
@@ -90,6 +92,13 @@ protected virtual void Start()
     }
 }
 
+    //This will be called on an animation event so characters can call target.TakeDamage() at the exact moment
+    public void animationDamageTiming()
+    {
+        Debug.Log("This is the damage moment");
+        
+    }
+
 public void GainEnergy(int energyGained)
 {
     if (energyGained % 2 != 0) //Checks to make sure energy values stay rounded 
@@ -130,6 +139,7 @@ public void GainEnergy(int energyGained)
 
     public IEnumerator ReturnToPosition()
     {
+        Debug.Log("Is returning to position");
         checkCollisionsDuringMovement = false;
         yield return StartCoroutine(Move(originalPosition, 15.0f));
         animator.SetTrigger("StopMovementAnimationTrigger");
@@ -149,6 +159,8 @@ public void GainEnergy(int energyGained)
 
     private IEnumerator Move(Vector3 targetPosition, float speed)
     {
+        Debug.Log(gameObject.name + " is trying to move to: " + targetPosition);
+    
         animator.SetTrigger("MovementAnimationTrigger");
         while (!HasReachedPosition(targetPosition))
         {
@@ -170,22 +182,35 @@ public void GainEnergy(int energyGained)
     }
 
     private bool IsCollidingWithCharacter()
-    {
-        Collider2D[] colliders = Physics2D.OverlapCapsuleAll(
-            transform.position, 
-            GetComponent<CapsuleCollider2D>().size, 
-            GetComponent<CapsuleCollider2D>().direction, 
-            0f
-        );
+{
+    Collider2D[] colliders = Physics2D.OverlapCapsuleAll(
+        transform.position, 
+        GetComponent<CapsuleCollider2D>().size, 
+        GetComponent<CapsuleCollider2D>().direction, 
+        0f
+    );
 
-        foreach (Collider2D collider in colliders)
+    foreach (Collider2D collider in colliders)
+    {
+        // Ignore the collider if it's the current object itself.
+        if (collider.gameObject.GetInstanceID() == gameObject.GetInstanceID()) 
         {
-            if (collider.gameObject.GetInstanceID() != gameObject.GetInstanceID() 
-                && (collider.CompareTag("Enemy") || collider.CompareTag("Player")))
-            {
-                return true;
-            }
+            continue;
         }
-        return false;
+
+        // If the colliding objects have the same tag, ignore the collision.
+        if (collider.CompareTag(tag))
+        {
+            continue;
+        }
+
+        // If collider has a tag "Enemy" or "Player", then we've found a collision.
+        if (collider.CompareTag("Enemy") || collider.CompareTag("Player"))
+        {
+            return true;
+        }
     }
+    return false;
+}
+
 }

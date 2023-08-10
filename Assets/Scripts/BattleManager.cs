@@ -291,6 +291,7 @@ public class BattleManager : MonoBehaviour
             
             yield return attackingEnemy.currentSkill.Execute(attackingEnemy, player, this);
 
+            
             if (attackingEnemy.currentSkill.requiresMovement)
             {
                 yield return attackingEnemy.ReturnToPosition();

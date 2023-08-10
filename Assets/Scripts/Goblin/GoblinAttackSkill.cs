@@ -1,12 +1,12 @@
 using System.Collections;
 using UnityEngine;
 
-public class SlimeAttackSkill : Skill
+public class GoblinAttackSkill : Skill
 {
-    public SlimeAttackSkill()
+    public GoblinAttackSkill()
     {
-        skillName = "Slime Attack";
-        description = "The slime attacks the player. The damage can be reduced by timely action.";
+        skillName = "Goblin Attack";
+        description = "The Goblin attacks the player. The damage can be reduced by timely action.";
         requiresMovement = true;
         energyCost = 0;
 
@@ -19,10 +19,10 @@ public class SlimeAttackSkill : Skill
 
         Debug.Log("Using basic attack");
         // Start the attack animation
-        user.animator.SetTrigger("SlimeAttack1Trigger");
+        user.animator.SetTrigger("GoblinAttack1Trigger");
 
         // Create a timing window for the player to reduce damage
-        yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(2.0f, 3.0f, (result) =>
+        yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(1.25f, 1.5f, (result) =>
         {
             if (result == TimingEventResult.Perfect)
             {
@@ -47,9 +47,9 @@ public class SlimeAttackSkill : Skill
             }
            
 
-            user.currentSkill.skillExecutionComplete = true;
+           
         }));
         user.isAttacking = false;
-        
+        user.currentSkill.skillExecutionComplete = false;
     }
 }
