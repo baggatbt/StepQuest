@@ -17,6 +17,7 @@ public class StepCounterController : MonoBehaviour
                 using (AndroidJavaClass stepCounterPluginClass = new AndroidJavaClass("com.example.stepcounterplugin.StepCounterPlugin"))
                 {
                     stepCounterPluginClass.CallStatic("init", currentActivity);
+                    Debug.Log("Plugin Initialized");
                 }
             }
             

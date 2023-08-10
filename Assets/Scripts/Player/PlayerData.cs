@@ -39,7 +39,13 @@ public class PlayerData : MonoBehaviour
         if (stepCounterController != null)
         {
             steps = stepCounterController.GetStepsSinceStart();
+            Debug.Log(steps);
         }
+    }
+
+    private void Update()
+    {
+        steps = stepCounterController.GetStepsSinceStart();
     }
 
     // Initialization method to setup data
