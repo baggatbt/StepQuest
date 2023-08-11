@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class GoblinAttackSkill : Skill
 {
+    private TimingEventResult result;
     public GoblinAttackSkill()
     {
         skillName = "Goblin Attack";
@@ -12,44 +13,57 @@ public class GoblinAttackSkill : Skill
 
     }
 
-    public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
+     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
         user.isAttacking = true;
-        user.MoveToTarget();
+       
+        
+        // First Timing Event
+        yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
+        HandleTimingResult(user, target, "GoblinAttack1Trigger");
+        
 
-        Debug.Log("Using basic attack");
-        // Start the attack animation
-        user.animator.SetTrigger("GoblinAttack1Trigger");
+        // Second Timing Event
+        yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
+        HandleTimingResult(user, target,"GoblinAttack2Trigger");
+       
 
-        // Create a timing window for the player to reduce damage
-        yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(1.25f, 1.5f, (result) =>
-        {
-            if (result == TimingEventResult.Perfect)
-            {
-                Debug.Log("Perfect Timing! Damage dodged.");
-                target.TakeDamage(user.damage - user.damage);
-                target.animator.SetTrigger("BlockTrigger");
-                AudioManager.instance.PlayBlockSound();
-            }
-            else if (result == TimingEventResult.Good)
-            {
-                Debug.Log("Good Timing! Damage reduced, but not by much.");
-                target.TakeDamage(user.damage - 1);
-                target.SpendEnergy(2);
-                AudioManager.instance.PlayPlayerIsHitSound();
-
-            }
-            else if (result == TimingEventResult.Miss)
-            {
-                Debug.Log("Miss Timing! Full damage taken.");
-                target.TakeDamage(user.damage);
-                AudioManager.instance.PlayPlayerIsHitSound();
-            }
-           
-
-           
-        }));
-        user.isAttacking = false;
-        user.currentSkill.skillExecutionComplete = false;
     }
+
+
+    private IEnumerator TimingWindow(Character user, Character target, BattleManager battleManager, float windowStart, float windowEnd)
+    {
+       
+        yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(windowStart, windowEnd, (timingResult) =>
+        {
+            result = timingResult;
+        }));
+         
+    }
+
+
+    private void HandleTimingResult(Character user, Character target, string trigger)
+    {
+        switch (result)
+        {
+            case TimingEventResult.Perfect:
+                Debug.Log("Perfect Hit!");
+                user.animator.SetTrigger(trigger);
+                target.TakeDamage(user.damage - user.damage);
+                AudioManager.instance.PlaySlashSound();
+                break;
+            case TimingEventResult.Good:
+                Debug.Log("Good Hit!");   
+                user.animator.SetTrigger(trigger);            
+                target.TakeDamage(user.damage - 1);
+                AudioManager.instance.PlaySlashSound();
+                break;
+            case TimingEventResult.Miss:
+                user.animator.SetTrigger(trigger);
+                target.TakeDamage(user.damage);            
+                
+                break;
+        }
+    }
+    
 }
