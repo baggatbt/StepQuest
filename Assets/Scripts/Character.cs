@@ -34,11 +34,20 @@ public class Character : MonoBehaviour
 
     private bool checkCollisionsDuringMovement = true;
 
+    //STATUS EFFECTS
+    public StatusEffectController statusEffectController;
+
+    public bool IsAffectedBy(string effectName)
+    {
+        return statusEffectController.HasEffect(effectName);
+    }
+
     protected virtual void Awake()
 {
     animator = GetComponent<Animator>();
     health = maxHealth; 
     originalPosition = transform.position;
+    statusEffectController = GetComponent<StatusEffectController>();
     Debug.Log(gameObject.name + " original position: " + originalPosition);
 }
 

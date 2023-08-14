@@ -23,6 +23,8 @@ public class BattleManager : MonoBehaviour
     public Queue<Skill> skillQueue = new Queue<Skill>();
     public Button[] skillButtons; // An array of buttons representing skill slots
     public Button launchAttacksButton; 
+    public StatusEffectController statusEffectController;
+    
 
 
 
@@ -290,8 +292,7 @@ public class BattleManager : MonoBehaviour
             }
             
             yield return attackingEnemy.currentSkill.Execute(attackingEnemy, player, this);
-            yield return new WaitUntil(() => attackingEnemy.animationEnded == true);
-            attackingEnemy.attackTrigger = false; //Reset the trigger I call on animations to fire when there are multi stage attacks for enemies
+
             
             if (attackingEnemy.currentSkill.requiresMovement)
             {

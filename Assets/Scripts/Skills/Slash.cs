@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Slash : Skill
 {
+
     public Slash()
     {
         skillName = "Slash";
@@ -20,6 +21,11 @@ public class Slash : Skill
     {
         user.animator.SetTrigger("Attack1Trigger");
         user.isAttacking = true;
+        // Create an instance of Airborne with a duration of 2 seconds
+        Airborne airborneEffect = new Airborne(1.0f);
+        battleManager.statusEffectController.AddEffect(airborneEffect, target);
+
+
 
         int damage = (int)System.Math.Round(user.attackPower * (1 + GetSkillLevel() / 10.0));
 
