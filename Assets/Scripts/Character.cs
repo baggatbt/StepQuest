@@ -61,7 +61,7 @@ protected virtual void Start()
         if (healthText !=null && energyText !=null)
         {
             healthText.text = "HP: " + health; 
-            energyText.text = "HP: " + energy;
+            energyText.text = "MP: " + energy;
         }
     }
 
@@ -140,51 +140,38 @@ public void GainEnergy(int energyGained)
     public void AnimationEnded() => animationEnded = true;
     public void attackStageTrigger() => attackTrigger = true;
 
-    public IEnumerator MoveToTarget()
-    {
-        Vector3 targetPosition = GetTargetPosition(1.0f);
-        checkCollisionsDuringMovement = true;
-        yield return StartCoroutine(Move(targetPosition, 15.0f));
-    }
+     public IEnumerator MoveToTarget()
+{
+    Vector3 targetPosition = attackTarget.position;
+    checkCollisionsDuringMovement = true;
+    animator.SetTrigger("MovementAnimationTrigger");  
+    yield return Move(targetPosition);
+    animator.SetTrigger("StopMovementAnimationTrigger");  
+}
 
-    public IEnumerator ReturnToPosition()
-    {
-        Debug.Log("Is returning to position");
-        checkCollisionsDuringMovement = false;
-        yield return StartCoroutine(Move(originalPosition, 15.0f));
-        animator.SetTrigger("StopMovementAnimationTrigger");
-    }
+public IEnumerator ReturnToPosition()
+{
+    checkCollisionsDuringMovement = false;
+    animator.SetTrigger("MovementAnimationTrigger");  
+    yield return Move(originalPosition);
+    animator.SetTrigger("StopMovementAnimationTrigger");  
+}
 
-    public void StopMoving()
+private IEnumerator Move(Vector3 targetPosition)
+{
+    while (!HasReachedPosition(targetPosition))
     {
-        animator.SetTrigger("StopMovementAnimationTrigger");
-        checkCollisionsDuringMovement = false;
-    }
-
-    private Vector3 GetTargetPosition(float offset)
-    {
-        Vector3 direction = (attackTarget.position - transform.position).normalized;
-        return attackTarget.position - direction * offset;
-    }
-
-    private IEnumerator Move(Vector3 targetPosition, float speed)
-    {
-        Debug.Log(gameObject.name + " is trying to move to: " + targetPosition);
-    
-        animator.SetTrigger("MovementAnimationTrigger");
-        while (!HasReachedPosition(targetPosition))
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, 15.0f * Time.deltaTime);
+        
+        if (checkCollisionsDuringMovement && IsCollidingWithCharacter())
         {
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
-            
-            if (checkCollisionsDuringMovement && IsCollidingWithCharacter())
-            {
-                StopMoving();
-                yield break;
-            }
-
-            yield return null;
+            animator.SetTrigger("StopMovementAnimationTrigger");  
+            yield break;
         }
+        yield return null;
     }
+}
+
 
     private bool HasReachedPosition(Vector3 targetPosition, float stoppingDistance = 0.1f)
     {
@@ -192,35 +179,15 @@ public void GainEnergy(int energyGained)
     }
 
     private bool IsCollidingWithCharacter()
-{
-    Collider2D[] colliders = Physics2D.OverlapCapsuleAll(
-        transform.position, 
-        GetComponent<CapsuleCollider2D>().size, 
-        GetComponent<CapsuleCollider2D>().direction, 
-        0f
-    );
-
-    foreach (Collider2D collider in colliders)
     {
-        // Ignore the collider if it's the current object itself.
-        if (collider.gameObject.GetInstanceID() == gameObject.GetInstanceID()) 
-        {
-            continue;
-        }
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 0.5f); // Use a circle instead of a capsule for simplicity
 
-        // If the colliding objects have the same tag, ignore the collision.
-        if (collider.CompareTag(tag))
+        foreach (Collider2D collider in colliders)
         {
-            continue;
+            if (collider.gameObject.GetInstanceID() == gameObject.GetInstanceID()) continue;
+            if (collider.CompareTag("Enemy") || collider.CompareTag("Player")) return true;
         }
-
-        // If collider has a tag "Enemy" or "Player", then we've found a collision.
-        if (collider.CompareTag("Enemy") || collider.CompareTag("Player"))
-        {
-            return true;
-        }
+        return false;
     }
-    return false;
-}
 
 }
