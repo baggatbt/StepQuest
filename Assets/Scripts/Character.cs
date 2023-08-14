@@ -24,7 +24,7 @@ public class Character : MonoBehaviour
     public TextMeshProUGUI healthText; 
     public TextMeshProUGUI energyText;
 
-
+    public bool attackTrigger;
     public bool animationEnded;
     public Skill currentSkill; 
     public List<Skill> skills = new List<Skill>();
@@ -129,6 +129,7 @@ public void GainEnergy(int energyGained)
 
     public void IsHit() => animator.SetTrigger("IsHurtTrigger");
     public void AnimationEnded() => animationEnded = true;
+    public void attackStageTrigger() => attackTrigger = true;
 
     public IEnumerator MoveToTarget()
     {

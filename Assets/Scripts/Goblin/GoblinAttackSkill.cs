@@ -16,14 +16,16 @@ public class GoblinAttackSkill : Skill
      public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
         user.isAttacking = true;
-       
-        
+
+
         // First Timing Event
+        Debug.Log("first attack");
         yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
         HandleTimingResult(user, target, "GoblinAttack1Trigger");
-        
 
+        yield return new WaitUntil(() => user.attackTrigger == true);
         // Second Timing Event
+        Debug.Log("Second attack");
         yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
         HandleTimingResult(user, target,"GoblinAttack2Trigger");
        
@@ -50,6 +52,7 @@ public class GoblinAttackSkill : Skill
                 Debug.Log("Perfect Hit!");
                 user.animator.SetTrigger(trigger);
                 target.TakeDamage(user.damage - user.damage);
+                target.animator.SetTrigger("BlockTrigger");
                 AudioManager.instance.PlaySlashSound();
                 break;
             case TimingEventResult.Good:

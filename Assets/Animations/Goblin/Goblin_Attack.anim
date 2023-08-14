@@ -35,22 +35,6 @@ AnimationClip:
       value: {fileID: 1290532464073988732, guid: f84c06efa9991bd49b5553f54f400348, type: 3}
     - time: 0.5833333
       value: {fileID: 4780903288873104255, guid: f84c06efa9991bd49b5553f54f400348, type: 3}
-    - time: 0.6666667
-      value: {fileID: 7441861488978599509, guid: 0bde33da364a06c4ab011aca33752f33, type: 3}
-    - time: 0.75
-      value: {fileID: 8288915215451595207, guid: 0bde33da364a06c4ab011aca33752f33, type: 3}
-    - time: 0.8333333
-      value: {fileID: 4668938655123782945, guid: 0bde33da364a06c4ab011aca33752f33, type: 3}
-    - time: 0.9166667
-      value: {fileID: 5683539909772271658, guid: 0bde33da364a06c4ab011aca33752f33, type: 3}
-    - time: 1
-      value: {fileID: 5764228812365489207, guid: 0bde33da364a06c4ab011aca33752f33, type: 3}
-    - time: 1.0833334
-      value: {fileID: -1191510351576865934, guid: 0bde33da364a06c4ab011aca33752f33, type: 3}
-    - time: 1.1666666
-      value: {fileID: -8937499057154260928, guid: 0bde33da364a06c4ab011aca33752f33, type: 3}
-    - time: 1.25
-      value: {fileID: 5293088307283036655, guid: 0bde33da364a06c4ab011aca33752f33, type: 3}
     attribute: m_Sprite
     path: 
     classID: 212
@@ -78,20 +62,12 @@ AnimationClip:
     - {fileID: 221524225039350300, guid: f84c06efa9991bd49b5553f54f400348, type: 3}
     - {fileID: 1290532464073988732, guid: f84c06efa9991bd49b5553f54f400348, type: 3}
     - {fileID: 4780903288873104255, guid: f84c06efa9991bd49b5553f54f400348, type: 3}
-    - {fileID: 7441861488978599509, guid: 0bde33da364a06c4ab011aca33752f33, type: 3}
-    - {fileID: 8288915215451595207, guid: 0bde33da364a06c4ab011aca33752f33, type: 3}
-    - {fileID: 4668938655123782945, guid: 0bde33da364a06c4ab011aca33752f33, type: 3}
-    - {fileID: 5683539909772271658, guid: 0bde33da364a06c4ab011aca33752f33, type: 3}
-    - {fileID: 5764228812365489207, guid: 0bde33da364a06c4ab011aca33752f33, type: 3}
-    - {fileID: -1191510351576865934, guid: 0bde33da364a06c4ab011aca33752f33, type: 3}
-    - {fileID: -8937499057154260928, guid: 0bde33da364a06c4ab011aca33752f33, type: 3}
-    - {fileID: 5293088307283036655, guid: 0bde33da364a06c4ab011aca33752f33, type: 3}
   m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 1.2666667
+    m_StopTime: 0.59999996
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0
@@ -110,4 +86,11 @@ AnimationClip:
   m_EulerEditorCurves: []
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 0
-  m_Events: []
+  m_Events:
+  - time: 0.5
+    functionName: attackStageTrigger
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
