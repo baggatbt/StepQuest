@@ -13,7 +13,7 @@ public class Slash : Skill
         requiresMovement = true;
         energyCost = 2;
         skillLevel = 1; // You could set a default level or fetch it from the player's saved data
-        numberOfSlashes = 2;
+        numberOfSlashes = 1;
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
