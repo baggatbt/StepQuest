@@ -173,14 +173,14 @@ private IEnumerator Move(Vector3 targetPosition)
 }
 
 
-    private bool HasReachedPosition(Vector3 targetPosition, float stoppingDistance = 0.1f)
+    private bool HasReachedPosition(Vector3 targetPosition, float stoppingDistance = 1.50f)
     {
         return (transform.position - targetPosition).sqrMagnitude <= stoppingDistance * stoppingDistance;
     }
 
     private bool IsCollidingWithCharacter()
     {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 0.5f); // Use a circle instead of a capsule for simplicity
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, .25f); // Use a circle instead of a capsule for simplicity
 
         foreach (Collider2D collider in colliders)
         {
