@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 6178202463525426464}
   - component: {fileID: 6178202463525426477}
   - component: {fileID: 6178202463525426478}
-  - component: {fileID: 6178202463525426469}
   m_Layer: 0
   m_Name: Goblin
   m_TagString: Enemy
@@ -132,6 +131,7 @@ MonoBehaviour:
   animator: {fileID: 6178202463525426478}
   healthText: {fileID: 0}
   energyText: {fileID: 0}
+  damageTextPrefab: {fileID: 0}
   attackTrigger: 0
   animationEnded: 0
   attacksBeforeSpecial: 0
@@ -159,15 +159,3 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &6178202463525426469
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6178202463525426479}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 975831af7c3eaef40a6b22161cf6bc57, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

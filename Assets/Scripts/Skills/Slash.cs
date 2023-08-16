@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Slash : Skill
 {
+    private int numberOfSlashes;
 
     public Slash()
     {
@@ -12,19 +13,22 @@ public class Slash : Skill
         requiresMovement = true;
         energyCost = 2;
         skillLevel = 1; // You could set a default level or fetch it from the player's saved data
-  
+        numberOfSlashes = 2;
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
 {   
-    yield return battleManager.PlayerActiveTimeEvent(0.0f, 1.0f, (result) =>
+    
+   
+    for (int i = 0; i < numberOfSlashes; i++)
     {
+        yield return new WaitForSeconds(.5f);
         user.animator.SetTrigger("Attack1Trigger");
+        yield return battleManager.PlayerActiveTimeEvent(0.0f, .7f, (result) =>
+    {
+        
         user.isAttacking = true;
-        // Create an instance of Airborne with a duration of 2 seconds
-        Airborne airborneEffect = new Airborne(1.0f);
-        battleManager.statusEffectController.AddEffect(airborneEffect, target);
-
+    
 
 
         int damage = (int)System.Math.Round(user.attackPower * (1 + GetSkillLevel() / 10.0));
@@ -65,9 +69,16 @@ public class Slash : Skill
            
         }
     });
-   
-    
-    
-   
+    }
+ 
 }
 }
+
+
+
+/*
+        // Create an instance of Airborne with a duration of 2 seconds
+        Airborne airborneEffect = new Airborne(1.0f);
+        battleManager.statusEffectController.AddEffect(airborneEffect, target);
+
+        */

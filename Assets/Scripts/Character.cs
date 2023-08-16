@@ -23,6 +23,8 @@ public class Character : MonoBehaviour
     public Animator animator;
     public TextMeshProUGUI healthText; 
     public TextMeshProUGUI energyText;
+    public TextMeshProUGUI damageTextPrefab;  
+
 
     public bool attackTrigger;
     public bool animationEnded;
@@ -78,7 +80,6 @@ protected virtual void Start()
 {
     health -= damage;
     healthBar.value = health;
-
     // Update the health text.
     if (healthText != null)
     {
@@ -88,6 +89,10 @@ protected virtual void Start()
     if (damage > 0) IsHit();
     if (health <= 0) this.gameObject.SetActive(false);
 }
+
+
+
+
 
 
     public void SpendEnergy(int energySpent)

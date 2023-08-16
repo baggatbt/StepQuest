@@ -190,7 +190,7 @@ public class BattleManager : MonoBehaviour
         
         Debug.Log("Cleared the skill queue after execution.");
         skillsExecuted = 0;
-
+        yield return new WaitUntil(() => player.isAttacking == false);
         // Move player back to their original position after all skills executed.
         yield return player.ReturnToPosition();
         
