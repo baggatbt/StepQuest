@@ -24,7 +24,7 @@ public class Slash : Skill
     {
         yield return new WaitForSeconds(.5f);
         user.animator.SetTrigger("Attack1Trigger");
-        yield return battleManager.PlayerActiveTimeEvent(0.0f, 0.7f, (result) =>
+        yield return battleManager.PlayerActiveTimeEvent(0.5f, 1.5f, (result) =>
     {
         
         user.isAttacking = true;
