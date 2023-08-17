@@ -12,6 +12,7 @@ public class PlayerData : MonoBehaviour
     public int attackPower;
     public int defensePower;
     public int steps;
+    public int speed;
     public Dictionary<string, int> skillLevels; // Keep track of each skill's level
     public Dictionary<string, int> skillExp; // Keep track of each skill's experience
     public bool isInitialized = false;
@@ -59,7 +60,7 @@ public class PlayerData : MonoBehaviour
         attackPower = player.attackPower;
         defensePower = player.defensePower;
         steps = player.steps;
-        
+        speed = player.speed;
         // Initialize the skillLevels dictionary
         skillLevels = new Dictionary<string, int>();
         skillExp = new Dictionary<string, int>();

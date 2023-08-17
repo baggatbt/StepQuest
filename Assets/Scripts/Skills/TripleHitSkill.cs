@@ -8,9 +8,9 @@ public class TripleHitSkill : Skill
     public TripleHitSkill()
     {
         skillName = "Triple Slash";
-        description = "Hits the enemy 3 times with timing checks before each hit";
+        description = "Slash up to three times with good timing";
         requiresMovement = true;
-        energyCost = 1;
+        energyCost = 2;
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)

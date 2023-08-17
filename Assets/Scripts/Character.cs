@@ -9,11 +9,12 @@ public class Character : MonoBehaviour
 {
     public int health;
     public int maxHealth;
-    public int damage; //This is for the slime, so the next time you forget and wonder, what is this for again? Thats what.
+    public int damage; //This is for the slime, so the next time you forget and wonder, what is this for again? Thats what. Everyone else has converted to AP
     public int energy;
     public int maxEnergy;
     public int attackPower;
     public int defensePower;
+    public int speed;
     public Slider healthBar;
     public Slider energyBar;
     public Transform attackTarget;
@@ -184,15 +185,20 @@ private IEnumerator Move(Vector3 targetPosition)
     }
 
     private bool IsCollidingWithCharacter()
-    {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, .25f); // Use a circle instead of a capsule for simplicity
+{
+    Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 0.5f);
 
-        foreach (Collider2D collider in colliders)
-        {
-            if (collider.gameObject.GetInstanceID() == gameObject.GetInstanceID()) continue;
-            if (collider.CompareTag("Enemy") || collider.CompareTag("Player")) return true;
-        }
-        return false;
+    foreach (Collider2D collider in colliders)
+    {
+        if (collider.gameObject.GetInstanceID() == gameObject.GetInstanceID()) continue;
+
+        // If current object is an enemy and the colliding object is also an enemy, ignore the collision
+        if (this.CompareTag("Enemy") && collider.CompareTag("Enemy")) continue;
+
+        if (collider.CompareTag("Enemy") || collider.CompareTag("Player")) return true;
     }
+    return false;
+}
+
 
 }

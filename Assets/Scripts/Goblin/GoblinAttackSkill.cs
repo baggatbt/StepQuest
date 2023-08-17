@@ -29,7 +29,7 @@ public class GoblinAttackSkill : Skill
         yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
         HandleTimingResult(user, target,"GoblinAttack2Trigger");
        
-
+        user.isAttacking = false;
     }
 
 

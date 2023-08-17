@@ -23,7 +23,7 @@ public class Goblin : Enemy
         this.expReward = 8;  //TODO: Add scaling
         this.goldReward = 3;
         this.attacksBeforeSpecial = 2;
-        this.damage = 4;
+        this.damage = 2;
 
         // Assign the skills
         this.normalSkill = this.skills[0]; // Normal skill

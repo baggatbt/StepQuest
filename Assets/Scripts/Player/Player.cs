@@ -44,6 +44,7 @@ public class Player : Character
         maxEnergy = 5;
         energy = maxEnergy;
         defensePower = 0;
+        speed = 2;
         steps = 0;
     }
 
@@ -66,8 +67,8 @@ public class Player : Character
         if (levelText) levelText.text = "Level: " + data.level;
         if (expText) expText.text = "EXP: " + data.exp;
         if (goldText) goldText.text = "Gold: " + data.gold;
-        if (attackPowerText) attackPowerText.text = "AP: " + data.attackPower;
-        if (defensePowerText) defensePowerText.text = "DP: " + data.defensePower;
+        if (attackPowerText) attackPowerText.text = "Atk: " + data.attackPower;
+        if (defensePowerText) defensePowerText.text = "Def: " + data.defensePower;
         if (stepsText) stepsText.text = "Steps: " + data.steps;
     }
 }
