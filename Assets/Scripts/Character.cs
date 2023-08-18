@@ -86,7 +86,7 @@ protected virtual void Start()
     {
         healthText.text = "HP: " + health;
     }
-
+    
     if (damage > 0) IsHit();
     if (health <= 0) this.gameObject.SetActive(false);
 }
@@ -179,7 +179,7 @@ private IEnumerator Move(Vector3 targetPosition)
 }
 
 
-    private bool HasReachedPosition(Vector3 targetPosition, float stoppingDistance = 1.50f)
+    private bool HasReachedPosition(Vector3 targetPosition, float stoppingDistance = 2.0f)
     {
         return (transform.position - targetPosition).sqrMagnitude <= stoppingDistance * stoppingDistance;
     }
@@ -195,10 +195,12 @@ private IEnumerator Move(Vector3 targetPosition)
         // If current object is an enemy and the colliding object is also an enemy, ignore the collision
         if (this.CompareTag("Enemy") && collider.CompareTag("Enemy")) continue;
 
-        if (collider.CompareTag("Enemy") || collider.CompareTag("Player")) return true;
+        // If it's colliding with the target, then return true
+        if (collider.gameObject.GetInstanceID() == attackTarget.gameObject.GetInstanceID()) return true;
     }
     return false;
 }
+
 
 
 }
