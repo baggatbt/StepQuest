@@ -438,12 +438,13 @@ public class BattleManager : MonoBehaviour
         float holdTimer = 0;
 
         holdReleaseSlider.ResetSlider(); // Reset the slider at the start of the hold event
+        holdReleaseSlider.gameObject.SetActive(true);
 
         while (holdTimer < totalHoldDuration)
         {
             if (Input.GetMouseButton(0)) // Button is currently held down
             {
-                holdReleaseSlider.gameObject.SetActive(true);
+                
                 holdTimer += Time.deltaTime;
 
                 // Update the slider value as the hold time increases
@@ -452,9 +453,10 @@ public class BattleManager : MonoBehaviour
 
             if (Input.GetMouseButtonUp(0)) // Button was just released
             {
+                holdReleaseSlider.gameObject.SetActive(false);  
                 break;
             }
-            holdReleaseSlider.gameObject.SetActive(false);    
+              
             yield return null;
         }
 
