@@ -29,6 +29,7 @@ public abstract class Skill
     public bool requiresMovement; // Indicates if the attack requires movement towards the target
     public int energyCost;
     public int skillLevel;
+
     
 
     public abstract IEnumerator Execute(Character user, Character target, BattleManager battleManager);

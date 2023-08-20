@@ -22,11 +22,11 @@ public class Slash : Skill
    
     for (int i = 0; i < numberOfSlashes; i++)
     {
-        yield return new WaitForSeconds(.5f);
-        user.animator.SetTrigger("Attack1Trigger");
-        yield return battleManager.PlayerActiveTimeEvent(0.5f, 1.5f, (result) =>
-    {
         
+        
+        yield return battleManager.PlayerActiveTimeEvent(0.0f, 1.0f, (result) =>
+    {
+        user.animator.SetTrigger("Attack1Trigger");
         user.isAttacking = true;
     
 

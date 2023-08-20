@@ -136,6 +136,15 @@ public class BattleManager : MonoBehaviour
         launchAttacksButton.interactable = true;
     }
 
+    public void MoveCirclesToTarget(Character target)
+{
+            // Move the circles to the targets position
+            outerCircle.transform.position = currentTarget.transform.position;
+            innerCircle.transform.position = currentTarget.transform.position;
+       
+}
+
+
     public void StartBattle(BattleConfig config)
     {
         // Use config.poolName and config.maxEnemiesToSpawn to set up battle
@@ -208,6 +217,7 @@ public class BattleManager : MonoBehaviour
         if (player.currentSkill.requiresMovement && skillsExecuted == 0)
         {
             yield return StartCoroutine(PlayerMoveAndAttackCoroutine());
+
         }
         else
         {
@@ -223,6 +233,8 @@ public class BattleManager : MonoBehaviour
     if (player.transform.position != currentTarget.transform.position)
     {
         yield return player.MoveToTarget();
+        
+          
     }
 
     yield return StartCoroutine(PlayerAttackCoroutine(null));
@@ -235,6 +247,7 @@ public class BattleManager : MonoBehaviour
 
     if (player.currentSkill != null)
     {
+        MoveCirclesToTarget(targetEnemy);
         yield return player.currentSkill.Execute(player, targetEnemy, this);
         yield return new WaitForSeconds(0.3f);
         CheckBattleEnd();
@@ -430,6 +443,7 @@ public class BattleManager : MonoBehaviour
         {
             if (Input.GetMouseButton(0)) // Button is currently held down
             {
+                holdReleaseSlider.gameObject.SetActive(true);
                 holdTimer += Time.deltaTime;
 
                 // Update the slider value as the hold time increases
@@ -440,7 +454,7 @@ public class BattleManager : MonoBehaviour
             {
                 break;
             }
-
+            holdReleaseSlider.gameObject.SetActive(false);    
             yield return null;
         }
 
@@ -501,18 +515,21 @@ public class BattleManager : MonoBehaviour
     private void Update()
 {
     if (Input.GetMouseButtonDown(0))
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
 
         if (hit.collider != null && hit.collider.CompareTag("Enemy"))
-            {
-                
-                currentTarget = hit.collider.gameObject;
-                player.attackTarget = currentTarget.transform; //For movement purposes sets the target to the players target
-                Debug.Log("Current target: " + currentTarget.name);
-            }
+        {
+            currentTarget = hit.collider.gameObject;
+            player.attackTarget = currentTarget.transform; //For movement purposes sets the target to the players target
+            Debug.Log("Current target: " + currentTarget.name);
+            
+            
+        }
     }
+
+
 }
 
 
