@@ -21,28 +21,40 @@ public class PlayerData : MonoBehaviour
     private StepCounterController stepCounterController;
 
     private void Awake()
+{
+    if (Instance == null)
     {
-        if (Instance == null)
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
+        // Check if it's the first launch
+        if (PlayerPrefs.GetInt("FirstLaunch", 1) == 1)
         {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
+            // If it's the first launch, set it to 0 so next time it's no longer the first launch
+            PlayerPrefs.SetInt("FirstLaunch", 0);
+            PlayerPrefs.Save();
+
+            // Initialize steps to 0 for the first launch
+            steps = 0;
         }
     }
+    else
+    {
+        Destroy(gameObject);
+    }
+}
 
     private void Start()
+{
+    stepCounterController = FindObjectOfType<StepCounterController>();
+    
+    if (stepCounterController != null && steps == 0)
     {
-        stepCounterController = FindObjectOfType<StepCounterController>();
-        
-        if (stepCounterController != null)
-        {
-            steps = stepCounterController.GetStepsSinceStart();
-            Debug.Log(steps);
-        }
+        // Only set the steps from the counter if it's not the first launch
+        steps = stepCounterController.GetStepsSinceStart();
+        Debug.Log(steps);
     }
+}
 
     private void Update()
     {
