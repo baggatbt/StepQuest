@@ -7,41 +7,29 @@ using TMPro;
 public class Mission : MonoBehaviour
 {
     public string missionName;
-    public int stepCost;
-    public int stepsToGo;
-    public int currentSteps;
-    public int stepsAtStart;
-
-    public void Start()
+    public int stepCost; // The total steps required to complete this mission.
+    public bool isActive = false; // This tracks if the mission is currently active.
+    public int stepsSinceActivation = 0; // This tracks the steps since the mission was activated.
+    
+    public void ActivateMission()
     {
-        stepsAtStart = PlayerData.Instance.steps; // get current steps at the start
-        UpdateMissionProgress(); // call to initialize values
+        isActive = true;
+        stepsSinceActivation = 0; // Reset the steps.
     }
-
-    protected virtual void Update()
+    
+    public bool CheckMissionCompletion()
     {
-        UpdateMissionProgress();
+        return stepsSinceActivation >= stepCost;
     }
-
-    public void UpdateMissionProgress()
+    
+    public void ClaimReward()
     {
-        currentSteps = PlayerData.Instance.steps - stepsAtStart;
-        stepsToGo = stepCost - currentSteps;
-    }
-
-    public virtual void ClaimReward()
-    {
-        if(stepsToGo <= 0)
+        if (CheckMissionCompletion())
         {
-            // reward logic here, for instance:
-            PlayerData.Instance.gold += 100; // Giving 100 gold as an example
-            Debug.Log("Rewards claimed!");
-
-            // Reset the mission or move to the next one or disable the claim button
-        }
-        else
-        {
-            Debug.Log("Not enough steps!");
+            // Add rewards here.
+            // e.g. PlayerData.Instance.gold += someRewardAmount;
+            isActive = false; // End the mission.
         }
     }
 }
+

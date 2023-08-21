@@ -16,6 +16,8 @@ public class PlayerData : MonoBehaviour
     public Dictionary<string, int> skillLevels; // Keep track of each skill's level
     public Dictionary<string, int> skillExp; // Keep track of each skill's experience
     public bool isInitialized = false;
+    public List<Mission> activeMissions = new List<Mission>(); // List of currently active missions.
+
 
 
     private StepCounterController stepCounterController;
@@ -55,10 +57,19 @@ public class PlayerData : MonoBehaviour
         Debug.Log(steps);
     }
 }
-
+    
     private void Update()
     {
         steps = stepCounterController.GetStepsSinceStart();
+
+        // Update steps for each active mission.
+        foreach (var mission in activeMissions)
+        {
+            if (mission.isActive)
+            {
+                mission.stepsSinceActivation = steps;
+            }
+        }
     }
 
     // Initialization method to setup data
@@ -104,6 +115,23 @@ public class PlayerData : MonoBehaviour
         else
         {
             skillExp[skillName] = amount;
+        }
+    }
+
+     public void ActivateMission(Mission mission)
+    {
+        mission.ActivateMission();
+        if (!activeMissions.Contains(mission))
+        {
+            activeMissions.Add(mission);
+        }
+    }
+
+    public void RemoveMission(Mission mission)
+    {
+        if (activeMissions.Contains(mission))
+        {
+            activeMissions.Remove(mission);
         }
     }
 
