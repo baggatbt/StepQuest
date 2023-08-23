@@ -7,6 +7,7 @@ using TMPro;
 
 public class Character : MonoBehaviour 
 {
+    public int level;
     public int health;
     public int maxHealth;
     public int damage; //This is for the slime, so the next time you forget and wonder, what is this for again? Thats what. Everyone else has converted to AP

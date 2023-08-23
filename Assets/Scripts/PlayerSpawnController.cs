@@ -4,7 +4,7 @@ using TMPro;
 
 public class PlayerSpawnController : MonoBehaviour
 {
-    public GameObject playerPrefab;
+    public GameObject knightPrefab;
     public Transform playerSpawnPoint; // You can assign this directly in the inspector
     public Slider associatedHealthBarSlider; // Reference to the slider
     public Slider associatedEnergyBarSlider;
@@ -31,7 +31,7 @@ public class PlayerSpawnController : MonoBehaviour
     public Character SpawnPlayerAtPoint(Transform spawnPoint)
 {
     // Instantiate the player at the position of spawnPoint and with its rotation
-    GameObject spawnedPlayerObject = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
+    GameObject spawnedPlayerObject = Instantiate(knightPrefab, spawnPoint.position, spawnPoint.rotation);
     Character spawnedPlayer = spawnedPlayerObject.GetComponent<Character>();
 
      

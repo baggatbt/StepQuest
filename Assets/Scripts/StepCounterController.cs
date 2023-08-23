@@ -3,17 +3,16 @@ using UnityEngine;
 public class StepCounterController : MonoBehaviour
 {
     private AndroidJavaObject stepCounterPluginInstance;
+    private int inGameSteps;
 
-    private void Start()
+    private void Awake()
     {
         if (Application.platform == RuntimePlatform.Android)
         {
-            // Access the Unity Player Activity
             using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
             {
                 AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
                 
-                // Initialize the step counter plugin
                 using (AndroidJavaClass stepCounterPluginClass = new AndroidJavaClass("com.example.stepcounterplugin.StepCounterPlugin"))
                 {
                     stepCounterPluginClass.CallStatic("init", currentActivity);
@@ -21,10 +20,7 @@ public class StepCounterController : MonoBehaviour
                 }
             }
             
-            // Create an instance of the plugin class
             stepCounterPluginInstance = new AndroidJavaObject("com.example.stepcounterplugin.StepCounterPlugin");
-
-            // Start counting steps
             stepCounterPluginInstance.CallStatic("startCounting");
         }
     }
@@ -33,26 +29,35 @@ public class StepCounterController : MonoBehaviour
     {
         if (Application.platform == RuntimePlatform.Android)
         {
-            // Optionally print the steps since starting the app to the Unity console
             Debug.Log("Steps since start: " + GetStepsSinceStart());
         }
     }
 
+    
     private void OnDestroy()
     {
         if (Application.platform == RuntimePlatform.Android)
         {
-            // Stop counting steps when the app closes or the object is destroyed
             stepCounterPluginInstance.CallStatic("stopCounting");
         }
     }
 
     public int GetStepsSinceStart()
     {
-        if (Application.platform == RuntimePlatform.Android)
+        return CallStaticMethodOnPlugin<int>("getStepsSinceStart");
+    }
+
+    public int GetSteps()
+    {
+        return CallStaticMethodOnPlugin<int>("getSteps");
+    }
+
+    private T CallStaticMethodOnPlugin<T>(string methodName)
+    {
+        if (Application.platform == RuntimePlatform.Android && stepCounterPluginInstance != null)
         {
-            return stepCounterPluginInstance.CallStatic<int>("getStepsSinceStart");
+            return stepCounterPluginInstance.CallStatic<T>(methodName);
         }
-        return 0; // return 0 if not on Android or any other default behavior
+        return default(T);
     }
 }

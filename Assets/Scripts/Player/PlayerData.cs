@@ -1,96 +1,152 @@
 using System;
 using UnityEngine;
-using System.Collections.Generic;  
+using System.Collections.Generic;
 
+//HANDLES STORING/RETRIEVING OF ALL PLAYER RELATED DATA
 public class PlayerData : MonoBehaviour
 {
-    public static PlayerData Instance;
+    private static PlayerData _instance;
+
+    public static PlayerData Instance
+    {
+        get { return _instance; }
+    }
 
     public int level;
     public int exp;
     public int gold;
     public int attackPower;
     public int defensePower;
-    public int steps;
+    public int inGameSteps;
     public int speed;
-    public Dictionary<string, int> skillLevels; // Keep track of each skill's level
-    public Dictionary<string, int> skillExp; // Keep track of each skill's experience
-    public bool isInitialized = false;
-    public List<Mission> activeMissions = new List<Mission>(); // List of currently active missions.
-
-
+    public Dictionary<string, int> skillLevels;
+    public Dictionary<string, int> skillExp;
+    public List<Mission> activeMissions = new List<Mission>();
 
     private StepCounterController stepCounterController;
 
     private void Awake()
-{
-    if (Instance == null)
     {
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-
-        // Check if it's the first launch
-        if (PlayerPrefs.GetInt("FirstLaunch", 1) == 1)
+        if (_instance == null)
         {
-            // If it's the first launch, set it to 0 so next time it's no longer the first launch
-            PlayerPrefs.SetInt("FirstLaunch", 0);
-            PlayerPrefs.Save();
-
-            // Initialize steps to 0 for the first launch
-            steps = 0;
+            _instance = this;
+            DontDestroyOnLoad(gameObject);
         }
-    }
-    else
-    {
-        Destroy(gameObject);
-    }
-}
-
-    private void Start()
-{
-    stepCounterController = FindObjectOfType<StepCounterController>();
-    
-    if (stepCounterController != null && steps == 0)
-    {
-        // Only set the steps from the counter if it's not the first launch
-        steps = stepCounterController.GetStepsSinceStart();
-        Debug.Log(steps);
-    }
-}
-    
-    private void Update()
-    {
-        steps = stepCounterController.GetStepsSinceStart();
-
-        // Update steps for each active mission.
-        foreach (var mission in activeMissions)
+        else
         {
-            if (mission.isActive)
-            {
-                mission.stepsSinceActivation = steps;
-            }
+            Destroy(gameObject);
         }
-    }
 
-    // Initialization method to setup data
-    public void Initialize(Player player)
-    {
-        if (isInitialized) return; // Skip if already initialized
-        
-        level = player.level;
-        exp = player.exp;
-        gold = player.gold;
-        attackPower = player.attackPower;
-        defensePower = player.defensePower;
-        steps = player.steps;
-        speed = player.speed;
-        // Initialize the skillLevels dictionary
         skillLevels = new Dictionary<string, int>();
         skillExp = new Dictionary<string, int>();
 
-        isInitialized = true; // Mark as initialized
+        stepCounterController = FindObjectOfType<StepCounterController>();
+        if (stepCounterController == null)
+        {
+            Debug.LogError("StepCounterController not found in the scene!");
+        }
     }
 
+    private void Start()
+    {
+        LoadStepsData();
+        LoadPlayerData();
+        int stepsSinceStart = stepCounterController.GetStepsSinceStart();
+        inGameSteps += stepsSinceStart;
+        Debug.Log("Steps after adding stepsSinceStart: " + inGameSteps);
+    }
+
+    private int previousSteps = 0;
+
+    private void Update()
+    {
+        int currentSteps = stepCounterController.GetSteps();
+        if(currentSteps >= previousSteps)
+        {
+            inGameSteps += currentSteps - previousSteps;
+            previousSteps = currentSteps;
+        }
+        Debug.Log("Steps in Update: " + inGameSteps);
+    }
+
+    public void UpdatePlayerData(int level, int exp, int gold, int attackPower, int defensePower, int inGameSteps)
+    {
+        this.level = level;
+        this.exp = exp;
+        this.gold = gold;
+        this.attackPower = attackPower;
+        this.defensePower = defensePower;
+        this.inGameSteps = inGameSteps;
+        
+        SavePlayerData(); 
+    }
+
+    public void SavePlayerData()
+    {
+        PlayerPrefs.SetInt("PlayerLevel", level);
+        PlayerPrefs.SetInt("PlayerExp", exp);
+        PlayerPrefs.SetInt("PlayerGold", gold);
+        PlayerPrefs.SetInt("PlayerAttackPower", attackPower);
+        PlayerPrefs.SetInt("PlayerDefensePower", defensePower);
+        PlayerPrefs.SetInt("PlayerInGameSteps", inGameSteps);
+        PlayerPrefs.Save();
+        Debug.Log("Data saved");
+    }
+
+    public void LoadPlayerData()
+    {
+        if (PlayerPrefs.HasKey("PlayerLevel"))
+        {
+            level = PlayerPrefs.GetInt("PlayerLevel");
+            exp = PlayerPrefs.GetInt("PlayerExp");
+            gold = PlayerPrefs.GetInt("PlayerGold");
+            attackPower = PlayerPrefs.GetInt("PlayerAttackPower");
+            defensePower = PlayerPrefs.GetInt("PlayerDefensePower");
+            inGameSteps = PlayerPrefs.GetInt("PlayerInGameSteps");
+        }
+    }
+
+    private void OnApplicationPause(bool pauseStatus)
+    {
+        if (pauseStatus)
+        {
+            SaveStepsData();
+        }
+        else
+        {
+            LoadStepsData();
+        }
+    }
+
+    private void OnApplicationQuit()
+    {
+        SaveStepsData();
+        SavePlayerData();
+        Debug.Log("Saving steps on quit: " + inGameSteps);
+    }
+
+    private void LoadStepsData()
+    {
+        if(PlayerPrefs.HasKey("StepsBeforeClosing") && PlayerPrefs.HasKey("InGameSteps"))
+        {
+            int stepsBeforeClosing = PlayerPrefs.GetInt("StepsBeforeClosing", 0);
+            int stepsWhenReOpening = stepCounterController.GetSteps();
+            int previousInGameSteps = PlayerPrefs.GetInt("InGameSteps", 0);
+            int stepsDuringClosure = stepsWhenReOpening - stepsBeforeClosing;
+            inGameSteps = previousInGameSteps + stepsDuringClosure; 
+            previousSteps = stepsWhenReOpening;
+            Debug.Log("Loaded Steps: " + inGameSteps);
+        }
+    }
+
+    private void SaveStepsData()
+    {
+        PlayerPrefs.SetInt("StepsBeforeClosing", stepCounterController.GetSteps());
+        PlayerPrefs.SetInt("InGameSteps", inGameSteps);
+        PlayerPrefs.Save();
+    }
+
+    //NEEDS OWN CLASS
     // Method to increase the level of a skill
     public void IncreaseSkillLevel(string skillName, int amount)
     {
@@ -117,7 +173,10 @@ public class PlayerData : MonoBehaviour
             skillExp[skillName] = amount;
         }
     }
+    
 
+
+    //MOVE THESE TO ANOTHER CLASS
      public void ActivateMission(Mission mission)
     {
         mission.ActivateMission();
@@ -134,10 +193,4 @@ public class PlayerData : MonoBehaviour
             activeMissions.Remove(mission);
         }
     }
-
-
-
-    
 }
-
-

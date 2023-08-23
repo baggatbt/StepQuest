@@ -12,10 +12,9 @@ GameObject:
   - component: {fileID: 358661848719693021}
   - component: {fileID: 358661848719693023}
   - component: {fileID: 358661848719693022}
-  - component: {fileID: 3476299109010144149}
-  - component: {fileID: 358661848719693018}
+  - component: {fileID: 5684344712779207555}
   m_Layer: 0
-  m_Name: Player
+  m_Name: Knight
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -125,7 +124,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &3476299109010144149
+--- !u!114 &5684344712779207555
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -134,9 +133,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 358661848719693019}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dd52f750d63fb5542ba9490a2aed5c33, type: 3}
+  m_Script: {fileID: 11500000, guid: 7fc6689e09fe7db4fab501b1165596c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  level: 0
   health: 0
   maxHealth: 0
   damage: 0
@@ -144,6 +144,7 @@ MonoBehaviour:
   maxEnergy: 0
   attackPower: 0
   defensePower: 0
+  speed: 0
   healthBar: {fileID: 0}
   energyBar: {fileID: 0}
   attackTarget: {fileID: 0}
@@ -158,49 +159,4 @@ MonoBehaviour:
   animationEnded: 0
   attacksBeforeSpecial: 0
   statusEffectController: {fileID: 0}
-  playerSpawnPoint: {fileID: 0}
-  levelText: {fileID: 0}
-  expText: {fileID: 0}
-  goldText: {fileID: 0}
-  attackPowerText: {fileID: 0}
-  defensePowerText: {fileID: 0}
-  stepsText: {fileID: 0}
-  saveButton: {fileID: 0}
-  loadButton: {fileID: 0}
-  level: 0
-  exp: 0
-  gold: 0
-  steps: 0
---- !u!114 &358661848719693018
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 358661848719693019}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 22c208c25b22e834a860bdeb5f884e76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  health: 10
-  maxHealth: 10
-  damage: 0
-  energy: 10
-  maxEnergy: 10
-  attackPower: 0
-  defensePower: 0
-  healthBar: {fileID: 0}
-  energyBar: {fileID: 0}
-  attackTarget: {fileID: 0}
-  originalPosition: {x: 0, y: 0, z: 0}
-  isAttacking: 0
-  spriteRenderer: {fileID: 358661848719693021}
-  animator: {fileID: 358661848719693022}
-  healthText: {fileID: 0}
-  energyText: {fileID: 0}
-  damageTextPrefab: {fileID: 0}
-  attackTrigger: 0
-  animationEnded: 0
-  attacksBeforeSpecial: 0
-  statusEffectController: {fileID: 0}
+  shieldPower: 0
