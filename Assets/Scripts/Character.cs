@@ -16,6 +16,8 @@ public class Character : MonoBehaviour
     public int attackPower;
     public int defensePower;
     public int speed;
+    public int atkGrowth;
+    public int defGrowth;
     public Slider healthBar;
     public Slider energyBar;
     public Transform attackTarget;
@@ -47,34 +49,34 @@ public class Character : MonoBehaviour
     }
 
     protected virtual void Awake()
-{
-    animator = GetComponent<Animator>();
-    health = maxHealth; 
-    originalPosition = transform.position;
-    statusEffectController = GetComponent<StatusEffectController>();
-    Debug.Log(gameObject.name + " original position: " + originalPosition);
-}
-
-protected virtual void Start()
-{
-    
-    if (healthBar != null)
     {
-        healthBar.maxValue = maxHealth;
-        healthBar.value = health;
-        if (healthText !=null && energyText !=null)
+        animator = GetComponent<Animator>();
+        health = maxHealth; 
+        originalPosition = transform.position;
+        statusEffectController = GetComponent<StatusEffectController>();
+        Debug.Log(gameObject.name + " original position: " + originalPosition);
+    }
+
+    protected virtual void Start()
+    {
+        
+        if (healthBar != null)
         {
-            healthText.text = "HP: " + health; 
-            energyText.text = "MP: " + energy;
+            healthBar.maxValue = maxHealth;
+            healthBar.value = health;
+            if (healthText !=null && energyText !=null)
+            {
+                healthText.text = "HP: " + health; 
+                energyText.text = "MP: " + energy;
+            }
+        }
+
+        if (energyBar != null)
+        {
+            energyBar.maxValue = maxEnergy;
+            energyBar.value = energy;
         }
     }
-
-    if (energyBar != null)
-    {
-        energyBar.maxValue = maxEnergy;
-        energyBar.value = energy;
-    }
-}
 
 
 
@@ -91,11 +93,6 @@ protected virtual void Start()
     if (damage > 0) IsHit();
     if (health <= 0) this.gameObject.SetActive(false);
 }
-
-
-
-
-
 
     public void SpendEnergy(int energySpent)
 {
@@ -115,7 +112,7 @@ protected virtual void Start()
         
     }
 
-public void GainEnergy(int energyGained)
+    public void GainEnergy(int energyGained)
 {
     if (energyGained % 2 != 0) //Checks to make sure energy values stay rounded 
     {
@@ -140,7 +137,7 @@ public void GainEnergy(int energyGained)
     }
 }
 
-
+   
     
 
     public void IsHit() => animator.SetTrigger("IsHurtTrigger");
@@ -156,28 +153,28 @@ public void GainEnergy(int energyGained)
     animator.SetTrigger("StopMovementAnimationTrigger");  
 }
 
-public IEnumerator ReturnToPosition()
-{
-    checkCollisionsDuringMovement = false;
-    animator.SetTrigger("MovementAnimationTrigger");  
-    yield return Move(originalPosition);
-    animator.SetTrigger("StopMovementAnimationTrigger");  
-}
-
-private IEnumerator Move(Vector3 targetPosition)
-{
-    while (!HasReachedPosition(targetPosition))
-    {
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, 15.0f * Time.deltaTime);
-        
-        if (checkCollisionsDuringMovement && IsCollidingWithCharacter())
+     public IEnumerator ReturnToPosition()
         {
+            checkCollisionsDuringMovement = false;
+            animator.SetTrigger("MovementAnimationTrigger");  
+            yield return Move(originalPosition);
             animator.SetTrigger("StopMovementAnimationTrigger");  
-            yield break;
         }
-        yield return null;
-    }
-}
+
+     private IEnumerator Move(Vector3 targetPosition)
+        {
+            while (!HasReachedPosition(targetPosition))
+            {
+                transform.position = Vector3.MoveTowards(transform.position, targetPosition, 15.0f * Time.deltaTime);
+                
+                if (checkCollisionsDuringMovement && IsCollidingWithCharacter())
+                {
+                    animator.SetTrigger("StopMovementAnimationTrigger");  
+                    yield break;
+                }
+                yield return null;
+            }
+        }
 
 
     private bool HasReachedPosition(Vector3 targetPosition, float stoppingDistance = 2.0f)

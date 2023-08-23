@@ -17,6 +17,7 @@ public class Player : Character
     public TextMeshProUGUI stepsText;
 
     private PlayerData playerData;
+    private int expRequiredToLevel;
 
     protected override void Awake()
     {
@@ -89,6 +90,15 @@ public class Player : Character
     {
         playerData.gold += amount;
         playerData.SavePlayerData();
+    }
+
+     public void LevelUp()
+    {
+        if (playerData.exp >= expRequiredToLevel)
+        {
+          playerData.attackPower += atkGrowth;
+        }
+        
     }
 
 }

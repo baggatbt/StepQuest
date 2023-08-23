@@ -146,6 +146,8 @@ public class PlayerData : MonoBehaviour
         PlayerPrefs.Save();
     }
 
+    
+
     //NEEDS OWN CLASS
     // Method to increase the level of a skill
     public void IncreaseSkillLevel(string skillName, int amount)
