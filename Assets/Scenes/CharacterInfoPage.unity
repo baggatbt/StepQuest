@@ -1203,7 +1203,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 7.5799866, y: -1.6399994}
+  m_AnchoredPosition: {x: 7.580017, y: -1.6400146}
   m_SizeDelta: {x: -329.95, y: -127.57}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &513042678
@@ -1553,7 +1553,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -218.5, y: 45.800003}
+  m_AnchoredPosition: {x: -218.49997, y: 45.800003}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &567007040
@@ -2039,7 +2039,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -208, y: -124}
+  m_AnchoredPosition: {x: -203, y: -127}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &613731599
@@ -3007,9 +3007,8 @@ MonoBehaviour:
   gold: 0
   attackPower: 0
   defensePower: 0
-  steps: 0
+  inGameSteps: 0
   speed: 0
-  isInitialized: 0
   activeMissions: []
 --- !u!4 &937494370
 Transform:
@@ -4282,7 +4281,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1211662998
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4638,6 +4637,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd52f750d63fb5542ba9490a2aed5c33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  level: 0
   health: 0
   maxHealth: 0
   damage: 0
@@ -4666,13 +4666,9 @@ MonoBehaviour:
   goldText: {fileID: 1268822382}
   attackPowerText: {fileID: 1445929555}
   defensePowerText: {fileID: 1663805952}
+  magicAttackText: {fileID: 103392001}
+  magicDefenseText: {fileID: 591875727}
   stepsText: {fileID: 978449236}
-  saveButton: {fileID: 1211662999}
-  loadButton: {fileID: 1477607124}
-  level: 0
-  exp: 0
-  gold: 0
-  steps: 0
 --- !u!114 &1274183896
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4755,7 +4751,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -386, y: -124}
+  m_AnchoredPosition: {x: 169, y: -126}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1373034237
@@ -5151,7 +5147,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1477607123
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5874,7 +5870,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Missions
+  m_text: Quests
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

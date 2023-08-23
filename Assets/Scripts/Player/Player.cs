@@ -12,6 +12,8 @@ public class Player : Character
     public TextMeshProUGUI goldText;
     public TextMeshProUGUI attackPowerText;
     public TextMeshProUGUI defensePowerText;
+    public TextMeshProUGUI magicAttackText;
+    public TextMeshProUGUI magicDefenseText;
     public TextMeshProUGUI stepsText;
 
     private PlayerData playerData;
@@ -73,9 +75,11 @@ public class Player : Character
     if (levelText != null) levelText.text = "Level: " + playerData.level.ToString();
     if (expText != null) expText.text = "Exp: " + playerData.exp.ToString();
     if (goldText != null) goldText.text = "Gold: " + playerData.gold.ToString();
-    if (attackPowerText != null) attackPowerText.text = "Attack Power: " + playerData.attackPower.ToString();
-    if (defensePowerText != null) defensePowerText.text = "Defense Power: " + playerData.defensePower.ToString();
+    if (attackPowerText != null) attackPowerText.text = "Atk:" + playerData.attackPower.ToString();
+    if (defensePowerText != null) defensePowerText.text = "Def: " + playerData.defensePower.ToString();
     if (stepsText != null) stepsText.text = "Steps: " + playerData.inGameSteps.ToString();
+    if (magicAttackText != null) magicAttackText.text = "M.Atk: 0";
+    if (magicDefenseText != null) magicDefenseText.text = "M.Def: 0";
 }
 
 
