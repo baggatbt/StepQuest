@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 8370724005610461911}
   - component: {fileID: 8370724005610461910}
   - component: {fileID: 8370724005610461913}
-  - component: {fileID: 8370724005610461906}
   m_Layer: 0
   m_Name: GreenSlime
   m_TagString: Enemy
@@ -119,19 +118,24 @@ MonoBehaviour:
   health: 8
   maxHealth: 8
   damage: 2
+  energy: 0
+  maxEnergy: 0
+  attackPower: 0
+  defensePower: 0
   healthBar: {fileID: 0}
+  energyBar: {fileID: 0}
   attackTarget: {fileID: 0}
   originalPosition: {x: 0, y: 0, z: 0}
   isAttacking: 0
   spriteRenderer: {fileID: 8370724005610461908}
   animator: {fileID: 8370724005610461913}
-  playerSpawn: {fileID: 0}
-  enemySpawns:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  healthText: {fileID: 0}
+  energyText: {fileID: 0}
+  damageTextPrefab: {fileID: 0}
+  attackTrigger: 0
   animationEnded: 0
   attacksBeforeSpecial: 2
+  statusEffectController: {fileID: 0}
   expReward: 5
   goldReward: 2
 --- !u!95 &8370724005610461913
@@ -155,15 +159,3 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &8370724005610461906
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8370724005610461912}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 975831af7c3eaef40a6b22161cf6bc57, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

@@ -5,6 +5,7 @@ using UnityEngine;
 public class OpenSkillSelectionPanel : MonoBehaviour
 {
     public GameObject skillSelectionGUI;
+    public GameObject missionGUI;
 
     public void openSkillSelectionGUI()
     {
@@ -14,6 +15,16 @@ public class OpenSkillSelectionPanel : MonoBehaviour
     public void closeSkillSelectionGUI()
     {
         skillSelectionGUI.SetActive(false);
+    }
+
+    public void openMissionInterface()
+    {
+        missionGUI.SetActive(true);
+    }
+
+    public void closeMissionInterface()
+    {
+        missionGUI.SetActive(false);
     }
    
 }

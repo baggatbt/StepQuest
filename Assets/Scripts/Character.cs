@@ -7,13 +7,15 @@ using TMPro;
 
 public class Character : MonoBehaviour 
 {
+    public int level;
     public int health;
     public int maxHealth;
-    public int damage; //This is for the slime, so the next time you forget and wonder, what is this for again? Thats what.
+    public int damage; //This is for the slime, so the next time you forget and wonder, what is this for again? Thats what. Everyone else has converted to AP
     public int energy;
     public int maxEnergy;
     public int attackPower;
     public int defensePower;
+    public int speed;
     public Slider healthBar;
     public Slider energyBar;
     public Transform attackTarget;
@@ -23,8 +25,10 @@ public class Character : MonoBehaviour
     public Animator animator;
     public TextMeshProUGUI healthText; 
     public TextMeshProUGUI energyText;
+    public TextMeshProUGUI damageTextPrefab;  
 
 
+    public bool attackTrigger;
     public bool animationEnded;
     public Skill currentSkill; 
     public List<Skill> skills = new List<Skill>();
@@ -34,15 +38,26 @@ public class Character : MonoBehaviour
 
     private bool checkCollisionsDuringMovement = true;
 
+    //STATUS EFFECTS
+    public StatusEffectController statusEffectController;
+
+    public bool IsAffectedBy(string effectName)
+    {
+        return statusEffectController.HasEffect(effectName);
+    }
+
     protected virtual void Awake()
 {
     animator = GetComponent<Animator>();
     health = maxHealth; 
     originalPosition = transform.position;
+    statusEffectController = GetComponent<StatusEffectController>();
+    Debug.Log(gameObject.name + " original position: " + originalPosition);
 }
 
 protected virtual void Start()
 {
+    
     if (healthBar != null)
     {
         healthBar.maxValue = maxHealth;
@@ -50,7 +65,7 @@ protected virtual void Start()
         if (healthText !=null && energyText !=null)
         {
             healthText.text = "HP: " + health; 
-            energyText.text = "HP: " + energy;
+            energyText.text = "MP: " + energy;
         }
     }
 
@@ -67,16 +82,19 @@ protected virtual void Start()
 {
     health -= damage;
     healthBar.value = health;
-
     // Update the health text.
     if (healthText != null)
     {
         healthText.text = "HP: " + health;
     }
-
+    
     if (damage > 0) IsHit();
     if (health <= 0) this.gameObject.SetActive(false);
 }
+
+
+
+
 
 
     public void SpendEnergy(int energySpent)
@@ -89,6 +107,13 @@ protected virtual void Start()
         energyText.text = "MP: " + energy;
     }
 }
+
+    //This will be called on an animation event so characters can call target.TakeDamage() at the exact moment
+    public void animationDamageTiming()
+    {
+        Debug.Log("This is the damage moment");
+        
+    }
 
 public void GainEnergy(int energyGained)
 {
@@ -120,72 +145,63 @@ public void GainEnergy(int energyGained)
 
     public void IsHit() => animator.SetTrigger("IsHurtTrigger");
     public void AnimationEnded() => animationEnded = true;
+    public void attackStageTrigger() => attackTrigger = true;
 
-    public IEnumerator MoveToTarget()
-    {
-        Vector3 targetPosition = GetTargetPosition(1.0f);
-        checkCollisionsDuringMovement = true;
-        yield return StartCoroutine(Move(targetPosition, 15.0f));
-    }
+     public IEnumerator MoveToTarget()
+{
+    Vector3 targetPosition = attackTarget.position;
+    checkCollisionsDuringMovement = true;
+    animator.SetTrigger("MovementAnimationTrigger");  
+    yield return Move(targetPosition);
+    animator.SetTrigger("StopMovementAnimationTrigger");  
+}
 
-    public IEnumerator ReturnToPosition()
-    {
-        checkCollisionsDuringMovement = false;
-        yield return StartCoroutine(Move(originalPosition, 15.0f));
-        animator.SetTrigger("StopMovementAnimationTrigger");
-    }
+public IEnumerator ReturnToPosition()
+{
+    checkCollisionsDuringMovement = false;
+    animator.SetTrigger("MovementAnimationTrigger");  
+    yield return Move(originalPosition);
+    animator.SetTrigger("StopMovementAnimationTrigger");  
+}
 
-    public void StopMoving()
+private IEnumerator Move(Vector3 targetPosition)
+{
+    while (!HasReachedPosition(targetPosition))
     {
-        animator.SetTrigger("StopMovementAnimationTrigger");
-        checkCollisionsDuringMovement = false;
-    }
-
-    private Vector3 GetTargetPosition(float offset)
-    {
-        Vector3 direction = (attackTarget.position - transform.position).normalized;
-        return attackTarget.position - direction * offset;
-    }
-
-    private IEnumerator Move(Vector3 targetPosition, float speed)
-    {
-        animator.SetTrigger("MovementAnimationTrigger");
-        while (!HasReachedPosition(targetPosition))
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, 15.0f * Time.deltaTime);
+        
+        if (checkCollisionsDuringMovement && IsCollidingWithCharacter())
         {
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
-            
-            if (checkCollisionsDuringMovement && IsCollidingWithCharacter())
-            {
-                StopMoving();
-                yield break;
-            }
-
-            yield return null;
+            animator.SetTrigger("StopMovementAnimationTrigger");  
+            yield break;
         }
+        yield return null;
     }
+}
 
-    private bool HasReachedPosition(Vector3 targetPosition, float stoppingDistance = 0.1f)
+
+    private bool HasReachedPosition(Vector3 targetPosition, float stoppingDistance = 2.0f)
     {
         return (transform.position - targetPosition).sqrMagnitude <= stoppingDistance * stoppingDistance;
     }
 
     private bool IsCollidingWithCharacter()
-    {
-        Collider2D[] colliders = Physics2D.OverlapCapsuleAll(
-            transform.position, 
-            GetComponent<CapsuleCollider2D>().size, 
-            GetComponent<CapsuleCollider2D>().direction, 
-            0f
-        );
+{
+    Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 0.5f);
 
-        foreach (Collider2D collider in colliders)
-        {
-            if (collider.gameObject.GetInstanceID() != gameObject.GetInstanceID() 
-                && (collider.CompareTag("Enemy") || collider.CompareTag("Player")))
-            {
-                return true;
-            }
-        }
-        return false;
+    foreach (Collider2D collider in colliders)
+    {
+        if (collider.gameObject.GetInstanceID() == gameObject.GetInstanceID()) continue;
+
+        // If current object is an enemy and the colliding object is also an enemy, ignore the collision
+        if (this.CompareTag("Enemy") && collider.CompareTag("Enemy")) continue;
+
+        // If it's colliding with the target, then return true
+        if (collider.gameObject.GetInstanceID() == attackTarget.gameObject.GetInstanceID()) return true;
     }
+    return false;
+}
+
+
+
 }

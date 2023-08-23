@@ -2,74 +2,95 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // Namespace for TextMeshPro
+using TMPro;
 
-
-[System.Serializable]
 public class Player : Character
 {
     public Transform playerSpawnPoint;
-    // The TextMeshProUGUI references.
     public TextMeshProUGUI levelText;
     public TextMeshProUGUI expText;
     public TextMeshProUGUI goldText;
     public TextMeshProUGUI attackPowerText;
     public TextMeshProUGUI defensePowerText;
+    public TextMeshProUGUI magicAttackText;
+    public TextMeshProUGUI magicDefenseText;
     public TextMeshProUGUI stepsText;
-    public Button saveButton;
-    public Button loadButton;
-    public int level;
-    public int exp;
-    public int gold;
-    public int steps;
 
-   protected override void Awake()
+    private PlayerData playerData;
+
+    protected override void Awake()
     {
         base.Awake();
-        InitializePlayer();
+        playerData = PlayerData.Instance;
+    }
 
-        // Initialize PlayerData with the current Player values
-        PlayerData.Instance.Initialize(this);
-        
+    private void Start()
+    {
+        if (PlayerPrefs.HasKey("PlayerInitialized"))
+        {
+            LoadFromPlayerData();
+            Debug.Log("Already init'd, this is loading");
+        }
+        else
+        {
+            InitializePlayer();
+            Debug.Log("making new player");
+        }
+
+        UpdateUI();  // Update the UI with initial values.
     }
 
     private void InitializePlayer()
     {
-        level = 1;
-        exp = 0;
-        gold = 0;
-        attackPower = 2;
-        maxHealth = 10;
-        health = maxHealth;
-        maxEnergy = 5;
-        energy = maxEnergy;
-        defensePower = 0;
-        steps = 0;
+        if (!PlayerPrefs.HasKey("PlayerInitialized"))
+        {
+            playerData.level = 1;
+            playerData.exp = 0;
+            playerData.gold = 100;
+            playerData.attackPower = 10;
+            playerData.defensePower = 5;
+            playerData.inGameSteps = 0;
+
+            PlayerPrefs.SetInt("PlayerInitialized", 1);
+            PlayerPrefs.Save();
+
+            // Save the initialized data
+            playerData.SavePlayerData();
+        }
     }
 
-    
-     void Update()
+    private void LoadFromPlayerData()
     {
+        playerData.LoadPlayerData();
+    }
+
+    private void Update()
+    {
+        // Update UI regularly or as per your needs
         UpdateUI();
     }
 
-    public void UpdateSteps(int newSteps)
-    {
-        this.steps = newSteps;
-        PlayerData.Instance.steps = this.steps;
-    }
-
     private void UpdateUI()
-    {
-        PlayerData data = PlayerData.Instance;
+{
+    if (levelText != null) levelText.text = "Level: " + playerData.level.ToString();
+    if (expText != null) expText.text = "Exp: " + playerData.exp.ToString();
+    if (goldText != null) goldText.text = "Gold: " + playerData.gold.ToString();
+    if (attackPowerText != null) attackPowerText.text = "Atk:" + playerData.attackPower.ToString();
+    if (defensePowerText != null) defensePowerText.text = "Def: " + playerData.defensePower.ToString();
+    if (stepsText != null) stepsText.text = "Steps: " + playerData.inGameSteps.ToString();
+    if (magicAttackText != null) magicAttackText.text = "M.Atk: 0";
+    if (magicDefenseText != null) magicDefenseText.text = "M.Def: 0";
+}
 
-        if (levelText) levelText.text = "Level: " + data.level;
-        if (expText) expText.text = "EXP: " + data.exp;
-        if (goldText) goldText.text = "Gold: " + data.gold;
-        if (attackPowerText) attackPowerText.text = "AP: " + data.attackPower;
-        if (defensePowerText) defensePowerText.text = "DP: " + data.defensePower;
-        if (stepsText) stepsText.text = "Steps: " + data.steps;
+
+     // Now, when I  need to update the player's attributes, just update them in the `playerData` 
+    // and then call the `SavePlayerData()` method of the `playerData`.
+    public void RewardGold(int amount)
+    {
+        playerData.gold += amount;
+        playerData.SavePlayerData();
     }
+
 }
 
 
@@ -79,31 +100,4 @@ public class Player : Character
 
 
 
-
-    /* Implement the saving and loading functions
-    public void SavePlayerData()
-    {
-        SaveSystem.SavePlayer(this);
-    }
-
-    public void LoadPlayerData()
-    {
-        PlayerData data = SaveSystem.LoadPlayer();
-        if (data != null)
-        {
-            level = data.level;
-            exp = data.exp;
-            gold = data.gold;
-            attackPower = data.attackPower;
-            defensePower = data.defensePower;
-        }
-        Update();
-    }
-    */
-
-
-
-
-
-   
 
