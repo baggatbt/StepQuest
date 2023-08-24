@@ -43,8 +43,7 @@ public class Slash : Skill
             user.GainEnergy((energyCost / 2));
             user.animator.SetTrigger("AttackFailTrigger");
             user.isAttacking = false;
-             // Gain +5 skillEXP on perfect
-            PlayerData.Instance.IncreaseSkillExp(skillName, 5);
+           
             
             
         }
@@ -55,7 +54,7 @@ public class Slash : Skill
             Debug.Log("Slash successful! " + target.name + " takes " + damage + " damage.");
             user.animator.SetTrigger("AttackFailTrigger");
             user.isAttacking = false;
-            PlayerData.Instance.IncreaseSkillExp(skillName, 3);
+            
 
         }
         else
@@ -64,9 +63,6 @@ public class Slash : Skill
             Debug.Log("Slash missed! " + target.name + " takes 0 damage.");
             user.animator.SetTrigger("AttackFailTrigger");
             user.isAttacking = false;
-            PlayerData.Instance.IncreaseSkillExp(skillName, 0);
-            
-           
         }
     });
     }

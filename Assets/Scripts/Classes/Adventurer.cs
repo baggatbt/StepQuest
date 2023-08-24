@@ -4,18 +4,17 @@ using UnityEngine;
 
 
 
-public class Knight : Character
+public class Adventurer : Character
 {
-    // Any specific properties or methods unique to the Knight.
-    
+    // Any specific properties or methods unique to the Adventurer.
+   
     public string jobClass = "Adventurer";
 
     // Static growth rates for the Adventurer class
-    public static int atkGrowth = 2;
-    public static int defGrowth = 3;
+    public static int atkGrowth = 1;
+    public static int defGrowth = 1;
     public static int magAtkGrowth = 1;
     public static int magDefGrowth = 1;
-    //public int shieldPower;
     
     protected override void Awake()
     {
@@ -28,9 +27,12 @@ public class Knight : Character
         energy = maxEnergy;
         defensePower = 0;
         speed = 2;
-       
     }
 
+    public void adventurerStatGrowth()
+    {
+        //
+    }
     
 
     // ... Any additional methods or behaviors for the Knight.

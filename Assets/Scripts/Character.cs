@@ -16,8 +16,7 @@ public class Character : MonoBehaviour
     public int attackPower;
     public int defensePower;
     public int speed;
-    public int atkGrowth;
-    public int defGrowth;
+    
     public Slider healthBar;
     public Slider energyBar;
     public Transform attackTarget;

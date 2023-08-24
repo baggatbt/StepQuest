@@ -15,6 +15,7 @@ public class Player : Character
     public TextMeshProUGUI magicAttackText;
     public TextMeshProUGUI magicDefenseText;
     public TextMeshProUGUI stepsText;
+    public TextMeshProUGUI jobText;
 
     private PlayerData playerData;
     private int expRequiredToLevel;
@@ -46,6 +47,7 @@ public class Player : Character
         if (!PlayerPrefs.HasKey("PlayerInitialized"))
         {
             playerData.level = 1;
+            playerData.jobClass = "Adventurer";
             playerData.exp = 0;
             playerData.gold = 100;
             playerData.attackPower = 10;
@@ -63,6 +65,7 @@ public class Player : Character
     private void LoadFromPlayerData()
     {
         playerData.LoadPlayerData();
+        Debug.Log(playerData.jobClass);
     }
 
     private void Update()
@@ -75,6 +78,7 @@ public class Player : Character
 
     private void UpdateUI()
 {
+    if (jobText != null) jobText.text = "Job: " + playerData.jobClass;
     if (levelText != null) levelText.text = "Level: " + playerData.level.ToString();
     if (expText != null) expText.text = "Exp: " + playerData.exp.ToString();
     if (goldText != null) goldText.text = "Gold: " + playerData.gold.ToString();
@@ -108,9 +112,10 @@ public class Player : Character
         {
           Debug.Log("Level up");
           playerData.level += 1;
+          StatGrowthForLevelUp();
           playerData.SavePlayerData();
         }
-        Debug.Log("Cant Level");
+        
         
     }
 
@@ -125,6 +130,29 @@ public class Player : Character
     
     return expRequiredToLevel;
 }
+
+
+    public void StatGrowthForLevelUp()
+{
+    switch(playerData.jobClass)
+    {
+        case "Adventurer":
+            playerData.attackPower += Adventurer.atkGrowth;
+            playerData.defensePower += Adventurer.defGrowth;
+            //playerData.magAttackPower += Adventurer.magAtkGrowth;
+            //playerData.magDefPower += Adventurer.magDefGrowth;
+            break;
+
+        case "Knight":
+            Debug.Log("Not implemented");
+            break;
+
+        default:
+            Debug.LogWarning("Unknown job class: " + playerData.jobClass);
+            break;
+    }
+}
+
 
 }
 
