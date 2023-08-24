@@ -25,7 +25,7 @@ public class Player : Character
         playerData = PlayerData.Instance;
     }
 
-    private void Start()
+    new private void  Start()
     {
         if (PlayerPrefs.HasKey("PlayerInitialized"))
         {
@@ -67,8 +67,10 @@ public class Player : Character
 
     private void Update()
     {
+        
         // Update UI regularly or as per your needs
         UpdateUI();
+        
     }
 
     private void UpdateUI()
@@ -84,22 +86,45 @@ public class Player : Character
 }
 
 
-     // Now, when I  need to update the player's attributes, just update them in the `playerData` 
-    // and then call the `SavePlayerData()` method of the `playerData`.
+    
     public void RewardGold(int amount)
     {
         playerData.gold += amount;
         playerData.SavePlayerData();
     }
 
+    public void GainExperience(int amount)
+    {
+        playerData.exp += amount;
+        playerData.SavePlayerData();
+        LevelUp();
+        
+
+    }
+
      public void LevelUp()
     {
-        if (playerData.exp >= expRequiredToLevel)
+        if (playerData.exp >= ExpRequiredToLevelUp(playerData.level))
         {
-          playerData.attackPower += atkGrowth;
+          Debug.Log("Level up");
+          playerData.level += 1;
+          playerData.SavePlayerData();
         }
+        Debug.Log("Cant Level");
         
     }
+
+    //ExpRequiredToLevelUp(1) will return 25.
+    //ExpRequiredToLevelUp(2) will return 100.
+    //ExpRequiredToLevelUp(50) will return 62,500.
+    private int ExpRequiredToLevelUp(int level)
+{
+    int a = 25; // This constant can be adjusted based on your needs.
+    
+    int expRequiredToLevel = a * level * level;
+    
+    return expRequiredToLevel;
+}
 
 }
 

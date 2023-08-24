@@ -12,6 +12,8 @@ public class BattleManager : MonoBehaviour
 {
     public Character player;
     public PlayerData playerCharacterData;
+
+    
     public List<Character> enemies = new List<Character>();
     public GameObject knightPrefab;
     private BattleState state;

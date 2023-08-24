@@ -26,16 +26,19 @@ public class PlayerData : MonoBehaviour
     private StepCounterController stepCounterController;
 
     private void Awake()
+{
+    if (_instance == null)
     {
-        if (_instance == null)
-        {
-            _instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        _instance = this;
+        DontDestroyOnLoad(gameObject);
+        
+        // Load the player data right here
+        LoadPlayerData();
+    }
+    else
+    {
+        Destroy(gameObject);
+    }
 
         skillLevels = new Dictionary<string, int>();
         skillExp = new Dictionary<string, int>();
@@ -50,7 +53,7 @@ public class PlayerData : MonoBehaviour
     private void Start()
     {
         LoadStepsData();
-        LoadPlayerData();
+       
         int stepsSinceStart = stepCounterController.GetStepsSinceStart();
         inGameSteps += stepsSinceStart;
         Debug.Log("Steps after adding stepsSinceStart: " + inGameSteps);
