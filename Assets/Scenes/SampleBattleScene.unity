@@ -979,6 +979,7 @@ GameObject:
   - component: {fileID: 519420032}
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
+  - component: {fileID: 519420033}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1052,6 +1053,21 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0.632, z: 0}
+--- !u!114 &519420033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a546b9d9f2cf5724f9735119d2568dc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shakeDuration: 0.15
+  shakeMagnitude: 0.2
+  cameraTransform: {fileID: 0}
 --- !u!1 &527478660
 GameObject:
   m_ObjectHideFlags: 0
@@ -2350,6 +2366,7 @@ GameObject:
   - component: {fileID: 1063650664}
   - component: {fileID: 1063650663}
   - component: {fileID: 1063650665}
+  - component: {fileID: 1063650666}
   m_Layer: 0
   m_Name: PlayerController
   m_TagString: Untagged
@@ -2412,8 +2429,6 @@ MonoBehaviour:
   attackPower: 0
   defensePower: 0
   speed: 0
-  atkGrowth: 0
-  defGrowth: 0
   healthBar: {fileID: 0}
   energyBar: {fileID: 0}
   attackTarget: {fileID: 0}
@@ -2428,6 +2443,7 @@ MonoBehaviour:
   animationEnded: 0
   attacksBeforeSpecial: 0
   statusEffectController: {fileID: 0}
+  cameraShake: {fileID: 0}
   playerSpawnPoint: {fileID: 0}
   levelText: {fileID: 0}
   expText: {fileID: 0}
@@ -2437,6 +2453,43 @@ MonoBehaviour:
   magicAttackText: {fileID: 0}
   magicDefenseText: {fileID: 0}
   stepsText: {fileID: 0}
+  jobText: {fileID: 0}
+--- !u!114 &1063650666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1063650662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22c208c25b22e834a860bdeb5f884e76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  level: 0
+  health: 0
+  maxHealth: 0
+  damage: 0
+  energy: 0
+  maxEnergy: 0
+  attackPower: 0
+  defensePower: 0
+  speed: 0
+  healthBar: {fileID: 0}
+  energyBar: {fileID: 0}
+  attackTarget: {fileID: 0}
+  originalPosition: {x: 0, y: 0, z: 0}
+  isAttacking: 0
+  spriteRenderer: {fileID: 0}
+  animator: {fileID: 0}
+  healthText: {fileID: 0}
+  energyText: {fileID: 0}
+  damageTextPrefab: {fileID: 0}
+  attackTrigger: 0
+  animationEnded: 0
+  attacksBeforeSpecial: 0
+  statusEffectController: {fileID: 0}
+  cameraShake: {fileID: 519420033}
 --- !u!114 &1146924752 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 9094242032581204097, guid: 913aafaa1579892448fead2f40335c8f, type: 3}

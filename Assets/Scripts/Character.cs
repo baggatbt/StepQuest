@@ -79,19 +79,29 @@ public class Character : MonoBehaviour
 
     
 
+    public CameraShake cameraShake; // Reference to the CameraShake script
+
     public void TakeDamage(int damage)
-{
-    health -= damage;
-    healthBar.value = health;
-    // Update the health text.
-    if (healthText != null)
     {
-        healthText.text = "HP: " + health;
+        health -= damage;
+        healthBar.value = health;
+
+        // Update the health text.
+        if (healthText != null)
+        {
+            healthText.text = "HP: " + health;
+        }
+        
+        if (damage > 0)
+        {
+            IsHit();
+         //   cameraShake.TriggerShake();  // Trigger the screen shake
+        }
+
+        if (health <= 0) 
+            this.gameObject.SetActive(false);
     }
-    
-    if (damage > 0) IsHit();
-    if (health <= 0) this.gameObject.SetActive(false);
-}
+
 
     public void SpendEnergy(int energySpent)
 {
