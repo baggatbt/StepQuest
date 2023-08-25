@@ -31,13 +31,13 @@ public class Slash : Skill
     
 
 
-        int damage = (int)System.Math.Round(user.attackPower * (1 + GetSkillLevel() / 10.0));
+        int damage = PlayerData.Instance.attackPower;
 
 
 
         if (result == TimingEventResult.Perfect)
         {
-            target.TakeDamage(damage);
+            target.TakeDamage(damage + ((int)System.Math.Round(PlayerData.Instance.attackPower * .5)));
             AudioManager.instance.PlaySlashSound();
             Debug.Log("Slash perfect! " + target.name + " takes " + damage + " damage.");
             user.GainEnergy((energyCost / 2));
@@ -59,7 +59,7 @@ public class Slash : Skill
         }
         else
         {
-            target.TakeDamage(0);
+            
             Debug.Log("Slash missed! " + target.name + " takes 0 damage.");
             user.animator.SetTrigger("AttackFailTrigger");
             user.isAttacking = false;
