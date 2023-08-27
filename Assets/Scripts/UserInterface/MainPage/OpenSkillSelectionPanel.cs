@@ -9,6 +9,9 @@ public class OpenSkillSelectionPanel : MonoBehaviour
 
     public void openSkillSelectionGUI()
     {
+        //Case: if adventurer, adventurerskillpanel .setActive
+        //Case: if class = knight, knightskillpanel . set active
+        //etc etc
         skillSelectionGUI.SetActive(true);
     }
 

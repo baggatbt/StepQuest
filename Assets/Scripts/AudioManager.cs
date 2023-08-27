@@ -51,7 +51,7 @@ public class AudioManager : MonoBehaviour
 
 
     [Range(0f, 1f)]
-public float musicVolume = 0.5f; // Default to half volume, but adjustable in inspector
+public float musicVolume = 0.1f; // Default volume, but adjustable in inspector
 
 public void PlayBattleMusic()
 {
