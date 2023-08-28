@@ -209,6 +209,8 @@ public class BattleManager : MonoBehaviour
         ChangeState(BattleState.EnemyTurn);
     }
 
+    public ZoomEffect zoomEffect;
+
 
     public IEnumerator PlayerAction()
 {
@@ -216,17 +218,23 @@ public class BattleManager : MonoBehaviour
     {
         Debug.Log("PlayerAction() being called");
 
+        // Start zoom effect
+        StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position)); 
+
         if (player.currentSkill.requiresMovement && skillsExecuted == 0)
         {
             yield return StartCoroutine(PlayerMoveAndAttackCoroutine());
-
         }
         else
         {
             yield return StartCoroutine(PlayerAttackCoroutine(null));
         }
+
+        // Zoom out after attack
+        yield return StartCoroutine(zoomEffect.ZoomOutEffect());
     }
 }
+
 
 
     public IEnumerator PlayerMoveAndAttackCoroutine()
@@ -344,7 +352,8 @@ public class BattleManager : MonoBehaviour
     }
     
    
-   
+   public CameraShake cameraShake;
+
 
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<TimingEventResult> callback)
 {
@@ -360,7 +369,7 @@ public class BattleManager : MonoBehaviour
     Vector3 innerCircleInitialScale = new Vector3(0.01f, 0.01f, 0.01f);
 
     float speedFactor = 1.5f;  // Change this value to adjust speed. Higher means faster.
-
+    
 
     try
     {
@@ -372,6 +381,8 @@ public class BattleManager : MonoBehaviour
             if (Input.GetMouseButtonDown(0))
             {
                 buttonClicked = true;
+                StartCoroutine(cameraShake.Shake());
+
                 break;
             }
 
