@@ -1,47 +1,33 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro; 
+
+
 
 public class CameraShake : MonoBehaviour
 {
     public float shakeDuration = 0.15f;
-    public float shakeMagnitude = 0.2f;
-    public Transform cameraTransform;
+    public float shakeMagnitude = 0.1f;
 
-    float initialDuration;
-    bool isShaking = false;
-
-    private void Awake()
+    public IEnumerator Shake()
     {
-        if (cameraTransform == null)
+        Vector3 originalPos = transform.position;
+        float elapsed = 0.0f;
+        Debug.Log("Shakin");
+        while (elapsed < shakeDuration)
         {
-            cameraTransform = GetComponent(typeof(Transform)) as Transform;
+            float x = Random.Range(-1f, 1f) * shakeMagnitude;
+            float y = Random.Range(-1f, 1f) * shakeMagnitude;
+
+            transform.position = new Vector3(originalPos.x + x, originalPos.y + y, originalPos.z);
+            
+            elapsed += Time.deltaTime;
+
+            yield return null;
         }
-    }
 
-    void OnEnable()
-    {
-        initialDuration = shakeDuration;
-    }
-
-    public void TriggerShake()
-    {
-        isShaking = true;
-    }
-
-    void Update()
-    {
-        if (isShaking)
-        {
-            if (shakeDuration > 0)
-            {
-                cameraTransform.localPosition = cameraTransform.position + Random.insideUnitSphere * shakeMagnitude;
-                shakeDuration -= Time.deltaTime;
-            }
-            else
-            {
-                isShaking = false;
-                shakeDuration = initialDuration;
-                cameraTransform.localPosition = Vector3.zero;
-            }
-        }
+        transform.position = originalPos;
     }
 }

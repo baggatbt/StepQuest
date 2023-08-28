@@ -94,8 +94,10 @@ public class Character : MonoBehaviour
         
         if (damage > 0)
         {
+            
             IsHit();
-         //   cameraShake.TriggerShake();  // Trigger the screen shake
+          //  StartCoroutine(cameraShake.Shake());
+
         }
 
         if (health <= 0) 
