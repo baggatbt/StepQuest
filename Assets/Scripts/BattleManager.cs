@@ -203,6 +203,7 @@ public class BattleManager : MonoBehaviour
         skillsExecuted = 0;
         yield return new WaitUntil(() => player.isAttacking == false);
         // Move player back to their original position after all skills executed.
+        yield return StartCoroutine(zoomEffect.ZoomOutEffect());
         yield return player.ReturnToPosition();
         
 
@@ -230,8 +231,6 @@ public class BattleManager : MonoBehaviour
             yield return StartCoroutine(PlayerAttackCoroutine(null));
         }
 
-        // Zoom out after attack
-        yield return StartCoroutine(zoomEffect.ZoomOutEffect());
     }
 }
 
@@ -259,7 +258,9 @@ public class BattleManager : MonoBehaviour
     {
         MoveCirclesToTarget(targetEnemy);
         yield return player.currentSkill.Execute(player, targetEnemy, this);
-        yield return new WaitForSeconds(0.3f);
+        
+        yield return new WaitForSeconds(0.1f);
+
         CheckBattleEnd();
     }
     else

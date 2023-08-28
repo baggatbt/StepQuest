@@ -71,7 +71,7 @@ public class PlayerData : MonoBehaviour
             inGameSteps += currentSteps - previousSteps;
             previousSteps = currentSteps;
         }
-        Debug.Log("Steps in Update: " + inGameSteps);
+     //   Debug.Log("Steps in Update: " + inGameSteps);
     }
 
     public void UpdatePlayerData(int level, string jobClass, int exp, int gold, int attackPower, int defensePower, int inGameSteps)

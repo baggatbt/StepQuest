@@ -5,8 +5,8 @@ using UnityEngine;
 public class ZoomEffect : MonoBehaviour
 {
     public Camera mainCamera;
-    public float zoomFactor = 0.4f; // The degree to which the camera zooms in
-    public float zoomDuration = 2.0f; // How long the zoom will last
+    public float zoomFactor = 0.6f; // The degree to which the camera zooms in
+    public float zoomDuration = 1.0f; // How long the zoom will last
     private float initialSize;
     private Vector3 initialCameraPosition;
 
@@ -17,6 +17,8 @@ public class ZoomEffect : MonoBehaviour
 
     public IEnumerator ZoomCameraEffect(Vector3 targetPosition)
     {
+        Debug.Log("Zoom Duration: " + zoomDuration);
+
         initialCameraPosition = mainCamera.transform.position; // Capture the original position
         Vector3 targetCameraPosition = new Vector3(targetPosition.x, targetPosition.y, initialCameraPosition.z);
         
