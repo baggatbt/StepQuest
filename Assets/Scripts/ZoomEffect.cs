@@ -38,7 +38,7 @@ public class ZoomEffect : MonoBehaviour
     {
         float originalSize = mainCamera.orthographicSize;
 
-        for (float t = 0; t < 1; t += Time.deltaTime / zoomDuration)
+        for (float t = 0; t < 1; t += Time.deltaTime / 0.5f)
         {
             mainCamera.orthographicSize = Mathf.Lerp(originalSize, initialSize, t);
             mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, initialCameraPosition, t);
