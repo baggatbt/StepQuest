@@ -43,7 +43,7 @@ public class SlimeAttackSkill : Skill
                 user.animator.SetTrigger(trigger);
                 target.TakeDamage(user.damage - user.damage);
                 target.animator.SetTrigger("BlockTrigger");
-                AudioManager.instance.PlaySlashSound();
+                AudioManager.instance.PlayBlockSound();
                 user.isAttacking = false;
                 break;
             case TimingEventResult.Good:

@@ -60,7 +60,7 @@ public class EnemySpawnController : MonoBehaviour
 
             lastSpawnedCharacter.healthText.text = "HP: " + lastSpawnedCharacter.health;
 
-            associatedHealthBarSlider.gameObject.SetActive(true);
+           // associatedHealthBarSlider.gameObject.SetActive(true);
             associatedHealthBarSlider.maxValue = lastSpawnedCharacter.maxHealth;
             associatedHealthBarSlider.value = lastSpawnedCharacter.health;
         }

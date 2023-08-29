@@ -18,6 +18,8 @@ public class PlayerData : MonoBehaviour
     public int attackPower;
     public int defensePower;
     public int inGameSteps;
+
+    public string jobClass;
     public int speed;
     public Dictionary<string, int> skillLevels;
     public Dictionary<string, int> skillExp;
@@ -26,16 +28,19 @@ public class PlayerData : MonoBehaviour
     private StepCounterController stepCounterController;
 
     private void Awake()
+{
+    if (_instance == null)
     {
-        if (_instance == null)
-        {
-            _instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        _instance = this;
+        DontDestroyOnLoad(gameObject);
+        
+        // Load the player data right here
+        LoadPlayerData();
+    }
+    else
+    {
+        Destroy(gameObject);
+    }
 
         skillLevels = new Dictionary<string, int>();
         skillExp = new Dictionary<string, int>();
@@ -50,7 +55,7 @@ public class PlayerData : MonoBehaviour
     private void Start()
     {
         LoadStepsData();
-        LoadPlayerData();
+       
         int stepsSinceStart = stepCounterController.GetStepsSinceStart();
         inGameSteps += stepsSinceStart;
         Debug.Log("Steps after adding stepsSinceStart: " + inGameSteps);
@@ -66,12 +71,13 @@ public class PlayerData : MonoBehaviour
             inGameSteps += currentSteps - previousSteps;
             previousSteps = currentSteps;
         }
-        Debug.Log("Steps in Update: " + inGameSteps);
+     //   Debug.Log("Steps in Update: " + inGameSteps);
     }
 
-    public void UpdatePlayerData(int level, int exp, int gold, int attackPower, int defensePower, int inGameSteps)
+    public void UpdatePlayerData(int level, string jobClass, int exp, int gold, int attackPower, int defensePower, int inGameSteps)
     {
         this.level = level;
+        this.jobClass = jobClass;
         this.exp = exp;
         this.gold = gold;
         this.attackPower = attackPower;
@@ -84,6 +90,7 @@ public class PlayerData : MonoBehaviour
     public void SavePlayerData()
     {
         PlayerPrefs.SetInt("PlayerLevel", level);
+        PlayerPrefs.SetString("PlayerJob", jobClass);
         PlayerPrefs.SetInt("PlayerExp", exp);
         PlayerPrefs.SetInt("PlayerGold", gold);
         PlayerPrefs.SetInt("PlayerAttackPower", attackPower);
@@ -98,6 +105,7 @@ public class PlayerData : MonoBehaviour
         if (PlayerPrefs.HasKey("PlayerLevel"))
         {
             level = PlayerPrefs.GetInt("PlayerLevel");
+            jobClass = PlayerPrefs.GetString("PlayerJob");
             exp = PlayerPrefs.GetInt("PlayerExp");
             gold = PlayerPrefs.GetInt("PlayerGold");
             attackPower = PlayerPrefs.GetInt("PlayerAttackPower");
@@ -146,35 +154,12 @@ public class PlayerData : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    //NEEDS OWN CLASS
-    // Method to increase the level of a skill
-    public void IncreaseSkillLevel(string skillName, int amount)
-    {
-        if (skillLevels.ContainsKey(skillName))
-        {
-            skillLevels[skillName] += amount; // Usage: PlayerData.Instance.IncreaseSkillLevel("Slash", 1);  // Increase the level of Slash skill by 1
-
-        }
-        else
-        {
-            skillLevels[skillName] = amount;
-        }
-    }
-
-     // Method to increase the experience of a skill
-    public void IncreaseSkillExp(string skillName, int amount)
-    {
-        if (skillExp.ContainsKey(skillName))
-        {
-            skillExp[skillName] += amount;
-        }
-        else
-        {
-            skillExp[skillName] = amount;
-        }
-    }
     
 
+    //NEEDS OWN CLASS
+   
+
+     
 
     //MOVE THESE TO ANOTHER CLASS
      public void ActivateMission(Mission mission)

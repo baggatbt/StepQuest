@@ -57,19 +57,20 @@ public class TripleHitSkill : Skill
 
     private void HandleTimingResult(Character user, Character target, string trigger)
     {
+        int damage = PlayerData.Instance.attackPower;
         switch (result)
         {
             case TimingEventResult.Perfect:
                 Debug.Log("Perfect Hit!");
                 user.animator.SetTrigger(trigger);
-                target.TakeDamage(1);
+                target.TakeDamage(damage + ((int)System.Math.Round(PlayerData.Instance.attackPower * .5)));
                 AudioManager.instance.PlaySlashSound();
                 user.GainEnergy((energyCost / 2));
                 break;
             case TimingEventResult.Good:
                 Debug.Log("Good Hit!");
                 user.animator.SetTrigger(trigger);
-                target.TakeDamage(1);
+                target.TakeDamage(damage);
                 AudioManager.instance.PlaySlashSound();
                 break;
             case TimingEventResult.Miss:

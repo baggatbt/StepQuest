@@ -11,6 +11,7 @@ using System.Collections.Generic;
 public class BattleManager : MonoBehaviour
 {
     public Character player;
+    public Character companion;
     public PlayerData playerCharacterData;
     public List<Character> enemies = new List<Character>();
     public GameObject knightPrefab;
@@ -32,6 +33,7 @@ public class BattleManager : MonoBehaviour
     public enum BattleState
     {
         PlayerTurn,
+        CompanionTurn,
         EnemyTurn
     }
 
@@ -68,6 +70,9 @@ public class BattleManager : MonoBehaviour
             {
                 case BattleState.PlayerTurn:
                     Debug.Log("Player Turn Started!");
+                    break;
+                case BattleState.CompanionTurn:
+                    Debug.Log("Companion Turn Started!");
                     break;
                 case BattleState.EnemyTurn:
                     Debug.Log("Enemy Turn Started!");
@@ -112,7 +117,7 @@ public class BattleManager : MonoBehaviour
     private void ChangeState(BattleState newState)
     {
         State = newState;
-        if (State == BattleState.PlayerTurn)
+        if (State == BattleState.PlayerTurn || State == BattleState.CompanionTurn)
         {
             EnableAllButtons();
         }
@@ -177,6 +182,19 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    public void CompanionExecuteQueuedSkills()
+    {
+        if (currentTarget != null)
+        {
+        DisableAllButtons();
+        StartCoroutine(CompanionExecuteAllSkillsCoroutine());
+        }
+        else
+        {
+        Debug.Log("No target selected");
+        }
+    }
+
     public int skillsExecuted = 0;
     private IEnumerator ExecuteAllSkillsCoroutine()
     {
@@ -201,11 +219,46 @@ public class BattleManager : MonoBehaviour
         skillsExecuted = 0;
         yield return new WaitUntil(() => player.isAttacking == false);
         // Move player back to their original position after all skills executed.
+        yield return StartCoroutine(zoomEffect.ZoomOutEffect());
         yield return player.ReturnToPosition();
+        
+
+        ChangeState(BattleState.CompanionTurn);
+    }
+
+    public int companionSkillsExecuted = 0;
+
+    private IEnumerator CompanionExecuteAllSkillsCoroutine()
+    {
+        Debug.Log("Executing queued skills. Current queue size before execution: " + skillQueue.Count);
+
+        // Dequeue skills one by one and execute them
+        Debug.Log("Starting skill execution loop");
+        int companionSkillsExecuted = 0;
+        while(skillQueue.Count > 0)
+        {
+            Debug.Log("Skill execution of  " + skillQueue.Count);
+            Skill skill = skillQueue.Dequeue();
+            Debug.Log("Executing skill: " + skill.skillName);
+            companion.currentSkill = skill;
+            companionSkillsExecuted++;
+            yield return StartCoroutine(CompanionAction());
+            
+        }
+        
+        
+        Debug.Log("Cleared the skill queue after execution.");
+        skillsExecuted = 0;
+        yield return new WaitUntil(() => companion.isAttacking == false);
+        // Move player back to their original position after all skills executed.
+        yield return StartCoroutine(zoomEffect.ZoomOutEffect());
+        yield return companion.ReturnToPosition();
         
 
         ChangeState(BattleState.EnemyTurn);
     }
+
+    public ZoomEffect zoomEffect;
 
 
     public IEnumerator PlayerAction()
@@ -214,17 +267,42 @@ public class BattleManager : MonoBehaviour
     {
         Debug.Log("PlayerAction() being called");
 
+        // Start zoom effect
+        StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position)); 
+
         if (player.currentSkill.requiresMovement && skillsExecuted == 0)
         {
             yield return StartCoroutine(PlayerMoveAndAttackCoroutine());
-
         }
         else
         {
             yield return StartCoroutine(PlayerAttackCoroutine(null));
         }
+
     }
 }
+
+public IEnumerator CompanionAction()
+{
+    if (state == BattleState.CompanionTurn && currentTarget)
+    {
+        Debug.Log("CompanionAction() being called");
+
+        // Start zoom effect
+        StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position)); 
+
+        if (companion.currentSkill.requiresMovement && companionSkillsExecuted == 0)
+        {
+            yield return StartCoroutine(CompanionMoveAndAttackCoroutine());
+        }
+        else
+        {
+            yield return StartCoroutine(CompanionAttackCoroutine(null));
+        }
+
+    }
+}
+
 
 
     public IEnumerator PlayerMoveAndAttackCoroutine()
@@ -240,6 +318,19 @@ public class BattleManager : MonoBehaviour
     yield return StartCoroutine(PlayerAttackCoroutine(null));
 }
 
+public IEnumerator CompanionMoveAndAttackCoroutine()
+{
+    // Only move if the player is not already at the target
+    if (companion.transform.position != currentTarget.transform.position)
+    {
+        yield return companion.MoveToTarget();
+        
+          
+    }
+
+    yield return StartCoroutine(CompanionAttackCoroutine(null));
+}
+
     public IEnumerator PlayerAttackCoroutine(System.Action successCallback)
 {
     Character targetEnemy = currentTarget.GetComponent<Character>();
@@ -249,7 +340,29 @@ public class BattleManager : MonoBehaviour
     {
         MoveCirclesToTarget(targetEnemy);
         yield return player.currentSkill.Execute(player, targetEnemy, this);
-        yield return new WaitForSeconds(0.3f);
+        
+        yield return new WaitForSeconds(0.1f);
+
+        CheckBattleEnd();
+    }
+    else
+    {
+        Debug.Log("currentSkill  - This should not happen");
+    }
+}
+
+public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
+{
+    Character targetEnemy = currentTarget.GetComponent<Character>();
+    yield return new WaitUntil(() => targetEnemy.isAttacking == false);
+
+    if (companion.currentSkill != null)
+    {
+        MoveCirclesToTarget(targetEnemy);
+        yield return companion.currentSkill.Execute(companion, targetEnemy, this);
+        
+        yield return new WaitForSeconds(0.1f);
+
         CheckBattleEnd();
     }
     else
@@ -342,7 +455,8 @@ public class BattleManager : MonoBehaviour
     }
     
    
-   
+   public CameraShake cameraShake;
+
 
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<TimingEventResult> callback)
 {
@@ -358,7 +472,7 @@ public class BattleManager : MonoBehaviour
     Vector3 innerCircleInitialScale = new Vector3(0.01f, 0.01f, 0.01f);
 
     float speedFactor = 1.5f;  // Change this value to adjust speed. Higher means faster.
-
+    
 
     try
     {
@@ -370,6 +484,8 @@ public class BattleManager : MonoBehaviour
             if (Input.GetMouseButtonDown(0))
             {
                 buttonClicked = true;
+                StartCoroutine(cameraShake.Shake());
+
                 break;
             }
 
@@ -525,6 +641,7 @@ public class BattleManager : MonoBehaviour
         {
             currentTarget = hit.collider.gameObject;
             player.attackTarget = currentTarget.transform; //For movement purposes sets the target to the players target
+            companion.attackTarget = currentTarget.transform;
             Debug.Log("Current target: " + currentTarget.name);
             
             

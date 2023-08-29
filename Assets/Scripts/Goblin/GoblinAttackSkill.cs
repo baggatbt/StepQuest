@@ -57,7 +57,7 @@ public class GoblinAttackSkill : Skill
                 user.animator.SetTrigger(trigger);
                 target.TakeDamage(user.damage - user.damage);
                 target.animator.SetTrigger("BlockTrigger");
-                AudioManager.instance.PlaySlashSound();
+                AudioManager.instance.PlayBlockSound();
                 break;
             case TimingEventResult.Good:
                 Debug.Log("Good Block!");   
