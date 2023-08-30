@@ -11,8 +11,8 @@ public class Slash : Skill
         skillName = "Slash";
         description = "A powerful slashing attack.";
         requiresMovement = true;
-        energyCost = 2;
-        skillLevel = 1; // You could set a default level or fetch it from the player's saved data
+        energyCost = 0;
+        skillLevel = 1; 
         numberOfSlashes = 1;
     }
 
@@ -40,7 +40,7 @@ public class Slash : Skill
             target.TakeDamage(damage + ((int)System.Math.Round(PlayerData.Instance.attackPower * .5)));
             AudioManager.instance.PlaySlashSound();
             Debug.Log("Slash perfect! " + target.name + " takes " + damage + " damage.");
-            user.GainEnergy((energyCost / 2));
+            user.GainEnergy(2);
             user.animator.SetTrigger("AttackFailTrigger");
             user.isAttacking = false;
            
