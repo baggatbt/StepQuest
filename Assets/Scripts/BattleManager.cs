@@ -171,7 +171,7 @@ public class BattleManager : MonoBehaviour
 
         public void ExecuteQueuedSkills()
     {
-        if (currentTarget != null)
+        if (currentTarget != null && state == BattleState.PlayerTurn)
         {
         DisableAllButtons();
         StartCoroutine(ExecuteAllSkillsCoroutine());
@@ -184,7 +184,7 @@ public class BattleManager : MonoBehaviour
 
     public void CompanionExecuteQueuedSkills()
     {
-        if (currentTarget != null)
+        if (currentTarget != null && state == BattleState.CompanionTurn)
         {
         DisableAllButtons();
         StartCoroutine(CompanionExecuteAllSkillsCoroutine());
