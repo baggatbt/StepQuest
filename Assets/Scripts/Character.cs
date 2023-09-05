@@ -95,21 +95,25 @@ public class Character : MonoBehaviour
     if (damage > 0)
     { 
         IsHit();
-        // Damage popup
-        GameObject damagePopupPrefab = Resources.Load<GameObject>("PreFab/DamagePopup");
+       // Damage popup
+    GameObject damagePopupPrefab = Resources.Load<GameObject>("PreFab/DamagePopup");
 
-        if(damagePopupPrefab != null)
-        {
-            Vector3 popupPosition = transform.position + new Vector3(0, 1.5f, 0); // 1.5f is the upward offset
-            GameObject damagePopupInstance = Instantiate(damagePopupPrefab, popupPosition, Quaternion.identity);
-            DamagePopup damagePopupScript = damagePopupInstance.GetComponent<DamagePopup>();
-            damagePopupScript.Setup(damage);
-            Debug.Log("DamagePopup instantiated!");
-        }
-        else
-        {
-            Debug.LogError("Failed to load DamagePopup prefab.");
-        }
+    // Find the EndOfBattleRewards GameObject in the scene
+    Transform endOfBattleRewardsTransform = GameObject.Find("EndOfBattleRewardsCanvas").transform;
+
+    if(damagePopupPrefab != null)
+    {
+        // Instantiate the damage popup as a child of the EndOfBattleRewards GameObject
+        GameObject damagePopupInstance = Instantiate(damagePopupPrefab, transform.position, Quaternion.identity, endOfBattleRewardsTransform);
+
+        DamagePopup damagePopupScript = damagePopupInstance.GetComponent<DamagePopup>();
+        damagePopupScript.Setup(damage);
+        Debug.Log("DamagePopup instantiated!");
+    }
+    else
+    {
+        Debug.LogError("Failed to load DamagePopup prefab.");
+    }
     }
 
     if (health <= 0) 

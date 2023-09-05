@@ -6,7 +6,7 @@ public class DamagePopup : MonoBehaviour
 {
     public float floatSpeed = 0.5f; 
     public float fadeSpeed = 1f;
-    private TextMeshProUGUI textMesh; // Use Text if you're not using TextMeshPro
+    private TextMeshProUGUI textMesh;
     private Color textColor;
 
     private void Awake()
