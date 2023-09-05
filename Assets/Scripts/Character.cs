@@ -26,7 +26,7 @@ public class Character : MonoBehaviour
     public Animator animator;
     public TextMeshProUGUI healthText; 
     public TextMeshProUGUI energyText;
-    public TextMeshProUGUI damageTextPrefab;  
+     
 
 
     public bool attackTrigger;
@@ -90,6 +90,7 @@ public class Character : MonoBehaviour
         if (healthText != null)
         {
             healthText.text = "HP: " + health;
+            
         }
         
         if (damage > 0)

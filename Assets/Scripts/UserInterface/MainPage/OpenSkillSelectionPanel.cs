@@ -6,6 +6,7 @@ public class OpenSkillSelectionPanel : MonoBehaviour
 {
     public GameObject skillSelectionGUI;
     public GameObject missionGUI;
+    public GameObject companionGUI;
 
     public void openSkillSelectionGUI()
     {
@@ -28,6 +29,16 @@ public class OpenSkillSelectionPanel : MonoBehaviour
     public void closeMissionInterface()
     {
         missionGUI.SetActive(false);
+    }
+
+    public void openCompanionInterface()
+    {
+        companionGUI.SetActive(true);
+    }
+
+    public void closeCompanionInterface()
+    {
+        companionGUI.SetActive(false);
     }
    
 }

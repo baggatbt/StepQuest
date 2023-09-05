@@ -222,8 +222,14 @@ public class BattleManager : MonoBehaviour
         yield return StartCoroutine(zoomEffect.ZoomOutEffect());
         yield return player.ReturnToPosition();
         
-
+        if (companion == null)
+        {
+            ChangeState(BattleState.EnemyTurn);
+        }
+        else
+        {
         ChangeState(BattleState.CompanionTurn);
+        }
     }
 
     public int companionSkillsExecuted = 0;
