@@ -81,29 +81,40 @@ public class Character : MonoBehaviour
 
     public CameraShake cameraShake; // Reference to the CameraShake script
 
-    public void TakeDamage(int damage)
+ public void TakeDamage(int damage)
+{
+    health -= damage;
+    healthBar.value = health;
+
+    // Update the health text.
+    if (healthText != null)
     {
-        health -= damage;
-        healthBar.value = health;
-
-        // Update the health text.
-        if (healthText != null)
-        {
-            healthText.text = "HP: " + health;
-            
-        }
-        
-        if (damage > 0)
-        {
-            
-            IsHit();
-          //  StartCoroutine(cameraShake.Shake());
-
-        }
-
-        if (health <= 0) 
-            this.gameObject.SetActive(false);
+        healthText.text = "HP: " + health;
     }
+    
+    if (damage > 0)
+    { 
+        IsHit();
+        // Damage popup
+        GameObject damagePopupPrefab = Resources.Load<GameObject>("PreFab/DamagePopup");
+
+        if(damagePopupPrefab != null)
+        {
+            Vector3 popupPosition = transform.position + new Vector3(0, 1.5f, 0); // 1.5f is the upward offset
+            GameObject damagePopupInstance = Instantiate(damagePopupPrefab, popupPosition, Quaternion.identity);
+            DamagePopup damagePopupScript = damagePopupInstance.GetComponent<DamagePopup>();
+            damagePopupScript.Setup(damage);
+            Debug.Log("DamagePopup instantiated!");
+        }
+        else
+        {
+            Debug.LogError("Failed to load DamagePopup prefab.");
+        }
+    }
+
+    if (health <= 0) 
+        this.gameObject.SetActive(false);
+}
 
 
     public void SpendEnergy(int energySpent)

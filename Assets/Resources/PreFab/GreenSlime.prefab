@@ -115,6 +115,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3adc8d17cb8c74498552c557a7adc8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  level: 1
   health: 8
   maxHealth: 8
   damage: 2
@@ -122,6 +123,7 @@ MonoBehaviour:
   maxEnergy: 0
   attackPower: 0
   defensePower: 0
+  speed: 0
   healthBar: {fileID: 0}
   energyBar: {fileID: 0}
   attackTarget: {fileID: 0}
@@ -131,11 +133,11 @@ MonoBehaviour:
   animator: {fileID: 8370724005610461913}
   healthText: {fileID: 0}
   energyText: {fileID: 0}
-  damageTextPrefab: {fileID: 0}
   attackTrigger: 0
   animationEnded: 0
   attacksBeforeSpecial: 2
   statusEffectController: {fileID: 0}
+  cameraShake: {fileID: 0}
   expReward: 5
   goldReward: 2
 --- !u!95 &8370724005610461913

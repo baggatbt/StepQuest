@@ -198,6 +198,12 @@ public class BattleManager : MonoBehaviour
     public int skillsExecuted = 0;
     private IEnumerator ExecuteAllSkillsCoroutine()
     {
+        if (currentTarget == null)
+        {
+            Debug.Log("Pick a target!");
+        }
+        else
+        {
         Debug.Log("Executing queued skills. Current queue size before execution: " + skillQueue.Count);
 
         // Dequeue skills one by one and execute them
@@ -229,6 +235,7 @@ public class BattleManager : MonoBehaviour
         else
         {
         ChangeState(BattleState.CompanionTurn);
+        }
         }
     }
 
