@@ -1,5 +1,6 @@
-using System.Collections;
+
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 public class ZoomEffect : MonoBehaviour
@@ -38,7 +39,8 @@ public class ZoomEffect : MonoBehaviour
     {
         float originalSize = mainCamera.orthographicSize;
 
-        for (float t = 0; t < 1; t += Time.deltaTime / 0.5f)
+        // Smoothly zoom out and pan back to initial position
+        for (float t = 0; t < 1; t += Time.deltaTime / zoomDuration)
         {
             mainCamera.orthographicSize = Mathf.Lerp(originalSize, initialSize, t);
             mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, initialCameraPosition, t);

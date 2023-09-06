@@ -228,7 +228,7 @@ public class BattleManager : MonoBehaviour
         skillsExecuted = 0;
         yield return new WaitUntil(() => player.isAttacking == false);
         // Move player back to their original position after all skills executed.
-        yield return StartCoroutine(zoomEffect.ZoomOutEffect());
+        //yield return StartCoroutine(zoomEffect.ZoomOutEffect());
         yield return player.ReturnToPosition();
         
         if (companion == null)
@@ -267,7 +267,7 @@ public class BattleManager : MonoBehaviour
         skillsExecuted = 0;
         yield return new WaitUntil(() => companion.isAttacking == false);
         // Move player back to their original position after all skills executed.
-        yield return StartCoroutine(zoomEffect.ZoomOutEffect());
+       // yield return StartCoroutine(zoomEffect.ZoomOutEffect());
         yield return new WaitForSeconds(1.0f);
         yield return companion.ReturnToPosition();
         
@@ -275,7 +275,7 @@ public class BattleManager : MonoBehaviour
         ChangeState(BattleState.EnemyTurn);
     }
 
-    public ZoomEffect zoomEffect;
+    //public ZoomEffect zoomEffect;
 
 
     public IEnumerator PlayerAction()
@@ -285,7 +285,7 @@ public class BattleManager : MonoBehaviour
         Debug.Log("PlayerAction() being called");
 
         // Start zoom effect
-        StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position)); 
+        //StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position)); 
 
         if (player.currentSkill.requiresMovement && skillsExecuted == 0)
         {
@@ -306,7 +306,7 @@ public IEnumerator CompanionAction()
         Debug.Log("CompanionAction() being called");
 
         // Start zoom effect
-        StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position)); 
+       // StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position)); 
 
         if (companion.currentSkill.requiresMovement && companionSkillsExecuted == 0)
         {

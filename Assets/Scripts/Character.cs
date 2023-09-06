@@ -81,7 +81,7 @@ public class Character : MonoBehaviour
 
     public CameraShake cameraShake; // Reference to the CameraShake script
 
- public void TakeDamage(int damage)
+    public void TakeDamage(int damage)
 {
     health -= damage;
     healthBar.value = health;
@@ -108,7 +108,7 @@ public class Character : MonoBehaviour
 
         DamagePopup damagePopupScript = damagePopupInstance.GetComponent<DamagePopup>();
         damagePopupScript.Setup(damage);
-        Debug.Log("DamagePopup instantiated!");
+        
     }
     else
     {
@@ -117,14 +117,38 @@ public class Character : MonoBehaviour
     }
 
     if (health <= 0) 
-        this.gameObject.SetActive(false);
+    {
+        StartCoroutine(FadeOutSprite());
+    }
+}
+
+    IEnumerator FadeOutSprite()
+{
+    SpriteRenderer sr = this.gameObject.GetComponent<SpriteRenderer>();
+    if (sr == null) yield break;  // If no SpriteRenderer, exit the coroutine
+
+    float fadeDuration = 0.25f; // duration for the fade, 
+    float currentTime = 0.0f;
+
+    Color originalColor = sr.color;
+
+    while (currentTime < fadeDuration)
+    {
+        currentTime += Time.deltaTime;
+        float alpha = Mathf.Lerp(originalColor.a, 0, currentTime / fadeDuration);
+        sr.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
+        yield return null;
+    }
+
+    sr.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0);
+    this.gameObject.SetActive(false);  // deactivate the GameObject after fade
 }
 
 
     public void SpendEnergy(int energySpent)
 {
     energy -= energySpent;
-    Debug.Log("Current Energy: " + energy); 
+   // Debug.Log("Current Energy: " + energy); 
     if (energyBar != null)
     {
         energyBar.value = energy;
@@ -155,7 +179,7 @@ public class Character : MonoBehaviour
         energy += energyGained; // Add the gained energy to the total
     }
     
-    Debug.Log("Current Energy: " + energy); 
+    //Debug.Log("Current Energy: " + energy); 
     
     if (energyBar != null)
     {

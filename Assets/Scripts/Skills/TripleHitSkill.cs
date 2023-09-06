@@ -23,24 +23,33 @@ public class TripleHitSkill : Skill
         HandleTimingResult(user, target, "Attack1Trigger");
         if (result == TimingEventResult.Miss)
             yield break;
-
             yield return  user.animationEnded == true;
 
+
+        if (target.health >= 1)
+        {
         // Second Timing Event
         yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
         HandleTimingResult(user, target,"Attack2Trigger");
         if (result == TimingEventResult.Miss)
             yield break;
-
             yield return  user.animationEnded == true;
-
+        }
+        
+        if (target.health >= 1)
+        {
         // Third Timing Event
         yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
         HandleTimingResult(user, target, "Attack3Trigger");
         user.isAttacking = false;
         yield return user.animationEnded == false; //Resets the animation flag
-       
+        }
         
+        else 
+        {
+            user.isAttacking = false;
+            yield return user.animationEnded == false; //Resets the animation flag
+        }
     }
 
 
