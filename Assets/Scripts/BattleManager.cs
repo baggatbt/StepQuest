@@ -50,6 +50,8 @@ public class BattleManager : MonoBehaviour
     private TextMeshProUGUI expGainedTextComponent;
     private TextMeshProUGUI goldGainedTextComponent;
 
+    private Camera mainCamera;
+
 
     public Transform[] enemySpawnPoints; // enemySpawnPoint1, enemySpawnPoint2....
 
@@ -95,6 +97,7 @@ public class BattleManager : MonoBehaviour
     // Cache the components
     expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
     goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
+    mainCamera = Camera.main;
 
 
     if (currentBattleConfig != null)
@@ -648,14 +651,14 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
 {
     if (Input.GetMouseButtonDown(0))
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
 
         if (hit.collider != null && hit.collider.CompareTag("Enemy"))
         {
             currentTarget = hit.collider.gameObject;
             player.attackTarget = currentTarget.transform; //For movement purposes sets the target to the players target
-            companion.attackTarget = currentTarget.transform;
+          //  companion.attackTarget = currentTarget.transform;
             Debug.Log("Current target: " + currentTarget.name);
             
             
