@@ -265,6 +265,7 @@ public class BattleManager : MonoBehaviour
         yield return new WaitUntil(() => companion.isAttacking == false);
         // Move player back to their original position after all skills executed.
         yield return StartCoroutine(zoomEffect.ZoomOutEffect());
+        yield return new WaitForSeconds(1.0f);
         yield return companion.ReturnToPosition();
         
 
