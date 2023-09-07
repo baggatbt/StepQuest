@@ -18,7 +18,8 @@ public class PlayerData : MonoBehaviour
     public int attackPower;
     public int defensePower;
     public int inGameSteps;
-
+    public int maxHealth;
+    public int health;
     public string jobClass;
     public int speed;
     public Dictionary<string, int> skillLevels;
@@ -74,7 +75,7 @@ public class PlayerData : MonoBehaviour
      //   Debug.Log("Steps in Update: " + inGameSteps);
     }
 
-    public void UpdatePlayerData(int level, string jobClass, int exp, int gold, int attackPower, int defensePower, int inGameSteps)
+    public void UpdatePlayerData(int level, string jobClass, int exp, int gold, int attackPower, int defensePower, int inGameSteps, int maxHealth, int health)
     {
         this.level = level;
         this.jobClass = jobClass;
@@ -83,7 +84,10 @@ public class PlayerData : MonoBehaviour
         this.attackPower = attackPower;
         this.defensePower = defensePower;
         this.inGameSteps = inGameSteps;
+        this.maxHealth = maxHealth;
+        this.health = health;
         
+
         SavePlayerData(); 
     }
 
@@ -96,6 +100,7 @@ public class PlayerData : MonoBehaviour
         PlayerPrefs.SetInt("PlayerAttackPower", attackPower);
         PlayerPrefs.SetInt("PlayerDefensePower", defensePower);
         PlayerPrefs.SetInt("PlayerInGameSteps", inGameSteps);
+        PlayerPrefs.SetInt("PlayerMaxHealth", maxHealth);
         PlayerPrefs.Save();
         Debug.Log("Data saved");
     }
@@ -111,6 +116,7 @@ public class PlayerData : MonoBehaviour
             attackPower = PlayerPrefs.GetInt("PlayerAttackPower");
             defensePower = PlayerPrefs.GetInt("PlayerDefensePower");
             inGameSteps = PlayerPrefs.GetInt("PlayerInGameSteps");
+            maxHealth = PlayerPrefs.GetInt("PlayerMaxHealth");
         }
     }
 

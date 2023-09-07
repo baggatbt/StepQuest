@@ -53,6 +53,8 @@ public class Player : Character
             playerData.attackPower = 10;
             playerData.defensePower = 5;
             playerData.inGameSteps = 0;
+            playerData.maxHealth = 30;
+            health = playerData.maxHealth;
 
             PlayerPrefs.SetInt("PlayerInitialized", 1);
             PlayerPrefs.Save();
