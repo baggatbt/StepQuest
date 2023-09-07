@@ -20,6 +20,8 @@ public class PlayerData : MonoBehaviour
     public int inGameSteps;
     public int maxHealth;
     public int health;
+    public int maxEnergy;
+    public int energy;
     public string jobClass;
     public int speed;
     public Dictionary<string, int> skillLevels;
@@ -30,6 +32,8 @@ public class PlayerData : MonoBehaviour
 
     private void Awake()
 {
+    PlayerPrefs.DeleteAll();
+
     if (_instance == null)
     {
         _instance = this;
@@ -37,6 +41,7 @@ public class PlayerData : MonoBehaviour
         
         // Load the player data right here
         LoadPlayerData();
+        
     }
     else
     {
@@ -75,7 +80,7 @@ public class PlayerData : MonoBehaviour
      //   Debug.Log("Steps in Update: " + inGameSteps);
     }
 
-    public void UpdatePlayerData(int level, string jobClass, int exp, int gold, int attackPower, int defensePower, int inGameSteps, int maxHealth, int health)
+    public void UpdatePlayerData(int level, string jobClass, int exp, int gold, int attackPower, int defensePower, int inGameSteps, int maxHealth, int health, int maxEnergy, int energy)
     {
         this.level = level;
         this.jobClass = jobClass;
@@ -86,6 +91,8 @@ public class PlayerData : MonoBehaviour
         this.inGameSteps = inGameSteps;
         this.maxHealth = maxHealth;
         this.health = health;
+        this.maxEnergy = maxEnergy;
+        this.energy = energy;
         
 
         SavePlayerData(); 
@@ -101,6 +108,7 @@ public class PlayerData : MonoBehaviour
         PlayerPrefs.SetInt("PlayerDefensePower", defensePower);
         PlayerPrefs.SetInt("PlayerInGameSteps", inGameSteps);
         PlayerPrefs.SetInt("PlayerMaxHealth", maxHealth);
+        PlayerPrefs.SetInt("PlayerMaxEnergy", maxEnergy); 
         PlayerPrefs.Save();
         Debug.Log("Data saved");
     }
@@ -117,6 +125,7 @@ public class PlayerData : MonoBehaviour
             defensePower = PlayerPrefs.GetInt("PlayerDefensePower");
             inGameSteps = PlayerPrefs.GetInt("PlayerInGameSteps");
             maxHealth = PlayerPrefs.GetInt("PlayerMaxHealth");
+            maxEnergy = PlayerPrefs.GetInt("PlayerMaxEnergy");
         }
     }
 

@@ -12,7 +12,8 @@ GameObject:
   - component: {fileID: 358661848719693021}
   - component: {fileID: 358661848719693023}
   - component: {fileID: 358661848719693022}
-  - component: {fileID: 5684344712779207555}
+  - component: {fileID: 1446137178827732635}
+  - component: {fileID: 885282432905562264}
   m_Layer: 0
   m_Name: Knight
   m_TagString: Player
@@ -124,7 +125,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &5684344712779207555
+--- !u!114 &1446137178827732635
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -133,7 +134,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 358661848719693019}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7fc6689e09fe7db4fab501b1165596c8, type: 3}
+  m_Script: {fileID: 11500000, guid: dd52f750d63fb5542ba9490a2aed5c33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   level: 0
@@ -159,4 +160,48 @@ MonoBehaviour:
   attacksBeforeSpecial: 0
   statusEffectController: {fileID: 0}
   cameraShake: {fileID: 0}
-  jobClass: Adventurer
+  playerSpawnPoint: {fileID: 0}
+  levelText: {fileID: 0}
+  expText: {fileID: 0}
+  goldText: {fileID: 0}
+  attackPowerText: {fileID: 0}
+  defensePowerText: {fileID: 0}
+  magicAttackText: {fileID: 0}
+  magicDefenseText: {fileID: 0}
+  stepsText: {fileID: 0}
+  jobText: {fileID: 0}
+--- !u!114 &885282432905562264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 358661848719693019}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22c208c25b22e834a860bdeb5f884e76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  level: 0
+  health: 0
+  maxHealth: 0
+  damage: 0
+  energy: 0
+  maxEnergy: 0
+  attackPower: 0
+  defensePower: 0
+  speed: 0
+  healthBar: {fileID: 0}
+  energyBar: {fileID: 0}
+  attackTarget: {fileID: 0}
+  originalPosition: {x: 0, y: 0, z: 0}
+  isAttacking: 0
+  spriteRenderer: {fileID: 0}
+  animator: {fileID: 0}
+  healthText: {fileID: 0}
+  energyText: {fileID: 0}
+  attackTrigger: 0
+  animationEnded: 0
+  attacksBeforeSpecial: 0
+  statusEffectController: {fileID: 0}
+  cameraShake: {fileID: 0}

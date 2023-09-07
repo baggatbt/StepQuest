@@ -4,27 +4,20 @@ using UnityEngine;
 
 
 
-public class Knight : Character
+public class Knight : PlayerJob
 {
-    // Any specific properties or methods unique to the Knight.
-    
-    public string jobClass = "Adventurer";
+    private int playerLevel => PlayerData.Instance.level;
 
-    // Static growth rates for the Adventurer class
-    public static int atkGrowth = 2;
-    public static int defGrowth = 3;
-    public static int magAtkGrowth = 1;
-    public static int magDefGrowth = 1;
-    //public int shieldPower;
-    
-    protected override void Awake()
-    {
-        base.Awake();
-        
-       
-    }
-
-    
-
-    // ... Any additional methods or behaviors for the Knight.
+    public override int BaseAtk => 3 * playerLevel;
+    public override int BaseDef => 4 * playerLevel;  
+    public override int BaseMagAtk => 2 * playerLevel;  
+    public override int BaseMagDef => 2 * playerLevel;  
+    public override int BaseHealth => 10 + (playerLevel + 2);
+    public override int BaseEnergy => 5;
 }
+
+
+    
+
+ 
+

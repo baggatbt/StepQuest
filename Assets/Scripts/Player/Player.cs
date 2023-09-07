@@ -16,6 +16,8 @@ public class Player : Character
     public TextMeshProUGUI magicDefenseText;
     public TextMeshProUGUI stepsText;
     public TextMeshProUGUI jobText;
+    public PlayerJob CurrentJob { get; private set; }
+
 
     private PlayerData playerData;
     private int expRequiredToLevel;
@@ -24,10 +26,6 @@ public class Player : Character
     {
         base.Awake();
         playerData = PlayerData.Instance;
-    }
-
-    new private void  Start()
-    {
         if (PlayerPrefs.HasKey("PlayerInitialized"))
         {
             LoadFromPlayerData();
@@ -42,39 +40,97 @@ public class Player : Character
         UpdateUI();  // Update the UI with initial values.
     }
 
+    new private void  Start()
+    {
+       
+    }
+
     private void InitializePlayer()
     {
         if (!PlayerPrefs.HasKey("PlayerInitialized"))
         {
             playerData.level = 1;
-            playerData.jobClass = "Adventurer";
+            playerData.jobClass = "Knight";
             playerData.exp = 0;
             playerData.gold = 100;
-            playerData.attackPower = 10;
+            playerData.attackPower = 3;
             playerData.defensePower = 5;
             playerData.inGameSteps = 0;
-            playerData.maxHealth = 30;
-            health = playerData.maxHealth;
+            playerData.maxHealth = 10;
+            playerData.health = playerData.maxHealth;
+            playerData.maxEnergy = 5;
+            playerData.energy = playerData.maxEnergy;
 
             PlayerPrefs.SetInt("PlayerInitialized", 1);
             PlayerPrefs.Save();
 
             // Save the initialized data
             playerData.SavePlayerData();
+            SetJob(playerData.jobClass);
+            ApplyJobStats();
+            SyncStatsWithPlayerData();
+            UpdateUI();
         }
     }
 
-    private void LoadFromPlayerData()
+     private void SyncStatsWithPlayerData()
     {
-        playerData.LoadPlayerData();
-        Debug.Log(playerData.jobClass);
+    maxHealth = playerData.maxHealth;
+    health = maxHealth;
+    maxEnergy = playerData.maxEnergy; 
+    energy = maxEnergy;
+    attackPower = playerData.attackPower;
+    defensePower = playerData.defensePower;
+    
     }
+
+
+     private void SetJob(string jobClassName)
+    {
+        switch (jobClassName)
+        {
+            case "Knight":
+                CurrentJob = gameObject.AddComponent<Knight>();
+                break;
+            // Add other cases for other jobs...
+            default:
+                Debug.LogError("Unknown job class: " + jobClassName);
+                break;
+        }
+    }
+    public void ChangeJob(string newJob)
+    {
+        if (CurrentJob != null) Destroy(CurrentJob);
+
+        SetJob(newJob);
+        ApplyJobStats();
+    }
+
+    private void ApplyJobStats()
+    {
+        playerData.attackPower = CurrentJob.BaseAtk;
+        playerData.defensePower = CurrentJob.BaseDef;
+        playerData.maxHealth = CurrentJob.BaseHealth;
+        playerData.maxEnergy = CurrentJob.BaseEnergy;
+        // Handle magic attack and defense here...
+
+        playerData.SavePlayerData();
+        SyncStatsWithPlayerData();
+    }
+
+    private void LoadFromPlayerData()
+{
+    playerData.LoadPlayerData();
+    SyncStatsWithPlayerData();
+    UpdateUI();
+}
+
 
     private void Update()
     {
         
         // Update UI regularly or as per your needs
-        UpdateUI();
+       // UpdateUI();
         
     }
 
@@ -108,17 +164,15 @@ public class Player : Character
 
     }
 
-     public void LevelUp()
+    public void LevelUp()
     {
-        if (playerData.exp >= ExpRequiredToLevelUp(playerData.level))
+    if (playerData.exp >= ExpRequiredToLevelUp(playerData.level))
         {
-          Debug.Log("Level up");
-          playerData.level += 1;
-          StatGrowthForLevelUp();
-          playerData.SavePlayerData();
+        Debug.Log("Level up");
+        playerData.level += 1;
+
+        ApplyJobStats();
         }
-        
-        
     }
 
     //ExpRequiredToLevelUp(1) will return 25.
@@ -134,26 +188,7 @@ public class Player : Character
 }
 
 
-    public void StatGrowthForLevelUp()
-{
-    switch(playerData.jobClass)
-    {
-        case "Adventurer":
-            playerData.attackPower += Adventurer.atkGrowth;
-            playerData.defensePower += Adventurer.defGrowth;
-            //playerData.magAttackPower += Adventurer.magAtkGrowth;
-            //playerData.magDefPower += Adventurer.magDefGrowth;
-            break;
-
-        case "Knight":
-            Debug.Log("Not implemented");
-            break;
-
-        default:
-            Debug.LogWarning("Unknown job class: " + playerData.jobClass);
-            break;
-    }
-}
+    
 
 
 }
