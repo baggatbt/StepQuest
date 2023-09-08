@@ -48,6 +48,7 @@ public class TripleHitSkill : Skill
         else 
         {
             user.isAttacking = false;
+            user.animator.SetTrigger("AttackFailTrigger");
             yield return user.animationEnded == false; //Resets the animation flag
         }
     }
