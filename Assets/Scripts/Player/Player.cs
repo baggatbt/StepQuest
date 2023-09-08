@@ -21,6 +21,7 @@ public class Player : Character
 
     private PlayerData playerData;
     private int expRequiredToLevel;
+    private int stepsAvailableToConsume;
     private int exp;
     private int gold;
 
@@ -32,6 +33,7 @@ public class Player : Character
         if (PlayerPrefs.HasKey("PlayerInitialized"))
         {
             LoadFromPlayerData();
+            Debug.Log(CurrentJob);
             Debug.Log("Already init'd, this is loading");
         }
         else
@@ -95,7 +97,7 @@ public class Player : Character
         switch (jobClassName)
         {
             case "Knight":
-                CurrentJob = gameObject.AddComponent<Knight>();
+                CurrentJob = new Knight();
                 break;
             // Add other cases for other jobs...
             default:
@@ -126,9 +128,11 @@ public class Player : Character
     private void LoadFromPlayerData()
 {
     playerData.LoadPlayerData();
+    SetJob(playerData.jobClass);  // Set the job based on the loaded data
     SyncStatsWithPlayerData();
     UpdateUI();
 }
+
 
 
     private void Update()
@@ -165,18 +169,36 @@ public class Player : Character
         playerData.exp += amount;
         LevelUp();
         playerData.SavePlayerData();
-        
-
     }
+
+    public void ConsumeStepsToGainRewards()
+{
+    stepsAvailableToConsume = playerData.inGameSteps;
+    
+    // Convert steps to rewards
+    double expReward = stepsAvailableToConsume * 0.00167; //EXP per step
+    double goldReward = stepsAvailableToConsume * 0.02; //GOLD per step
+
+    playerData.exp += (int)expReward;
+    playerData.gold += (int)goldReward;
+    LevelUp();
+    playerData.inGameSteps = 0;
+    playerData.SavePlayerData();
+}
+
+
+    
 
     public void LevelUp()
     {
-    if (playerData.exp >= ExpRequiredToLevelUp(playerData.level))
-        {
-        Debug.Log("Level up");
-        playerData.level += 1;
-
-        }
+        if (playerData.exp >= ExpRequiredToLevelUp(playerData.level))
+            {
+                Debug.Log("Level up");
+                playerData.level += 1;
+                ApplyJobStats();
+                playerData.SavePlayerData();
+                UpdateUI();
+            }
     }
 
     //ExpRequiredToLevelUp(1) will return 25.
@@ -184,7 +206,7 @@ public class Player : Character
     //ExpRequiredToLevelUp(50) will return 62,500.
     private int ExpRequiredToLevelUp(int level)
 {
-    int a = 10; // This constant can be adjusted based on your needs.
+    int a = 25; // This constant can be adjusted based on your needs.
     
     int expRequiredToLevel = a * level * level;
     
