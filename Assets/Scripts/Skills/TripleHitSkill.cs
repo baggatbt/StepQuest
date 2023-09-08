@@ -10,7 +10,7 @@ public class TripleHitSkill : Skill
         skillName = "Triple Slash";
         description = "Slash up to three times with good timing";
         requiresMovement = true;
-        energyCost = 2;
+        energyCost = 0;
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
@@ -41,15 +41,15 @@ public class TripleHitSkill : Skill
         // Third Timing Event
         yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
         HandleTimingResult(user, target, "Attack3Trigger");
+        yield return new WaitUntil(() => user.animationEnded == true); //Resets the animation flag
         user.isAttacking = false;
-        yield return user.animationEnded == false; //Resets the animation flag
         }
         
         else 
         {
             user.isAttacking = false;
             user.animator.SetTrigger("AttackFailTrigger");
-            yield return user.animationEnded == false; //Resets the animation flag
+            yield return user.animationEnded == true; //Resets the animation flag
         }
     }
 
@@ -71,20 +71,21 @@ public class TripleHitSkill : Skill
         switch (result)
         {
             case TimingEventResult.Perfect:
-                Debug.Log("Perfect Hit!");
+                //Debug.Log("Perfect Hit!");
                 user.animator.SetTrigger(trigger);
                 target.TakeDamage(damage + ((int)System.Math.Round(PlayerData.Instance.attackPower * .5)));
                 AudioManager.instance.PlaySlashSound();
-                user.GainEnergy((energyCost / 2));
+                user.GainEnergy(2);
                 break;
             case TimingEventResult.Good:
-                Debug.Log("Good Hit!");
+                //Debug.Log("Good Hit!");
                 user.animator.SetTrigger(trigger);
                 target.TakeDamage(damage);
                 AudioManager.instance.PlaySlashSound();
+                user.GainEnergy(1);
                 break;
             case TimingEventResult.Miss:
-                Debug.Log("Missed!");
+                //Debug.Log("Missed!");
                 user.animator.SetTrigger("AttackFailTrigger");
                 user.isAttacking = false;
                 break;

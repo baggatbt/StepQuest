@@ -13,6 +13,7 @@ public class BattleManager : MonoBehaviour
     public Character player;
     public Character companion;
     public PlayerData playerCharacterData;
+    public Player playerClassReference;
     public List<Character> enemies = new List<Character>();
     public GameObject knightPrefab;
     private BattleState state;
@@ -455,7 +456,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
         }
         else
         {
-            yield return new WaitForSeconds(1.0f);
+            yield return new WaitForSeconds(0.5f);
 
            // Check if there are more enemies to take their turns
         if (enemyTurnQueue.Count > 0)
@@ -634,6 +635,9 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
 
     PlayerData.Instance.exp += totalExp;
     PlayerData.Instance.gold += totalGold;
+    PlayerData.Instance.SavePlayerData();
+    
+
 
     TextMeshProUGUI expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
     expGainedTextComponent.text = totalExp.ToString();

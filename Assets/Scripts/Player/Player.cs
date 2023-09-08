@@ -21,6 +21,9 @@ public class Player : Character
 
     private PlayerData playerData;
     private int expRequiredToLevel;
+    private int exp;
+    private int gold;
+
 
     protected override void Awake()
     {
@@ -81,6 +84,8 @@ public class Player : Character
     energy = maxEnergy;
     attackPower = playerData.attackPower;
     defensePower = playerData.defensePower;
+    exp = playerData.exp;
+    gold = playerData.gold;
     
     }
 
@@ -149,7 +154,7 @@ public class Player : Character
 
 
     
-    public void RewardGold(int amount)
+    public void GainGold(int amount)
     {
         playerData.gold += amount;
         playerData.SavePlayerData();
@@ -158,8 +163,8 @@ public class Player : Character
     public void GainExperience(int amount)
     {
         playerData.exp += amount;
-        playerData.SavePlayerData();
         LevelUp();
+        playerData.SavePlayerData();
         
 
     }
@@ -171,7 +176,6 @@ public class Player : Character
         Debug.Log("Level up");
         playerData.level += 1;
 
-        ApplyJobStats();
         }
     }
 
@@ -180,7 +184,7 @@ public class Player : Character
     //ExpRequiredToLevelUp(50) will return 62,500.
     private int ExpRequiredToLevelUp(int level)
 {
-    int a = 25; // This constant can be adjusted based on your needs.
+    int a = 10; // This constant can be adjusted based on your needs.
     
     int expRequiredToLevel = a * level * level;
     

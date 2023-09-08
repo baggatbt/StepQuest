@@ -17,6 +17,8 @@ public class Slime : Enemy
         this.goldReward = 2;
         this.attacksBeforeSpecial = 2;
         this.damage = 3;
+        this.maxHealth = 9;
+        this.health = this.maxHealth;
 
         // Assign the skills
         this.normalSkill = this.skills[0]; // Normal skill

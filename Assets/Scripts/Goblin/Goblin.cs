@@ -10,8 +10,8 @@ public class Goblin : Enemy
     protected override void Awake()
     {
         base.Awake();
-        this.maxHealth = 6;
-        this.health = 6;
+        this.maxHealth = 10;
+        this.health = this.maxHealth;
         this.level = 1;
     }
      protected override void Start()
