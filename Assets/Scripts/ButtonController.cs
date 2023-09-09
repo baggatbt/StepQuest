@@ -4,33 +4,32 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-
-
 public class ButtonController : MonoBehaviour
 {
     public TextMeshProUGUI buttonText;
     public BattleManager battleManager;
-    public Button[] skillButtons; // An array of buttons. Assign these in the Unity Editor.
-    public int slotIndex; //This indicates which slot this button corresponds to.
+    public Button[] skillButtons;
+    public int slotIndex;
+
+    public GameObject skillSelectionPanel;
    
     private Skill skill;
+    private bool isAwaitingConfirmation = false;
 
-       void Start()
+    void Start()
     {
         skill = SkillAssignmentManager.Instance.GetSkillForSlot(slotIndex);
-        if(skill != null)
+        if(skill != null )
         {
-            buttonText.text = skill.skillName; // Adjust based on your Skill class.
+            Debug.LogError("doot");
+           // buttonText.text = skill.skillName;
         }
         else
         {
             Debug.LogError("No skill assigned to slot " + slotIndex);
-            buttonText.text = "Unassigned"; // Or another default text.
+          //  buttonText.text = "Unassigned";
         }
     }
-
-
-
 
     public void OnButtonClick()
 {
@@ -40,15 +39,18 @@ public class ButtonController : MonoBehaviour
     {
         if (!battleManager.player.isAttacking && !battleManager.IsAnyEnemyAttacking())
         {
-           battleManager.player.SpendEnergy(skill.energyCost);
-            Debug.Log("Energy after deduction: " + battleManager.player.energy);
-
-            battleManager.skillQueue.Enqueue(skill);
-            // After adding skill to the queue, disable the button using its slot index
-            battleManager.skillButtons[slotIndex].interactable = false;
-            Debug.Log("Skill " + skill.skillName + " added to queue. Current queue size: " + battleManager.skillQueue.Count);
-
-            // Add the skill icon to the top of the screen to show its position in queue. Eventually let the user tap it to remove it
+            if (!battleManager.isSkillSelected)
+            {
+                // Set skill to the temporary variable and set the flag
+                battleManager.player.SpendEnergy(skill.energyCost);
+                Debug.Log("Energy after deduction: " + battleManager.player.energy);
+                battleManager.skillQueue.Enqueue(skill);
+                battleManager.skillButtons[slotIndex].interactable = false;
+                Debug.Log("Skill " + skill.skillName + " added to queue. Current queue size: " + battleManager.skillQueue.Count);
+                
+                // Setting flag to indicate skill has been selected
+                battleManager.isSkillSelected = true;
+            }
         }
         else 
         {
@@ -62,4 +64,32 @@ public class ButtonController : MonoBehaviour
 }
 
 
+    public void AttackButtonClick()
+{
+    // Set the skill to TripleHitSkill
+    skill = new TripleHitSkill();
+    Debug.Log("Using TripleHitSkill.");
+
+    // Execute the skill
+    OnButtonClick();
+}
+
+
+    IEnumerator ResetConfirmationState()
+    {
+        yield return new WaitForSeconds(2);  // Waits for 2 seconds
+        isAwaitingConfirmation = false;
+    }
+
+
+
+    public void OpenSkillPanel()
+    {
+        skillSelectionPanel.SetActive(true);
+    }
+
+    public void CloseSkillPanel()
+    {
+        skillSelectionPanel.SetActive(false);
+    }
 }

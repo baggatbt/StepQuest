@@ -54,6 +54,7 @@ public class Character : MonoBehaviour
         originalPosition = transform.position;
         statusEffectController = GetComponent<StatusEffectController>();
         Debug.Log(gameObject.name + " original position: " + originalPosition);
+        
     }
 
     protected virtual void Start()

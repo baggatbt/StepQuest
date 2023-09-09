@@ -651,26 +651,30 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
 
 
 
-    private void Update()
+    public bool isSkillSelected = false;  // New variable
+
+
+private void Update()
 {
     if (Input.GetMouseButtonDown(0))
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
 
-        if (hit.collider != null && hit.collider.CompareTag("Enemy"))
+        if (hit.collider != null && hit.collider.CompareTag("Enemy") && isSkillSelected)
         {
             currentTarget = hit.collider.gameObject;
-            player.attackTarget = currentTarget.transform; //For movement purposes sets the target to the players target
-          //  companion.attackTarget = currentTarget.transform;
+            player.attackTarget = currentTarget.transform;
+
             Debug.Log("Current target: " + currentTarget.name);
             
-            
+            // Execute the queued skill here since an enemy is tapped after selecting a skill
+            ExecuteQueuedSkills();
+            isSkillSelected = false;  // Reset the flag
         }
     }
-
-
 }
+
 
 
     public bool IsAnyEnemyAttacking()
