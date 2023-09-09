@@ -33,7 +33,7 @@ public class PlayerData : MonoBehaviour
     private void Awake()
 {
    //For testing, wipes saved data 
-   PlayerPrefs.DeleteAll();
+   //PlayerPrefs.DeleteAll();
 
     if (_instance == null)
     {
