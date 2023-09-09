@@ -2647,7 +2647,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -218.50003, y: 45.80002}
+  m_AnchoredPosition: {x: -218.5, y: 45.80002}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &567007040
@@ -6055,7 +6055,6 @@ GameObject:
   - component: {fileID: 1274183896}
   - component: {fileID: 1274183897}
   - component: {fileID: 1274183898}
-  - component: {fileID: 1274183899}
   m_Layer: 0
   m_Name: EventSystemMainMenu
   m_TagString: Untagged
@@ -6222,51 +6221,6 @@ MonoBehaviour:
   m_InputActionsPerSecond: 10
   m_RepeatDelay: 0.5
   m_ForceModuleActive: 0
---- !u!114 &1274183899
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1274183887}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dd52f750d63fb5542ba9490a2aed5c33, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  level: 0
-  health: 0
-  maxHealth: 0
-  damage: 0
-  energy: 0
-  maxEnergy: 0
-  attackPower: 0
-  defensePower: 0
-  speed: 0
-  healthBar: {fileID: 0}
-  energyBar: {fileID: 0}
-  attackTarget: {fileID: 0}
-  originalPosition: {x: 0, y: 0, z: 0}
-  isAttacking: 0
-  spriteRenderer: {fileID: 0}
-  animator: {fileID: 0}
-  healthText: {fileID: 0}
-  energyText: {fileID: 0}
-  attackTrigger: 0
-  animationEnded: 0
-  attacksBeforeSpecial: 0
-  statusEffectController: {fileID: 0}
-  cameraShake: {fileID: 0}
-  playerSpawnPoint: {fileID: 0}
-  levelText: {fileID: 0}
-  expText: {fileID: 0}
-  goldText: {fileID: 0}
-  attackPowerText: {fileID: 0}
-  defensePowerText: {fileID: 0}
-  magicAttackText: {fileID: 0}
-  magicDefenseText: {fileID: 0}
-  stepsText: {fileID: 0}
-  jobText: {fileID: 0}
 --- !u!1 &1331055301
 GameObject:
   m_ObjectHideFlags: 0
@@ -8989,7 +8943,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1274183899}
+      - m_Target: {fileID: 1274183894}
         m_TargetAssemblyTypeName: Player, Assembly-CSharp
         m_MethodName: ConsumeStepsToGainRewards
         m_Mode: 1

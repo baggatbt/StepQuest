@@ -24,6 +24,7 @@ public class Player : Character
     private int stepsAvailableToConsume;
     private int exp;
     private int gold;
+    private string jobClass;
 
 
     protected override void Awake()
@@ -33,8 +34,7 @@ public class Player : Character
         if (PlayerPrefs.HasKey("PlayerInitialized"))
         {
             LoadFromPlayerData();
-            Debug.Log(CurrentJob);
-            Debug.Log("Already init'd, this is loading");
+           
         }
         else
         {
@@ -69,7 +69,7 @@ public class Player : Character
             PlayerPrefs.SetInt("PlayerInitialized", 1);
             PlayerPrefs.Save();
 
-            // Save the initialized data
+             // Save the initialized data
             playerData.SavePlayerData();
             SetJob(playerData.jobClass);
             ApplyJobStats();
@@ -87,7 +87,8 @@ public class Player : Character
     attackPower = playerData.attackPower;
     defensePower = playerData.defensePower;
     exp = playerData.exp;
-    gold = playerData.gold;
+    jobClass = playerData.jobClass;
+    
     
     }
 
@@ -107,8 +108,6 @@ public class Player : Character
     }
     public void ChangeJob(string newJob)
     {
-        if (CurrentJob != null) Destroy(CurrentJob);
-
         SetJob(newJob);
         ApplyJobStats();
     }
@@ -174,6 +173,7 @@ public class Player : Character
     public void ConsumeStepsToGainRewards()
 {
     stepsAvailableToConsume = playerData.inGameSteps;
+    Debug.Log(stepsAvailableToConsume);
     
     // Convert steps to rewards
     double expReward = stepsAvailableToConsume * 0.00167; //EXP per step
