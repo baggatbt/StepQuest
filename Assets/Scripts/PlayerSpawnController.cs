@@ -47,8 +47,7 @@ public class PlayerSpawnController : MonoBehaviour
     associatedEnergyBarSlider.maxValue = spawnedPlayer.maxEnergy;
     associatedEnergyBarSlider.value = spawnedPlayer.energy;
     spawnedPlayer.energyText = associatedEnergyText;
-
-    Debug.Log(spawnedPlayer.attackPower);
+     
 
   
 
