@@ -11,5 +11,10 @@ public abstract class PlayerJob
     public abstract int BaseHealth { get; } 
     public abstract int BaseEnergy { get; }
    // public abstract string jobClassName { get; }
+
+    public abstract List<SkillType> AvailableSkills { get; }
+
+    public abstract Skill GetSkillInstance(SkillType skillType);
+
 }
 

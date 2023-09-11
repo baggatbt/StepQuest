@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class OpenSkillSelectionPanel : MonoBehaviour
 {
-    public GameObject skillSelectionGUI;
+    public GameObject knightSkillPanel;
+    public GameObject adventurerSkillPanel;
     public GameObject missionGUI;
     public GameObject companionGUI;
 
@@ -13,12 +14,25 @@ public class OpenSkillSelectionPanel : MonoBehaviour
         //Case: if adventurer, adventurerskillpanel .setActive
         //Case: if class = knight, knightskillpanel . set active
         //etc etc
-        skillSelectionGUI.SetActive(true);
+        switch (PlayerData.Instance.jobClass)
+        {
+            case "Knight":
+                knightSkillPanel.SetActive(true);
+                break;
+            case "Adventurer":
+                adventurerSkillPanel.SetActive(true);
+                break;
+            default:
+                Debug.LogError("Unknown job class: ");
+                break;
+        }
+        
     }
 
     public void closeSkillSelectionGUI()
     {
-        skillSelectionGUI.SetActive(false);
+        knightSkillPanel.SetActive(false);
+        adventurerSkillPanel.SetActive(false);
     }
 
     public void openMissionInterface()

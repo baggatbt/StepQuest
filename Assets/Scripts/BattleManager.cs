@@ -99,7 +99,7 @@ public class BattleManager : MonoBehaviour
     expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
     goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
     mainCamera = Camera.main;
-
+    
 
     if (currentBattleConfig != null)
     {
@@ -129,20 +129,23 @@ public class BattleManager : MonoBehaviour
 
     public void DisableAllButtons()
     {
+        /*
         foreach (Button btn in skillButtons)
         {
             btn.interactable = false;
         }
         launchAttacksButton.interactable = false;
+        */
     }
    
     public void EnableAllButtons()
     {
-        foreach (Button btn in skillButtons)
+       /* foreach (Button btn in skillButtons)
         {
             btn.interactable = true;
         }
         launchAttacksButton.interactable = true;
+        */
     }
 
     public void MoveCirclesToTarget(Character target)

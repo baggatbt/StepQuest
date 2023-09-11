@@ -59,6 +59,23 @@ public class PlayerData : MonoBehaviour
         }
     }
 
+    private Dictionary<string, PlayerJob> jobInstances = new Dictionary<string, PlayerJob>
+    {
+        {"Knight", new Knight()} // Add other job instances as necessary
+    };
+
+    public PlayerJob CurrentJob
+    {
+        get 
+        {
+            if (jobInstances.ContainsKey(jobClass))
+                return jobInstances[jobClass];
+
+            Debug.LogError("Job instance for " + jobClass + " not found.");
+            return null;
+        }
+    }
+
     private void Start()
     {
         LoadStepsData();

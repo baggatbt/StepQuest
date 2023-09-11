@@ -6,10 +6,13 @@ using TMPro;
 
 public class ButtonController : MonoBehaviour
 {
-    public TextMeshProUGUI buttonText;
+    
     public BattleManager battleManager;
-    public Button[] skillButtons;
-    public int slotIndex;
+    public GameObject skillButtonPrefab;
+
+    public List<Button> skillButtons = new List<Button>();
+
+    
 
     public GameObject skillSelectionPanel;
    
@@ -18,18 +21,52 @@ public class ButtonController : MonoBehaviour
 
     void Start()
     {
-        skill = SkillAssignmentManager.Instance.GetSkillForSlot(slotIndex);
-        if(skill != null )
+       PopulateSkillPanelWithPlayerSkills();
+    }
+    
+    public void PopulateSkillPanelWithPlayerSkills()
+{
+    List<SkillType> availableSkills = PlayerData.Instance.CurrentJob.AvailableSkills;
+
+    foreach (SkillType skillType in availableSkills)
+    {
+        // Instantiate a new button
+        GameObject newButtonObj = Instantiate(skillButtonPrefab, skillSelectionPanel.transform);
+        
+        // Get the Button component
+        Button buttonComponent = newButtonObj.GetComponent<Button>();
+        if (buttonComponent != null)
         {
-            Debug.LogError("doot");
-           // buttonText.text = skill.skillName;
-        }
-        else
-        {
-            Debug.LogError("No skill assigned to slot " + slotIndex);
-          //  buttonText.text = "Unassigned";
+            skillButtons.Add(buttonComponent); // Add the button to the list
+            
+            // Get the Skill instance from the CurrentJob based on skillType
+            Skill currentSkill = PlayerData.Instance.CurrentJob.GetSkillInstance(skillType);
+
+            // Set the button's text to the skill's name
+            TextMeshProUGUI buttonText = newButtonObj.GetComponentInChildren<TextMeshProUGUI>();
+            if (buttonText != null)
+            {
+                buttonText.text = currentSkill.skillName;
+            }
+
+            // Add a listener to the button to handle its click action
+            buttonComponent.onClick.AddListener(() => 
+            {
+                SelectAndUseSkill(currentSkill);
+            });
         }
     }
+}
+
+
+public void SelectAndUseSkill(Skill selectedSkill)
+{
+    skill = selectedSkill;
+    OnButtonClick();
+}
+
+        
+
 
     public void OnButtonClick()
 {
@@ -45,7 +82,8 @@ public class ButtonController : MonoBehaviour
                 battleManager.player.SpendEnergy(skill.energyCost);
                 Debug.Log("Energy after deduction: " + battleManager.player.energy);
                 battleManager.skillQueue.Enqueue(skill);
-                battleManager.skillButtons[slotIndex].interactable = false;
+                
+
                 Debug.Log("Skill " + skill.skillName + " added to queue. Current queue size: " + battleManager.skillQueue.Count);
                 
                 // Setting flag to indicate skill has been selected
@@ -64,6 +102,7 @@ public class ButtonController : MonoBehaviour
 }
 
 
+
     public void AttackButtonClick()
 {
     // Set the skill to TripleHitSkill
@@ -73,14 +112,6 @@ public class ButtonController : MonoBehaviour
     // Execute the skill
     OnButtonClick();
 }
-
-
-    IEnumerator ResetConfirmationState()
-    {
-        yield return new WaitForSeconds(2);  // Waits for 2 seconds
-        isAwaitingConfirmation = false;
-    }
-
 
 
     public void OpenSkillPanel()
