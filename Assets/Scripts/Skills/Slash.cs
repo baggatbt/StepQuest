@@ -39,7 +39,6 @@ public class Slash : Skill
         {
             target.TakeDamage(damage + ((int)System.Math.Round(PlayerData.Instance.attackPower * .5)));
             AudioManager.instance.PlaySlashSound();
-            Debug.Log("Slash perfect! " + target.name + " takes " + damage + " damage.");
             user.GainEnergy(2);
             user.animator.SetTrigger("AttackFailTrigger");
             user.isAttacking = false;
@@ -51,7 +50,6 @@ public class Slash : Skill
         {
             target.TakeDamage(damage);
             AudioManager.instance.PlaySlashSound();
-            Debug.Log("Slash successful! " + target.name + " takes " + damage + " damage.");
             user.animator.SetTrigger("AttackFailTrigger");
             user.isAttacking = false;
             
