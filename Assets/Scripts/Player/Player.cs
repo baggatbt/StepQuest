@@ -138,7 +138,7 @@ public class Player : Character
     {
         
         // Update UI regularly or as per your needs
-       // UpdateUI();
+       UpdateUI();
         
     }
 
