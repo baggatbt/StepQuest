@@ -94,6 +94,7 @@ public class BattleManager : MonoBehaviour
 
     outerCircle.SetActive(false);
     innerCircle.SetActive(false);
+    
 
     // Cache the components
     expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
@@ -152,7 +153,9 @@ public class BattleManager : MonoBehaviour
 {
             // Move the circles to the targets position
             outerCircle.transform.position = currentTarget.transform.position;
-            innerCircle.transform.position = currentTarget.transform.position;
+
+           // innerCircle.transform.position = currentTarget.transform.position;
+            //NEEDS OFFSET TO BE OFF SPRITE
        
 }
 
@@ -359,7 +362,7 @@ public IEnumerator CompanionMoveAndAttackCoroutine()
 
     if (player.currentSkill != null)
     {
-        MoveCirclesToTarget(targetEnemy);
+        //MoveCirclesToTarget(targetEnemy);
         yield return player.currentSkill.Execute(player, targetEnemy, this);
         
         yield return new WaitForSeconds(0.1f);
@@ -379,7 +382,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
 
     if (companion.currentSkill != null)
     {
-        MoveCirclesToTarget(targetEnemy);
+        //MoveCirclesToTarget(targetEnemy);
         yield return companion.currentSkill.Execute(companion, targetEnemy, this);
         
         yield return new WaitForSeconds(0.1f);
@@ -437,7 +440,8 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
             {
                 yield return attackingEnemy.MoveToTarget();
             }
-            
+
+            //MoveCirclesToTarget(player);
             yield return attackingEnemy.currentSkill.Execute(attackingEnemy, player, this);
 
             
@@ -481,26 +485,26 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
 
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<TimingEventResult> callback)
 {
-      // Enable the timing circles when the event starts
-        outerCircle.SetActive(true);
-        innerCircle.SetActive(true);
+    // Enable the timing circles when the event starts
+    outerCircle.SetActive(true);
+    // innerCircle.SetActive(true);
 
     float totalWindowDuration = windowEnd - windowStart;
     float timer = 0;
     bool buttonClicked = false;
 
-    // Start the inner circle at a very small size
-    Vector3 innerCircleInitialScale = new Vector3(0.01f, 0.01f, 0.01f);
+    // Set the sizes: outer starts bigger and shrinks to size (0,0,0)
+    Vector3 outerCircleInitialScale = outerCircle.transform.localScale; // Let's assume this is the size at start.
+    Vector3 zeroScale = new Vector3(0, 0, 0); 
 
-    float speedFactor = 1.5f;  // Change this value to adjust speed. Higher means faster.
-    
+    float speedFactor = 1.5f; // Change this value to adjust speed. Higher means faster.
 
     try
     {
         while (timer < totalWindowDuration)
         {
             float progress = timer / totalWindowDuration;
-            innerCircle.transform.localScale = Vector3.Lerp(innerCircleInitialScale, outerCircleInitialScale, progress);
+            outerCircle.transform.localScale = Vector3.Lerp(outerCircleInitialScale, zeroScale, progress);
 
             if (Input.GetMouseButtonDown(0))
             {
@@ -519,12 +523,12 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
         {
             if (timer >= windowStart)
             {
-                result = GetTimingAccuracy(innerCircle.transform.localScale, outerCircle.transform.localScale);
+                result = GetTimingAccuracy(outerCircle.transform.localScale);
             }
             else
             {
                 Debug.Log("Timing Missed!");
-                result = TimingEventResult.Miss; //Breaks the queue'd chain if anything misses.
+                result = TimingEventResult.Miss;
                 skillQueue.Clear();
             }
         }
@@ -539,35 +543,37 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
     }
     finally
     {
-        // Reset the scale of the inner circle, ensuring it always happens even if the coroutine is interrupted
-        innerCircle.transform.localScale = innerCircleInitialScale;
+        // Reset the scale of the outer circle, ensuring it always happens even if the coroutine is interrupted
+        outerCircle.transform.localScale = outerCircleInitialScale;
     }
     // Disable the timing circles when the event ends
-        outerCircle.SetActive(false);
-        innerCircle.SetActive(false);
+    outerCircle.SetActive(false);
+   // innerCircle.SetActive(false);
 }
 
 
-    
-    private TimingEventResult GetTimingAccuracy(Vector3 innerCircleScale, Vector3 outerCircleScale)
-    {
-        float scaleRatio = innerCircleScale.x / outerCircleScale.x;
-        float perfectThreshold = 0.9f;
-        float goodThreshold = 0.5f;
 
-        if (scaleRatio >= perfectThreshold)
-        {
-            return TimingEventResult.Perfect;
-        }
-        else if (scaleRatio >= goodThreshold)
-        {
-            return TimingEventResult.Good;
-        }
-        else
-        {
-            return TimingEventResult.Miss;
-        }
+    
+    private TimingEventResult GetTimingAccuracy(Vector3 outerCircleScale)
+{
+    // Thresholds based on the size of the outer circle
+    float perfectThreshold = 0.1f; // This means the circle is very small, almost disappeared
+    float goodThreshold = 0.5f; // This means the circle is half its original size
+
+    if (outerCircleScale.x <= perfectThreshold) 
+    {
+        return TimingEventResult.Perfect;
     }
+    else if (outerCircleScale.x <= goodThreshold)
+    {
+        return TimingEventResult.Good;
+    }
+    else
+    {
+        return TimingEventResult.Miss;
+    }
+}
+
 
     public IEnumerator PlayerHoldReleaseTimeEvent(float holdStart, float holdEnd, Action<TimingEventResult> callback)
     {

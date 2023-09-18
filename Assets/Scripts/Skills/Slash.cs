@@ -17,54 +17,42 @@ public class Slash : Skill
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
-{   
-    
-   
+{
     for (int i = 0; i < numberOfSlashes; i++)
     {
-        
-        
-        yield return battleManager.PlayerActiveTimeEvent(0.0f, 1.0f, (result) =>
-    {
+        // Trigger the animation first
         user.animator.SetTrigger("Attack1Trigger");
         user.isAttacking = true;
-    
 
+        // Wait for a short delay, then start the timing event. 
+        // to match when I want the timing event to occur during the animation.
+        yield return new WaitForSeconds(0.1f);  // Adjust this value based on animation's timing
 
-        int damage = PlayerData.Instance.attackPower;
-
-
-
-        if (result == TimingEventResult.Perfect)
+        yield return battleManager.PlayerActiveTimeEvent(0.0f, 0.7f, (result) =>
         {
-            target.TakeDamage(damage + ((int)System.Math.Round(PlayerData.Instance.attackPower * .5)));
-            AudioManager.instance.PlaySlashSound();
-            user.GainEnergy(2);
+            int damage = PlayerData.Instance.attackPower;
+
+            if (result == TimingEventResult.Perfect)
+            {
+                target.TakeDamage(damage + ((int)System.Math.Round(PlayerData.Instance.attackPower * .5)));
+                AudioManager.instance.PlaySlashSound();
+                user.GainEnergy(2);
+            }
+            else if (result == TimingEventResult.Good)
+            {
+                target.TakeDamage(damage);
+                AudioManager.instance.PlaySlashSound();
+            }
+            else
+            {
+                Debug.Log("Slash missed! " + target.name + " takes 0 damage.");
+            }
+
+            // Trigger the end/fail animation here instead of repeating it for each result.
             user.animator.SetTrigger("AttackFailTrigger");
             user.isAttacking = false;
-           
-            
-            
-        }
-        else if (result == TimingEventResult.Good)
-        {
-            target.TakeDamage(damage);
-            AudioManager.instance.PlaySlashSound();
-            user.animator.SetTrigger("AttackFailTrigger");
-            user.isAttacking = false;
-            
-
-        }
-        else
-        {
-            
-            Debug.Log("Slash missed! " + target.name + " takes 0 damage.");
-            user.animator.SetTrigger("AttackFailTrigger");
-            user.isAttacking = false;
-        }
-    });
+        });
     }
- 
 }
 }
 

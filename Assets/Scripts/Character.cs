@@ -207,6 +207,7 @@ public class Character : MonoBehaviour
 
      public IEnumerator ReturnToPosition()
         {
+            yield return new WaitForSeconds(0.5f);
             checkCollisionsDuringMovement = false;
             animator.SetTrigger("MovementAnimationTrigger");  
             yield return Move(originalPosition);
