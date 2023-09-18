@@ -12,12 +12,12 @@ public class Slime : Enemy
             new SlimeAttackSkill(),
             // new SlimeSpecialAttackSkill()
         };
-
-        this.expReward = 5;  //TODO: Add scaling
-        this.goldReward = 2;
+        this.level = 1;
+        this.expReward = (5 * this.level);
+        this.goldReward = (2 * this.level);
         this.attacksBeforeSpecial = 2;
-        this.damage = 3;
-        this.maxHealth = 9;
+        this.damage = (7 + (this.level * 2));
+        this.maxHealth = (14 + this.level);
         this.health = this.maxHealth;
 
         // Assign the skills

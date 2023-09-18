@@ -10,9 +10,10 @@ public class Goblin : Enemy
     protected override void Awake()
     {
         base.Awake();
-        this.maxHealth = 10;
-        this.health = this.maxHealth;
         this.level = 1;
+        this.maxHealth = 22;
+        this.health = this.maxHealth;
+        
     }
      protected override void Start()
     {
@@ -27,7 +28,7 @@ public class Goblin : Enemy
         this.goldReward = 3;
         this.attacksBeforeSpecial = 2;
         this.damage = Mathf.RoundToInt(2 * Mathf.Pow(1.10f, level - 1)); //Increase by 10% each level, controlled by 1.10f
-
+        this.defensePower = 2;
 
         // Assign the skills
         this.normalSkill = this.skills[0]; // Normal skill

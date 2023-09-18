@@ -17,7 +17,7 @@ public class ButtonController : MonoBehaviour
     public GameObject skillSelectionPanel;
    
     private Skill skill;
-    private bool isAwaitingConfirmation = false;
+    
 
     void Start()
     {
