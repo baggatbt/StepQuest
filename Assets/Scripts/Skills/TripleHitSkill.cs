@@ -15,24 +15,37 @@ public class TripleHitSkill : Skill
         energyCost = 0;
     }
 
+    // Override the default base damage calculation.
+    protected override int CalculateBaseDamage(Character user)
+    {
+        return (int)(user.attackPower * 0.5f);  // 70% of the character's attack.
+    }
+
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
         user.isAttacking = true;
-       
+
+        int baseDamage = CalculateBaseDamage(user);
+        
+        
         
         // First Timing Event
         yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
-        HandleTimingResultForPlayerAttack(user, target, "Attack1Trigger", result);
+        HandleTimingResultForPlayerAttack(user, target, "Attack1Trigger", result, baseDamage);
         if (result == TimingEventResult.Miss)
-            yield break;
-            yield return  user.animationEnded == true;
+            {
+                user.animator.SetTrigger("Attack1Trigger");
+                yield break;
+            }
+        yield return new WaitUntil(() => user.animationEnded);
+
 
 
         if (target.health >= 1)
         {
         // Second Timing Event
         yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
-        HandleTimingResultForPlayerAttack(user, target, "Attack2Trigger", result);
+        HandleTimingResultForPlayerAttack(user, target, "Attack2Trigger", result, baseDamage);
         if (result == TimingEventResult.Miss)
             yield break;
             yield return  user.animationEnded == true;
@@ -42,7 +55,7 @@ public class TripleHitSkill : Skill
         {
         // Third Timing Event
         yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
-        HandleTimingResultForPlayerAttack(user, target, "Attack3Trigger", result);
+        HandleTimingResultForPlayerAttack(user, target, "Attack3Trigger", result, baseDamage);
         yield return new WaitUntil(() => user.animationEnded == true); //Resets the animation flag
         user.isAttacking = false;
         }

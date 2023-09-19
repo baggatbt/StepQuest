@@ -4,47 +4,39 @@ using UnityEngine;
 
 public class Slash : Skill
 {
-    private int numberOfSlashes;
-
     public Slash()
     {
         skillName = "Slash";
-        description = "A powerful slashing attack.";
-        requiresMovement = true;
-        energyCost = 0;
-        skillLevel = 1; 
-        numberOfSlashes = 1;
+        description = "A swift slash that deals damage equal to the user's attack power.";
+        energyCost = 5; // You can set an appropriate energy cost
+        skillLevel = 1; // Setting default level, this might get overridden by GetSkillLevel()
+        requiresMovement = true; // Assuming the skill requires the user to move towards the target
+        skillExecutionComplete = false;
+    }
+
+    protected override int CalculateBaseDamage(Character user)
+    {
+        return user.attackPower; // 100% of user's attack power
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
-{
-    for (int i = 0; i < numberOfSlashes; i++)
     {
-       
-    
-        user.isAttacking = true;
+        skillExecutionComplete = false;
+        int baseDamage = CalculateBaseDamage(user);
 
-        // Wait for a short delay, then start the timing event. 
-        // to match when I want the timing event to occur during the animation.
-        yield return new WaitForSeconds(0.1f);  // Adjust this value based on animation's timing
-
+        // Let's assume you have a method in BattleManager for handling timing events
         yield return battleManager.PlayerActiveTimeEvent(0.0f, 0.7f, (result) =>
         {
-            HandleTimingResultForPlayerAttack(user, target, "Attack1Trigger", result);
-
-            // Trigger the end/fail animation here instead of repeating it for each result.
-            user.animator.SetTrigger("AttackFailTrigger");
-            user.isAttacking = false;
+             HandleTimingResultForPlayerAttack(user, target, "Attack1Trigger", result, baseDamage);
+             
+        
         });
+
+        skillExecutionComplete = true; // Mark the skill as executed once completed
     }
 }
-}
 
-
-
-/*
-        // Create an instance of Airborne with a duration of 2 seconds
-        Airborne airborneEffect = new Airborne(1.0f);
-        battleManager.statusEffectController.AddEffect(airborneEffect, target);
-
-        */
+       
+      
+   
+    

@@ -16,51 +16,31 @@ public class SwordWave : Skill
         energyCost = 2;
     }
 
+    // Override the default base damage calculation.
+    protected override int CalculateBaseDamage(Character user)
+    {
+        return (int)(user.attackPower * 1.5);  // 150% of the character's attack.
+    }
+
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
         user.isAttacking = true;
+        int baseDamage = CalculateBaseDamage(user);
 
         yield return battleManager.PlayerHoldReleaseTimeEvent(0.0f, 1.0f, (result) =>
         {
-            user.animator.SetTrigger("SwordWaveTrigger");
-
-            switch (result)
-            {
-                case TimingEventResult.Perfect:
-                     foreach (var enemy in battleManager.enemies)
-                    {
-                    enemy.TakeDamage(2);
-                    }
-                    Debug.Log("SwordWave Perfect! " + target.name + " takes 2 damage.");
-                    user.GainEnergy((energyCost / 2));
-                    user.animator.SetTrigger("AttackFailTrigger");
-                    // Use Object.Instantiate to spawn the sword wave
-                    skillManager.SpawnAndPushSwordWave(user.transform.position + user.transform.forward, user.transform.forward);
-
-                    
-                   
-                    break;
-
-                case TimingEventResult.Good:
-                    Debug.Log("SwordWave Good! " + target.name + " takes 1 damage.");
-                    user.animator.SetTrigger("AttackFailTrigger");
-                    skillManager.SpawnAndPushSwordWave(user.transform.position + user.transform.forward, user.transform.forward);
-                    target.TakeDamage(1);
-                    break;
-
-                case TimingEventResult.Miss:
-                    Debug.Log("SwordWave missed! " + target.name + " takes no damage.");
-                    user.animator.SetTrigger("AttackFailTrigger");
-                    break;
-            }
+             HandleTimingResultForPlayerAttack(user, target, "Attack1Trigger", result, baseDamage);
+             skillExecutionComplete = true;
+             user.isAttacking = false;
+        
         });
-
-        yield return new WaitForSeconds(1.0f);
-        skillExecutionComplete = true;
-        user.isAttacking = false;
-    }
-
-
-
+     }
 }
+       
+      
+        
+
+
+
+
 

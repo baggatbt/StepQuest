@@ -30,7 +30,13 @@ public abstract class Skill
     public bool requiresMovement; // Indicates if the attack requires movement towards the target
     public int energyCost;
     public int skillLevel;
-    protected TimingEventResult result; // Moved from TripleHitSkill to here
+    protected TimingEventResult result; 
+
+      // New virtual function for calculating base damage.
+    protected virtual int CalculateBaseDamage(Character user)
+    {
+        return PlayerData.Instance.attackPower;
+    }
 
 
     
@@ -68,13 +74,13 @@ public abstract class Skill
     }
 }
 
-public void HandleTimingResultForPlayerAttack(Character user, Character target, string trigger, TimingEventResult timingResult)
-{
-    float damageMultiplier = 1.0f;
-    result = timingResult; // set the result using argument
-
-    int baseDamage = PlayerData.Instance.attackPower;
-    
+    public void HandleTimingResultForPlayerAttack(Character user, Character target, string trigger, TimingEventResult timingResult, int baseDamage)
+    {
+        float damageMultiplier = 1.0f;
+        
+        result = timingResult;
+        baseDamage = user.attackPower;
+        
     switch (result)
     {
         case TimingEventResult.Perfect:
@@ -97,9 +103,10 @@ public void HandleTimingResultForPlayerAttack(Character user, Character target, 
             break;
         case TimingEventResult.Miss:
             Debug.Log("Missed!");
-            user.animator.SetTrigger("AttackFailTrigger");
+            user.animator.SetTrigger(trigger); 
             target.animator.SetTrigger("IsHurtTrigger");
             target.TakeDamage(baseDamage); // No damage boost
+            AudioManager.instance.PlaySlashSound();
             user.isAttacking = false;
             break;
     }

@@ -369,10 +369,7 @@ public IEnumerator CompanionMoveAndAttackCoroutine()
 
         CheckBattleEnd();
     }
-    else
-    {
-        Debug.Log("currentSkill  - This should not happen");
-    }
+
 }
 
 public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
@@ -488,17 +485,16 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
 {
     // Enable the timing circles when the event starts
     outerCircle.SetActive(true);
-    // innerCircle.SetActive(true);
+    bool buttonClicked = false;
 
     float totalWindowDuration = windowEnd - windowStart;
     float timer = 0;
-    bool buttonClicked = false;
 
     // Set the sizes: outer starts bigger and shrinks to size (0,0,0)
-    Vector3 outerCircleInitialScale = outerCircle.transform.localScale; // Let's assume this is the size at start.
+    Vector3 outerCircleInitialScale = outerCircle.transform.localScale;
     Vector3 zeroScale = new Vector3(0, 0, 0); 
 
-    float speedFactor = 1.5f; // Change this value to adjust speed. Higher means faster.
+    float speedFactor = 1.25f;
 
     try
     {
@@ -507,50 +503,71 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
             float progress = timer / totalWindowDuration;
             outerCircle.transform.localScale = Vector3.Lerp(outerCircleInitialScale, zeroScale, progress);
 
+            // Check for perfect timing continuously as the circle scales down
+            if (GetTimingAccuracy(outerCircle.transform.localScale) == TimingEventResult.Perfect)
+            {
+                player.animator.SetTrigger("TimingFlashTrigger");
+                Debug.Log("THIS IS THE PERFECT TIMING GOOOO");
+                break;
+            }
+
+            // Existing condition for button click
             if (Input.GetMouseButtonDown(0))
             {
                 buttonClicked = true;
                 StartCoroutine(cameraShake.Shake());
+                break;
+            }
 
+            // New logic to handle timer exceeding totalWindowDuration
+            if (timer >= totalWindowDuration)
+            {
+                Debug.Log("No input detected. Missed!");
+                buttonClicked = true;
                 break;
             }
 
             timer += Time.deltaTime * speedFactor;
             yield return null;
+
         }
 
+        // Determine the result after the loop
         TimingEventResult result;
-        if (buttonClicked)
-        {
-            if (timer >= windowStart)
-            {
-                result = GetTimingAccuracy(outerCircle.transform.localScale);
-            }
-            else
-            {
-                Debug.Log("Timing Missed!");
-                result = TimingEventResult.Miss;
-                skillQueue.Clear();
-            }
-        }
-        else
-        {
-            Debug.Log("No input detected. Missed!");
-            result = TimingEventResult.Miss;
-            skillQueue.Clear();
-        }
+if (buttonClicked)
+{
+    if (timer >= windowStart && timer < totalWindowDuration) // Added timer < totalWindowDuration
+    {
+        result = GetTimingAccuracy(outerCircle.transform.localScale);
+    }
+    else
+    {
+        Debug.Log("Timing Missed!");
+        result = TimingEventResult.Miss;
+    }
+}
+else
+{
+    Debug.Log("No input detected. Missed!");
+    result = TimingEventResult.Miss;
+    skillQueue.Clear();
+}
 
-        callback(result);
+
+        Debug.Log("Callback is being invoked with result: " + result);
+callback(result);
+
     }
     finally
     {
-        // Reset the scale of the outer circle, ensuring it always happens even if the coroutine is interrupted
+        // Reset the scale of the outer circle
         outerCircle.transform.localScale = outerCircleInitialScale;
     }
+
     // Disable the timing circles when the event ends
     outerCircle.SetActive(false);
-   // innerCircle.SetActive(false);
 }
+
 
 
 
