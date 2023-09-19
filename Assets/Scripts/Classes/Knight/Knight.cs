@@ -17,7 +17,8 @@ public class Knight : PlayerJob
     {
         SkillType.Slash,
         SkillType.TripleHit,
-        SkillType.SwordWave
+        SkillType.SwordWave,
+        SkillType.GuardSkill
     };
 
     public override Skill GetSkillInstance(SkillType skillType)
@@ -26,10 +27,16 @@ public class Knight : PlayerJob
         {
             case SkillType.Slash:
                 return new Slash();
+
             case SkillType.TripleHit:
                 return new TripleHitSkill();
+
             case SkillType.SwordWave:
                 return new SwordWave(skillManager);
+
+            case SkillType.GuardSkill:
+                return new GuardSkill();
+
             default:
                 Debug.LogError("Unknown skill type for Knight: " + skillType);
                 return null;

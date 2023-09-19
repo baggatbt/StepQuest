@@ -17,6 +17,7 @@ public enum SkillType
         Slash,
         TripleHit,
         SwordWave,
+        GuardSkill,
     }
 
 

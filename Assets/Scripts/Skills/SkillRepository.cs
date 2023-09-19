@@ -24,7 +24,8 @@ public class SkillRepository : MonoBehaviour
         {
             { SkillType.Slash, new Slash() },
             { SkillType.TripleHit, new TripleHitSkill() },
-            { SkillType.SwordWave, new SwordWave(skillManager) } // Use the initialized reference here.
+            { SkillType.SwordWave, new SwordWave(skillManager) }, // Use the initialized reference here.
+            { SkillType.GuardSkill, new GuardSkill() }
         };
     }
 }
