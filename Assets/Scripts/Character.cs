@@ -57,6 +57,10 @@ public class Character : MonoBehaviour
         
     }
 
+    void Update(){
+
+    }
+
     protected virtual void Start()
     {
         
@@ -82,9 +86,11 @@ public class Character : MonoBehaviour
 
     public CameraShake cameraShake; // Reference to the CameraShake script
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damageOfAttacker)
 {
-    health -= damage;
+    int damageDealt = damageOfAttacker * (1 - (this.defensePower / 100));
+
+    health -= damageDealt;
     healthBar.value = health;
 
     // Update the health text.
@@ -93,7 +99,7 @@ public class Character : MonoBehaviour
         healthText.text = "HP: " + health;
     }
     
-    if (damage > 0)
+    if (damageDealt > 0)
     { 
         IsHit();
        // Damage popup
@@ -108,7 +114,7 @@ public class Character : MonoBehaviour
         GameObject damagePopupInstance = Instantiate(damagePopupPrefab, transform.position, Quaternion.identity, endOfBattleRewardsTransform);
 
         DamagePopup damagePopupScript = damagePopupInstance.GetComponent<DamagePopup>();
-        damagePopupScript.Setup(damage);
+        damagePopupScript.Setup(damageDealt);
         
     }
     else
