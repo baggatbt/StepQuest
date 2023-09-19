@@ -22,7 +22,7 @@ public class TripleHitSkill : Skill
         
         // First Timing Event
         yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
-        HandleTimingResult(user, target, "Attack1Trigger", result);
+        HandleTimingResultForPlayerAttack(user, target, "Attack1Trigger", result);
         if (result == TimingEventResult.Miss)
             yield break;
             yield return  user.animationEnded == true;
@@ -32,7 +32,7 @@ public class TripleHitSkill : Skill
         {
         // Second Timing Event
         yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
-        HandleTimingResult(user, target, "Attack2Trigger", result);
+        HandleTimingResultForPlayerAttack(user, target, "Attack2Trigger", result);
         if (result == TimingEventResult.Miss)
             yield break;
             yield return  user.animationEnded == true;
@@ -42,7 +42,7 @@ public class TripleHitSkill : Skill
         {
         // Third Timing Event
         yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
-        HandleTimingResult(user, target, "Attack3Trigger", result);
+        HandleTimingResultForPlayerAttack(user, target, "Attack3Trigger", result);
         yield return new WaitUntil(() => user.animationEnded == true); //Resets the animation flag
         user.isAttacking = false;
         }

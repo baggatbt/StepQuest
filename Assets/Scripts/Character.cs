@@ -101,7 +101,7 @@ public class Character : MonoBehaviour
     
     if (damageDealt > 0)
     { 
-        IsHit();
+       // IsHit();
        // Damage popup
     GameObject damagePopupPrefab = Resources.Load<GameObject>("PreFab/DamagePopup");
 
