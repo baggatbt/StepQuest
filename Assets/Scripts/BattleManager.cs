@@ -399,7 +399,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
 
     private Queue<Character> enemyTurnQueue = new Queue<Character>();
 
-
+    
     public void EnemyAttack()
     {
         // If the queue is empty (or at the start of the enemy turn phase), populate it.
@@ -415,6 +415,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
         // If all enemies had their turns, it's the player's turn next.
         if (enemyTurnQueue.Count == 0)
         {
+            statusEffectController.ProcessEffects();
             ChangeState(BattleState.PlayerTurn);
             return;
         }

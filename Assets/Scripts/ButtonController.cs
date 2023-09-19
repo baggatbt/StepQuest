@@ -101,6 +101,11 @@ public void SelectAndUseSkill(Skill selectedSkill)
         Debug.Log("Not enough energy to queue this skill!");
     }
 }
+    public void testButtonClick()
+    {
+        skill = new GuardSkill();
+        OnButtonClick();
+    }
 
 
 

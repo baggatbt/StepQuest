@@ -42,10 +42,7 @@ public class Character : MonoBehaviour
     //STATUS EFFECTS
     public StatusEffectController statusEffectController;
 
-    public bool IsAffectedBy(string effectName)
-    {
-        return statusEffectController.HasEffect(effectName);
-    }
+    
 
     protected virtual void Awake()
     {

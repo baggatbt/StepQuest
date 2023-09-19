@@ -8,7 +8,7 @@ public class Airborne : StatusEffect
     public Airborne(float effectDuration)
     {
         effectName = "Airborne";
-        duration = effectDuration;
+        
     }
 
     public override void ApplyEffect(Character target)
@@ -24,11 +24,7 @@ public class Airborne : StatusEffect
         target.transform.position -= new Vector3(0, liftHeight, 0);
     }
 
-    public override IEnumerator EffectCoroutine(Character target, StatusEffectController controller)
-{
-    yield return new WaitForSeconds(duration);
-    controller.RemoveEffect(this, target);
-}
+ 
 
 
 }
