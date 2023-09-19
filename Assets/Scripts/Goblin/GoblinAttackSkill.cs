@@ -18,7 +18,7 @@ public class GoblinAttackSkill : Skill
      public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
         user.isAttacking = true;
-        user.animator.SetTrigger("GoblinAttack1Trigger");
+        
         for (int i = 0; i < numberOfHits; i++)
         {
 

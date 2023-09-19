@@ -20,8 +20,8 @@ public class Slash : Skill
 {
     for (int i = 0; i < numberOfSlashes; i++)
     {
-        // Trigger the animation first
-        user.animator.SetTrigger("Attack1Trigger");
+       
+    
         user.isAttacking = true;
 
         // Wait for a short delay, then start the timing event. 
@@ -30,23 +30,7 @@ public class Slash : Skill
 
         yield return battleManager.PlayerActiveTimeEvent(0.0f, 0.7f, (result) =>
         {
-            int damage = PlayerData.Instance.attackPower;
-
-            if (result == TimingEventResult.Perfect)
-            {
-                target.TakeDamage(damage + ((int)System.Math.Round(PlayerData.Instance.attackPower * .5)));
-                AudioManager.instance.PlaySlashSound();
-                user.GainEnergy(2);
-            }
-            else if (result == TimingEventResult.Good)
-            {
-                target.TakeDamage(damage);
-                AudioManager.instance.PlaySlashSound();
-            }
-            else
-            {
-                Debug.Log("Slash missed! " + target.name + " takes 0 damage.");
-            }
+            HandleTimingResultForPlayerAttack(user, target, "Attack1Trigger", result);
 
             // Trigger the end/fail animation here instead of repeating it for each result.
             user.animator.SetTrigger("AttackFailTrigger");
