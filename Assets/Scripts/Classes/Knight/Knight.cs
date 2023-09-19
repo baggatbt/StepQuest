@@ -1,0 +1,38 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Knight : PlayerJob
+{
+    private int playerLevel => PlayerData.Instance.level;
+
+    public override int BaseAtk => 10 + (playerLevel * 3);
+    public override int BaseDef => 3 + playerLevel;  
+    public override int BaseMagAtk => 5 + (playerLevel);  
+    public override int BaseMagDef => 2 + playerLevel;  
+    public override int BaseHealth => 30 + (playerLevel * 3);
+    public override int BaseEnergy => 5;
+
+    public override List<SkillType> AvailableSkills => new List<SkillType>
+    {
+        SkillType.Slash,
+        SkillType.TripleHit,
+        SkillType.SwordWave
+    };
+
+    public override Skill GetSkillInstance(SkillType skillType)
+    {
+        switch(skillType)
+        {
+            case SkillType.Slash:
+                return new Slash();
+            case SkillType.TripleHit:
+                return new TripleHitSkill();
+            case SkillType.SwordWave:
+                return new SwordWave(skillManager);
+            default:
+                Debug.LogError("Unknown skill type for Knight: " + skillType);
+                return null;
+        }
+    }
+}

@@ -13,6 +13,7 @@ public class BattleManager : MonoBehaviour
     public Character player;
     public Character companion;
     public PlayerData playerCharacterData;
+    public Player playerClassReference;
     public List<Character> enemies = new List<Character>();
     public GameObject knightPrefab;
     private BattleState state;
@@ -49,6 +50,8 @@ public class BattleManager : MonoBehaviour
     private Vector3 innerCircleInitialScale;
     private TextMeshProUGUI expGainedTextComponent;
     private TextMeshProUGUI goldGainedTextComponent;
+
+    private Camera mainCamera;
 
 
     public Transform[] enemySpawnPoints; // enemySpawnPoint1, enemySpawnPoint2....
@@ -91,11 +94,13 @@ public class BattleManager : MonoBehaviour
 
     outerCircle.SetActive(false);
     innerCircle.SetActive(false);
+    
 
     // Cache the components
     expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
     goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
-
+    mainCamera = Camera.main;
+    
 
     if (currentBattleConfig != null)
     {
@@ -125,27 +130,32 @@ public class BattleManager : MonoBehaviour
 
     public void DisableAllButtons()
     {
+        /*
         foreach (Button btn in skillButtons)
         {
             btn.interactable = false;
         }
         launchAttacksButton.interactable = false;
+        */
     }
    
     public void EnableAllButtons()
     {
-        foreach (Button btn in skillButtons)
+       /* foreach (Button btn in skillButtons)
         {
             btn.interactable = true;
         }
         launchAttacksButton.interactable = true;
+        */
     }
 
     public void MoveCirclesToTarget(Character target)
 {
             // Move the circles to the targets position
             outerCircle.transform.position = currentTarget.transform.position;
-            innerCircle.transform.position = currentTarget.transform.position;
+
+           // innerCircle.transform.position = currentTarget.transform.position;
+            //NEEDS OFFSET TO BE OFF SPRITE
        
 }
 
@@ -171,7 +181,7 @@ public class BattleManager : MonoBehaviour
 
         public void ExecuteQueuedSkills()
     {
-        if (currentTarget != null)
+        if (currentTarget != null && state == BattleState.PlayerTurn)
         {
         DisableAllButtons();
         StartCoroutine(ExecuteAllSkillsCoroutine());
@@ -184,7 +194,7 @@ public class BattleManager : MonoBehaviour
 
     public void CompanionExecuteQueuedSkills()
     {
-        if (currentTarget != null)
+        if (currentTarget != null && state == BattleState.CompanionTurn)
         {
         DisableAllButtons();
         StartCoroutine(CompanionExecuteAllSkillsCoroutine());
@@ -198,6 +208,12 @@ public class BattleManager : MonoBehaviour
     public int skillsExecuted = 0;
     private IEnumerator ExecuteAllSkillsCoroutine()
     {
+        if (currentTarget == null)
+        {
+            Debug.Log("Pick a target!");
+        }
+        else
+        {
         Debug.Log("Executing queued skills. Current queue size before execution: " + skillQueue.Count);
 
         // Dequeue skills one by one and execute them
@@ -219,11 +235,18 @@ public class BattleManager : MonoBehaviour
         skillsExecuted = 0;
         yield return new WaitUntil(() => player.isAttacking == false);
         // Move player back to their original position after all skills executed.
-        yield return StartCoroutine(zoomEffect.ZoomOutEffect());
+        //yield return StartCoroutine(zoomEffect.ZoomOutEffect());
         yield return player.ReturnToPosition();
         
-
+        if (companion == null)
+        {
+            ChangeState(BattleState.EnemyTurn);
+        }
+        else
+        {
         ChangeState(BattleState.CompanionTurn);
+        }
+        }
     }
 
     public int companionSkillsExecuted = 0;
@@ -251,14 +274,15 @@ public class BattleManager : MonoBehaviour
         skillsExecuted = 0;
         yield return new WaitUntil(() => companion.isAttacking == false);
         // Move player back to their original position after all skills executed.
-        yield return StartCoroutine(zoomEffect.ZoomOutEffect());
+       // yield return StartCoroutine(zoomEffect.ZoomOutEffect());
+        yield return new WaitForSeconds(1.0f);
         yield return companion.ReturnToPosition();
         
 
         ChangeState(BattleState.EnemyTurn);
     }
 
-    public ZoomEffect zoomEffect;
+    //public ZoomEffect zoomEffect;
 
 
     public IEnumerator PlayerAction()
@@ -268,7 +292,7 @@ public class BattleManager : MonoBehaviour
         Debug.Log("PlayerAction() being called");
 
         // Start zoom effect
-        StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position)); 
+        //StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position)); 
 
         if (player.currentSkill.requiresMovement && skillsExecuted == 0)
         {
@@ -289,7 +313,7 @@ public IEnumerator CompanionAction()
         Debug.Log("CompanionAction() being called");
 
         // Start zoom effect
-        StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position)); 
+       // StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position)); 
 
         if (companion.currentSkill.requiresMovement && companionSkillsExecuted == 0)
         {
@@ -338,7 +362,7 @@ public IEnumerator CompanionMoveAndAttackCoroutine()
 
     if (player.currentSkill != null)
     {
-        MoveCirclesToTarget(targetEnemy);
+        //MoveCirclesToTarget(targetEnemy);
         yield return player.currentSkill.Execute(player, targetEnemy, this);
         
         yield return new WaitForSeconds(0.1f);
@@ -358,7 +382,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
 
     if (companion.currentSkill != null)
     {
-        MoveCirclesToTarget(targetEnemy);
+        //MoveCirclesToTarget(targetEnemy);
         yield return companion.currentSkill.Execute(companion, targetEnemy, this);
         
         yield return new WaitForSeconds(0.1f);
@@ -375,7 +399,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
 
     private Queue<Character> enemyTurnQueue = new Queue<Character>();
 
-
+    
     public void EnemyAttack()
     {
         // If the queue is empty (or at the start of the enemy turn phase), populate it.
@@ -391,6 +415,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
         // If all enemies had their turns, it's the player's turn next.
         if (enemyTurnQueue.Count == 0)
         {
+            statusEffectController.ProcessEffects();
             ChangeState(BattleState.PlayerTurn);
             return;
         }
@@ -416,7 +441,8 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
             {
                 yield return attackingEnemy.MoveToTarget();
             }
-            
+
+            //MoveCirclesToTarget(player);
             yield return attackingEnemy.currentSkill.Execute(attackingEnemy, player, this);
 
             
@@ -438,7 +464,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
         }
         else
         {
-            yield return new WaitForSeconds(1.0f);
+            yield return new WaitForSeconds(0.5f);
 
            // Check if there are more enemies to take their turns
         if (enemyTurnQueue.Count > 0)
@@ -460,26 +486,26 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
 
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<TimingEventResult> callback)
 {
-      // Enable the timing circles when the event starts
-        outerCircle.SetActive(true);
-        innerCircle.SetActive(true);
+    // Enable the timing circles when the event starts
+    outerCircle.SetActive(true);
+    // innerCircle.SetActive(true);
 
     float totalWindowDuration = windowEnd - windowStart;
     float timer = 0;
     bool buttonClicked = false;
 
-    // Start the inner circle at a very small size
-    Vector3 innerCircleInitialScale = new Vector3(0.01f, 0.01f, 0.01f);
+    // Set the sizes: outer starts bigger and shrinks to size (0,0,0)
+    Vector3 outerCircleInitialScale = outerCircle.transform.localScale; // Let's assume this is the size at start.
+    Vector3 zeroScale = new Vector3(0, 0, 0); 
 
-    float speedFactor = 1.5f;  // Change this value to adjust speed. Higher means faster.
-    
+    float speedFactor = 1.5f; // Change this value to adjust speed. Higher means faster.
 
     try
     {
         while (timer < totalWindowDuration)
         {
             float progress = timer / totalWindowDuration;
-            innerCircle.transform.localScale = Vector3.Lerp(innerCircleInitialScale, outerCircleInitialScale, progress);
+            outerCircle.transform.localScale = Vector3.Lerp(outerCircleInitialScale, zeroScale, progress);
 
             if (Input.GetMouseButtonDown(0))
             {
@@ -498,12 +524,12 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
         {
             if (timer >= windowStart)
             {
-                result = GetTimingAccuracy(innerCircle.transform.localScale, outerCircle.transform.localScale);
+                result = GetTimingAccuracy(outerCircle.transform.localScale);
             }
             else
             {
                 Debug.Log("Timing Missed!");
-                result = TimingEventResult.Miss; //Breaks the queue'd chain if anything misses.
+                result = TimingEventResult.Miss;
                 skillQueue.Clear();
             }
         }
@@ -518,35 +544,37 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
     }
     finally
     {
-        // Reset the scale of the inner circle, ensuring it always happens even if the coroutine is interrupted
-        innerCircle.transform.localScale = innerCircleInitialScale;
+        // Reset the scale of the outer circle, ensuring it always happens even if the coroutine is interrupted
+        outerCircle.transform.localScale = outerCircleInitialScale;
     }
     // Disable the timing circles when the event ends
-        outerCircle.SetActive(false);
-        innerCircle.SetActive(false);
+    outerCircle.SetActive(false);
+   // innerCircle.SetActive(false);
 }
 
 
-    
-    private TimingEventResult GetTimingAccuracy(Vector3 innerCircleScale, Vector3 outerCircleScale)
-    {
-        float scaleRatio = innerCircleScale.x / outerCircleScale.x;
-        float perfectThreshold = 0.9f;
-        float goodThreshold = 0.5f;
 
-        if (scaleRatio >= perfectThreshold)
-        {
-            return TimingEventResult.Perfect;
-        }
-        else if (scaleRatio >= goodThreshold)
-        {
-            return TimingEventResult.Good;
-        }
-        else
-        {
-            return TimingEventResult.Miss;
-        }
+    
+    private TimingEventResult GetTimingAccuracy(Vector3 outerCircleScale)
+{
+    // Thresholds based on the size of the outer circle
+    float perfectThreshold = 0.1f; // This means the circle is very small, almost disappeared
+    float goodThreshold = 0.5f; // This means the circle is half its original size
+
+    if (outerCircleScale.x <= perfectThreshold) 
+    {
+        return TimingEventResult.Perfect;
     }
+    else if (outerCircleScale.x <= goodThreshold)
+    {
+        return TimingEventResult.Good;
+    }
+    else
+    {
+        return TimingEventResult.Miss;
+    }
+}
+
 
     public IEnumerator PlayerHoldReleaseTimeEvent(float holdStart, float holdEnd, Action<TimingEventResult> callback)
     {
@@ -617,6 +645,9 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
 
     PlayerData.Instance.exp += totalExp;
     PlayerData.Instance.gold += totalGold;
+    PlayerData.Instance.SavePlayerData();
+    
+
 
     TextMeshProUGUI expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
     expGainedTextComponent.text = totalExp.ToString();
@@ -630,26 +661,30 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
 
 
 
-    private void Update()
+    public bool isSkillSelected = false;  // New variable
+
+
+private void Update()
 {
     if (Input.GetMouseButtonDown(0))
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
 
-        if (hit.collider != null && hit.collider.CompareTag("Enemy"))
+        if (hit.collider != null && hit.collider.CompareTag("Enemy") && isSkillSelected)
         {
             currentTarget = hit.collider.gameObject;
-            player.attackTarget = currentTarget.transform; //For movement purposes sets the target to the players target
-            companion.attackTarget = currentTarget.transform;
+            player.attackTarget = currentTarget.transform;
+
             Debug.Log("Current target: " + currentTarget.name);
             
-            
+            // Execute the queued skill here since an enemy is tapped after selecting a skill
+            ExecuteQueuedSkills();
+            isSkillSelected = false;  // Reset the flag
         }
     }
-
-
 }
+
 
 
     public bool IsAnyEnemyAttacking()

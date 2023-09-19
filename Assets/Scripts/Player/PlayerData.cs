@@ -18,7 +18,10 @@ public class PlayerData : MonoBehaviour
     public int attackPower;
     public int defensePower;
     public int inGameSteps;
-
+    public int maxHealth;
+    public int health;
+    public int maxEnergy;
+    public int energy;
     public string jobClass;
     public int speed;
     public Dictionary<string, int> skillLevels;
@@ -29,13 +32,17 @@ public class PlayerData : MonoBehaviour
 
     private void Awake()
 {
+   //For testing, wipes saved data 
+   //PlayerPrefs.DeleteAll();
+
     if (_instance == null)
     {
         _instance = this;
         DontDestroyOnLoad(gameObject);
         
-        // Load the player data right here
+        
         LoadPlayerData();
+        
     }
     else
     {
@@ -49,6 +56,23 @@ public class PlayerData : MonoBehaviour
         if (stepCounterController == null)
         {
             Debug.LogError("StepCounterController not found in the scene!");
+        }
+    }
+
+    private Dictionary<string, PlayerJob> jobInstances = new Dictionary<string, PlayerJob>
+    {
+        {"Knight", new Knight()} // Add other job instances as necessary
+    };
+
+    public PlayerJob CurrentJob
+    {
+        get 
+        {
+            if (jobInstances.ContainsKey(jobClass))
+                return jobInstances[jobClass];
+
+            Debug.LogError("Job instance for " + jobClass + " not found.");
+            return null;
         }
     }
 
@@ -74,7 +98,7 @@ public class PlayerData : MonoBehaviour
      //   Debug.Log("Steps in Update: " + inGameSteps);
     }
 
-    public void UpdatePlayerData(int level, string jobClass, int exp, int gold, int attackPower, int defensePower, int inGameSteps)
+    public void UpdatePlayerData(int level, string jobClass, int exp, int gold, int attackPower, int defensePower, int inGameSteps, int maxHealth, int health, int maxEnergy, int energy)
     {
         this.level = level;
         this.jobClass = jobClass;
@@ -83,7 +107,12 @@ public class PlayerData : MonoBehaviour
         this.attackPower = attackPower;
         this.defensePower = defensePower;
         this.inGameSteps = inGameSteps;
+        this.maxHealth = maxHealth;
+        this.health = health;
+        this.maxEnergy = maxEnergy;
+        this.energy = energy;
         
+
         SavePlayerData(); 
     }
 
@@ -96,6 +125,8 @@ public class PlayerData : MonoBehaviour
         PlayerPrefs.SetInt("PlayerAttackPower", attackPower);
         PlayerPrefs.SetInt("PlayerDefensePower", defensePower);
         PlayerPrefs.SetInt("PlayerInGameSteps", inGameSteps);
+        PlayerPrefs.SetInt("PlayerMaxHealth", maxHealth);
+        PlayerPrefs.SetInt("PlayerMaxEnergy", maxEnergy); 
         PlayerPrefs.Save();
         Debug.Log("Data saved");
     }
@@ -111,6 +142,8 @@ public class PlayerData : MonoBehaviour
             attackPower = PlayerPrefs.GetInt("PlayerAttackPower");
             defensePower = PlayerPrefs.GetInt("PlayerDefensePower");
             inGameSteps = PlayerPrefs.GetInt("PlayerInGameSteps");
+            maxHealth = PlayerPrefs.GetInt("PlayerMaxHealth");
+            maxEnergy = PlayerPrefs.GetInt("PlayerMaxEnergy");
         }
     }
 

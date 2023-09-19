@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class SwordWave : Skill
 {
-    private GameObject swordWavePrefab;
+    private SkillManager skillManager;
     
 
-    public SwordWave(GameObject swordWavePrefab)
+    public SwordWave( SkillManager manager)
     {
+        skillManager = manager;
         skillName = "SwordWave";
         description = "Release a powerful wave from your sword.";
-        this.swordWavePrefab = swordWavePrefab;
         requiresMovement = false;
         energyCost = 2;
     }
@@ -34,17 +34,17 @@ public class SwordWave : Skill
                     Debug.Log("SwordWave Perfect! " + target.name + " takes 2 damage.");
                     user.GainEnergy((energyCost / 2));
                     user.animator.SetTrigger("AttackFailTrigger");
-
                     // Use Object.Instantiate to spawn the sword wave
-                    GameObject swordWave = Object.Instantiate(swordWavePrefab, user.transform.position, Quaternion.identity);
+                    skillManager.SpawnAndPushSwordWave(user.transform.position + user.transform.forward, user.transform.forward);
 
-                    // Use the direction of the user character to set the direction of the sword wave.
-                    swordWave.transform.forward = user.transform.forward;
+                    
+                   
                     break;
 
                 case TimingEventResult.Good:
                     Debug.Log("SwordWave Good! " + target.name + " takes 1 damage.");
                     user.animator.SetTrigger("AttackFailTrigger");
+                    skillManager.SpawnAndPushSwordWave(user.transform.position + user.transform.forward, user.transform.forward);
                     target.TakeDamage(1);
                     break;
 

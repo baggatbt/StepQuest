@@ -7,6 +7,7 @@ public class StepCounterController : MonoBehaviour
 
     private void Awake()
     {
+        Debug.Log("Awake in StepCounterController");
         if (Application.platform == RuntimePlatform.Android)
         {
             using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))

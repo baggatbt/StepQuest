@@ -11,62 +11,32 @@ public class Slash : Skill
         skillName = "Slash";
         description = "A powerful slashing attack.";
         requiresMovement = true;
-        energyCost = 2;
-        skillLevel = 1; // You could set a default level or fetch it from the player's saved data
+        energyCost = 0;
+        skillLevel = 1; 
         numberOfSlashes = 1;
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
-{   
-    
-   
+{
     for (int i = 0; i < numberOfSlashes; i++)
     {
-        
-        
-        yield return battleManager.PlayerActiveTimeEvent(0.0f, 1.0f, (result) =>
-    {
-        user.animator.SetTrigger("Attack1Trigger");
-        user.isAttacking = true;
+       
     
+        user.isAttacking = true;
 
+        // Wait for a short delay, then start the timing event. 
+        // to match when I want the timing event to occur during the animation.
+        yield return new WaitForSeconds(0.1f);  // Adjust this value based on animation's timing
 
-        int damage = PlayerData.Instance.attackPower;
-
-
-
-        if (result == TimingEventResult.Perfect)
+        yield return battleManager.PlayerActiveTimeEvent(0.0f, 0.7f, (result) =>
         {
-            target.TakeDamage(damage + ((int)System.Math.Round(PlayerData.Instance.attackPower * .5)));
-            AudioManager.instance.PlaySlashSound();
-            Debug.Log("Slash perfect! " + target.name + " takes " + damage + " damage.");
-            user.GainEnergy((energyCost / 2));
+            HandleTimingResultForPlayerAttack(user, target, "Attack1Trigger", result);
+
+            // Trigger the end/fail animation here instead of repeating it for each result.
             user.animator.SetTrigger("AttackFailTrigger");
             user.isAttacking = false;
-           
-            
-            
-        }
-        else if (result == TimingEventResult.Good)
-        {
-            target.TakeDamage(damage);
-            AudioManager.instance.PlaySlashSound();
-            Debug.Log("Slash successful! " + target.name + " takes " + damage + " damage.");
-            user.animator.SetTrigger("AttackFailTrigger");
-            user.isAttacking = false;
-            
-
-        }
-        else
-        {
-            
-            Debug.Log("Slash missed! " + target.name + " takes 0 damage.");
-            user.animator.SetTrigger("AttackFailTrigger");
-            user.isAttacking = false;
-        }
-    });
+        });
     }
- 
 }
 }
 

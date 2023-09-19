@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class GoblinAttackSkill : Skill
 {
-    private TimingEventResult result;
+    
     private int numberOfHits;
     public GoblinAttackSkill()
     {
@@ -18,7 +18,7 @@ public class GoblinAttackSkill : Skill
      public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
         user.isAttacking = true;
-        user.animator.SetTrigger("GoblinAttack1Trigger");
+        
         for (int i = 0; i < numberOfHits; i++)
         {
 
@@ -26,7 +26,7 @@ public class GoblinAttackSkill : Skill
         // First Timing Event
         Debug.Log("first attack");
         yield return TimingWindow(user, target, battleManager, 0.0f, 0.7f);
-        HandleTimingResult(user, target, "GobliAttack1Trigger");
+        HandleTimingResult(user, target, "GoblinAttack1Trigger", result);
 
         
         
@@ -48,29 +48,6 @@ public class GoblinAttackSkill : Skill
     }
 
 
-    private void HandleTimingResult(Character user, Character target, string trigger)
-    {
-        switch (result)
-        {
-            case TimingEventResult.Perfect:
-                Debug.Log("Perfect Block!");
-                user.animator.SetTrigger(trigger);
-                target.TakeDamage(user.damage - user.damage);
-                target.animator.SetTrigger("BlockTrigger");
-                AudioManager.instance.PlayBlockSound();
-                break;
-            case TimingEventResult.Good:
-                Debug.Log("Good Block!");   
-                user.animator.SetTrigger(trigger);            
-                target.TakeDamage(user.damage - 1);
-                AudioManager.instance.PlaySlashSound();
-                break;
-            case TimingEventResult.Miss:
-                user.animator.SetTrigger(trigger);
-                target.TakeDamage(user.damage);            
-                
-                break;
-        }
-    }
+   
     
 }

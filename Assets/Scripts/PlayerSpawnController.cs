@@ -20,7 +20,7 @@ public class PlayerSpawnController : MonoBehaviour
         battleManager = FindObjectOfType<BattleManager>();
     }
 
-    Character spawnedPlayer = SpawnPlayerAtPoint(playerSpawnPoint);
+    Player spawnedPlayer = SpawnPlayerAtPoint(playerSpawnPoint);
     Debug.Log(spawnedPlayer.attackPower);
     if (spawnedPlayer != null && battleManager != null)
     {
@@ -28,11 +28,11 @@ public class PlayerSpawnController : MonoBehaviour
     }
    }
 
-    public Character SpawnPlayerAtPoint(Transform spawnPoint)
+    public Player SpawnPlayerAtPoint(Transform spawnPoint)
 {
     // Instantiate the player at the position of spawnPoint and with its rotation
     GameObject spawnedPlayerObject = Instantiate(knightPrefab, spawnPoint.position, spawnPoint.rotation);
-    Character spawnedPlayer = spawnedPlayerObject.GetComponent<Character>();
+    Player spawnedPlayer = spawnedPlayerObject.GetComponent<Player>();
 
      
     // Link this character to the health bar
@@ -47,14 +47,13 @@ public class PlayerSpawnController : MonoBehaviour
     associatedEnergyBarSlider.maxValue = spawnedPlayer.maxEnergy;
     associatedEnergyBarSlider.value = spawnedPlayer.energy;
     spawnedPlayer.energyText = associatedEnergyText;
-
-    Debug.Log(spawnedPlayer.attackPower);
+     
 
   
 
    
 
-    return spawnedPlayer; // Ensure a Character is always returned
+    return spawnedPlayer; // Ensure a player character is always returned
 }
 
 }
