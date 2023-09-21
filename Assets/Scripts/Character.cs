@@ -83,7 +83,7 @@ public class Character : MonoBehaviour
 
     public CameraShake cameraShake; // Reference to the CameraShake script
 
-    public void TakeDamage(int damageOfAttacker)
+    public void TakeDamage(int damageOfAttacker, Character attacker)
 {
     int damageDealt = damageOfAttacker * (1 - (this.defensePower / 100));
 
@@ -119,12 +119,17 @@ public class Character : MonoBehaviour
         Debug.LogError("Failed to load DamagePopup prefab.");
     }
     }
+    Debug.Log(attacker.isAttacking);
+        
+}   
 
-    if (health <= 0) 
+    public void CheckForDeath()
     {
-        StartCoroutine(FadeOutSprite());
+        if (health <= 0)
+        {
+            StartCoroutine(FadeOutSprite());
+        }
     }
-}
 
     IEnumerator FadeOutSprite()
 {
@@ -196,8 +201,14 @@ public class Character : MonoBehaviour
     
 
     public void IsHit() => animator.SetTrigger("IsHurtTrigger");
-    public void AnimationEnded() => animationEnded = true;
-    public void attackStageTrigger() => attackTrigger = true;
+    
+    public bool isAnimationDone = false;
+
+    //Called at points in an animation to flag that its over and the animation can continue or stop
+    public void AnimationEnded()
+    {
+        isAnimationDone = true;
+    }
 
      public IEnumerator MoveToTarget()
 {

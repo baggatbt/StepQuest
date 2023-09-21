@@ -3,9 +3,7 @@ using UnityEngine;
 
 public class TripleHitSkill : Skill
 {
-    
-
-    
+    private int numberOfAttacksPossible;
 
     public TripleHitSkill()
     {
@@ -13,6 +11,7 @@ public class TripleHitSkill : Skill
         description = "Slash up to three times with good timing";
         requiresMovement = true;
         energyCost = 0;
+        numberOfAttacksPossible = 4;
     }
 
     // Override the default base damage calculation.
@@ -27,45 +26,21 @@ public class TripleHitSkill : Skill
 
         int baseDamage = CalculateBaseDamage(user);
         
-        
-        
-        // First Timing Event
-        yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
-        HandleTimingResultForPlayerAttack(user, target, "Attack1Trigger", result, baseDamage);
-        if (result == TimingEventResult.Miss)
-            {
-                user.animator.SetTrigger("Attack1Trigger");
-                yield break;
-            }
-        yield return new WaitUntil(() => user.animationEnded);
-
-
-
-        if (target.health >= 1)
+        for( int i = 1; i < numberOfAttacksPossible; i++)
         {
-        // Second Timing Event
-        yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
-        HandleTimingResultForPlayerAttack(user, target, "Attack2Trigger", result, baseDamage);
-        if (result == TimingEventResult.Miss)
-            yield break;
-            yield return  user.animationEnded == true;
+             user.isAnimationDone = false;
+
+             yield return TimingWindow(user, target, battleManager, 0.0f, 0.7f);
+
+             HandleTimingResultForPlayerAttack(user, target, "Attack"+i+"Trigger", result, baseDamage);
+
+             yield return new WaitUntil(() => user.isAnimationDone);
+
+             
         }
         
-        if (target.health >= 1)
-        {
-        // Third Timing Event
-        yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
-        HandleTimingResultForPlayerAttack(user, target, "Attack3Trigger", result, baseDamage);
-        yield return new WaitUntil(() => user.animationEnded == true); //Resets the animation flag
         user.isAttacking = false;
-        }
-        
-        else 
-        {
-            user.isAttacking = false;
-            user.animator.SetTrigger("AttackFailTrigger");
-            yield return user.animationEnded == true; //Resets the animation flag
-        }
+        target.CheckForDeath();
     }
 
 

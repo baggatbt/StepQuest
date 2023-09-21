@@ -4,14 +4,16 @@ using UnityEngine;
 
 public class Slash : Skill
 {
+    private int numberOfAttacks;
     public Slash()
     {
         skillName = "Slash";
         description = "A swift slash that deals damage equal to the user's attack power.";
-        energyCost = 5; // You can set an appropriate energy cost
-        skillLevel = 1; // Setting default level, this might get overridden by GetSkillLevel()
-        requiresMovement = true; // Assuming the skill requires the user to move towards the target
+        energyCost = 0; 
+        skillLevel = 1; 
+        requiresMovement = true; 
         skillExecutionComplete = false;
+        numberOfAttacks = 2;
     }
 
     protected override int CalculateBaseDamage(Character user)
@@ -23,14 +25,24 @@ public class Slash : Skill
     {
         skillExecutionComplete = false;
         int baseDamage = CalculateBaseDamage(user);
+        user.isAttacking = true;
+        
+        for (int i = 0; i < numberOfAttacks; i++)
+        {
 
-        // Let's assume you have a method in BattleManager for handling timing events
+        
         yield return battleManager.PlayerActiveTimeEvent(0.0f, 0.7f, (result) =>
         {
              HandleTimingResultForPlayerAttack(user, target, "Attack1Trigger", result, baseDamage);
              
-        
+           
         });
+        }
+        yield return new WaitForSeconds(.5f);
+        user.isAttacking = false;
+        
+
+      
 
         skillExecutionComplete = true; // Mark the skill as executed once completed
     }
