@@ -29,7 +29,7 @@ public class SwordWave : Skill
 
         yield return battleManager.PlayerHoldReleaseTimeEvent(0.0f, 1.0f, (result) =>
         {
-             HandleTimingResultForPlayerAttack(user, target, "Attack1Trigger", result, baseDamage);
+              HandleTimingResultForPlayerAttack(user, target, /*"Attack1Trigger" ,*/ result, baseDamage);
              skillExecutionComplete = true;
              user.isAttacking = false;
         

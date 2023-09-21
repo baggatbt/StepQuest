@@ -75,7 +75,7 @@ public abstract class Skill
 }
     
 
-    public void HandleTimingResultForPlayerAttack(Character user, Character target, string trigger, TimingEventResult timingResult, int baseDamage)
+    public void HandleTimingResultForPlayerAttack(Character user, Character target, TimingEventResult timingResult, int baseDamage)
     {
         float damageMultiplier = 1.0f;
         
@@ -87,7 +87,7 @@ public abstract class Skill
         case TimingEventResult.Perfect:
             Debug.Log("Perfect Hit!");
             damageMultiplier = 1.5f;  // Boost damage by 50%
-            user.animator.SetTrigger(trigger);
+           // user.animator.SetTrigger(trigger);
             target.TakeDamage((int)(baseDamage * damageMultiplier),user); // Apply damage boost
             target.animator.SetTrigger("IsHurtTrigger");
             AudioManager.instance.PlaySlashSound();
@@ -96,7 +96,7 @@ public abstract class Skill
         case TimingEventResult.Good:
             Debug.Log("Good Hit!");   
             damageMultiplier = 1.25f;  // Boost damage by 25%
-            user.animator.SetTrigger(trigger);         
+           // user.animator.SetTrigger(trigger);         
             target.animator.SetTrigger("IsHurtTrigger");   
             target.TakeDamage((int)(baseDamage * damageMultiplier), user); // Apply damage boost
             AudioManager.instance.PlaySlashSound();
@@ -104,7 +104,7 @@ public abstract class Skill
             break;
         case TimingEventResult.Miss:
             Debug.Log("Missed!");
-            user.animator.SetTrigger(trigger); 
+           // user.animator.SetTrigger(trigger); 
             target.animator.SetTrigger("IsHurtTrigger");
             target.TakeDamage(baseDamage, user); // No damage boost
             AudioManager.instance.PlaySlashSound();

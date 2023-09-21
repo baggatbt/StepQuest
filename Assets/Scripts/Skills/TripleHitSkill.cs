@@ -8,7 +8,7 @@ public class TripleHitSkill : Skill
     public TripleHitSkill()
     {
         skillName = "Triple Slash";
-        description = "Slash up to three times with good timing";
+        description = "Slash three times";
         requiresMovement = true;
         energyCost = 0;
         numberOfAttacksPossible = 4;
@@ -25,16 +25,16 @@ public class TripleHitSkill : Skill
         user.isAttacking = true;
 
         int baseDamage = CalculateBaseDamage(user);
-        
+        user.animator.SetTrigger("TripleSlashTrigger");
         for( int i = 1; i < numberOfAttacksPossible; i++)
         {
              user.isAnimationDone = false;
 
-             yield return TimingWindow(user, target, battleManager, 0.0f, 0.7f);
+             yield return TimingWindow(user, target, battleManager, 0.0f, 0.6f);
 
-             HandleTimingResultForPlayerAttack(user, target, "Attack"+i+"Trigger", result, baseDamage);
-
-             yield return new WaitUntil(() => user.isAnimationDone);
+             HandleTimingResultForPlayerAttack(user, target, result, baseDamage);
+                Debug.Log("Timing for player attack has been handled waiting for animations");
+             
 
              
         }

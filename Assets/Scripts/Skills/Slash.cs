@@ -33,7 +33,7 @@ public class Slash : Skill
         
         yield return battleManager.PlayerActiveTimeEvent(0.0f, 0.7f, (result) =>
         {
-             HandleTimingResultForPlayerAttack(user, target, "Attack1Trigger", result, baseDamage);
+             HandleTimingResultForPlayerAttack(user, target, /*"Attack1Trigger" ,*/ result, baseDamage);
              
            
         });

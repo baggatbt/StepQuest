@@ -85,6 +85,7 @@ public class Character : MonoBehaviour
 
     public void TakeDamage(int damageOfAttacker, Character attacker)
 {
+    Debug.Log("Damage being taken");
     int damageDealt = damageOfAttacker * (1 - (this.defensePower / 100));
 
     health -= damageDealt;
@@ -119,17 +120,9 @@ public class Character : MonoBehaviour
         Debug.LogError("Failed to load DamagePopup prefab.");
     }
     }
-    Debug.Log(attacker.isAttacking);
+    Debug.Log("isAttacking = " +attacker.isAttacking);
         
 }   
-
-    public void CheckForDeath()
-    {
-        if (health <= 0)
-        {
-            StartCoroutine(FadeOutSprite());
-        }
-    }
 
     IEnumerator FadeOutSprite()
 {
@@ -207,7 +200,19 @@ public class Character : MonoBehaviour
     //Called at points in an animation to flag that its over and the animation can continue or stop
     public void AnimationEnded()
     {
+        Debug.Log("Animation is done");
         isAnimationDone = true;
+    }
+
+    public void CheckForDeath()
+    {
+        
+        Debug.Log("Checking for death");
+        if (health <= 0 && isAnimationDone)
+        {
+            StartCoroutine(FadeOutSprite());
+        }
+       
     }
 
      public IEnumerator MoveToTarget()
