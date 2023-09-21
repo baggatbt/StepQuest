@@ -158,12 +158,6 @@ public class Character : MonoBehaviour
     }
 }
 
-    //This will be called on an animation event so characters can call target.TakeDamage() at the exact moment
-    public void animationDamageTiming()
-    {
-        Debug.Log("This is the damage moment");
-        
-    }
 
     public void GainEnergy(int energyGained)
 {
@@ -202,6 +196,18 @@ public class Character : MonoBehaviour
     {
         Debug.Log("Animation is done");
         isAnimationDone = true;
+    }
+
+     //This will be called on an animation event so characters can call target.TakeDamage() at the exact moment
+     public bool animationDamageTime = false;
+    public IEnumerator animationDamageTiming()
+    {
+        Debug.Log("This is the damage moment");
+        animationDamageTime = true;;
+        //Short delay
+        yield return new WaitForSeconds(0.1f);
+        animationDamageTime = false;
+        
     }
 
     public void CheckForDeath()

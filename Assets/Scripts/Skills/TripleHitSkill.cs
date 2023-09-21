@@ -17,7 +17,7 @@ public class TripleHitSkill : Skill
     // Override the default base damage calculation.
     protected override int CalculateBaseDamage(Character user)
     {
-        return (int)(user.attackPower * 0.5f);  // 70% of the character's attack.
+        return (int)(user.attackPower * 0.6f);  // 60% of the character's attack.
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
@@ -31,9 +31,11 @@ public class TripleHitSkill : Skill
              user.isAnimationDone = false;
 
              yield return TimingWindow(user, target, battleManager, 0.0f, 0.6f);
+             
 
              HandleTimingResultForPlayerAttack(user, target, result, baseDamage);
-                Debug.Log("Timing for player attack has been handled waiting for animations");
+             Debug.Log("Timing for player attack has been handled waiting for animations");
+             yield return new WaitUntil(() => user.animationDamageTime == true);
              
 
              
