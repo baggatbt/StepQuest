@@ -88,6 +88,7 @@ public class Player : Character
     defensePower = playerData.defensePower;
     exp = playerData.exp;
     jobClass = playerData.jobClass;
+    stepsAvailableToConsume = playerData.inGameSteps;
     
     
     }
