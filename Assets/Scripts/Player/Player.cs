@@ -25,6 +25,7 @@ public class Player : Character
     private int exp;
     private int gold;
     private string jobClass;
+    private int inGameSteps;
 
 
     protected override void Awake()
@@ -47,7 +48,7 @@ public class Player : Character
 
     new private void  Start()
     {
-       
+       SyncStatsWithPlayerData();
     }
 
     private void InitializePlayer()
@@ -88,9 +89,15 @@ public class Player : Character
     defensePower = playerData.defensePower;
     exp = playerData.exp;
     jobClass = playerData.jobClass;
-    stepsAvailableToConsume = playerData.inGameSteps;
+    inGameSteps = playerData.inGameSteps;
     
     
+    }
+
+
+    public void DeleteEverything()
+    {
+        PlayerPrefs.DeleteAll();
     }
 
 

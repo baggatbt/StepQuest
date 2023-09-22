@@ -3898,6 +3898,8 @@ MonoBehaviour:
   attacksBeforeSpecial: 0
   statusEffectController: {fileID: 0}
   cameraShake: {fileID: 0}
+  isAnimationDone: 0
+  animationDamageTime: 0
   playerSpawnPoint: {fileID: 0}
   levelText: {fileID: 951623233}
   expText: {fileID: 174448656}
@@ -5189,7 +5191,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Convert Steps
+  m_text: Delete
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 2353e11fcac99f744b7e44398cca1b52, type: 2}
   m_sharedMaterial: {fileID: -6775357937180123722, guid: 2353e11fcac99f744b7e44398cca1b52, type: 2}
@@ -6189,7 +6191,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1274183894}
         m_TargetAssemblyTypeName: Player, Assembly-CSharp
-        m_MethodName: ConsumeStepsToGainRewards
+        m_MethodName: DeleteEverything
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
