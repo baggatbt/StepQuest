@@ -23,24 +23,30 @@ public class TripleHitSkill : Skill
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
         user.isAttacking = true;
+        user.isAnimationDone = false;  // Reset the flag at the start of each attack
+
+
 
         int baseDamage = CalculateBaseDamage(user);
         user.animator.SetTrigger("TripleSlashTrigger");
         for( int i = 1; i < numberOfAttacksPossible; i++)
         {
-             user.isAnimationDone = false;
+             
 
              yield return TimingWindow(user, target, battleManager, 0.0f, 0.6f);
              
 
              HandleTimingResultForPlayerAttack(user, target, result, baseDamage);
              Debug.Log("Timing for player attack has been handled waiting for animations");
+             //Wait until the timing event happens to move on to next attack stage
              yield return new WaitUntil(() => user.animationDamageTime == true);
              
 
              
         }
-        
+        Debug.Log("waiting on animation to finish");
+    
+        yield return new WaitUntil(() => user.isAnimationDone == true);
         user.isAttacking = false;
         target.CheckForDeath();
     }

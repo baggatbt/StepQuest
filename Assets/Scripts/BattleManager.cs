@@ -233,7 +233,8 @@ public class BattleManager : MonoBehaviour
         
         Debug.Log("Cleared the skill queue after execution.");
         skillsExecuted = 0;
-        yield return new WaitUntil(() => player.isAttacking == false);
+        
+        
         // Move player back to their original position after all skills executed.
         //yield return StartCoroutine(zoomEffect.ZoomOutEffect());
         yield return player.ReturnToPosition();
@@ -365,7 +366,7 @@ public IEnumerator CompanionMoveAndAttackCoroutine()
         //MoveCirclesToTarget(targetEnemy);
         yield return player.currentSkill.Execute(player, targetEnemy, this);
         
-        yield return new WaitForSeconds(0.1f);
+        //yield return new WaitForSeconds(0.1f);
 
         CheckBattleEnd();
     }
@@ -443,11 +444,12 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
             //MoveCirclesToTarget(player);
             yield return attackingEnemy.currentSkill.Execute(attackingEnemy, player, this);
 
-            
+           
             if (attackingEnemy.currentSkill.requiresMovement)
             {
                 yield return attackingEnemy.ReturnToPosition();
             }
+            Debug.Log("Enemy reurning to position");
         }
         else
         {

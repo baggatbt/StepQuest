@@ -43,17 +43,19 @@ public abstract class Skill
 
     public abstract IEnumerator Execute(Character user, Character target, BattleManager battleManager);
 
-    public void HandleTimingResult(Character user, Character target, string trigger, TimingEventResult timingResult)
+    public void HandleTimingResultForEnemyAttack(Character user, Character target,TimingEventResult timingResult, int baseDamage)
 {
-    float damageMultiplier = 1.0f; 
-    result = timingResult; // set the result using argument
+        float damageMultiplier = 1.0f;
+        
+        result = timingResult;
+        baseDamage = user.attackPower;
     
     switch (result)
     {
         case TimingEventResult.Perfect:
             Debug.Log("Perfect Block!");
             damageMultiplier = 0.5f;  // Reduce damage by 50%
-            user.animator.SetTrigger(trigger);
+          //  user.animator.SetTrigger(trigger);
             target.TakeDamage((int)(user.damage * damageMultiplier),user); // Apply damage multiplier
             target.animator.SetTrigger("BlockTrigger");
             AudioManager.instance.PlayBlockSound();
@@ -61,13 +63,13 @@ public abstract class Skill
         case TimingEventResult.Good:
             Debug.Log("Good Block!");   
             damageMultiplier = 0.75f;  // Reduce damage by 25%
-            user.animator.SetTrigger(trigger);            
+           // user.animator.SetTrigger(trigger);            
             target.TakeDamage((int)(user.damage * damageMultiplier),user); // Apply damage multiplier
             target.animator.SetTrigger("BlockTrigger");
             AudioManager.instance.PlayBlockSound();
             break;
         case TimingEventResult.Miss:
-            user.animator.SetTrigger(trigger);
+          //  user.animator.SetTrigger(trigger);
             target.TakeDamage(user.damage, user); // Full damage as there's no reduction 
             target.animator.SetTrigger("IsHurtTrigger");        
             break;

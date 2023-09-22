@@ -194,21 +194,38 @@ public class Character : MonoBehaviour
     //Called at points in an animation to flag that its over and the animation can continue or stop
     public void AnimationEnded()
     {
-        Debug.Log("Animation is done");
-        isAnimationDone = true;
+        Debug.Log("animation ended!");
+        StartCoroutine(AnimationEndedCoroutine());
     }
 
-     //This will be called on an animation event so characters can call target.TakeDamage() at the exact moment
+    private IEnumerator AnimationEndedCoroutine()
+    {
+        Debug.Log("Animation is done");
+        isAnimationDone = true;
+        yield return null;
+    }
+
+    //This will be called on an animation event so characters can call target.TakeDamage() at the exact moment
      public bool animationDamageTime = false;
-    public IEnumerator animationDamageTiming()
+    public void animationDamageTiming()
+    {
+        StartCoroutine(AnimationDamageTimingCoroutine());
+    
+    }
+    //Animation Ended doesnt have a COuroutine still, 
+    private IEnumerator AnimationDamageTimingCoroutine()
     {
         Debug.Log("This is the damage moment");
         animationDamageTime = true;;
         //Short delay
         yield return new WaitForSeconds(0.1f);
         animationDamageTime = false;
-        
     }
+
+
+
+     
+    
 
     public void CheckForDeath()
     {
@@ -223,18 +240,21 @@ public class Character : MonoBehaviour
 
      public IEnumerator MoveToTarget()
 {
+    animator.SetTrigger("MovementAnimationTrigger");
+     
     Vector3 targetPosition = attackTarget.position;
     checkCollisionsDuringMovement = true;
-    animator.SetTrigger("MovementAnimationTrigger");  
+    
     yield return Move(targetPosition);
     animator.SetTrigger("StopMovementAnimationTrigger");  
 }
 
      public IEnumerator ReturnToPosition()
         {
-            yield return new WaitForSeconds(0.5f);
-            checkCollisionsDuringMovement = false;
-            animator.SetTrigger("MovementAnimationTrigger");  
+            animator.SetTrigger("MovementAnimationTrigger"); 
+             
+            checkCollisionsDuringMovement = false; 
+            
             yield return Move(originalPosition);
             animator.SetTrigger("StopMovementAnimationTrigger");  
         }
