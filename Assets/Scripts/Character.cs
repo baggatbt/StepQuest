@@ -51,6 +51,11 @@ public class Character : MonoBehaviour
         originalPosition = transform.position;
         statusEffectController = GetComponent<StatusEffectController>();
         Debug.Log(gameObject.name + " original position: " + originalPosition);
+        if (healthText != null)
+    {
+        healthText.text = "HP: " + health;
+        Debug.Log(health);
+    }
         
     }
 
@@ -71,6 +76,7 @@ public class Character : MonoBehaviour
                 energyText.text = "MP: " + energy;
             }
         }
+        
 
         if (energyBar != null)
         {
@@ -205,6 +211,7 @@ public class Character : MonoBehaviour
     public void animationDamageTiming()
     {
         Debug.Log("This is the damage moment");
+        //animator.SetTrigger("TimingFlashTrigger");
         animationDamageTime = true;;
     
     }
