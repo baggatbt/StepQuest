@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 6178202463525426466}
   - component: {fileID: 6178202463525426467}
   - component: {fileID: 6178202463525426464}
-  - component: {fileID: 6178202463525426477}
   - component: {fileID: 6178202463525426478}
+  - component: {fileID: 6178202463525426477}
   - component: {fileID: 1860233840583192940}
   m_Layer: 0
   m_Name: Goblin
@@ -104,6 +104,27 @@ CapsuleCollider2D:
   m_Offset: {x: 0.0012712674, y: 0.16061842}
   m_Size: {x: 0.30298692, y: 0.37710893}
   m_Direction: 0
+--- !u!95 &6178202463525426478
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6178202463525426479}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 4f230fa6acf87ff4aa55a06a9691101d, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &6178202463525426477
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -143,27 +164,6 @@ MonoBehaviour:
   animationDamageTime: 0
   expReward: 0
   goldReward: 0
---- !u!95 &6178202463525426478
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6178202463525426479}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 4f230fa6acf87ff4aa55a06a9691101d, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &1860233840583192940
 MonoBehaviour:
   m_ObjectHideFlags: 0

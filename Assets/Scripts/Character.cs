@@ -194,44 +194,26 @@ public class Character : MonoBehaviour
     //Called at points in an animation to flag that its over and the animation can continue or stop
     public void AnimationEnded()
     {
-        Debug.Log("animation ended!");
-        StartCoroutine(AnimationEndedCoroutine());
-    }
-
-    private IEnumerator AnimationEndedCoroutine()
-    {
-        Debug.Log("Animation is done");
-        isAnimationDone = true;
-        yield return null;
+         Debug.Log("animation ended!");
+         isAnimationDone = true;
+        
     }
 
     //This will be called on an animation event so characters can call target.TakeDamage() at the exact moment
-     public bool animationDamageTime = false;
+    public bool animationDamageTime = false;
+
     public void animationDamageTiming()
-    {
-        StartCoroutine(AnimationDamageTimingCoroutine());
-    
-    }
-    //Animation Ended doesnt have a COuroutine still, 
-    private IEnumerator AnimationDamageTimingCoroutine()
     {
         Debug.Log("This is the damage moment");
         animationDamageTime = true;;
-        //Short delay
-        yield return new WaitForSeconds(0.1f);
-        animationDamageTime = false;
-    }
-
-
-
-     
     
+    }
 
     public void CheckForDeath()
     {
         
         Debug.Log("Checking for death");
-        if (health <= 0 && isAnimationDone)
+        if (this.health <= 0)
         {
             StartCoroutine(FadeOutSprite());
         }

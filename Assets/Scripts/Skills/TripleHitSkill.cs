@@ -41,12 +41,12 @@ public class TripleHitSkill : Skill
              //Wait until the timing event happens to move on to next attack stage
              yield return new WaitUntil(() => user.animationDamageTime == true);
              
-
-             
         }
         Debug.Log("waiting on animation to finish");
     
         yield return new WaitUntil(() => user.isAnimationDone == true);
+        user.animationDamageTime = false;
+        user.isAnimationDone = false;
         user.isAttacking = false;
         target.CheckForDeath();
     }
