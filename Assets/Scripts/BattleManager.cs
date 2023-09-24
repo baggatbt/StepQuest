@@ -483,14 +483,15 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
    
    public CameraShake cameraShake;
 
-
+    public ColorChanger colorChanger;  // Reference to the ColorLerper script
+    
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<TimingEventResult> callback)
 {
     // Enable the timing circles when the event starts
     outerCircle.SetActive(true);
     // innerCircle.SetActive(true);
-
     float totalWindowDuration = windowEnd - windowStart;
+    colorChanger.StartColorTransition(totalWindowDuration);
     float timer = 0;
     bool buttonClicked = false;
 
@@ -504,6 +505,8 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
     {
         while (timer < totalWindowDuration)
         {
+            
+   
             float progress = timer / totalWindowDuration;
             outerCircle.transform.localScale = Vector3.Lerp(outerCircleInitialScale, zeroScale, progress);
 

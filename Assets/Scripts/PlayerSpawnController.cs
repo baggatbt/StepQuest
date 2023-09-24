@@ -41,6 +41,7 @@ public class PlayerSpawnController : MonoBehaviour
     associatedHealthBarSlider.maxValue = spawnedPlayer.maxHealth;
     associatedHealthBarSlider.value = spawnedPlayer.health;
     spawnedPlayer.healthText = associatedHealthText;
+    
 
     spawnedPlayer.energyBar = associatedEnergyBarSlider;
     associatedEnergyBarSlider.gameObject.SetActive(true); // Activate the energy bar
@@ -49,7 +50,7 @@ public class PlayerSpawnController : MonoBehaviour
     spawnedPlayer.energyText = associatedEnergyText;
      
 
-  
+  //Spawn controller is loading after character cause player is a characte4r!
 
    
 

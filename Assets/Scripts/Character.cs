@@ -56,11 +56,31 @@ public class Character : MonoBehaviour
         healthText.text = "HP: " + health;
         Debug.Log(health);
     }
+    else 
+    {
+        Debug.Log("Healtexh is null");
+    }
         
     }
 
     void Update(){
+        if (healthBar != null)
+        {
+            healthBar.maxValue = maxHealth;
+            healthBar.value = health;
+            if (healthText !=null && energyText !=null)
+            {
+                healthText.text = "HP: " + health; 
+                energyText.text = "MP: " + energy;
+            }
+        }
+        
 
+        if (energyBar != null)
+        {
+            energyBar.maxValue = maxEnergy;
+            energyBar.value = energy;
+        }
     }
 
     protected virtual void Start()
