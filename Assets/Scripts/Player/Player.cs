@@ -68,7 +68,7 @@ public class Player : Character
             playerData.energy = playerData.maxEnergy;
 
             PlayerPrefs.SetInt("PlayerInitialized", 1);
-            PlayerPrefs.Save();
+            
 
              // Save the initialized data
             playerData.SavePlayerData();
@@ -76,6 +76,10 @@ public class Player : Character
             ApplyJobStats();
             SyncStatsWithPlayerData();
             UpdateUI();
+            PlayerPrefs.Save();
+        }
+        else{
+            LoadFromPlayerData();
         }
     }
 
@@ -98,6 +102,7 @@ public class Player : Character
     public void DeleteEverything()
     {
         PlayerPrefs.DeleteAll();
+        Debug.Log("Player prefs deleted");
     }
 
 
@@ -147,6 +152,8 @@ public class Player : Character
         
         // Update UI regularly or as per your needs
        UpdateUI();
+      // playerData.UpdatePlayerData();
+       
         
     }
 

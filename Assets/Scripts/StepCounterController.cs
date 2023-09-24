@@ -3,7 +3,7 @@ using UnityEngine;
 public class StepCounterController : MonoBehaviour
 {
     private AndroidJavaObject stepCounterPluginInstance;
-    private int inGameSteps;
+     private int steps;
 
     private void Awake()
     {
@@ -26,30 +26,40 @@ public class StepCounterController : MonoBehaviour
         }
     }
 
-    private void Update()
+     private void Update()
+{
+    int currentSteps = GetStepsSinceStart();
+    Debug.Log("Current steps: " + currentSteps);
+}
+
+
+
+    public int GetStepCount()
     {
-        if (Application.platform == RuntimePlatform.Android)
-        {
-            Debug.Log("Steps since start: " + GetStepsSinceStart());
-        }
+        return steps;
     }
 
-    
     private void OnDestroy()
     {
         if (Application.platform == RuntimePlatform.Android)
         {
             stepCounterPluginInstance.CallStatic("stopCounting");
         }
+        Debug.Log("On destroy call in step counter ");
     }
 
-    public int GetStepsSinceStart()
-    {
-        return CallStaticMethodOnPlugin<int>("getStepsSinceStart");
-    }
+   public int GetStepsSinceStart()
+{
+    Debug.Log("Getting steps since start in controller");
+    steps = CallStaticMethodOnPlugin<int>("getStepsSinceStart");
+    Debug.Log(steps);
+    return steps;
+}
 
-    public int GetSteps()
+
+    private int GetStepsFromPlugin()
     {
+        // Assuming the method CallStaticMethodOnPlugin<int>("getSteps") fetches the latest step count from your plugin
         return CallStaticMethodOnPlugin<int>("getSteps");
     }
 
