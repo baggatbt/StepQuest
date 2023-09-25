@@ -363,7 +363,7 @@ public IEnumerator CompanionMoveAndAttackCoroutine()
 
     if (player.currentSkill != null)
     {
-        //MoveCirclesToTarget(targetEnemy);
+        MoveCirclesToTarget(targetEnemy);
         yield return player.currentSkill.Execute(player, targetEnemy, this);
         
         //yield return new WaitForSeconds(0.1f);
@@ -441,7 +441,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
                 yield return attackingEnemy.MoveToTarget();
             }
 
-            //MoveCirclesToTarget(player);
+            MoveCirclesToTarget(player);
             yield return attackingEnemy.currentSkill.Execute(attackingEnemy, player, this);
 
            

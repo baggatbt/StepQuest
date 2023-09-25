@@ -90,15 +90,14 @@ public class PlayerData : MonoBehaviour
 
     private void Update()
     {
-        int currentSteps = stepCounterController.GetStepCount();
-        if (currentSteps >= previousSteps)
+        int currentSteps = stepCounterController.GetSteps();
+        if(currentSteps >= previousSteps)
         {
             inGameSteps += currentSteps - previousSteps;
             previousSteps = currentSteps;
         }
-        Debug.Log("Found in update of player data" +inGameSteps);
+     //   Debug.Log("Steps in Update: " + inGameSteps);
     }
-
 
     public void UpdatePlayerData(int level, string jobClass, int exp, int gold, int attackPower, int defensePower, int inGameSteps, int maxHealth, int health, int maxEnergy, int energy)
     {
@@ -147,30 +146,19 @@ public class PlayerData : MonoBehaviour
             maxHealth = PlayerPrefs.GetInt("PlayerMaxHealth");
             maxEnergy = PlayerPrefs.GetInt("PlayerMaxEnergy");
         }
-        Debug.Log("Loading outside of the player prefs if" + inGameSteps);
     }
 
     private void OnApplicationPause(bool pauseStatus)
-{
-    if (pauseStatus)
     {
-        // The app has been paused (i.e., put into the background)
-        int stepsBeforeClosing = stepCounterController.GetStepCount();
-        PlayerPrefs.SetInt("StepsBeforeClosing", stepsBeforeClosing);
-        SavePlayerData();
-        Debug.Log("Saving data on pause" + inGameSteps);
+        if (pauseStatus)
+        {
+            SaveStepsData();
+        }
+        else
+        {
+            LoadStepsData();
+        }
     }
-    else
-    {
-        // The app has been resumed
-        LoadStepsData();
-        LoadPlayerData();
-        Debug.Log("Loading data on resume");
-    }
-}
-
-
-    
 
     private void OnApplicationQuit()
     {
@@ -180,26 +168,24 @@ public class PlayerData : MonoBehaviour
     }
 
     private void LoadStepsData()
-{
-    if(PlayerPrefs.HasKey("StepsBeforeClosing") && PlayerPrefs.HasKey("InGameSteps"))
     {
-        int stepsBeforeClosing = PlayerPrefs.GetInt("StepsBeforeClosing");
-        int stepsWhenReOpening = stepCounterController.GetStepCount();
-        int previousInGameSteps = PlayerPrefs.GetInt("InGameSteps");
-        int stepsDuringClosure = stepsWhenReOpening - stepsBeforeClosing;
-        inGameSteps = previousInGameSteps + stepsDuringClosure; 
-        previousSteps = stepsWhenReOpening;
-        Debug.Log("Loaded Steps: " + inGameSteps);
+        if(PlayerPrefs.HasKey("StepsBeforeClosing") && PlayerPrefs.HasKey("InGameSteps"))
+        {
+            int stepsBeforeClosing = PlayerPrefs.GetInt("StepsBeforeClosing", 0);
+            int stepsWhenReOpening = stepCounterController.GetSteps();
+            int previousInGameSteps = PlayerPrefs.GetInt("InGameSteps", 0);
+            int stepsDuringClosure = stepsWhenReOpening - stepsBeforeClosing;
+            inGameSteps = previousInGameSteps + stepsDuringClosure; 
+            previousSteps = stepsWhenReOpening;
+            Debug.Log("Loaded Steps: " + inGameSteps);
+        }
     }
-}
-
 
     private void SaveStepsData()
     {
-        PlayerPrefs.SetInt("StepsBeforeClosing", stepCounterController.GetStepCount());
+        PlayerPrefs.SetInt("StepsBeforeClosing", stepCounterController.GetSteps());
         PlayerPrefs.SetInt("InGameSteps", inGameSteps);
         PlayerPrefs.Save();
-        Debug.Log("Steps have bveen sav3ed");
     }
 
     

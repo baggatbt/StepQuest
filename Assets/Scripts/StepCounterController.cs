@@ -2,64 +2,67 @@ using UnityEngine;
 
 public class StepCounterController : MonoBehaviour
 {
+    public static StepCounterController Instance { get; private set; }
+
     private AndroidJavaObject stepCounterPluginInstance;
-     private int steps;
+    private int inGameSteps;
 
     private void Awake()
     {
-        Debug.Log("Awake in StepCounterController");
-        if (Application.platform == RuntimePlatform.Android)
+        if (Instance == null)
         {
-            using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+
+            // Your initialization code
+            Debug.Log("Awake in StepCounterController");
+            if (Application.platform == RuntimePlatform.Android)
             {
-                AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-                
-                using (AndroidJavaClass stepCounterPluginClass = new AndroidJavaClass("com.example.stepcounterplugin.StepCounterPlugin"))
+                using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
                 {
-                    stepCounterPluginClass.CallStatic("init", currentActivity);
-                    Debug.Log("Plugin Initialized");
+                    AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+                    
+                    using (AndroidJavaClass stepCounterPluginClass = new AndroidJavaClass("com.example.stepcounterplugin.StepCounterPlugin"))
+                    {
+                        stepCounterPluginClass.CallStatic("init", currentActivity);
+                        Debug.Log("Plugin Initialized");
+                    }
                 }
+                
+                stepCounterPluginInstance = new AndroidJavaObject("com.example.stepcounterplugin.StepCounterPlugin");
+                stepCounterPluginInstance.CallStatic("startCounting");
             }
-            
-            stepCounterPluginInstance = new AndroidJavaObject("com.example.stepcounterplugin.StepCounterPlugin");
-            stepCounterPluginInstance.CallStatic("startCounting");
+        }
+        else
+        {
+            Destroy(gameObject);
         }
     }
 
-     private void Update()
-{
-    int currentSteps = GetStepsSinceStart();
-    Debug.Log("Current steps: " + currentSteps);
-}
-
-
-
-    public int GetStepCount()
+    private void Update()
     {
-        return steps;
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            Debug.Log("Steps since start: " + GetStepsSinceStart());
+        }
     }
-
+    //CHECK ON DESTROY VS ONPAUSE
+    
     private void OnDestroy()
     {
         if (Application.platform == RuntimePlatform.Android)
         {
             stepCounterPluginInstance.CallStatic("stopCounting");
         }
-        Debug.Log("On destroy call in step counter ");
     }
 
-   public int GetStepsSinceStart()
-{
-    Debug.Log("Getting steps since start in controller");
-    steps = CallStaticMethodOnPlugin<int>("getStepsSinceStart");
-    Debug.Log(steps);
-    return steps;
-}
-
-
-    private int GetStepsFromPlugin()
+    public int GetStepsSinceStart()
     {
-        // Assuming the method CallStaticMethodOnPlugin<int>("getSteps") fetches the latest step count from your plugin
+        return CallStaticMethodOnPlugin<int>("getStepsSinceStart");
+    }
+
+    public int GetSteps()
+    {
         return CallStaticMethodOnPlugin<int>("getSteps");
     }
 

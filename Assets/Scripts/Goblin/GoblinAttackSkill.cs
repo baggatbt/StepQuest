@@ -10,7 +10,7 @@ public class GoblinAttackSkill : Skill
         skillName = "Goblin Attack";
         description = "The Goblin attacks the player. The damage can be reduced by timely action.";
         requiresMovement = true;
-        numberOfAttacksPossible = 3;
+        numberOfAttacksPossible = 2;
     }
 
     // Override the default base damage calculation.
@@ -23,13 +23,15 @@ public class GoblinAttackSkill : Skill
     {
         user.isAttacking = true;
         user.isAnimationDone = false;  
+
         int baseDamage = CalculateBaseDamage(user);
+
         user.animator.SetTrigger("GoblinAttack1Trigger");
 
-        for (int i = 1; i < numberOfAttacksPossible; i++)
+        for (int i = 0; i < numberOfAttacksPossible; i++)
         {
             
-            yield return TimingWindow(user, target, battleManager, 0.0f, 0.6f);
+            yield return TimingWindow(user, target, battleManager, 0.0f, 0.8f);
 
             HandleTimingResultForEnemyAttack(user, target, result, baseDamage);
             Debug.Log("Timing for player attack has been handled waiting for animations");
