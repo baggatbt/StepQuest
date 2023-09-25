@@ -284,7 +284,7 @@ public class Character : MonoBehaviour
         }
 
 
-    private bool HasReachedPosition(Vector3 targetPosition, float stoppingDistance = 2.0f)
+    private bool HasReachedPosition(Vector3 targetPosition, float stoppingDistance = 3.0f)
     {
         return (transform.position - targetPosition).sqrMagnitude <= stoppingDistance * stoppingDistance;
     }

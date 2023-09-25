@@ -464,7 +464,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
         }
         else
         {
-            yield return new WaitForSeconds(0.5f);
+           // yield return new WaitForSeconds(0.5f);
 
            // Check if there are more enemies to take their turns
         if (enemyTurnQueue.Count > 0)
