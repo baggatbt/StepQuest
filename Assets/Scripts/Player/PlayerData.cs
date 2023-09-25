@@ -78,6 +78,7 @@ public class PlayerData : MonoBehaviour
 
     private void Start()
     {
+        Application.targetFrameRate = 60;  // Set target frame rate to 60 FPS.
         LoadStepsData();
        
         int stepsSinceStart = stepCounterController.GetStepsSinceStart();
@@ -150,22 +151,24 @@ public class PlayerData : MonoBehaviour
     }
 
     private void OnApplicationPause(bool pauseStatus)
+{
+    if (pauseStatus)
     {
-        if (pauseStatus)
-        {
-            // The app has been paused (i.e., put into the background)
-            SaveStepsData();
-            SavePlayerData();
-            Debug.Log("Saving data on pause" + inGameSteps);
-        }
-        else
-        {
-            // The app has been resumed
-            LoadStepsData();
-            LoadPlayerData();
-            Debug.Log("Loading data on resume");
-        }
+        // The app has been paused (i.e., put into the background)
+        int stepsBeforeClosing = stepCounterController.GetStepCount();
+        PlayerPrefs.SetInt("StepsBeforeClosing", stepsBeforeClosing);
+        SavePlayerData();
+        Debug.Log("Saving data on pause" + inGameSteps);
     }
+    else
+    {
+        // The app has been resumed
+        LoadStepsData();
+        LoadPlayerData();
+        Debug.Log("Loading data on resume");
+    }
+}
+
 
     
 
@@ -177,19 +180,19 @@ public class PlayerData : MonoBehaviour
     }
 
     private void LoadStepsData()
+{
+    if(PlayerPrefs.HasKey("StepsBeforeClosing") && PlayerPrefs.HasKey("InGameSteps"))
     {
-        if(PlayerPrefs.HasKey("StepsBeforeClosing") && PlayerPrefs.HasKey("InGameSteps"))
-        {
-            int stepsBeforeClosing = stepCounterController.GetStepCount();
-            int stepsWhenReOpening = stepCounterController.GetStepCount();
-            int previousInGameSteps = PlayerPrefs.GetInt("InGameSteps", 0);
-            int stepsDuringClosure = stepsWhenReOpening - stepsBeforeClosing;
-            inGameSteps = previousInGameSteps + stepsDuringClosure; 
-            previousSteps = stepsWhenReOpening;
-            Debug.Log("Loaded Steps: " + inGameSteps);
-        }
-        
+        int stepsBeforeClosing = PlayerPrefs.GetInt("StepsBeforeClosing");
+        int stepsWhenReOpening = stepCounterController.GetStepCount();
+        int previousInGameSteps = PlayerPrefs.GetInt("InGameSteps");
+        int stepsDuringClosure = stepsWhenReOpening - stepsBeforeClosing;
+        inGameSteps = previousInGameSteps + stepsDuringClosure; 
+        previousSteps = stepsWhenReOpening;
+        Debug.Log("Loaded Steps: " + inGameSteps);
     }
+}
+
 
     private void SaveStepsData()
     {
