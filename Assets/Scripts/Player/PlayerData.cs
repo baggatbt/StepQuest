@@ -188,28 +188,6 @@ public class PlayerData : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    
 
-    //NEEDS OWN CLASS
-   
-
-     
-
-    //MOVE THESE TO ANOTHER CLASS
-     public void ActivateMission(Mission mission)
-    {
-        mission.ActivateMission();
-        if (!activeMissions.Contains(mission))
-        {
-            activeMissions.Add(mission);
-        }
-    }
-
-    public void RemoveMission(Mission mission)
-    {
-        if (activeMissions.Contains(mission))
-        {
-            activeMissions.Remove(mission);
-        }
-    }
+  
 }

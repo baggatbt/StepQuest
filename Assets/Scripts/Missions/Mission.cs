@@ -4,49 +4,26 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro; 
 
-public class Mission : MonoBehaviour
+public class Mission: MonoBehaviour
 {
     public string missionName;
     public int stepCost; // The total steps required to complete this mission.
-    public bool isActive = false; // This tracks if the mission is currently active.
-    public int currentSteps = 0;
-    public int stepsAtMissionStart = 0;
+    public bool isActive; // This tracks if the mission is currently active.
+    public int currentSteps;
+    public int stepsAtMissionStart; // Gets players current in game steps 
+    public int stepsToGo;
 
-    private Update()
-    {
-        while (isActive)
-        {
-            currentSteps = (PlayerData.Instance.inGameSteps - stepsAtMissionStart);
-        }
-    }
+ 
+
     
-    public void ActivateMission()
-    {
-        if (!isActive)
-        {
-            isActive = true;
-            stepsAtMissionStart = PlayerData.Instance.inGameSteps
-            
-        }
-    }
     
-    public void checkMissionCompletion()
-    {
-        while (isActive)
-        {
-            if (currentSteps >= stepCost) 
-            {
-                ClaimReward();
-            }
-        }
-    }
     
-    public void ClaimReward()
+    public virtual void ClaimReward()
     {
         // Add rewards here.
-        PlayerData.Instance.gold += 100;
-        PlayerData.Instance.exp += 100;
-        isActive = false; // End the mission.       
+        PlayerData.Instance.gold += 1;
+        PlayerData.Instance.exp += 1;
+        this.isActive = false; // End the mission.       
     }  
     
 }
