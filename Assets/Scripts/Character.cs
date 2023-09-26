@@ -263,7 +263,7 @@ public class Character : MonoBehaviour
             animator.SetTrigger("MovementAnimationTrigger"); 
              
             checkCollisionsDuringMovement = false; 
-            
+            Debug.Log(gameObject.name + " original position in return to pos: " + originalPosition);
             yield return Move(originalPosition);
             animator.SetTrigger("StopMovementAnimationTrigger");  
         }

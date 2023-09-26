@@ -9,27 +9,45 @@ public class Mission : MonoBehaviour
     public string missionName;
     public int stepCost; // The total steps required to complete this mission.
     public bool isActive = false; // This tracks if the mission is currently active.
-    public int stepsSinceActivation = 0; // This tracks the steps since the mission was activated.
+    public int currentSteps = 0;
+    public int stepsAtMissionStart = 0;
+
+    private Update()
+    {
+        while (isActive)
+        {
+            currentSteps = (PlayerData.Instance.inGameSteps - stepsAtMissionStart);
+        }
+    }
     
     public void ActivateMission()
     {
-        isActive = true;
-        stepsSinceActivation = 0; // Reset the steps.
+        if (!isActive)
+        {
+            isActive = true;
+            stepsAtMissionStart = PlayerData.Instance.inGameSteps
+            
+        }
     }
     
-    public bool CheckMissionCompletion()
+    public void checkMissionCompletion()
     {
-        return stepsSinceActivation >= stepCost;
+        while (isActive)
+        {
+            if (currentSteps >= stepCost) 
+            {
+                ClaimReward();
+            }
+        }
     }
     
     public void ClaimReward()
     {
-        if (CheckMissionCompletion())
-        {
-            // Add rewards here.
-            // e.g. PlayerData.Instance.gold += someRewardAmount;
-            isActive = false; // End the mission.
-        }
-    }
+        // Add rewards here.
+        PlayerData.Instance.gold += 100;
+        PlayerData.Instance.exp += 100;
+        isActive = false; // End the mission.       
+    }  
+    
 }
 
