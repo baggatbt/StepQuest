@@ -259,14 +259,18 @@ public class Character : MonoBehaviour
 }
 
      public IEnumerator ReturnToPosition()
-        {
-            animator.SetTrigger("MovementAnimationTrigger"); 
-             
-            checkCollisionsDuringMovement = false; 
-            Debug.Log(gameObject.name + " original position in return to pos: " + originalPosition);
-            yield return Move(originalPosition);
-            animator.SetTrigger("StopMovementAnimationTrigger");  
-        }
+{
+    animator.SetTrigger("MovementAnimationTrigger");
+
+    // You can keep this line if you want the character to move back over time
+    yield return Move(originalPosition);
+
+    // This line will ensure the character is exactly at the original position
+    transform.position = originalPosition;
+
+    animator.SetTrigger("StopMovementAnimationTrigger");
+}
+
 
      private IEnumerator Move(Vector3 targetPosition)
         {
@@ -284,14 +288,14 @@ public class Character : MonoBehaviour
         }
 
 
-    private bool HasReachedPosition(Vector3 targetPosition, float stoppingDistance = 3.0f)
+    private bool HasReachedPosition(Vector3 targetPosition, float stoppingDistance = 0.0f)
     {
         return (transform.position - targetPosition).sqrMagnitude <= stoppingDistance * stoppingDistance;
     }
 
     private bool IsCollidingWithCharacter()
 {
-    Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 0.5f);
+    Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 2.0f);
 
     foreach (Collider2D collider in colliders)
     {
@@ -299,6 +303,8 @@ public class Character : MonoBehaviour
 
         // If current object is an enemy and the colliding object is also an enemy, ignore the collision
         if (this.CompareTag("Enemy") && collider.CompareTag("Enemy")) continue;
+
+        if (this.CompareTag("UI")) continue;
 
         // If it's colliding with the target, then return true
         if (collider.gameObject.GetInstanceID() == attackTarget.gameObject.GetInstanceID()) return true;

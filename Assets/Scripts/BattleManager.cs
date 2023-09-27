@@ -538,6 +538,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
         }
         else
         {
+            StartCoroutine(cameraShake.Shake());
             Debug.Log("No input detected. Missed!");
             result = TimingEventResult.Miss;
             skillQueue.Clear();
