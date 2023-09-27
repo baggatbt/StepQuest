@@ -29,6 +29,7 @@ public abstract class Skill
     public bool skillExecutionComplete; // Flag to track the completion of skill execution
     public bool requiresMovement; // Indicates if the attack requires movement towards the target
     public int energyCost;
+    public int energyGain;
     public int skillLevel;
     protected TimingEventResult result; 
 
@@ -93,7 +94,7 @@ public abstract class Skill
             target.TakeDamage((int)(baseDamage * damageMultiplier),user); // Apply damage boost
             target.animator.SetTrigger("IsHurtTrigger");
             AudioManager.instance.PlaySlashSound();
-            user.GainEnergy(2);
+            user.GainEnergy(energyGain + 1); //Perfect hits give +1 energy
             break;
         case TimingEventResult.Good:
             Debug.Log("Good Hit!");   
@@ -102,7 +103,7 @@ public abstract class Skill
             target.animator.SetTrigger("IsHurtTrigger");   
             target.TakeDamage((int)(baseDamage * damageMultiplier), user); // Apply damage boost
             AudioManager.instance.PlaySlashSound();
-            user.GainEnergy(1);
+            user.GainEnergy(energyGain);
             break;
         case TimingEventResult.Miss:
             Debug.Log("Missed!");

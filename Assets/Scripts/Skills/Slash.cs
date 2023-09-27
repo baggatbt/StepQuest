@@ -10,6 +10,7 @@ public class Slash : Skill
         skillName = "Slash";
         description = "A swift slash that deals damage equal to the user's attack power.";
         energyCost = 0; 
+        energyGain = 2;
         skillLevel = 1; 
         requiresMovement = true; 
         skillExecutionComplete = false;
