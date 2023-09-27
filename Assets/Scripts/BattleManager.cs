@@ -473,7 +473,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
         }
         else
         {
-            player.GainEnergy(5); //TODO: Instead of hard value, use player stat energyRegenValue
+            
             ChangeState(BattleState.PlayerTurn);  // If all enemies had their turns, it's the player's turn next.
          }
         CheckBattleEnd();
@@ -714,7 +714,7 @@ public void CheckBattleEnd()
             break;
         }
     }
-
+    new WaitForSeconds(3.0f);
     if (allEnemiesDefeated)
     {
         EndOfBattleRewards(enemies);
