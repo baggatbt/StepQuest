@@ -498,9 +498,11 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
     // Set the sizes: outer starts bigger and shrinks to size 
     Vector3 outerCircleInitialScale = outerCircle.transform.localScale; // Let's assume this is the size at start.
     Vector3 innerCircleFinalScale = innerCircle.transform.localScale;
+
+    ///Need to find a way to base it on size not scale. Maybe take diameter and shrink that to match.
     
 
-    float speedFactor = 1.5f; // Change this value to adjust speed. Higher means faster.
+    float speedFactor = 1.0f; // Change this value to adjust speed. Higher means faster.
 
     try
     {
@@ -509,7 +511,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
             
    
             float progress = timer / totalWindowDuration;
-            outerCircle.transform.localScale = Vector3.Lerp(innerCircleFinalScale, outerCircleInitialScale, progress);
+            outerCircle.transform.localScale = Vector3.Lerp(outerCircleInitialScale,innerCircleFinalScale, progress);
 
             if (Input.GetMouseButtonDown(0))
             {
