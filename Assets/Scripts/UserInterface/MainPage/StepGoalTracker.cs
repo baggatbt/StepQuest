@@ -22,8 +22,11 @@ public class StepGoalTracker : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (goalTrackerBar != null)
+        {
         currentStepsTowardDailyGoal = PlayerData.Instance.inGameSteps;
         goalTrackerBar.value = currentStepsTowardDailyGoal;
+        }
     }
 
     private void GetSteps()

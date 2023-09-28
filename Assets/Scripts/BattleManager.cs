@@ -154,7 +154,7 @@ public class BattleManager : MonoBehaviour
             // Move the circles to the targets position
             outerCircle.transform.position = currentTarget.transform.position;
 
-           // innerCircle.transform.position = currentTarget.transform.position;
+            innerCircle.transform.position = currentTarget.transform.position;
             //NEEDS OFFSET TO BE OFF SPRITE
        
 }
@@ -236,7 +236,7 @@ public class BattleManager : MonoBehaviour
         
         
         // Move player back to their original position after all skills executed.
-        //yield return StartCoroutine(zoomEffect.ZoomOutEffect());
+        yield return StartCoroutine(zoomEffect.ZoomOutEffect());
         yield return player.ReturnToPosition();
         
         if (companion == null)
@@ -275,7 +275,7 @@ public class BattleManager : MonoBehaviour
         skillsExecuted = 0;
         yield return new WaitUntil(() => companion.isAttacking == false);
         // Move player back to their original position after all skills executed.
-       // yield return StartCoroutine(zoomEffect.ZoomOutEffect());
+        yield return StartCoroutine(zoomEffect.ZoomOutEffect());
         yield return new WaitForSeconds(1.0f);
         yield return companion.ReturnToPosition();
         
@@ -283,7 +283,7 @@ public class BattleManager : MonoBehaviour
         ChangeState(BattleState.EnemyTurn);
     }
 
-    //public ZoomEffect zoomEffect;
+    public ZoomEffect zoomEffect;
 
 
     public IEnumerator PlayerAction()
@@ -293,7 +293,7 @@ public class BattleManager : MonoBehaviour
         Debug.Log("PlayerAction() being called");
 
         // Start zoom effect
-        //StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position)); 
+        StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position)); 
 
         if (player.currentSkill.requiresMovement && skillsExecuted == 0)
         {
@@ -489,17 +489,18 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
 {
     // Enable the timing circles when the event starts
     outerCircle.SetActive(true);
-    // innerCircle.SetActive(true);
+    innerCircle.SetActive(true);
     float totalWindowDuration = windowEnd - windowStart;
     colorChanger.StartColorTransition(totalWindowDuration);
     float timer = 0;
     bool buttonClicked = false;
 
-    // Set the sizes: outer starts bigger and shrinks to size (0,0,0)
+    // Set the sizes: outer starts bigger and shrinks to size 
     Vector3 outerCircleInitialScale = outerCircle.transform.localScale; // Let's assume this is the size at start.
-    Vector3 zeroScale = new Vector3(0, 0, 0); 
+    Vector3 innerCircleFinalScale = innerCircle.transform.localScale;
+    
 
-    float speedFactor = 1.5f; // Change this value to adjust speed. Higher means faster.
+    //float speedFactor = 1.25f; // Change this value to adjust speed. Higher means faster.
 
     try
     {
@@ -508,7 +509,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
             
    
             float progress = timer / totalWindowDuration;
-            outerCircle.transform.localScale = Vector3.Lerp(outerCircleInitialScale, zeroScale, progress);
+            outerCircle.transform.localScale = Vector3.Lerp(outerCircleInitialScale, innerCircleFinalScale, progress);
 
             if (Input.GetMouseButtonDown(0))
             {
@@ -518,7 +519,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
                 break;
             }
 
-            timer += Time.deltaTime * speedFactor;
+            timer += Time.deltaTime;
             yield return null;
         }
 
@@ -553,7 +554,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
     }
     // Disable the timing circles when the event ends
     outerCircle.SetActive(false);
-   // innerCircle.SetActive(false);
+    innerCircle.SetActive(false);
 }
 
 
