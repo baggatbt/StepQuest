@@ -85,9 +85,12 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+       [SerializeField] private BattleConfig[] battleConfigs;  // List of battle configurations for each stage.
+        private int currentStageIndex = 0;  // Index to track the current stage.
 
    private void Start()
 {
+    
     State = BattleState.PlayerTurn;
     outerCircleInitialScale = outerCircle.transform.localScale;
     innerCircleInitialScale = innerCircle.transform.localScale;
@@ -102,16 +105,71 @@ public class BattleManager : MonoBehaviour
     mainCamera = Camera.main;
     
 
-    if (currentBattleConfig != null)
-    {
-        StartBattle(currentBattleConfig);
-    }
+    if (battleConfigs.Length > 0)
+        {
+            StartBattle(battleConfigs[currentStageIndex]);  // Start the first battle.
+        }
     else
     {
         Debug.LogError("No battle configuration set!");
         // Handle error or default configuration
     }
 }
+    public Button nextBattleButton;
+    
+    /*
+    public void LoadNewConfig(BattleConfig newConfig)
+    {
+        if (newConfig != null)
+        {
+            currentBattleConfig = newConfig;
+            // Need to clear old battle data or reset states here
+            StartBattle(currentBattleConfig);
+        }
+        else
+        {
+            Debug.LogError("The new configuration is null!");
+        }
+    }
+    */
+   
+   
+
+     public void StartBattle(BattleConfig config)
+    {
+        // Use config.poolName and config.maxEnemiesToSpawn to set up battle
+        // use the enemySpawnController to spawn the desired enemy type and number
+        endOfBattlePanel.SetActive(false);
+        for (int i = 0; i < config.maxEnemiesToSpawn; i++)
+        {
+            // Spawn enemies based on the config.poolName
+            Character spawnedEnemy = enemySpawnController.SpawnEnemiesFromPool(config.poolName, 1, enemySpawnPoints[i], healthBars[i]);
+
+            // Add spawned enemy to the list
+            if (spawnedEnemy != null)
+            {
+                enemies.Add(spawnedEnemy);
+            }
+        }
+        State = BattleState.PlayerTurn;
+        // TODO: Continue with any other setup like setting backgrounds, play music, etc.
+    }
+
+    public void NextBattle()
+    {
+        currentStageIndex++;  // Increment the stage index.
+        if (currentStageIndex < battleConfigs.Length)
+        {
+            StartBattle(battleConfigs[currentStageIndex]);  // Start the next battle.
+        }
+        else
+        {
+            // No more battles, handle end of game or loop back to the beginning.
+            
+            currentStageIndex = 0;  // Optional: Reset to the first battle.
+        }
+    }
+
 
     private void StartEnemyTurn()
 {
@@ -160,24 +218,7 @@ public class BattleManager : MonoBehaviour
 }
 
 
-    public void StartBattle(BattleConfig config)
-    {
-        // Use config.poolName and config.maxEnemiesToSpawn to set up battle
-        // use the enemySpawnController to spawn the desired enemy type and number
-    
-        for (int i = 0; i < config.maxEnemiesToSpawn; i++)
-        {
-            // Spawn enemies based on the config.poolName
-            Character spawnedEnemy = enemySpawnController.SpawnEnemiesFromPool(config.poolName, 1, enemySpawnPoints[i], healthBars[i]);
 
-            // Add spawned enemy to the list
-            if (spawnedEnemy != null)
-            {
-                enemies.Add(spawnedEnemy);
-            }
-        }
-        // TODO: Continue with any other setup like setting backgrounds, play music, etc.
-    }
 
         public void ExecuteQueuedSkills()
     {
@@ -214,16 +255,16 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-        Debug.Log("Executing queued skills. Current queue size before execution: " + skillQueue.Count);
+        //Debug.Log("Executing queued skills. Current queue size before execution: " + skillQueue.Count);
 
         // Dequeue skills one by one and execute them
-        Debug.Log("Starting skill execution loop");
+      //  Debug.Log("Starting skill execution loop");
         int skillsExecuted = 0;
         while(skillQueue.Count > 0)
         {
-            Debug.Log("Skill execution of  " + skillQueue.Count);
+          //  Debug.Log("Skill execution of  " + skillQueue.Count);
             Skill skill = skillQueue.Dequeue();
-            Debug.Log("Executing skill: " + skill.skillName);
+          //  Debug.Log("Executing skill: " + skill.skillName);
             player.currentSkill = skill;
             skillsExecuted++;
             yield return StartCoroutine(PlayerAction());
@@ -231,7 +272,7 @@ public class BattleManager : MonoBehaviour
         }
         
         
-        Debug.Log("Cleared the skill queue after execution.");
+      //  Debug.Log("Cleared the skill queue after execution.");
         skillsExecuted = 0;
         
         
@@ -290,7 +331,7 @@ public class BattleManager : MonoBehaviour
 {
     if (state == BattleState.PlayerTurn && currentTarget)
     {
-        Debug.Log("PlayerAction() being called");
+      //  Debug.Log("PlayerAction() being called");
 
         // Start zoom effect
         //StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position)); 
@@ -424,7 +465,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
         if (!player.isAttacking && !attackingEnemy.isAttacking && state == BattleState.EnemyTurn)
         {
             attackingEnemy.currentSkill = attackingEnemy.normalSkill;
-            Debug.Log("The enemy is starting to attack");
+          //  Debug.Log("The enemy is starting to attack");
             StartCoroutine(EnemyAttackCoroutine(attackingEnemy));
         }
     }
@@ -449,7 +490,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
             {
                 yield return attackingEnemy.ReturnToPosition();
             }
-            Debug.Log("Enemy reurning to position");
+           // Debug.Log("Enemy reurning to position");
         }
         else
         {
@@ -485,6 +526,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
 
     public ColorChanger colorChanger;  // Reference to the ColorLerper script
     
+    
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<TimingEventResult> callback)
 {
     // Enable the timing circles when the event starts
@@ -495,14 +537,11 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
     float timer = 0;
     bool buttonClicked = false;
 
-    // Set the sizes: outer starts bigger and shrinks to size 
+    // Set the sizes: outer starts bigger and shrinks to size (0,0,0)
     Vector3 outerCircleInitialScale = outerCircle.transform.localScale; // Let's assume this is the size at start.
-    Vector3 innerCircleFinalScale = innerCircle.transform.localScale;
+    Vector3 zeroScale = new Vector3(0, 0, 0); 
 
-    ///Need to find a way to base it on size not scale. Maybe take diameter and shrink that to match.
-    
-
-    float speedFactor = 1.0f; // Change this value to adjust speed. Higher means faster.
+    float speedFactor = 1.25f; // Change this value to adjust speed. Higher means faster.
 
     try
     {
@@ -511,7 +550,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
             
    
             float progress = timer / totalWindowDuration;
-            outerCircle.transform.localScale = Vector3.Lerp(outerCircleInitialScale,innerCircleFinalScale, progress);
+            outerCircle.transform.localScale = Vector3.Lerp(outerCircleInitialScale, zeroScale, progress);
 
             if (Input.GetMouseButtonDown(0))
             {
@@ -588,10 +627,13 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
     {
         float totalHoldDuration = holdEnd - holdStart;
         float holdTimer = 0;
+        
+        colorChanger.StartColorTransition(totalHoldDuration);
 
         holdReleaseSlider.ResetSlider(); // Reset the slider at the start of the hold event
         holdReleaseSlider.gameObject.SetActive(true);
 
+        
         while (holdTimer < totalHoldDuration)
         {
             if (Input.GetMouseButton(0)) // Button is currently held down
@@ -663,8 +705,6 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
     TextMeshProUGUI goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
     goldGainedTextComponent.text = totalGold.ToString();
 
-    Debug.Log($"Total EXP gained: {totalExp}");
-    Debug.Log($"Total Gold gained: {totalGold}");
 }
 
 
@@ -684,7 +724,7 @@ private void Update()
             currentTarget = hit.collider.gameObject;
             player.attackTarget = currentTarget.transform;
 
-            Debug.Log("Current target: " + currentTarget.name);
+         //   Debug.Log("Current target: " + currentTarget.name);
             
             // Execute the queued skill here since an enemy is tapped after selecting a skill
             ExecuteQueuedSkills();

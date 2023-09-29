@@ -32,7 +32,7 @@ public class Knight : PlayerJob
                 return new TripleHitSkill();
 
             case SkillType.SwordWave:
-                return new SwordWave(skillManager);
+                return new SwordWave();
 
             case SkillType.GuardSkill:
                 return new GuardSkill();

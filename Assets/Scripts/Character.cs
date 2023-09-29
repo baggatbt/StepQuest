@@ -187,10 +187,12 @@ public class Character : MonoBehaviour
 
     public void GainEnergy(int energyGained)
 {
+    /*
     if (energyGained % 2 != 0) //Checks to make sure energy values stay rounded 
     {
         energyGained--;
     }
+    */
 
     if (energy + energyGained > maxEnergy) // If the gained energy will bring the total over the max
     {
@@ -287,7 +289,7 @@ public class Character : MonoBehaviour
             }
         }
 
-
+    //This can cause a bug where a longer animation will snap back to pos and skip running
     private bool HasReachedPosition(Vector3 targetPosition, float stoppingDistance = 0.0f)
     {
         return (transform.position - targetPosition).sqrMagnitude <= stoppingDistance * stoppingDistance;

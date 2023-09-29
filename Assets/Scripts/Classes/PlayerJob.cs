@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class PlayerJob
 {
-    protected SkillManager skillManager => SkillManager.Instance;
+    
 
     public abstract int BaseAtk { get; }
     public abstract int BaseDef { get; }
