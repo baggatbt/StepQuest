@@ -44,6 +44,34 @@ public abstract class Skill
 
     public abstract IEnumerator Execute(Character user, Character target, BattleManager battleManager);
 
+    public void HandleAoeAttack(Character user, List<Character> enemies, TimingEventResult timingResult, int baseDamage)
+{
+    float damageMultiplier = 1.0f;
+    
+    result = timingResult;
+    baseDamage = user.attackPower;
+
+    foreach (Character target in enemies)
+    {
+        if (result == TimingEventResult.Miss)
+        {
+             target.animator.SetTrigger("IsHurtTrigger");
+             AudioManager.instance.PlaySlashSound();
+        }
+        else if (result == TimingEventResult.Perfect)
+        {
+            damageMultiplier = 1.5f;  // Boost damage by 50%                      
+            target.TakeDamage((int)(baseDamage * damageMultiplier),user); // Apply damage boost
+        }
+        else 
+        {
+            damageMultiplier = 1.25f;  // Boost damage by 25%                      
+            target.TakeDamage((int)(baseDamage * damageMultiplier),user); // Apply damage boost
+        }
+    }
+}
+
+
     public void HandleTimingResultForEnemyAttack(Character user, Character target,TimingEventResult timingResult, int baseDamage)
 {
         float damageMultiplier = 1.0f;
