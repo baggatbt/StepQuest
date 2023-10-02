@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class ColorChanger : MonoBehaviour
 {
-    public Renderer renderer;
+    new public Renderer renderer;
     public float duration;  // Duration for the transition
 
     private float timer = 0.0f;

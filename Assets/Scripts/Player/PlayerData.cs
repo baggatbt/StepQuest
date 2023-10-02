@@ -99,7 +99,7 @@ public class PlayerData : MonoBehaviour
      //   Debug.Log("Steps in Update: " + inGameSteps);
     }
 
-    public void UpdatePlayerData(int level, string jobClass, int exp, int gold, int attackPower, int defensePower, int inGameSteps, int maxHealth, int health, int maxEnergy, int energy)
+    public void UpdatePlayerData(int level, string jobClass, int exp, int gold, int attackPower, int defensePower, int inGameSteps, int maxHealth, int health, int maxEnergy, int energy, int speed)
     {
         this.level = level;
         this.jobClass = jobClass;
@@ -112,6 +112,7 @@ public class PlayerData : MonoBehaviour
         this.health = health;
         this.maxEnergy = maxEnergy;
         this.energy = energy;
+        this.speed = speed;
         
 
         SavePlayerData(); 
@@ -128,6 +129,7 @@ public class PlayerData : MonoBehaviour
         PlayerPrefs.SetInt("PlayerInGameSteps", inGameSteps);
         PlayerPrefs.SetInt("PlayerMaxHealth", maxHealth);
         PlayerPrefs.SetInt("PlayerMaxEnergy", maxEnergy); 
+        PlayerPrefs.SetInt("PlayerSpeed", speed);
         PlayerPrefs.Save();
         Debug.Log("Data saved");
     }
@@ -145,6 +147,7 @@ public class PlayerData : MonoBehaviour
             inGameSteps = PlayerPrefs.GetInt("PlayerInGameSteps");
             maxHealth = PlayerPrefs.GetInt("PlayerMaxHealth");
             maxEnergy = PlayerPrefs.GetInt("PlayerMaxEnergy");
+            speed = PlayerPrefs.GetInt("PlayerSpeed");
         }
     }
 

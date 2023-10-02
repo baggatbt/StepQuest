@@ -12,6 +12,7 @@ public abstract class PlayerJob
     public abstract int BaseMagDef { get; }
     public abstract int BaseHealth { get; } 
     public abstract int BaseEnergy { get; }
+    public abstract int BaseSpeed { get; }
 
     public abstract List<SkillType> AvailableSkills { get; }
 

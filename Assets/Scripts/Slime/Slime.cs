@@ -20,6 +20,7 @@ public class Slime : Enemy
         this.maxHealth = (27 + (this.level * 3));
         this.health = this.maxHealth;
         this.defensePower = 4 + (this.level * 3);
+        this.speed = 2;
 
         // Assign the skills
         this.normalSkill = this.skills[0]; // Normal skill
