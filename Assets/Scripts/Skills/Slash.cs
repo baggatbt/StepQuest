@@ -8,13 +8,14 @@ public class Slash : Skill
     public Slash()
     {
         skillName = "Slash";
-        description = "A swift slash that deals damage equal to the user's attack power.";
+        description = "A slash that deals damage equal to the user's attack power.";
         energyCost = 0; 
         energyGain = 2;
         skillLevel = 1; 
         requiresMovement = true; 
         skillExecutionComplete = false;
         numberOfAttacks = 1;
+        
     }
 
     protected override int CalculateBaseDamage(Character user)

@@ -49,13 +49,13 @@ public class SwordWave : Skill
             }
 
 
-            HandleTimingResultForPlayerAttack(user, target, result, baseDamage);
+            HandleAoeAttack(user, battleManager.enemies, result, baseDamage);
           
         });
        
         yield return new WaitUntil(() => projectileScript.isColliding == true);
         user.isAttacking = false;
-        target.CheckForDeath();
+        
     }
 }
 

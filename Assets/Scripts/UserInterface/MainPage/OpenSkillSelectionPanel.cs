@@ -8,6 +8,7 @@ public class OpenSkillSelectionPanel : MonoBehaviour
     public GameObject adventurerSkillPanel;
     public GameObject missionGUI;
     public GameObject companionGUI;
+    public GameObject characterGUI;
 
     public void openSkillSelectionGUI()
     {
@@ -54,5 +55,17 @@ public class OpenSkillSelectionPanel : MonoBehaviour
     {
         companionGUI.SetActive(false);
     }
+
+    public void openCharacterInterface()
+    {
+        characterGUI.SetActive(true);
+    }
+
+    public void closeCharacterInterface()
+    {
+        characterGUI.SetActive(false);
+    }
+
+    
    
 }

@@ -31,6 +31,7 @@ public abstract class Skill
     public int energyCost;
     public int energyGain;
     public int skillLevel;
+    public int requiredLevel;  // New field
     protected TimingEventResult result; 
 
       // New virtual function for calculating base damage.
@@ -68,6 +69,7 @@ public abstract class Skill
             damageMultiplier = 1.25f;  // Boost damage by 25%                      
             target.TakeDamage((int)(baseDamage * damageMultiplier),user); // Apply damage boost
         }
+        target.CheckForDeath();
     }
 }
 
