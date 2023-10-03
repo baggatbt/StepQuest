@@ -66,6 +66,7 @@ public class Player : Character
             playerData.health = playerData.maxHealth;
             playerData.maxEnergy = 5;
             playerData.energy = playerData.maxEnergy;
+            playerData.speed = 3;
 
             PlayerPrefs.SetInt("PlayerInitialized", 1);
             

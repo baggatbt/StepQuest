@@ -11,10 +11,10 @@ using System.Collections.Generic;
 public class BattleManager : MonoBehaviour
 {
     public Character player;
-    public Character companion;
     public PlayerData playerCharacterData;
     public Player playerClassReference;
     public List<Character> enemies = new List<Character>();
+    
     public GameObject knightPrefab;
     private BattleState state;
     public int enemyAttackCount = 0;
@@ -76,6 +76,7 @@ public class BattleManager : MonoBehaviour
                     break;
                 case BattleState.CompanionTurn:
                     Debug.Log("Companion Turn Started!");
+                    Debug.Log(currentTarget);
                     break;
                 case BattleState.EnemyTurn:
                     Debug.Log("Enemy Turn Started!");
@@ -133,7 +134,7 @@ public class BattleManager : MonoBehaviour
     }
     */
    
-   
+    
 
      public void StartBattle(BattleConfig config)
     {
@@ -151,7 +152,11 @@ public class BattleManager : MonoBehaviour
                 enemies.Add(spawnedEnemy);
             }
         }
-        State = BattleState.PlayerTurn;
+       // if (player.speed >= companion.speed)
+            State = BattleState.PlayerTurn;
+        
+        
+        
         // TODO: Continue with any other setup like setting backgrounds, play music, etc.
     }
 
@@ -208,16 +213,14 @@ public class BattleManager : MonoBehaviour
     }
 
     public void MoveCirclesToTarget(Character target)
-{
-            // Move the circles to the targets position
-            outerCircle.transform.position = currentTarget.transform.position;
+     {
+        // Move the circles to the targets position
+        outerCircle.transform.position = currentTarget.transform.position;
 
-            innerCircle.transform.position = currentTarget.transform.position;
-            //NEEDS OFFSET TO BE OFF SPRITE
-       
-}
-
-
+        innerCircle.transform.position = currentTarget.transform.position;
+        //NEEDS OFFSET TO BE OFF SPRITE
+            
+    }
 
 
         public void ExecuteQueuedSkills()
@@ -233,18 +236,7 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    public void CompanionExecuteQueuedSkills()
-    {
-        if (currentTarget != null && state == BattleState.CompanionTurn)
-        {
-        DisableAllButtons();
-        StartCoroutine(CompanionExecuteAllSkillsCoroutine());
-        }
-        else
-        {
-        Debug.Log("No target selected");
-        }
-    }
+    
 
     public int skillsExecuted = 0;
     private IEnumerator ExecuteAllSkillsCoroutine()
@@ -255,187 +247,86 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-        //Debug.Log("Executing queued skills. Current queue size before execution: " + skillQueue.Count);
-
-        // Dequeue skills one by one and execute them
-      //  Debug.Log("Starting skill execution loop");
+       
         int skillsExecuted = 0;
         while(skillQueue.Count > 0)
         {
-          //  Debug.Log("Skill execution of  " + skillQueue.Count);
             Skill skill = skillQueue.Dequeue();
-          //  Debug.Log("Executing skill: " + skill.skillName);
             player.currentSkill = skill;
             skillsExecuted++;
             yield return StartCoroutine(PlayerAction());
             
         }
-        
-        
-      //  Debug.Log("Cleared the skill queue after execution.");
+    
         skillsExecuted = 0;
-        
         
         // Move player back to their original position after all skills executed.
        // yield return StartCoroutine(zoomEffect.ZoomOutEffect());
         yield return player.ReturnToPosition();
-        
-        if (companion == null)
-        {
-            ChangeState(BattleState.EnemyTurn);
-        }
-        else
-        {
-        ChangeState(BattleState.CompanionTurn);
-        }
-        }
-    }
-
-    public int companionSkillsExecuted = 0;
-
-    private IEnumerator CompanionExecuteAllSkillsCoroutine()
-    {
-        Debug.Log("Executing queued skills. Current queue size before execution: " + skillQueue.Count);
-
-        // Dequeue skills one by one and execute them
-        Debug.Log("Starting skill execution loop");
-        int companionSkillsExecuted = 0;
-        while(skillQueue.Count > 0)
-        {
-            Debug.Log("Skill execution of  " + skillQueue.Count);
-            Skill skill = skillQueue.Dequeue();
-            Debug.Log("Executing skill: " + skill.skillName);
-            companion.currentSkill = skill;
-            companionSkillsExecuted++;
-            yield return StartCoroutine(CompanionAction());
-            
-        }
-        
-        
-        Debug.Log("Cleared the skill queue after execution.");
-        skillsExecuted = 0;
-        yield return new WaitUntil(() => companion.isAttacking == false);
-        // Move player back to their original position after all skills executed.
-       // yield return StartCoroutine(zoomEffect.ZoomOutEffect());
-        yield return new WaitForSeconds(1.0f);
-        yield return companion.ReturnToPosition();
-        
-
         ChangeState(BattleState.EnemyTurn);
+      
+      
+        }
     }
+
+    
+
+    
 
     //public ZoomEffect zoomEffect;
 
 
     public IEnumerator PlayerAction()
-{
-    if (state == BattleState.PlayerTurn && currentTarget)
     {
-      //  Debug.Log("PlayerAction() being called");
-
-        // Start zoom effect
-        //StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position)); 
-
-        if (player.currentSkill.requiresMovement && skillsExecuted == 0)
+        if (state == BattleState.PlayerTurn && currentTarget)
         {
-            yield return StartCoroutine(PlayerMoveAndAttackCoroutine());
-        }
-        else
-        {
-            yield return StartCoroutine(PlayerAttackCoroutine(null));
-        }
+        //  Debug.Log("PlayerAction() being called");
 
+            // Start zoom effect
+            //StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position)); 
+
+            if (player.currentSkill.requiresMovement && skillsExecuted == 0)
+            {
+                yield return StartCoroutine(PlayerMoveAndAttackCoroutine());
+            }
+            else
+            {
+                yield return StartCoroutine(PlayerAttackCoroutine(null));
+            }
+
+        }
     }
-}
-
-public IEnumerator CompanionAction()
-{
-    if (state == BattleState.CompanionTurn && currentTarget)
-    {
-        Debug.Log("CompanionAction() being called");
-
-        // Start zoom effect
-       // StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position)); 
-
-        if (companion.currentSkill.requiresMovement && companionSkillsExecuted == 0)
-        {
-            yield return StartCoroutine(CompanionMoveAndAttackCoroutine());
-        }
-        else
-        {
-            yield return StartCoroutine(CompanionAttackCoroutine(null));
-        }
-
-    }
-}
-
-
 
     public IEnumerator PlayerMoveAndAttackCoroutine()
-{
-    // Only move if the player is not already at the target
-    if (player.transform.position != currentTarget.transform.position)
     {
-        yield return player.MoveToTarget();
-        
-          
+        // Only move if the player is not already at the target
+        if (player.transform.position != currentTarget.transform.position)
+        {
+            yield return player.MoveToTarget();
+            
+            
+        }
+
+        yield return StartCoroutine(PlayerAttackCoroutine(null));
     }
 
-    yield return StartCoroutine(PlayerAttackCoroutine(null));
-}
-
-public IEnumerator CompanionMoveAndAttackCoroutine()
-{
-    // Only move if the player is not already at the target
-    if (companion.transform.position != currentTarget.transform.position)
-    {
-        yield return companion.MoveToTarget();
-        
-          
-    }
-
-    yield return StartCoroutine(CompanionAttackCoroutine(null));
-}
 
     public IEnumerator PlayerAttackCoroutine(System.Action successCallback)
-{
-    Character targetEnemy = currentTarget.GetComponent<Character>();
-    yield return new WaitUntil(() => targetEnemy.isAttacking == false);
-
-    if (player.currentSkill != null)
     {
-        MoveCirclesToTarget(targetEnemy);
-        yield return player.currentSkill.Execute(player, targetEnemy, this);
-        
-        //yield return new WaitForSeconds(0.1f);
+        Character targetEnemy = currentTarget.GetComponent<Character>();
+        yield return new WaitUntil(() => targetEnemy.isAttacking == false);
 
-        CheckBattleEnd();
+        if (player.currentSkill != null)
+        {
+            MoveCirclesToTarget(targetEnemy);
+            yield return player.currentSkill.Execute(player, targetEnemy, this);
+            
+            //yield return new WaitForSeconds(0.1f);
+
+            CheckBattleEnd();
+        }
+
     }
-
-}
-
-
-public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
-{
-    Character targetEnemy = currentTarget.GetComponent<Character>();
-    yield return new WaitUntil(() => targetEnemy.isAttacking == false);
-
-    if (companion.currentSkill != null)
-    {
-        //MoveCirclesToTarget(targetEnemy);
-        yield return companion.currentSkill.Execute(companion, targetEnemy, this);
-        
-        yield return new WaitForSeconds(0.1f);
-
-        CheckBattleEnd();
-    }
-    else
-    {
-        Debug.Log("currentSkill  - This should not happen");
-    }
-}
-
-
 
     private Queue<Character> enemyTurnQueue = new Queue<Character>();
 
@@ -714,6 +605,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
 
 private void Update()
 {
+    
     if (Input.GetMouseButtonDown(0))
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
@@ -723,14 +615,17 @@ private void Update()
         {
             currentTarget = hit.collider.gameObject;
             player.attackTarget = currentTarget.transform;
-
-         //   Debug.Log("Current target: " + currentTarget.name);
-            
+        
             // Execute the queued skill here since an enemy is tapped after selecting a skill
-            ExecuteQueuedSkills();
+            if (State == BattleState.PlayerTurn)
+            {
+                ExecuteQueuedSkills();
+            }
             isSkillSelected = false;  // Reset the flag
         }
     }
+   
+    
 }
 
 
