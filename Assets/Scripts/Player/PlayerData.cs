@@ -78,6 +78,7 @@ public class PlayerData : MonoBehaviour
 
     private void Start()
     {
+        Application.targetFrameRate = 60;  // Set target frame rate to 60 FPS.
         LoadStepsData();
        
         int stepsSinceStart = stepCounterController.GetStepsSinceStart();
@@ -98,7 +99,7 @@ public class PlayerData : MonoBehaviour
      //   Debug.Log("Steps in Update: " + inGameSteps);
     }
 
-    public void UpdatePlayerData(int level, string jobClass, int exp, int gold, int attackPower, int defensePower, int inGameSteps, int maxHealth, int health, int maxEnergy, int energy)
+    public void UpdatePlayerData(int level, string jobClass, int exp, int gold, int attackPower, int defensePower, int inGameSteps, int maxHealth, int health, int maxEnergy, int energy, int speed)
     {
         this.level = level;
         this.jobClass = jobClass;
@@ -111,6 +112,7 @@ public class PlayerData : MonoBehaviour
         this.health = health;
         this.maxEnergy = maxEnergy;
         this.energy = energy;
+        this.speed = speed;
         
 
         SavePlayerData(); 
@@ -127,6 +129,7 @@ public class PlayerData : MonoBehaviour
         PlayerPrefs.SetInt("PlayerInGameSteps", inGameSteps);
         PlayerPrefs.SetInt("PlayerMaxHealth", maxHealth);
         PlayerPrefs.SetInt("PlayerMaxEnergy", maxEnergy); 
+        PlayerPrefs.SetInt("PlayerSpeed", speed);
         PlayerPrefs.Save();
         Debug.Log("Data saved");
     }
@@ -144,6 +147,7 @@ public class PlayerData : MonoBehaviour
             inGameSteps = PlayerPrefs.GetInt("PlayerInGameSteps");
             maxHealth = PlayerPrefs.GetInt("PlayerMaxHealth");
             maxEnergy = PlayerPrefs.GetInt("PlayerMaxEnergy");
+            speed = PlayerPrefs.GetInt("PlayerSpeed");
         }
     }
 
@@ -187,28 +191,6 @@ public class PlayerData : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    
 
-    //NEEDS OWN CLASS
-   
-
-     
-
-    //MOVE THESE TO ANOTHER CLASS
-     public void ActivateMission(Mission mission)
-    {
-        mission.ActivateMission();
-        if (!activeMissions.Contains(mission))
-        {
-            activeMissions.Add(mission);
-        }
-    }
-
-    public void RemoveMission(Mission mission)
-    {
-        if (activeMissions.Contains(mission))
-        {
-            activeMissions.Remove(mission);
-        }
-    }
+  
 }

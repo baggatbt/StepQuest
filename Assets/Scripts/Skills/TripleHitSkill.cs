@@ -3,56 +3,52 @@ using UnityEngine;
 
 public class TripleHitSkill : Skill
 {
-    
-
-    
+    private int numberOfAttacksPossible;
 
     public TripleHitSkill()
     {
         skillName = "Triple Slash";
-        description = "Slash up to three times with good timing";
+        description = "Slash three times";
         requiresMovement = true;
-        energyCost = 0;
+        energyCost = 3;
+        numberOfAttacksPossible = 3;
+    }
+
+    // Override the default base damage calculation.
+    protected override int CalculateBaseDamage(Character user)
+    {
+        return (int)(user.attackPower * 0.5f);  // 60% of the character's attack.
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
         user.isAttacking = true;
-       
-        
-        // First Timing Event
-        yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
-        HandleTimingResultForPlayerAttack(user, target, "Attack1Trigger", result);
-        if (result == TimingEventResult.Miss)
-            yield break;
-            yield return  user.animationEnded == true;
+        user.isAnimationDone = false;  // Reset the flag at the start of each attack
 
 
-        if (target.health >= 1)
+
+        int baseDamage = CalculateBaseDamage(user);
+        user.animator.SetTrigger("TripleSlashTrigger");
+        for( int i = 0; i < numberOfAttacksPossible; i++)
         {
-        // Second Timing Event
-        yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
-        HandleTimingResultForPlayerAttack(user, target, "Attack2Trigger", result);
-        if (result == TimingEventResult.Miss)
-            yield break;
-            yield return  user.animationEnded == true;
+             
+
+             yield return TimingWindow(user, target, battleManager, 0.0f, 0.6f);
+             
+
+             HandleTimingResultForPlayerAttack(user, target, result, baseDamage);
+             Debug.Log("Timing for player attack has been handled waiting for animations");
+             //Wait until the timing event happens to move on to next attack stage
+             yield return new WaitUntil(() => user.animationDamageTime == true);
+             
         }
-        
-        if (target.health >= 1)
-        {
-        // Third Timing Event
-        yield return TimingWindow(user, target, battleManager, 0.0f, 1.0f);
-        HandleTimingResultForPlayerAttack(user, target, "Attack3Trigger", result);
-        yield return new WaitUntil(() => user.animationEnded == true); //Resets the animation flag
+        Debug.Log("waiting on animation to finish");
+    
+        yield return new WaitUntil(() => user.isAnimationDone == true);
+        user.animationDamageTime = false;
+        user.isAnimationDone = false;
         user.isAttacking = false;
-        }
-        
-        else 
-        {
-            user.isAttacking = false;
-            user.animator.SetTrigger("AttackFailTrigger");
-            yield return user.animationEnded == true; //Resets the animation flag
-        }
+        target.CheckForDeath();
     }
 
 

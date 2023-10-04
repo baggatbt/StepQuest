@@ -11,5 +11,13 @@ public abstract class StatusEffect
     public abstract void ApplyEffect(Character target);
     public abstract void RemoveEffect(Character target);
     
+    
+
+/*
+        // Create an instance of Airborne with a duration of 2 seconds
+        Airborne airborneEffect = new Airborne(1.0f);
+        battleManager.statusEffectController.AddEffect(airborneEffect, target);
+
+        */
 }
 

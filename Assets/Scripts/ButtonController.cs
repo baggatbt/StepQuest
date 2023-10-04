@@ -74,7 +74,7 @@ public void SelectAndUseSkill(Skill selectedSkill)
 
     if(skill.energyCost <= battleManager.player.energy)
     {
-        skillSelectionPanel.SetActive(false);
+       // skillSelectionPanel.SetActive(false);
         if (!battleManager.player.isAttacking && !battleManager.IsAnyEnemyAttacking())
         {
             if (!battleManager.isSkillSelected)
@@ -101,7 +101,7 @@ public void SelectAndUseSkill(Skill selectedSkill)
         Debug.Log("Not enough energy to queue this skill!");
     }
 }
-    public void testButtonClick()
+    public void testButtonClick() //set test button to this methd
     {
         skill = new GuardSkill();
         OnButtonClick();

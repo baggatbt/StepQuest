@@ -25,6 +25,7 @@ public class Player : Character
     private int exp;
     private int gold;
     private string jobClass;
+    private int inGameSteps;
 
 
     protected override void Awake()
@@ -47,7 +48,7 @@ public class Player : Character
 
     new private void  Start()
     {
-       
+       SyncStatsWithPlayerData();
     }
 
     private void InitializePlayer()
@@ -65,9 +66,10 @@ public class Player : Character
             playerData.health = playerData.maxHealth;
             playerData.maxEnergy = 5;
             playerData.energy = playerData.maxEnergy;
+            playerData.speed = 3;
 
             PlayerPrefs.SetInt("PlayerInitialized", 1);
-            PlayerPrefs.Save();
+            
 
              // Save the initialized data
             playerData.SavePlayerData();
@@ -75,6 +77,10 @@ public class Player : Character
             ApplyJobStats();
             SyncStatsWithPlayerData();
             UpdateUI();
+            PlayerPrefs.Save();
+        }
+        else{
+            LoadFromPlayerData();
         }
     }
 
@@ -88,8 +94,16 @@ public class Player : Character
     defensePower = playerData.defensePower;
     exp = playerData.exp;
     jobClass = playerData.jobClass;
+    inGameSteps = playerData.inGameSteps;
     
     
+    }
+
+
+    public void DeleteEverything()
+    {
+        PlayerPrefs.DeleteAll();
+        Debug.Log("Player prefs deleted");
     }
 
 
@@ -139,6 +153,8 @@ public class Player : Character
         
         // Update UI regularly or as per your needs
        UpdateUI();
+      // playerData.UpdatePlayerData();
+       
         
     }
 

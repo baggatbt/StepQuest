@@ -11,7 +11,7 @@ public class Goblin : Enemy
     {
         base.Awake();
         this.level = 1;
-        this.maxHealth = 22;
+        this.maxHealth = 30 + (this.level * 10);
         this.health = this.maxHealth;
         
     }
@@ -27,8 +27,9 @@ public class Goblin : Enemy
         this.expReward = 8;  //TODO: Add scaling
         this.goldReward = 3;
         this.attacksBeforeSpecial = 2;
-        this.damage = Mathf.RoundToInt(2 * Mathf.Pow(1.10f, level - 1)); //Increase by 10% each level, controlled by 1.10f
-        this.defensePower = 2;
+        this.damage = 6 + (this.level * 3);
+        this.defensePower = 2  + this.level;
+        this.speed = 4;
 
         // Assign the skills
         this.normalSkill = this.skills[0]; // Normal skill

@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 6178202463525426466}
   - component: {fileID: 6178202463525426467}
   - component: {fileID: 6178202463525426464}
-  - component: {fileID: 6178202463525426477}
   - component: {fileID: 6178202463525426478}
+  - component: {fileID: 6178202463525426477}
+  - component: {fileID: 1860233840583192940}
   m_Layer: 0
   m_Name: Goblin
   m_TagString: Enemy
@@ -28,7 +29,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6178202463525426479}
   m_LocalRotation: {x: -0, y: -0.02035631, z: -0, w: 0.9997928}
-  m_LocalPosition: {x: 324.59, y: 102.08, z: -16.45}
+  m_LocalPosition: {x: 324.65, y: 102.08, z: -16.45}
   m_LocalScale: {x: 9.910537, y: 9.411649, z: 9.798582}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -100,9 +101,30 @@ CapsuleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.0012712674, y: 0.16061842}
-  m_Size: {x: 0.30298692, y: 0.37710893}
+  m_Offset: {x: 0.020651545, y: 0.16061842}
+  m_Size: {x: 0.3417475, y: 0.37710893}
   m_Direction: 0
+--- !u!95 &6178202463525426478
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6178202463525426479}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 4f230fa6acf87ff4aa55a06a9691101d, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &6178202463525426477
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -138,26 +160,44 @@ MonoBehaviour:
   attacksBeforeSpecial: 0
   statusEffectController: {fileID: 0}
   cameraShake: {fileID: 0}
+  isAnimationDone: 0
+  animationDamageTime: 0
   expReward: 0
   goldReward: 0
---- !u!95 &6178202463525426478
-Animator:
-  serializedVersion: 5
+--- !u!114 &1860233840583192940
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6178202463525426479}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 4f230fa6acf87ff4aa55a06a9691101d, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22c208c25b22e834a860bdeb5f884e76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  level: 0
+  health: 0
+  maxHealth: 0
+  damage: 0
+  energy: 0
+  maxEnergy: 0
+  attackPower: 0
+  defensePower: 0
+  speed: 0
+  healthBar: {fileID: 0}
+  energyBar: {fileID: 0}
+  attackTarget: {fileID: 0}
+  originalPosition: {x: 0, y: 0, z: 0}
+  isAttacking: 0
+  spriteRenderer: {fileID: 0}
+  animator: {fileID: 0}
+  healthText: {fileID: 0}
+  energyText: {fileID: 0}
+  attackTrigger: 0
+  animationEnded: 0
+  attacksBeforeSpecial: 0
+  statusEffectController: {fileID: 0}
+  cameraShake: {fileID: 0}
+  isAnimationDone: 0
+  animationDamageTime: 0

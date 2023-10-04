@@ -2,27 +2,40 @@ using UnityEngine;
 
 public class StepCounterController : MonoBehaviour
 {
+    public static StepCounterController Instance { get; private set; }
+
     private AndroidJavaObject stepCounterPluginInstance;
     private int inGameSteps;
 
     private void Awake()
     {
-        Debug.Log("Awake in StepCounterController");
-        if (Application.platform == RuntimePlatform.Android)
+        if (Instance == null)
         {
-            using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+
+            // Your initialization code
+            Debug.Log("Awake in StepCounterController");
+            if (Application.platform == RuntimePlatform.Android)
             {
-                AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-                
-                using (AndroidJavaClass stepCounterPluginClass = new AndroidJavaClass("com.example.stepcounterplugin.StepCounterPlugin"))
+                using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
                 {
-                    stepCounterPluginClass.CallStatic("init", currentActivity);
-                    Debug.Log("Plugin Initialized");
+                    AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+                    
+                    using (AndroidJavaClass stepCounterPluginClass = new AndroidJavaClass("com.example.stepcounterplugin.StepCounterPlugin"))
+                    {
+                        stepCounterPluginClass.CallStatic("init", currentActivity);
+                        Debug.Log("Plugin Initialized");
+                    }
                 }
+                
+                stepCounterPluginInstance = new AndroidJavaObject("com.example.stepcounterplugin.StepCounterPlugin");
+                stepCounterPluginInstance.CallStatic("startCounting");
             }
-            
-            stepCounterPluginInstance = new AndroidJavaObject("com.example.stepcounterplugin.StepCounterPlugin");
-            stepCounterPluginInstance.CallStatic("startCounting");
+        }
+        else
+        {
+            Destroy(gameObject);
         }
     }
 
@@ -33,7 +46,7 @@ public class StepCounterController : MonoBehaviour
             Debug.Log("Steps since start: " + GetStepsSinceStart());
         }
     }
-
+    //CHECK ON DESTROY VS ONPAUSE
     
     private void OnDestroy()
     {

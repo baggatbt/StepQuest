@@ -51,11 +51,36 @@ public class Character : MonoBehaviour
         originalPosition = transform.position;
         statusEffectController = GetComponent<StatusEffectController>();
         Debug.Log(gameObject.name + " original position: " + originalPosition);
+        if (healthText != null)
+    {
+        healthText.text = "HP: " + health;
+        Debug.Log(health);
+    }
+    else 
+    {
+        Debug.Log("Healtexh is null");
+    }
         
     }
 
     void Update(){
+        if (healthBar != null)
+        {
+            healthBar.maxValue = maxHealth;
+            healthBar.value = health;
+            if (healthText !=null && energyText !=null)
+            {
+                healthText.text = "HP: " + health; 
+                energyText.text = "MP: " + energy;
+            }
+        }
+        
 
+        if (energyBar != null)
+        {
+            energyBar.maxValue = maxEnergy;
+            energyBar.value = energy;
+        }
     }
 
     protected virtual void Start()
@@ -71,6 +96,7 @@ public class Character : MonoBehaviour
                 energyText.text = "MP: " + energy;
             }
         }
+        
 
         if (energyBar != null)
         {
@@ -83,8 +109,9 @@ public class Character : MonoBehaviour
 
     public CameraShake cameraShake; // Reference to the CameraShake script
 
-    public void TakeDamage(int damageOfAttacker)
+    public void TakeDamage(int damageOfAttacker, Character attacker)
 {
+    Debug.Log("Damage being taken");
     int damageDealt = damageOfAttacker * (1 - (this.defensePower / 100));
 
     health -= damageDealt;
@@ -119,12 +146,9 @@ public class Character : MonoBehaviour
         Debug.LogError("Failed to load DamagePopup prefab.");
     }
     }
-
-    if (health <= 0) 
-    {
-        StartCoroutine(FadeOutSprite());
-    }
-}
+    Debug.Log("isAttacking = " +attacker.isAttacking);
+        
+}   
 
     IEnumerator FadeOutSprite()
 {
@@ -160,19 +184,15 @@ public class Character : MonoBehaviour
     }
 }
 
-    //This will be called on an animation event so characters can call target.TakeDamage() at the exact moment
-    public void animationDamageTiming()
-    {
-        Debug.Log("This is the damage moment");
-        
-    }
 
     public void GainEnergy(int energyGained)
 {
+    /*
     if (energyGained % 2 != 0) //Checks to make sure energy values stay rounded 
     {
         energyGained--;
     }
+    */
 
     if (energy + energyGained > maxEnergy) // If the gained energy will bring the total over the max
     {
@@ -196,26 +216,63 @@ public class Character : MonoBehaviour
     
 
     public void IsHit() => animator.SetTrigger("IsHurtTrigger");
-    public void AnimationEnded() => animationEnded = true;
-    public void attackStageTrigger() => attackTrigger = true;
+    
+    public bool isAnimationDone = false;
+
+    //Called at points in an animation to flag that its over and the animation can continue or stop
+    public void AnimationEnded()
+    {
+         Debug.Log("animation ended!");
+         isAnimationDone = true;
+        
+    }
+
+    //This will be called on an animation event so characters can call target.TakeDamage() at the exact moment
+    public bool animationDamageTime = false;
+
+    public void animationDamageTiming()
+    {
+        Debug.Log("This is the damage moment");
+        //animator.SetTrigger("TimingFlashTrigger");
+        animationDamageTime = true;;
+    
+    }
+
+    public void CheckForDeath()
+    {
+        
+        Debug.Log("Checking for death");
+        if (this.health <= 0)
+        {
+            StartCoroutine(FadeOutSprite());
+        }
+       
+    }
 
      public IEnumerator MoveToTarget()
 {
+    animator.SetTrigger("MovementAnimationTrigger");
+     
     Vector3 targetPosition = attackTarget.position;
     checkCollisionsDuringMovement = true;
-    animator.SetTrigger("MovementAnimationTrigger");  
+    
     yield return Move(targetPosition);
     animator.SetTrigger("StopMovementAnimationTrigger");  
 }
 
      public IEnumerator ReturnToPosition()
-        {
-            yield return new WaitForSeconds(0.5f);
-            checkCollisionsDuringMovement = false;
-            animator.SetTrigger("MovementAnimationTrigger");  
-            yield return Move(originalPosition);
-            animator.SetTrigger("StopMovementAnimationTrigger");  
-        }
+{
+    animator.SetTrigger("MovementAnimationTrigger");
+
+    // You can keep this line if you want the character to move back over time
+    yield return Move(originalPosition);
+
+    // This line will ensure the character is exactly at the original position
+    transform.position = originalPosition;
+
+    animator.SetTrigger("StopMovementAnimationTrigger");
+}
+
 
      private IEnumerator Move(Vector3 targetPosition)
         {
@@ -232,15 +289,15 @@ public class Character : MonoBehaviour
             }
         }
 
-
-    private bool HasReachedPosition(Vector3 targetPosition, float stoppingDistance = 2.0f)
+    //This can cause a bug where a longer animation will snap back to pos and skip running
+    private bool HasReachedPosition(Vector3 targetPosition, float stoppingDistance = 0.0f)
     {
         return (transform.position - targetPosition).sqrMagnitude <= stoppingDistance * stoppingDistance;
     }
 
     private bool IsCollidingWithCharacter()
 {
-    Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 0.5f);
+    Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 2.0f);
 
     foreach (Collider2D collider in colliders)
     {
@@ -248,6 +305,8 @@ public class Character : MonoBehaviour
 
         // If current object is an enemy and the colliding object is also an enemy, ignore the collision
         if (this.CompareTag("Enemy") && collider.CompareTag("Enemy")) continue;
+
+        if (this.CompareTag("UI")) continue;
 
         // If it's colliding with the target, then return true
         if (collider.gameObject.GetInstanceID() == attackTarget.gameObject.GetInstanceID()) return true;

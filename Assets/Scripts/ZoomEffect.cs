@@ -8,6 +8,8 @@ public class ZoomEffect : MonoBehaviour
     public Camera mainCamera;
     public float zoomFactor = 0.6f; // The degree to which the camera zooms in
     public float zoomDuration = 1.0f; // How long the zoom will last
+
+    public float zoomOutDuration = 0.3f;
     private float initialSize;
     private Vector3 initialCameraPosition;
 
@@ -40,7 +42,7 @@ public class ZoomEffect : MonoBehaviour
         float originalSize = mainCamera.orthographicSize;
 
         // Smoothly zoom out and pan back to initial position
-        for (float t = 0; t < 1; t += Time.deltaTime / zoomDuration)
+        for (float t = 0; t < 1; t += Time.deltaTime / zoomOutDuration)
         {
             mainCamera.orthographicSize = Mathf.Lerp(originalSize, initialSize, t);
             mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, initialCameraPosition, t);

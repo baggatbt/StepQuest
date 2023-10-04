@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class PlayerJob
 {
-    protected SkillManager skillManager => SkillManager.Instance;
+    
 
     public abstract int BaseAtk { get; }
     public abstract int BaseDef { get; }
@@ -12,8 +12,11 @@ public abstract class PlayerJob
     public abstract int BaseMagDef { get; }
     public abstract int BaseHealth { get; } 
     public abstract int BaseEnergy { get; }
+    public abstract int JobExp { get; }
 
     public abstract List<SkillType> AvailableSkills { get; }
+
+    public abstract List<SkillType> LockedSkills { get; }
 
     public abstract Skill GetSkillInstance(SkillType skillType);
 }

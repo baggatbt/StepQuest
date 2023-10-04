@@ -6,18 +6,25 @@ public class Knight : PlayerJob
 {
     private int playerLevel => PlayerData.Instance.level;
 
-    public override int BaseAtk => 10 + (playerLevel * 3);
+    public override int BaseAtk => 10 + (playerLevel * 2);
     public override int BaseDef => 3 + playerLevel;  
     public override int BaseMagAtk => 5 + (playerLevel);  
     public override int BaseMagDef => 2 + playerLevel;  
     public override int BaseHealth => 30 + (playerLevel * 3);
     public override int BaseEnergy => 5;
+    public override int JobExp => 0; //Need to implement function to make this go up, and move skills to available
 
     public override List<SkillType> AvailableSkills => new List<SkillType>
     {
         SkillType.Slash,
         SkillType.TripleHit,
-        SkillType.SwordWave
+        
+    };
+
+    public override List<SkillType> LockedSkills => new List<SkillType>
+    {
+        SkillType.SwordWave,
+        SkillType.GuardSkill,
     };
 
     public override Skill GetSkillInstance(SkillType skillType)
@@ -26,10 +33,16 @@ public class Knight : PlayerJob
         {
             case SkillType.Slash:
                 return new Slash();
+
             case SkillType.TripleHit:
                 return new TripleHitSkill();
+
             case SkillType.SwordWave:
-                return new SwordWave(skillManager);
+                return new SwordWave();
+
+            case SkillType.GuardSkill:
+                return new GuardSkill();
+
             default:
                 Debug.LogError("Unknown skill type for Knight: " + skillType);
                 return null;

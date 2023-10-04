@@ -11,10 +11,10 @@ using System.Collections.Generic;
 public class BattleManager : MonoBehaviour
 {
     public Character player;
-    public Character companion;
     public PlayerData playerCharacterData;
     public Player playerClassReference;
     public List<Character> enemies = new List<Character>();
+    
     public GameObject knightPrefab;
     private BattleState state;
     public int enemyAttackCount = 0;
@@ -76,6 +76,7 @@ public class BattleManager : MonoBehaviour
                     break;
                 case BattleState.CompanionTurn:
                     Debug.Log("Companion Turn Started!");
+                    Debug.Log(currentTarget);
                     break;
                 case BattleState.EnemyTurn:
                     Debug.Log("Enemy Turn Started!");
@@ -85,9 +86,12 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+       [SerializeField] private BattleConfig[] battleConfigs;  // List of battle configurations for each stage.
+        private int currentStageIndex = 0;  // Index to track the current stage.
 
    private void Start()
 {
+    
     State = BattleState.PlayerTurn;
     outerCircleInitialScale = outerCircle.transform.localScale;
     innerCircleInitialScale = innerCircle.transform.localScale;
@@ -102,16 +106,75 @@ public class BattleManager : MonoBehaviour
     mainCamera = Camera.main;
     
 
-    if (currentBattleConfig != null)
-    {
-        StartBattle(currentBattleConfig);
-    }
+    if (battleConfigs.Length > 0)
+        {
+            StartBattle(battleConfigs[currentStageIndex]);  // Start the first battle.
+        }
     else
     {
         Debug.LogError("No battle configuration set!");
         // Handle error or default configuration
     }
 }
+    public Button nextBattleButton;
+    
+    /*
+    public void LoadNewConfig(BattleConfig newConfig)
+    {
+        if (newConfig != null)
+        {
+            currentBattleConfig = newConfig;
+            // Need to clear old battle data or reset states here
+            StartBattle(currentBattleConfig);
+        }
+        else
+        {
+            Debug.LogError("The new configuration is null!");
+        }
+    }
+    */
+   
+    
+
+     public void StartBattle(BattleConfig config)
+    {
+        // Use config.poolName and config.maxEnemiesToSpawn to set up battle
+        // use the enemySpawnController to spawn the desired enemy type and number
+        endOfBattlePanel.SetActive(false);
+        for (int i = 0; i < config.maxEnemiesToSpawn; i++)
+        {
+            // Spawn enemies based on the config.poolName
+            Character spawnedEnemy = enemySpawnController.SpawnEnemiesFromPool(config.poolName, 1, enemySpawnPoints[i], healthBars[i]);
+
+            // Add spawned enemy to the list
+            if (spawnedEnemy != null)
+            {
+                enemies.Add(spawnedEnemy);
+            }
+        }
+       // if (player.speed >= companion.speed)
+            State = BattleState.PlayerTurn;
+        
+        
+        
+        // TODO: Continue with any other setup like setting backgrounds, play music, etc.
+    }
+
+    public void NextBattle()
+    {
+        currentStageIndex++;  // Increment the stage index.
+        if (currentStageIndex < battleConfigs.Length)
+        {
+            StartBattle(battleConfigs[currentStageIndex]);  // Start the next battle.
+        }
+        else
+        {
+            // No more battles, handle end of game or loop back to the beginning.
+            
+            currentStageIndex = 0;  // Optional: Reset to the first battle.
+        }
+    }
+
 
     private void StartEnemyTurn()
 {
@@ -150,34 +213,15 @@ public class BattleManager : MonoBehaviour
     }
 
     public void MoveCirclesToTarget(Character target)
-{
-            // Move the circles to the targets position
-            outerCircle.transform.position = currentTarget.transform.position;
+     {
+        // Move the circles to the targets position
+        outerCircle.transform.position = currentTarget.transform.position;
 
-           // innerCircle.transform.position = currentTarget.transform.position;
-            //NEEDS OFFSET TO BE OFF SPRITE
-       
-}
-
-
-    public void StartBattle(BattleConfig config)
-    {
-        // Use config.poolName and config.maxEnemiesToSpawn to set up battle
-        // use the enemySpawnController to spawn the desired enemy type and number
-    
-        for (int i = 0; i < config.maxEnemiesToSpawn; i++)
-        {
-            // Spawn enemies based on the config.poolName
-            Character spawnedEnemy = enemySpawnController.SpawnEnemiesFromPool(config.poolName, 1, enemySpawnPoints[i], healthBars[i]);
-
-            // Add spawned enemy to the list
-            if (spawnedEnemy != null)
-            {
-                enemies.Add(spawnedEnemy);
-            }
-        }
-        // TODO: Continue with any other setup like setting backgrounds, play music, etc.
+        innerCircle.transform.position = currentTarget.transform.position;
+        //NEEDS OFFSET TO BE OFF SPRITE
+            
     }
+
 
         public void ExecuteQueuedSkills()
     {
@@ -192,18 +236,7 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    public void CompanionExecuteQueuedSkills()
-    {
-        if (currentTarget != null && state == BattleState.CompanionTurn)
-        {
-        DisableAllButtons();
-        StartCoroutine(CompanionExecuteAllSkillsCoroutine());
-        }
-        else
-        {
-        Debug.Log("No target selected");
-        }
-    }
+    
 
     public int skillsExecuted = 0;
     private IEnumerator ExecuteAllSkillsCoroutine()
@@ -214,188 +247,86 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-        Debug.Log("Executing queued skills. Current queue size before execution: " + skillQueue.Count);
-
-        // Dequeue skills one by one and execute them
-        Debug.Log("Starting skill execution loop");
+       
         int skillsExecuted = 0;
         while(skillQueue.Count > 0)
         {
-            Debug.Log("Skill execution of  " + skillQueue.Count);
             Skill skill = skillQueue.Dequeue();
-            Debug.Log("Executing skill: " + skill.skillName);
             player.currentSkill = skill;
             skillsExecuted++;
             yield return StartCoroutine(PlayerAction());
             
         }
-        
-        
-        Debug.Log("Cleared the skill queue after execution.");
+    
         skillsExecuted = 0;
-        yield return new WaitUntil(() => player.isAttacking == false);
-        // Move player back to their original position after all skills executed.
-        //yield return StartCoroutine(zoomEffect.ZoomOutEffect());
-        yield return player.ReturnToPosition();
         
-        if (companion == null)
-        {
-            ChangeState(BattleState.EnemyTurn);
-        }
-        else
-        {
-        ChangeState(BattleState.CompanionTurn);
-        }
-        }
-    }
-
-    public int companionSkillsExecuted = 0;
-
-    private IEnumerator CompanionExecuteAllSkillsCoroutine()
-    {
-        Debug.Log("Executing queued skills. Current queue size before execution: " + skillQueue.Count);
-
-        // Dequeue skills one by one and execute them
-        Debug.Log("Starting skill execution loop");
-        int companionSkillsExecuted = 0;
-        while(skillQueue.Count > 0)
-        {
-            Debug.Log("Skill execution of  " + skillQueue.Count);
-            Skill skill = skillQueue.Dequeue();
-            Debug.Log("Executing skill: " + skill.skillName);
-            companion.currentSkill = skill;
-            companionSkillsExecuted++;
-            yield return StartCoroutine(CompanionAction());
-            
-        }
-        
-        
-        Debug.Log("Cleared the skill queue after execution.");
-        skillsExecuted = 0;
-        yield return new WaitUntil(() => companion.isAttacking == false);
         // Move player back to their original position after all skills executed.
        // yield return StartCoroutine(zoomEffect.ZoomOutEffect());
-        yield return new WaitForSeconds(1.0f);
-        yield return companion.ReturnToPosition();
-        
-
+        yield return player.ReturnToPosition();
         ChangeState(BattleState.EnemyTurn);
+      
+      
+        }
     }
+
+    
+
+    
 
     //public ZoomEffect zoomEffect;
 
 
     public IEnumerator PlayerAction()
-{
-    if (state == BattleState.PlayerTurn && currentTarget)
     {
-        Debug.Log("PlayerAction() being called");
-
-        // Start zoom effect
-        //StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position)); 
-
-        if (player.currentSkill.requiresMovement && skillsExecuted == 0)
+        if (state == BattleState.PlayerTurn && currentTarget)
         {
-            yield return StartCoroutine(PlayerMoveAndAttackCoroutine());
-        }
-        else
-        {
-            yield return StartCoroutine(PlayerAttackCoroutine(null));
-        }
+        //  Debug.Log("PlayerAction() being called");
 
+            // Start zoom effect
+            //StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position)); 
+
+            if (player.currentSkill.requiresMovement && skillsExecuted == 0)
+            {
+                yield return StartCoroutine(PlayerMoveAndAttackCoroutine());
+            }
+            else
+            {
+                yield return StartCoroutine(PlayerAttackCoroutine(null));
+            }
+
+        }
     }
-}
-
-public IEnumerator CompanionAction()
-{
-    if (state == BattleState.CompanionTurn && currentTarget)
-    {
-        Debug.Log("CompanionAction() being called");
-
-        // Start zoom effect
-       // StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position)); 
-
-        if (companion.currentSkill.requiresMovement && companionSkillsExecuted == 0)
-        {
-            yield return StartCoroutine(CompanionMoveAndAttackCoroutine());
-        }
-        else
-        {
-            yield return StartCoroutine(CompanionAttackCoroutine(null));
-        }
-
-    }
-}
-
-
 
     public IEnumerator PlayerMoveAndAttackCoroutine()
-{
-    // Only move if the player is not already at the target
-    if (player.transform.position != currentTarget.transform.position)
     {
-        yield return player.MoveToTarget();
-        
-          
+        // Only move if the player is not already at the target
+        if (player.transform.position != currentTarget.transform.position)
+        {
+            yield return player.MoveToTarget();
+            
+            
+        }
+
+        yield return StartCoroutine(PlayerAttackCoroutine(null));
     }
 
-    yield return StartCoroutine(PlayerAttackCoroutine(null));
-}
-
-public IEnumerator CompanionMoveAndAttackCoroutine()
-{
-    // Only move if the player is not already at the target
-    if (companion.transform.position != currentTarget.transform.position)
-    {
-        yield return companion.MoveToTarget();
-        
-          
-    }
-
-    yield return StartCoroutine(CompanionAttackCoroutine(null));
-}
 
     public IEnumerator PlayerAttackCoroutine(System.Action successCallback)
-{
-    Character targetEnemy = currentTarget.GetComponent<Character>();
-    yield return new WaitUntil(() => targetEnemy.isAttacking == false);
-
-    if (player.currentSkill != null)
     {
-        //MoveCirclesToTarget(targetEnemy);
-        yield return player.currentSkill.Execute(player, targetEnemy, this);
-        
-        yield return new WaitForSeconds(0.1f);
+        Character targetEnemy = currentTarget.GetComponent<Character>();
+        yield return new WaitUntil(() => targetEnemy.isAttacking == false);
 
-        CheckBattleEnd();
+        if (player.currentSkill != null)
+        {
+            MoveCirclesToTarget(targetEnemy);
+            yield return player.currentSkill.Execute(player, targetEnemy, this);
+            
+            //yield return new WaitForSeconds(0.1f);
+
+            CheckBattleEnd();
+        }
+
     }
-    else
-    {
-        Debug.Log("currentSkill  - This should not happen");
-    }
-}
-
-public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
-{
-    Character targetEnemy = currentTarget.GetComponent<Character>();
-    yield return new WaitUntil(() => targetEnemy.isAttacking == false);
-
-    if (companion.currentSkill != null)
-    {
-        //MoveCirclesToTarget(targetEnemy);
-        yield return companion.currentSkill.Execute(companion, targetEnemy, this);
-        
-        yield return new WaitForSeconds(0.1f);
-
-        CheckBattleEnd();
-    }
-    else
-    {
-        Debug.Log("currentSkill  - This should not happen");
-    }
-}
-
-
 
     private Queue<Character> enemyTurnQueue = new Queue<Character>();
 
@@ -425,7 +356,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
         if (!player.isAttacking && !attackingEnemy.isAttacking && state == BattleState.EnemyTurn)
         {
             attackingEnemy.currentSkill = attackingEnemy.normalSkill;
-            Debug.Log("The enemy is starting to attack");
+          //  Debug.Log("The enemy is starting to attack");
             StartCoroutine(EnemyAttackCoroutine(attackingEnemy));
         }
     }
@@ -442,19 +373,20 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
                 yield return attackingEnemy.MoveToTarget();
             }
 
-            //MoveCirclesToTarget(player);
+            MoveCirclesToTarget(player);
             yield return attackingEnemy.currentSkill.Execute(attackingEnemy, player, this);
 
-            
+           
             if (attackingEnemy.currentSkill.requiresMovement)
             {
                 yield return attackingEnemy.ReturnToPosition();
             }
+           // Debug.Log("Enemy reurning to position");
         }
         else
         {
             Debug.Log("Standard Attack Performed - This should not happen");
-            player.TakeDamage(attackingEnemy.damage);
+            
         }
 
         if (player.health <= 0)
@@ -464,7 +396,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
         }
         else
         {
-            yield return new WaitForSeconds(0.5f);
+           // yield return new WaitForSeconds(0.5f);
 
            // Check if there are more enemies to take their turns
         if (enemyTurnQueue.Count > 0)
@@ -473,7 +405,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
         }
         else
         {
-            player.GainEnergy(5); //TODO: Instead of hard value, use player stat energyRegenValue
+            
             ChangeState(BattleState.PlayerTurn);  // If all enemies had their turns, it's the player's turn next.
          }
         CheckBattleEnd();
@@ -483,14 +415,16 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
    
    public CameraShake cameraShake;
 
-
+    public ColorChanger colorChanger;  // Reference to the ColorLerper script
+    
+    
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<TimingEventResult> callback)
 {
     // Enable the timing circles when the event starts
     outerCircle.SetActive(true);
-    // innerCircle.SetActive(true);
-
+    innerCircle.SetActive(true);
     float totalWindowDuration = windowEnd - windowStart;
+    colorChanger.StartColorTransition(totalWindowDuration);
     float timer = 0;
     bool buttonClicked = false;
 
@@ -498,12 +432,14 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
     Vector3 outerCircleInitialScale = outerCircle.transform.localScale; // Let's assume this is the size at start.
     Vector3 zeroScale = new Vector3(0, 0, 0); 
 
-    float speedFactor = 1.5f; // Change this value to adjust speed. Higher means faster.
+    float speedFactor = 1.25f; // Change this value to adjust speed. Higher means faster.
 
     try
     {
         while (timer < totalWindowDuration)
         {
+            
+   
             float progress = timer / totalWindowDuration;
             outerCircle.transform.localScale = Vector3.Lerp(outerCircleInitialScale, zeroScale, progress);
 
@@ -535,6 +471,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
         }
         else
         {
+            StartCoroutine(cameraShake.Shake());
             Debug.Log("No input detected. Missed!");
             result = TimingEventResult.Miss;
             skillQueue.Clear();
@@ -549,8 +486,9 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
     }
     // Disable the timing circles when the event ends
     outerCircle.SetActive(false);
-   // innerCircle.SetActive(false);
+    innerCircle.SetActive(false);
 }
+
 
 
 
@@ -580,10 +518,13 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
     {
         float totalHoldDuration = holdEnd - holdStart;
         float holdTimer = 0;
+        
+        colorChanger.StartColorTransition(totalHoldDuration);
 
         holdReleaseSlider.ResetSlider(); // Reset the slider at the start of the hold event
         holdReleaseSlider.gameObject.SetActive(true);
 
+        
         while (holdTimer < totalHoldDuration)
         {
             if (Input.GetMouseButton(0)) // Button is currently held down
@@ -655,8 +596,6 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
     TextMeshProUGUI goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
     goldGainedTextComponent.text = totalGold.ToString();
 
-    Debug.Log($"Total EXP gained: {totalExp}");
-    Debug.Log($"Total Gold gained: {totalGold}");
 }
 
 
@@ -666,6 +605,7 @@ public IEnumerator CompanionAttackCoroutine(System.Action successCallback)
 
 private void Update()
 {
+    
     if (Input.GetMouseButtonDown(0))
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
@@ -675,14 +615,17 @@ private void Update()
         {
             currentTarget = hit.collider.gameObject;
             player.attackTarget = currentTarget.transform;
-
-            Debug.Log("Current target: " + currentTarget.name);
-            
+        
             // Execute the queued skill here since an enemy is tapped after selecting a skill
-            ExecuteQueuedSkills();
+            if (State == BattleState.PlayerTurn)
+            {
+                ExecuteQueuedSkills();
+            }
             isSkillSelected = false;  // Reset the flag
         }
     }
+   
+    
 }
 
 
@@ -709,7 +652,7 @@ public void CheckBattleEnd()
             break;
         }
     }
-
+    new WaitForSeconds(3.0f);
     if (allEnemiesDefeated)
     {
         EndOfBattleRewards(enemies);
@@ -717,6 +660,7 @@ public void CheckBattleEnd()
         
     }
 }
+
 
 
 
