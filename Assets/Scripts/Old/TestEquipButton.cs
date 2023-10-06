@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class TestEquipButton : MonoBehaviour {
     public Equipment testEquipment;
     public EquipmentManager equipmentManager;
+    public Slot slot;
     public InventoryUI inventoryUI;
 
     private void Start() {
@@ -16,7 +17,8 @@ public class TestEquipButton : MonoBehaviour {
     void OnClickEquip() {
         
         int changedSlot = equipmentManager.Equip(testEquipment);
-        inventoryUI.UpdateUI(changedSlot);
+        slot.AddItem(testEquipment);
+        inventoryUI.UpdateUI();
 
     }
 }

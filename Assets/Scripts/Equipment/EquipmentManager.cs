@@ -38,8 +38,8 @@ public class EquipmentManager : MonoBehaviour {
         if (onEquipmentChanged != null) {
             onEquipmentChanged.Invoke(newEquipment, oldEquipment);
         }
-        inventoryUI.UpdateUI(slotIndex);
-         return slotIndex;
+        inventoryUI.UpdateUI();
+        return slotIndex;
 
     }
 
@@ -54,6 +54,7 @@ public class EquipmentManager : MonoBehaviour {
             if (onEquipmentChanged != null) {
                 onEquipmentChanged.Invoke(null, currentEquipment[slotIndex]);
             }
+             inventoryUI.UpdateUI();
         }
     
 
