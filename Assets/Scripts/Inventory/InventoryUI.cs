@@ -48,4 +48,27 @@ public class InventoryUI : MonoBehaviour
             slot.ClearSlot();
         }
     }
+
+    public void UpdateEquipmentSlotUI(int slotIndex, Equipment item)
+{
+    if (slotIndex < equipmentSlots.Count)
+    {
+        equipmentSlots[slotIndex].AddItem(item);
+    }
+}
+
+public void UpdateInventorySlotUI(Equipment item)
+{
+    // Find the first empty slot
+    for (int i = 0; i < inventorySlots.Count; i++)
+    {
+        if (inventorySlots[i].item == null)
+        {
+            inventorySlots[i].AddItem(item);
+            break;
+        }
+    }
+}
+
+    
 }

@@ -41,19 +41,16 @@ public class Slot : MonoBehaviour
 
 
     public void EquipFromInventory()
+{
+    if (item != null) 
     {
-        if (item != null) 
-        {
-            int equipmentSlotIndex = equipmentManager.Equip(item); // This should return the slot index where the item was equipped
-            
-            // update the equipment slot's UI based on equipmentSlotIndex
-            // equipmentSlots[equipmentSlotIndex].AddItem(item);
-
-            inventory.items.Remove(item);
-            ClearSlot();
-            inventoryUI.UpdateUI();
-        }
+        int equipmentSlotIndex = equipmentManager.Equip(item);
+        inventoryUI.UpdateEquipmentSlotUI(equipmentSlotIndex, item); // New line
+        inventory.items.Remove(item);
+        ClearSlot();
     }
+}
+
 
 
     // Handle the item click for both inventory and equipment slots
@@ -71,14 +68,16 @@ public class Slot : MonoBehaviour
     }
 
     private void UnequipItem()
+{
+    if (item != null)
     {
-        if (item != null)
-        {
-            inventory.items.Add(item);
-            equipmentManager.Unequip((int)equipmentType);
-            ClearSlot();
-        }
+        inventory.items.Add(item);
+        inventoryUI.UpdateInventorySlotUI(item); // New line
+        equipmentManager.Unequip((int)equipmentType);
+        ClearSlot();
     }
+}
+
 
     public void AddItem(Equipment newItem)
     {

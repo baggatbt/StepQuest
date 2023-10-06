@@ -8,6 +8,8 @@ public class EquipmentManager : MonoBehaviour {
     public Equipment[] currentEquipment; // Array to hold currently equipped items
     public Inventory inventory; // Reference to the player's inventory
     public InventoryUI inventoryUI;
+    public Slot[] equipmentSlots; // Array to hold the equipment slots UI elements
+   
 
 
     
