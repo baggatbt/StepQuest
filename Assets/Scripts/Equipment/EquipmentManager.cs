@@ -9,6 +9,7 @@ public class EquipmentManager : MonoBehaviour {
     public Inventory inventory; // Reference to the player's inventory
     public InventoryUI inventoryUI;
     public Slot[] equipmentSlots; // Array to hold the equipment slots UI elements
+    
    
 
 
@@ -35,6 +36,8 @@ public class EquipmentManager : MonoBehaviour {
 
         // Equip the new item
         currentEquipment[slotIndex] = newEquipment;
+        Debug.Log("Equipped to slot index: " + slotIndex);
+
 
         // Trigger an equipment change event, if there are any subscribers
         if (onEquipmentChanged != null) {
@@ -45,19 +48,22 @@ public class EquipmentManager : MonoBehaviour {
 
     }
 
-    public void Unequip(int slotIndex) {
+    public void Unequip(int slotIndex) 
+    {
         if (currentEquipment[slotIndex] != null)
         {
-            inventory.items.Add(currentEquipment[slotIndex]); // Add the unequipped item back to the inventory
+            Equipment itemToUnequip = currentEquipment[slotIndex];
+            inventory.items.Add(itemToUnequip);  // Adding it back to the inventory here, ensure this is the only place you're doing it
             currentEquipment[slotIndex] = null;
-        }
 
-            // Trigger an equipment change event, if there are any subscribers
-            if (onEquipmentChanged != null) {
-                onEquipmentChanged.Invoke(null, currentEquipment[slotIndex]);
+            if (onEquipmentChanged != null) 
+            {
+                onEquipmentChanged.Invoke(null, itemToUnequip);
             }
-             inventoryUI.UpdateUI();
+
+            inventoryUI.UpdateUI();
         }
+    }
     
 
     // Function to unequip all items

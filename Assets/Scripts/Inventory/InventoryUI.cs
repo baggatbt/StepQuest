@@ -8,6 +8,7 @@ public class InventoryUI : MonoBehaviour
 {
     public Inventory inventory;
     public Transform itemsParent; // The parent object holding all the inventory slots
+    public Transform equipmentParent;
     private List<Slot> inventorySlots;
     private List<Slot> equipmentSlots;
 
@@ -15,7 +16,7 @@ public class InventoryUI : MonoBehaviour
     {
         // Separate out inventory and equipment slots
         inventorySlots = itemsParent.GetComponentsInChildren<Slot>().Where(slot => slot.slotType == SlotType.Inventory).ToList();
-        equipmentSlots = itemsParent.GetComponentsInChildren<Slot>().Where(slot => slot.slotType == SlotType.Equipment).ToList();
+        equipmentSlots = equipmentParent.GetComponentsInChildren<Slot>().Where(slot => slot.slotType == SlotType.Equipment).ToList();
 
         Debug.Log("Inventory Slots count: " + inventorySlots.Count);
         Debug.Log("Equipment Slots count: " + equipmentSlots.Count);
@@ -54,6 +55,8 @@ public class InventoryUI : MonoBehaviour
     if (slotIndex < equipmentSlots.Count)
     {
         equipmentSlots[slotIndex].AddItem(item);
+        Debug.Log("Updating equipment slot UI for slot index: " + slotIndex + " out of " + equipmentSlots.Count + " total equipment slots.");
+
     }
 }
 

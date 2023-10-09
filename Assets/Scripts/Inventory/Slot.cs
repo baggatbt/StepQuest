@@ -17,7 +17,7 @@ using UnityEngine.UI;
 public class Slot : MonoBehaviour       
 {
     public SlotType slotType;
-    public EquipmentType? equipmentType; // Only used if slotType is Equipment
+    public EquipmentType equipmentType; // Only used if slotType is Equipment
    
     public Image icon;
     public Button removeButton; //  remove items from inventory
@@ -32,11 +32,13 @@ public class Slot : MonoBehaviour
     
     private void Start() 
 {
+    /*
     if (inventory.items.Count > 0) 
     {
         Equipment tempItem = inventory.items[0]; // Get the first item
       //  AddItem(tempItem);
     }
+    */
 }
 
 
@@ -55,28 +57,34 @@ public class Slot : MonoBehaviour
 
     // Handle the item click for both inventory and equipment slots
     public void OnItemClicked()
-    {
-        if (slotType == SlotType.Inventory)
-        {
-            EquipFromInventory();
-
-        }
-        else if (slotType == SlotType.Equipment && item != null)
-        {
-            UnequipItem();
-        }
-    }
-
-    private void UnequipItem()
 {
-    if (item != null)
+    Debug.Log("Item clicked!");
+
+    if (slotType == SlotType.Inventory)
     {
-        inventory.items.Add(item);
-        inventoryUI.UpdateInventorySlotUI(item); // New line
-        equipmentManager.Unequip((int)equipmentType);
-        ClearSlot();
+        Debug.Log("INVENTORY TYPE DETECTED");
+        EquipFromInventory();
+    }
+    else if (slotType == SlotType.Equipment)
+    {
+        Debug.Log("Trying to unequip...");
+        UnequipItem();
     }
 }
+
+
+    private void UnequipItem()
+    {
+        
+        if (item != null)  
+        {
+            Debug.Log("Attempting to Unequip");
+            inventoryUI.UpdateInventorySlotUI(item);
+            equipmentManager.Unequip((int)equipmentType);  
+            ClearSlot();
+        }
+        
+    }
 
 
     public void AddItem(Equipment newItem)
