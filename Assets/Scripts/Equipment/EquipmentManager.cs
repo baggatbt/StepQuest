@@ -25,6 +25,8 @@ public class EquipmentManager : MonoBehaviour {
 
     public int Equip(Equipment newEquipment) {
         int slotIndex = (int)newEquipment.equipmentType;
+        Debug.Log("Equipping: " + newEquipment.name + " to index: " + slotIndex);
+  
 
         Equipment oldEquipment = null;
 
@@ -50,6 +52,7 @@ public class EquipmentManager : MonoBehaviour {
 
     public void Unequip(int slotIndex) 
     {
+        Debug.Log("Trying to unequip from index: " + slotIndex);
         if (currentEquipment[slotIndex] != null)
         {
             Equipment itemToUnequip = currentEquipment[slotIndex];
