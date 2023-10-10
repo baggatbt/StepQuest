@@ -4497,6 +4497,7 @@ MonoBehaviour:
   attackPower: 0
   defensePower: 0
   inGameSteps: 0
+  stepsSinceStart: 0
   maxHealth: 0
   health: 0
   maxEnergy: 0
@@ -7413,7 +7414,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -673.9999, y: 90.880005}
+  m_AnchoredPosition: {x: -674, y: 90.880005}
   m_SizeDelta: {x: -1734.34, y: -988.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1649823201
@@ -8325,9 +8326,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1274183892}
-        m_TargetAssemblyTypeName: OpenSkillSelectionPanel, Assembly-CSharp
-        m_MethodName: openCompanionInterface
+      - m_Target: {fileID: 1274183894}
+        m_TargetAssemblyTypeName: Player, Assembly-CSharp
+        m_MethodName: ConsumeStepsToGainRewards
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -9807,7 +9808,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2037130038
 RectTransform:
   m_ObjectHideFlags: 0
