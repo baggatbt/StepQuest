@@ -18,8 +18,8 @@ public class Knight : PlayerJob
     {
         SkillType.Slash,
         SkillType.TripleHit,
-        SkillType.SwordWave,
         SkillType.GuardSkill,
+        SkillType.SwordWave,
         
     };
 

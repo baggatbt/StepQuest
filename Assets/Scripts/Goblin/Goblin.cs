@@ -13,6 +13,7 @@ public class Goblin : Enemy
         this.level = 1;
         this.maxHealth = 30 + (this.level * 10);
         this.health = this.maxHealth;
+        this.maxEnergy = 1;
         
     }
      protected override void Start()
@@ -21,7 +22,7 @@ public class Goblin : Enemy
         this.skills = new List<Skill> // Make sure to initialize the skills list before adding to it
         {
             new GoblinAttackSkill(),
-            //new GoblinSpecialAttackSkill()
+            new GoblinSpecialAttackSkill()
         };
         
         this.expReward = 8;  //TODO: Add scaling
@@ -33,7 +34,7 @@ public class Goblin : Enemy
 
         // Assign the skills
         this.normalSkill = this.skills[0]; // Normal skill
-        // this.specialSkill = this.skills[1]; // Special skill
+        this.specialSkill = this.skills[1]; // Special skill
 
         // Set the default currentSkill
         this.currentSkill = this.normalSkill;

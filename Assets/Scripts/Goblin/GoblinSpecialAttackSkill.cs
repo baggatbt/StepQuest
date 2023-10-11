@@ -1,16 +1,18 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class GoblinAttackSkill : Skill
+
+public class GoblinSpecialAttackSkill : Skill
 {
     private int numberOfAttacksPossible;
 
-    public GoblinAttackSkill()
+    public GoblinSpecialAttackSkill()
     {
         skillName = "Goblin Attack";
         description = "The Goblin attacks the player. The damage can be reduced by timely action.";
         requiresMovement = true;
-        numberOfAttacksPossible = 1;
+        numberOfAttacksPossible = 2;
     }
 
     // Override the default base damage calculation.
@@ -46,6 +48,7 @@ public class GoblinAttackSkill : Skill
         user.animationDamageTime = false;
         user.isAnimationDone = false;
         user.isAttacking = false;
+        user.energy = 0;
         target.CheckForDeath();
     }
 
