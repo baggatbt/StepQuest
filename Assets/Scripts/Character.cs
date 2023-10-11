@@ -68,9 +68,13 @@ public class Character : MonoBehaviour
         {
             healthBar.maxValue = maxHealth;
             healthBar.value = health;
-            if (healthText !=null && energyText !=null)
+            if (healthText != null )
             {
                 healthText.text = "HP: " + health; 
+                
+            }
+            if (energyText != null)
+            {
                 energyText.text = "MP: " + energy;
             }
         }
@@ -85,6 +89,7 @@ public class Character : MonoBehaviour
 
     protected virtual void Start()
     {
+        /*
         
         if (healthBar != null)
         {
@@ -103,6 +108,7 @@ public class Character : MonoBehaviour
             energyBar.maxValue = maxEnergy;
             energyBar.value = energy;
         }
+        */
     }
 
     
@@ -208,6 +214,10 @@ public class Character : MonoBehaviour
     if (energyBar != null)
     {
         energyBar.value = energy;
+        
+    }
+    if (energyText != null) //Had to separate this because monster energies do not use text.
+    {
         energyText.text = "MP: " + energy;
     }
 }

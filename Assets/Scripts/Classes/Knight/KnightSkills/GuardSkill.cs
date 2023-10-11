@@ -8,10 +8,12 @@ public class GuardSkill : Skill
     public GuardSkill()
     {
         skillName = "Guard";
-        description = "Increase DEF by 50% for two turns.";
-        requiresMovement = false;
-        energyCost = 2;
+        description = "Increases defense by 50% for two turns";
+        energyCost = 2; 
+        energyGain = 0;
         skillLevel = 1; 
+        requiresMovement = false; 
+        skillExecutionComplete = false;
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
@@ -21,6 +23,7 @@ public class GuardSkill : Skill
         battleManager.statusEffectController.AddEffect(defenseUpEffect, user, 2);
         Debug.Log("Guard skill applied");
         user.isAttacking = false;
+        user.animator.SetTrigger("GuardTrigger");
         yield return null;
     }
 }

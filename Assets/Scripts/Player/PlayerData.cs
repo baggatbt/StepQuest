@@ -18,6 +18,7 @@ public class PlayerData : MonoBehaviour
     public int attackPower;
     public int defensePower;
     public int inGameSteps;
+    public int stepsSinceStart;
     public int maxHealth;
     public int health;
     public int maxEnergy;
@@ -179,7 +180,7 @@ public class PlayerData : MonoBehaviour
             int previousInGameSteps = PlayerPrefs.GetInt("InGameSteps", 0);
             int stepsDuringClosure = stepsWhenReOpening - stepsBeforeClosing;
             inGameSteps = previousInGameSteps + stepsDuringClosure; 
-            previousSteps = stepsWhenReOpening;
+            previousSteps = inGameSteps;
             Debug.Log("Loaded Steps: " + inGameSteps);
         }
     }

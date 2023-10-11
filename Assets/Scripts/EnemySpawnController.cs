@@ -10,6 +10,7 @@ public class EnemySpawnController : MonoBehaviour
     public TextMeshProUGUI healthText3;
 
     private TextMeshProUGUI[] healthTexts; // Array to store all health texts
+
     private int enemiesSpawned = 0;        // Counter to keep track of the number of enemies spawned
 
     [System.Serializable]
@@ -35,7 +36,7 @@ public class EnemySpawnController : MonoBehaviour
         healthTexts = new TextMeshProUGUI[] { healthText, healthText2, healthText3 };
     }
 
-    public Character SpawnEnemiesFromPool(string poolName, int numberToSpawn, Transform spawnPoint, Slider associatedHealthBarSlider)
+    public Character SpawnEnemiesFromPool(string poolName, int numberToSpawn, Transform spawnPoint, Slider associatedHealthBarSlider, Slider associatedEnergyBarSlider)
     {
         if (!poolDictionary.ContainsKey(poolName))
         {
@@ -53,6 +54,7 @@ public class EnemySpawnController : MonoBehaviour
             if (lastSpawnedCharacter == null) continue;
 
             lastSpawnedCharacter.healthBar = associatedHealthBarSlider;
+            lastSpawnedCharacter.energyBar = associatedEnergyBarSlider;
 
             // Assign the healthText based on the enemiesSpawned count
             lastSpawnedCharacter.healthText = healthTexts[enemiesSpawned];
@@ -63,6 +65,10 @@ public class EnemySpawnController : MonoBehaviour
             associatedHealthBarSlider.gameObject.SetActive(true);
             associatedHealthBarSlider.maxValue = lastSpawnedCharacter.maxHealth;
             associatedHealthBarSlider.value = lastSpawnedCharacter.health;
+
+            associatedEnergyBarSlider.gameObject.SetActive(true);
+            associatedEnergyBarSlider.maxValue = lastSpawnedCharacter.maxEnergy;
+            associatedEnergyBarSlider.value = 0;
         }
 
         return lastSpawnedCharacter;

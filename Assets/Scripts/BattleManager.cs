@@ -20,10 +20,11 @@ public class BattleManager : MonoBehaviour
     public int enemyAttackCount = 0;
     public GameObject currentTarget;
     public HoldReleaseSlider holdReleaseSlider;
-    public Slider[] healthBars; //set these in the inspector
+    public Slider[] healthBars; //set these in the inspector for enemies
+    public Slider[] energyBars;
     public Skill requestedSkill; // The skill the player chooses next during an ongoing attack.
     public Queue<Skill> skillQueue = new Queue<Skill>();
-    public Button[] skillButtons; // An array of buttons representing skill slots
+    public Button[] skillButtons; // An array of buttons for representing skill slots
     public Button launchAttacksButton; 
     public StatusEffectController statusEffectController;
     
@@ -144,7 +145,7 @@ public class BattleManager : MonoBehaviour
         for (int i = 0; i < config.maxEnemiesToSpawn; i++)
         {
             // Spawn enemies based on the config.poolName
-            Character spawnedEnemy = enemySpawnController.SpawnEnemiesFromPool(config.poolName, 1, enemySpawnPoints[i], healthBars[i]);
+            Character spawnedEnemy = enemySpawnController.SpawnEnemiesFromPool(config.poolName, 1, enemySpawnPoints[i], healthBars[i], energyBars[i]);
 
             // Add spawned enemy to the list
             if (spawnedEnemy != null)
@@ -352,12 +353,20 @@ public class BattleManager : MonoBehaviour
         }
 
         Character attackingEnemy = enemyTurnQueue.Dequeue();
-
+        //Decide whether or not to use the special attack or the normal one
         if (!player.isAttacking && !attackingEnemy.isAttacking && state == BattleState.EnemyTurn)
         {
+            if (attackingEnemy.energy >= attackingEnemy.maxEnergy)
+            {
+                attackingEnemy.currentSkill = attackingEnemy.specialSkill;
+            }
+            else 
+            {
             attackingEnemy.currentSkill = attackingEnemy.normalSkill;
-          //  Debug.Log("The enemy is starting to attack");
+            }
+          
             StartCoroutine(EnemyAttackCoroutine(attackingEnemy));
+            
         }
     }
 

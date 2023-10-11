@@ -10,7 +10,7 @@ public class Slime : Enemy
         this.skills = new List<Skill> // Make sure to initialize the skills list before adding to it
         {
             new SlimeAttackSkill(),
-            // new SlimeSpecialAttackSkill()
+            new SlimeSpecialAttackSkill()
         };
         this.level = 1;
         this.expReward = (5 * this.level);
@@ -21,10 +21,11 @@ public class Slime : Enemy
         this.health = this.maxHealth;
         this.defensePower = 4 + (this.level * 3);
         this.speed = 2;
+        this.maxEnergy = 2;
 
         // Assign the skills
         this.normalSkill = this.skills[0]; // Normal skill
-        // this.specialSkill = this.skills[1]; // Special skill
+        this.specialSkill = this.skills[1]; // Special skill
 
         // Set the default currentSkill
         this.currentSkill = this.normalSkill;

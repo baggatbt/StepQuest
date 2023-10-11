@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public class Player : Character
 {
@@ -186,24 +187,20 @@ public class Player : Character
         playerData.SavePlayerData();
     }
 
-    public void ConsumeStepsToGainRewards()
+   public void ConsumeStepsToGainRewards()
 {
-    stepsAvailableToConsume = playerData.inGameSteps;
-    Debug.Log(stepsAvailableToConsume);
-    
-    // Convert steps to rewards
-    double expReward = stepsAvailableToConsume * 0.00167; //EXP per step
-    double goldReward = stepsAvailableToConsume * 0.02; //GOLD per step
+    stepsAvailableToConsume = PlayerData.Instance.stepsSinceStart;
+    Debug.Log(stepsAvailableToConsume); 
 
-    playerData.exp += (int)expReward;
-    playerData.gold += (int)goldReward;
-    LevelUp();
-    playerData.inGameSteps = 0;
+    int expReward = (int)Math.Round(stepsAvailableToConsume * 0.01);
+    int goldReward = (int)Math.Round(stepsAvailableToConsume * 0.01);
+
+    GainExperience(expReward);
+    GainGold(goldReward);
+    PlayerData.Instance.stepsSinceStart = 0;
     playerData.SavePlayerData();
 }
 
-
-    
 
     public void LevelUp()
     {
@@ -219,10 +216,11 @@ public class Player : Character
 
     //ExpRequiredToLevelUp(1) will return 25.
     //ExpRequiredToLevelUp(2) will return 100.
+    //(3) will return 225
     //ExpRequiredToLevelUp(50) will return 62,500.
     private int ExpRequiredToLevelUp(int level)
 {
-    int a = 25; // This constant can be adjusted based on your needs.
+    int a = 25; 
     
     int expRequiredToLevel = a * level * level;
     

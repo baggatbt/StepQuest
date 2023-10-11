@@ -10,14 +10,14 @@ public class TripleHitSkill : Skill
         skillName = "Triple Slash";
         description = "Slash three times";
         requiresMovement = true;
-        energyCost = 3;
+        energyCost = 4;
         numberOfAttacksPossible = 3;
     }
 
     // Override the default base damage calculation.
     protected override int CalculateBaseDamage(Character user)
     {
-        return (int)(user.attackPower * 0.5f);  // 60% of the character's attack.
+        return (int)(user.attackPower * 0.5f);  // 50% of the character's attack.
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)

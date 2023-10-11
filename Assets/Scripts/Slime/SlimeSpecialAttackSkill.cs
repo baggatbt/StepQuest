@@ -1,66 +1,69 @@
-/*
 using System.Collections;
 using UnityEngine;
 
 public class SlimeSpecialAttackSkill : Skill
 {
-    // Constants for the timing window for player block
-    private const float WINDOW_START = 0.5f;
-    private const float WINDOW_END = 1.5f;
-
+    private int numberOfAttacks;
     public SlimeSpecialAttackSkill()
     {
-        name = "Slime Special Attack";
-        description = "The slime hits hard, unless the attack is blocked";
+        skillName = "Slime Special Attack";
+        description = "The slime attacks the player. The damage can be reduced by timely action.";
+        requiresMovement = true;
+        energyCost = 0;
+        numberOfAttacks = 2;
+
     }
 
-    // Damage calculation methods
-    private int CalculateUnblockedDamage(Character user)
+     protected override int CalculateBaseDamage(Character user)
     {
-        // Insert your damage calculation logic here. For now, let's return a simple value.
-        return user.damage + 1;
+        return user.attackPower; // 100% of user's attack power
     }
 
-    private int CalculateBlockedDamage(Character user)
+     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
-        
-        return user.damage;
-    }
+        user.isAttacking = true;
+        user.isAnimationDone = false;  // Reset the flag at the start of each attack
 
-    public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
-    {
-        Debug.Log("using special attack");
 
-        // Reset the skillExecutionComplete flag at the start
-        skillExecutionComplete = false;
 
-        user.animator.SetTrigger("SlimeSpecialAttackTrigger");
+        int baseDamage = CalculateBaseDamage(user);
 
-        TimingEventResult timingResult = TimingEventResult.Failure;
-
-        // Player has a chance to block the attack
-        yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(WINDOW_START, WINDOW_END, (result) =>
+        user.animator.SetTrigger("SlimeAttack1Trigger");
+        for( int i = 0; i < numberOfAttacks; i++)
         {
-            timingResult = result;
+             
+
+             yield return TimingWindow(user, target, battleManager, 0.0f, 0.7f);
+             
+
+             HandleTimingResultForEnemyAttack(user, target, result, baseDamage);
+             Debug.Log("Timing for enemy attack has been handled waiting for animations");
+             //Wait until the timing event happens to move on to next attack stage
+             yield return new WaitUntil(() => user.animationDamageTime == true);
+             
+        }
+        Debug.Log("waiting on animation to finish");
+    
+        yield return new WaitUntil(() => user.isAnimationDone == true);
+        user.animationDamageTime = false;
+        user.isAnimationDone = false;
+        user.energy = 0;
+        user.isAttacking = false;
+        target.CheckForDeath();
+    }
+
+
+    private IEnumerator TimingWindow(Character user, Character target, BattleManager battleManager, float windowStart, float windowEnd)
+    {
+       
+        yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(windowStart, windowEnd, (timingResult) =>
+        {
+            result = timingResult;
         }));
-
-        // If the player blocked successfully, do less damage
-        if (timingResult == TimingEventResult.Success)
-        {
-            Debug.Log("Attack blocked!");
-            target.TakeDamage(CalculateBlockedDamage(user));
-        }
-        else
-        {
-            // Otherwise, do full damage
-            target.TakeDamage(CalculateUnblockedDamage(user));
-        }
-
-        Debug.Log("Enemy attacked with Slime Special Attack");
-
-        // Set the skillExecutionComplete flag to true at the end
-        skillExecutionComplete = true;
+         
     }
+
 
 }
-*/
+    
+
