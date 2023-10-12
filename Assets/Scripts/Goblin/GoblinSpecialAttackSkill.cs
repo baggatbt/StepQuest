@@ -28,7 +28,7 @@ public class GoblinSpecialAttackSkill : Skill
 
         int baseDamage = CalculateBaseDamage(user);
 
-        user.animator.SetTrigger("GoblinAttack1Trigger");
+        user.animator.SetTrigger("GoblinSpecialAttackTrigger");
 
         for (int i = 0; i < numberOfAttacksPossible; i++)
         {
