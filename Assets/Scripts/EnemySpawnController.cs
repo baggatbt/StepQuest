@@ -70,6 +70,7 @@ public class EnemySpawnController : MonoBehaviour
             associatedEnergyBarSlider.maxValue = lastSpawnedCharacter.maxEnergy;
             associatedEnergyBarSlider.value = 0;
         }
+        enemiesSpawned = 0;
 
         return lastSpawnedCharacter;
     }

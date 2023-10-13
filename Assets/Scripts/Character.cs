@@ -288,7 +288,7 @@ public class Character : MonoBehaviour
         {
             while (!HasReachedPosition(targetPosition))
             {
-                transform.position = Vector3.MoveTowards(transform.position, targetPosition, 15.0f * Time.deltaTime);
+                transform.position = Vector3.MoveTowards(transform.position, targetPosition, 17.5f * Time.deltaTime);
                 
                 if (checkCollisionsDuringMovement && IsCollidingWithCharacter())
                 {
