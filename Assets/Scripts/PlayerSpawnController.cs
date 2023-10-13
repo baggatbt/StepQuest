@@ -8,6 +8,7 @@ public class PlayerSpawnController : MonoBehaviour
     public Transform playerSpawnPoint; // You can assign this directly in the inspector
     public Slider associatedHealthBarSlider; // Reference to the slider
     public Slider associatedEnergyBarSlider;
+    public Slider associatedStrideEnergyBarSlider;
     public TextMeshProUGUI associatedHealthText;
     public TextMeshProUGUI associatedEnergyText;
     public BattleManager battleManager;
@@ -48,9 +49,15 @@ public class PlayerSpawnController : MonoBehaviour
     associatedEnergyBarSlider.maxValue = spawnedPlayer.maxEnergy;
     associatedEnergyBarSlider.value = spawnedPlayer.energy;
     spawnedPlayer.energyText = associatedEnergyText;
+
+    spawnedPlayer.strideEnergyBar = associatedStrideEnergyBarSlider;
+    associatedStrideEnergyBarSlider.gameObject.SetActive(true);
+    associatedStrideEnergyBarSlider.maxValue = (spawnedPlayer.maxEnergy / 2);
+    associatedStrideEnergyBarSlider.value = 0; //Always starts at 0
+
      
 
-  //Spawn controller is loading after character cause player is a characte4r!
+  //Spawn controller is loading after character cause player is a character!
 
    
 

@@ -68,6 +68,8 @@ public class Player : Character
             playerData.maxEnergy = 5;
             playerData.energy = playerData.maxEnergy;
             playerData.speed = 3;
+            playerData.maxStrideEnergy = playerData.maxEnergy;
+            playerData.strideEnergy = 0;
 
             PlayerPrefs.SetInt("PlayerInitialized", 1);
             
@@ -96,6 +98,8 @@ public class Player : Character
     exp = playerData.exp;
     jobClass = playerData.jobClass;
     inGameSteps = playerData.inGameSteps;
+    strideEnergyMax = playerData.maxStrideEnergy;
+    strideEnergy = playerData.strideEnergy;
     
     
     }
