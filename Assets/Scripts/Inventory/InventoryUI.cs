@@ -1,77 +1,27 @@
-using System.Collections;
+using UnityEngine.UI;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using System.Linq;
 
-public class InventoryUI : MonoBehaviour 
+public class InventoryUI : MonoBehaviour
 {
-    public Inventory inventory;
-    public Transform itemsParent; // The parent object holding all the inventory slots
-    public Transform equipmentParent;
-    private List<Slot> inventorySlots;
-    private List<Slot> equipmentSlots;
-
-    private void Start() 
-    {
-        // Separate out inventory and equipment slots
-        inventorySlots = itemsParent.GetComponentsInChildren<Slot>().Where(slot => slot.slotType == SlotType.Inventory).ToList();
-        equipmentSlots = equipmentParent.GetComponentsInChildren<Slot>().Where(slot => slot.slotType == SlotType.Equipment).ToList();
-
-        Debug.Log("Inventory Slots count: " + inventorySlots.Count);
-        Debug.Log("Equipment Slots count: " + equipmentSlots.Count);
-        Debug.Log("Inventory reference: " + inventory);
-
-        UpdateUI();
-    }
+    public Inventory playerInventory;
+    public Image[] itemSlots;  // Drag item slot images from the scene here
 
     public void UpdateUI()
     {
-        Debug.Log("UpdateUI being called");
-
-        // Handle Inventory Slots
-        for (int i = 0; i < inventorySlots.Count; i++)
+        // Clear all item slot visuals
+        foreach (Image image in itemSlots)
         {
-            if (i < inventory.items.Count)
-            {
-                inventorySlots[i].AddItem(inventory.items[i]);
-            }
-            else
-            {
-                inventorySlots[i].ClearSlot();
-            }
+            image.sprite = null;
+            image.enabled = false;  // hide image
         }
 
-        // Handle Equipment Slots
-        // For now, just clear them. 
-        foreach (Slot slot in equipmentSlots)
+        // Loop through inventory items and display them
+        for (int i = 0; i < playerInventory.items.Count; i++)
         {
-            slot.ClearSlot();
+            itemSlots[i].sprite = playerInventory.items[i].itemIcon;
+            itemSlots[i].enabled = true;  // show image
         }
     }
-
-    public void UpdateEquipmentSlotUI(int slotIndex, Equipment item)
-{
-    if (slotIndex < equipmentSlots.Count)
-    {
-        equipmentSlots[slotIndex].AddItem(item);
-        Debug.Log("Updating equipment slot UI for slot index: " + slotIndex + " out of " + equipmentSlots.Count + " total equipment slots.");
-
-    }
-}
-
-public void UpdateInventorySlotUI(Equipment item)
-{
-    // Find the first empty slot
-    for (int i = 0; i < inventorySlots.Count; i++)
-    {
-        if (inventorySlots[i].item == null)
-        {
-            inventorySlots[i].AddItem(item);
-            break;
-        }
-    }
-}
-
-    
 }
