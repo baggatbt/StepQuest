@@ -1,45 +1,66 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using System.Collections.Generic;
 
-[Serializable]
 public class Inventory : MonoBehaviour
 {
-    public List<Equipment> items = new List<Equipment>();
-    public int maxItems = 20;
-    public EquipmentSlots equippedItems = new EquipmentSlots();
+    [Header("Inventory UI")]
+    public GameObject inventoryUI; // Drag your InventoryUI GameObject here
+    public GameObject slotPrefab; // Drag your Slot Prefab here
+    public int maxInventorySlots = 16; // Maximum number of slots
+    public Item testItem;
 
-    public void Add(Equipment item)
-    {
-        if (items.Count < maxItems) items.Add(item);
-    }
+    private List<Item> items = new List<Item>();
+    private List<GameObject> itemSlots = new List<GameObject>();
 
-    public void Remove(Equipment item)
+    private void Start()
     {
-        items.Remove(item);
-    }
-
-    public void Equip(Equipment item)
-    {
-        // Unequip the current item if there's one in the slot
-        Equipment currentItem = equippedItems.GetEquipment(item.equipmentType);
-        if(currentItem != null)
+        // Initialize empty slots
+        for (int i = 0; i < maxInventorySlots; i++)
         {
-            Unequip(item.equipmentType);
+            GameObject slot = Instantiate(slotPrefab, inventoryUI.transform);
+            slot.SetActive(true);
+            itemSlots.Add(slot);
+        }
+    }
+
+    public bool AddItem(Item item)
+    {
+        if (items.Count >= maxInventorySlots)
+        {
+            Debug.Log("Inventory is full!");
+            return false;
         }
 
-        // Equip the new item
-        equippedItems.SetEquipment(item.equipmentType, item);
-        Remove(item);
+        items.Add(item);
+        UpdateInventoryUI();
+        return true;
     }
 
-    public void Unequip(EquipmentType type)
+    public void RemoveItem(Item item)
     {
-        Equipment currentItem = equippedItems.GetEquipment(type);
-        if(currentItem != null)
+        if (items.Remove(item))
         {
-            Add(currentItem);
-            equippedItems.SetEquipment(type, null);
+            UpdateInventoryUI();
         }
+    }
+
+    private void UpdateInventoryUI()
+    {
+        // Then enable and update necessary slots
+        for (int i = 0; i < items.Count; i++)
+        {
+            itemSlots[i].SetActive(true);
+
+            // Find the ItemContainer and then the Image inside it
+            Image itemImage = itemSlots[i].transform.Find("ItemContainer").GetComponentInChildren<Image>();
+            if (itemImage != null)
+                itemImage.sprite = items[i].itemIcon;
+        }
+    }
+
+    public void AddTestItem()
+    {
+        AddItem(testItem);
     }
 }

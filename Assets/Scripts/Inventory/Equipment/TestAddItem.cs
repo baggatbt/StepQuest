@@ -1,3 +1,4 @@
+/*
 using UnityEngine;
 
 public class TestAddItem : MonoBehaviour
@@ -15,3 +16,4 @@ public class TestAddItem : MonoBehaviour
         }
     }
 }
+*/
