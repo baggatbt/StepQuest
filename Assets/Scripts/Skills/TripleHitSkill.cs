@@ -33,7 +33,8 @@ public class TripleHitSkill : Skill
         {
              
 
-             yield return TimingWindow(user, target, battleManager, 0.0f, 0.6f);
+             yield return TimingWindow(user, target, battleManager, 0.0f, 0.7f);
+             
              
 
              HandleTimingResultForPlayerAttack(user, target, result, baseDamage);

@@ -27,6 +27,7 @@ public class BattleManager : MonoBehaviour
     public Button[] skillButtons; // An array of buttons for representing skill slots
     public Button launchAttacksButton; 
     public StatusEffectController statusEffectController;
+    public TextMeshProUGUI timingFeedbackText;
     
 
 
@@ -430,8 +431,8 @@ public class BattleManager : MonoBehaviour
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<TimingEventResult> callback)
 {
     // Enable the timing circles when the event starts
-    outerCircle.SetActive(true);
-    innerCircle.SetActive(true);
+   // outerCircle.SetActive(true);
+    //innerCircle.SetActive(true);
     float totalWindowDuration = windowEnd - windowStart;
     colorChanger.StartColorTransition(totalWindowDuration);
     float timer = 0;
@@ -455,7 +456,7 @@ public class BattleManager : MonoBehaviour
             if (Input.GetMouseButtonDown(0))
             {
                 buttonClicked = true;
-                StartCoroutine(cameraShake.Shake());
+               
 
                 break;
             }
@@ -470,19 +471,22 @@ public class BattleManager : MonoBehaviour
             if (timer >= windowStart)
             {
                 result = GetTimingAccuracy(outerCircle.transform.localScale);
+                timingFeedbackText.text = result.ToString();
             }
             else
             {
                 Debug.Log("Timing Missed!");
                 result = TimingEventResult.Miss;
+                timingFeedbackText.text = result.ToString();
                 skillQueue.Clear();
             }
         }
         else
         {
-            StartCoroutine(cameraShake.Shake());
+          
             Debug.Log("No input detected. Missed!");
             result = TimingEventResult.Miss;
+            timingFeedbackText.text = result.ToString();
             skillQueue.Clear();
         }
 
@@ -510,10 +514,12 @@ public class BattleManager : MonoBehaviour
 
     if (outerCircleScale.x <= perfectThreshold) 
     {
+        StartCoroutine(cameraShake.Shake());
         return TimingEventResult.Perfect;
     }
     else if (outerCircleScale.x <= goodThreshold)
     {
+        StartCoroutine(cameraShake.Shake());
         return TimingEventResult.Good;
     }
     else

@@ -23,6 +23,8 @@ public class PlayerData : MonoBehaviour
     public int health;
     public int maxEnergy;
     public int energy;
+    public int maxStrideEnergy;
+    public int strideEnergy;
     public string jobClass;
     public int speed;
     public Dictionary<string, int> skillLevels;
@@ -30,9 +32,11 @@ public class PlayerData : MonoBehaviour
     public List<Mission> activeMissions = new List<Mission>();
 
     private StepCounterController stepCounterController;
+    
 
     private void Awake()
 {
+    maxStrideEnergy = (maxEnergy / 2);
    //For testing, wipes saved data 
    //PlayerPrefs.DeleteAll();
 
@@ -44,6 +48,7 @@ public class PlayerData : MonoBehaviour
         
         LoadPlayerData();
         
+        
     }
     else
     {
@@ -53,6 +58,8 @@ public class PlayerData : MonoBehaviour
         skillLevels = new Dictionary<string, int>();
         skillExp = new Dictionary<string, int>();
 
+        maxStrideEnergy = (maxEnergy / 2);
+        strideEnergy = 0;
         stepCounterController = FindObjectOfType<StepCounterController>();
         if (stepCounterController == null)
         {
@@ -100,7 +107,7 @@ public class PlayerData : MonoBehaviour
      //   Debug.Log("Steps in Update: " + inGameSteps);
     }
 
-    public void UpdatePlayerData(int level, string jobClass, int exp, int gold, int attackPower, int defensePower, int inGameSteps, int maxHealth, int health, int maxEnergy, int energy, int speed)
+    public void UpdatePlayerData(int level, string jobClass, int exp, int gold, int attackPower, int defensePower, int inGameSteps, int maxHealth, int health, int maxEnergy, int energy, int speed, int maxStrideEnergy, int strideEnergy)
     {
         this.level = level;
         this.jobClass = jobClass;
@@ -114,6 +121,8 @@ public class PlayerData : MonoBehaviour
         this.maxEnergy = maxEnergy;
         this.energy = energy;
         this.speed = speed;
+        this.maxStrideEnergy = maxStrideEnergy;
+        this.strideEnergy = strideEnergy;
         
 
         SavePlayerData(); 
@@ -131,6 +140,7 @@ public class PlayerData : MonoBehaviour
         PlayerPrefs.SetInt("PlayerMaxHealth", maxHealth);
         PlayerPrefs.SetInt("PlayerMaxEnergy", maxEnergy); 
         PlayerPrefs.SetInt("PlayerSpeed", speed);
+        PlayerPrefs.SetInt("PlayerMaxStrideEnergy", maxStrideEnergy);
         PlayerPrefs.Save();
         Debug.Log("Data saved");
     }

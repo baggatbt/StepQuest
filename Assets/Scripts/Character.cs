@@ -16,9 +16,11 @@ public class Character : MonoBehaviour
     public int attackPower;
     public int defensePower;
     public int speed;
-    
+    public int strideEnergyMax;
+    public int strideEnergy;
     public Slider healthBar;
     public Slider energyBar;
+    public Slider strideEnergyBar;
     public Transform attackTarget;
     public Vector3 originalPosition;
     public bool isAttacking = false;
@@ -75,7 +77,10 @@ public class Character : MonoBehaviour
             }
             if (energyText != null)
             {
-                energyText.text = "MP: " + energy;
+                energyText.text = "MP: " + energy + " / " + strideEnergy;
+                strideEnergyBar.value = strideEnergy;
+                Debug.Log("Stride energy" + strideEnergy);
+                
             }
         }
         
@@ -84,6 +89,7 @@ public class Character : MonoBehaviour
         {
             energyBar.maxValue = maxEnergy;
             energyBar.value = energy;
+            
         }
     }
 
@@ -146,6 +152,7 @@ public class Character : MonoBehaviour
         DamagePopup damagePopupScript = damagePopupInstance.GetComponent<DamagePopup>();
         damagePopupScript.Setup(damageDealt);
         
+        
     }
     else
     {
@@ -178,47 +185,60 @@ public class Character : MonoBehaviour
     this.gameObject.SetActive(false);  // deactivate the GameObject after fade
 }
 
-
+    private int remainingCost = 0;
     public void SpendEnergy(int energySpent)
 {
-    energy -= energySpent;
-   // Debug.Log("Current Energy: " + energy); 
+    remainingCost = energySpent - strideEnergy;
+
+    if (strideEnergy <= 0) //If player has no stride energy, just use mana
+    {
+        energy -= energySpent;
+    }
+    if (strideEnergy >= 1 && remainingCost >= 0) //if player has stride energy but not enough to cover the whole cost
+    {
+        strideEnergy = 0;
+        energy -= remainingCost;
+        strideEnergyBar.value = strideEnergy;
+    }
+    else 
+    {
+        strideEnergy -= energySpent;
+        strideEnergyBar.value = strideEnergy;
+    }
+    
+   
     if (energyBar != null)
     {
         energyBar.value = energy;
-        energyText.text = "MP: " + energy;
+        energyText.text = "MP: " + energy + " / " + strideEnergy;
     }
 }
 
 
     public void GainEnergy(int energyGained)
 {
-    /*
-    if (energyGained % 2 != 0) //Checks to make sure energy values stay rounded 
+    if (strideEnergy + energyGained > strideEnergyMax) // If the gained energy will bring the total over the max
     {
-        energyGained--;
-    }
-    */
+        strideEnergy = strideEnergyMax; // Set energy to the max
 
-    if (energy + energyGained > maxEnergy) // If the gained energy will bring the total over the max
-    {
-        energy = maxEnergy; // Set energy to the max
     }
-    else // If the gained energy will not bring the total over the max
+    if (strideEnergy + energyGained < strideEnergyMax) // If the gained energy will not bring the total over the max
     {
-        energy += energyGained; // Add the gained energy to the total
+        strideEnergy += energyGained; // Add the gained energy to the total
     }
-    
-    //Debug.Log("Current Energy: " + energy); 
+    if (energy + energyGained > maxEnergy && strideEnergy + energyGained < strideEnergyMax) //Energy 
+    {
+
+    }
     
     if (energyBar != null)
     {
-        energyBar.value = energy;
+        strideEnergyBar.value = strideEnergy;
         
     }
     if (energyText != null) //Had to separate this because monster energies do not use text.
     {
-        energyText.text = "MP: " + energy;
+        energyText.text = "MP: " + energy + " / " + strideEnergy;
     }
 }
 
@@ -288,7 +308,7 @@ public class Character : MonoBehaviour
         {
             while (!HasReachedPosition(targetPosition))
             {
-                transform.position = Vector3.MoveTowards(transform.position, targetPosition, 15.0f * Time.deltaTime);
+                transform.position = Vector3.MoveTowards(transform.position, targetPosition, 17.5f * Time.deltaTime);
                 
                 if (checkCollisionsDuringMovement && IsCollidingWithCharacter())
                 {
