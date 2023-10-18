@@ -152,6 +152,7 @@ public class Character : MonoBehaviour
         DamagePopup damagePopupScript = damagePopupInstance.GetComponent<DamagePopup>();
         damagePopupScript.Setup(damageDealt);
         
+        
     }
     else
     {
