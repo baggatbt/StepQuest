@@ -214,12 +214,13 @@ public class BattleManager : MonoBehaviour
         */
     }
 
-    public void MoveCirclesToTarget(Character target)
+    public void MoveCursorToTarget()
      {
         // Move the circles to the targets position
-        outerCircle.transform.position = currentTarget.transform.position;
+        outerCircle.transform.position = new Vector3(currentTarget.transform.position.x, currentTarget.transform.position.y + 4f, currentTarget.transform.position.z);
 
-        innerCircle.transform.position = currentTarget.transform.position;
+
+       // innerCircle.transform.position = currentTarget.transform.position;
         //NEEDS OFFSET TO BE OFF SPRITE
             
     }
@@ -320,7 +321,7 @@ public class BattleManager : MonoBehaviour
 
         if (player.currentSkill != null)
         {
-            MoveCirclesToTarget(targetEnemy);
+            
             yield return player.currentSkill.Execute(player, targetEnemy, this);
             
             //yield return new WaitForSeconds(0.1f);
@@ -383,7 +384,7 @@ public class BattleManager : MonoBehaviour
                 yield return attackingEnemy.MoveToTarget();
             }
 
-            MoveCirclesToTarget(player);
+            
             yield return attackingEnemy.currentSkill.Execute(attackingEnemy, player, this);
 
            
@@ -431,18 +432,22 @@ public class BattleManager : MonoBehaviour
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<TimingEventResult> callback)
 {
     // Enable the timing circles when the event starts
-   // outerCircle.SetActive(true);
+    outerCircle.SetActive(true);
     //innerCircle.SetActive(true);
     float totalWindowDuration = windowEnd - windowStart;
-    colorChanger.StartColorTransition(totalWindowDuration);
+    //colorChanger.StartColorTransition(totalWindowDuration);
     float timer = 0;
     bool buttonClicked = false;
+
+    /* Old, might re-use shrinking somewhere else, possibly as a status effect.
 
     // Set the sizes: outer starts bigger and shrinks to size (0,0,0)
     Vector3 outerCircleInitialScale = outerCircle.transform.localScale; // Let's assume this is the size at start.
     Vector3 zeroScale = new Vector3(0, 0, 0); 
 
-    float speedFactor = 1.25f; // Change this value to adjust speed. Higher means faster.
+    */
+
+    float speedFactor = 1.05f; // Change this value to adjust speed. Higher means faster.
 
     try
     {
@@ -451,7 +456,7 @@ public class BattleManager : MonoBehaviour
             
    
             float progress = timer / totalWindowDuration;
-            outerCircle.transform.localScale = Vector3.Lerp(outerCircleInitialScale, zeroScale, progress);
+         //   outerCircle.transform.localScale = Vector3.Lerp(outerCircleInitialScale, zeroScale, progress);
 
             if (Input.GetMouseButtonDown(0))
             {
@@ -629,6 +634,7 @@ private void Update()
         if (hit.collider != null && hit.collider.CompareTag("Enemy") && isSkillSelected)
         {
             currentTarget = hit.collider.gameObject;
+            MoveCursorToTarget();
             player.attackTarget = currentTarget.transform;
         
             // Execute the queued skill here since an enemy is tapped after selecting a skill
