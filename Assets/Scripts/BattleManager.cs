@@ -432,22 +432,19 @@ public class BattleManager : MonoBehaviour
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<TimingEventResult> callback)
 {
     // Enable the timing circles when the event starts
-    outerCircle.SetActive(true);
+   // outerCircle.SetActive(true);
     //innerCircle.SetActive(true);
     float totalWindowDuration = windowEnd - windowStart;
-    //colorChanger.StartColorTransition(totalWindowDuration);
+   // colorChanger.StartColorTransition(totalWindowDuration);
     float timer = 0;
     bool buttonClicked = false;
-
-    /* Old, might re-use shrinking somewhere else, possibly as a status effect.
 
     // Set the sizes: outer starts bigger and shrinks to size (0,0,0)
     Vector3 outerCircleInitialScale = outerCircle.transform.localScale; // Let's assume this is the size at start.
     Vector3 zeroScale = new Vector3(0, 0, 0); 
 
-    */
+    float speedFactor = 1.25f; // Change this value to adjust speed. Higher means faster.
 
-    float speedFactor = 1.05f; // Change this value to adjust speed. Higher means faster.
 
     try
     {
@@ -456,7 +453,7 @@ public class BattleManager : MonoBehaviour
             
    
             float progress = timer / totalWindowDuration;
-         //   outerCircle.transform.localScale = Vector3.Lerp(outerCircleInitialScale, zeroScale, progress);
+            outerCircle.transform.localScale = Vector3.Lerp(outerCircleInitialScale, zeroScale, progress);
 
             if (Input.GetMouseButtonDown(0))
             {
@@ -631,14 +628,15 @@ private void Update()
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
 
-        if (hit.collider != null && hit.collider.CompareTag("Enemy") && isSkillSelected)
+        if (hit.collider != null && hit.collider.CompareTag("Enemy")) //&& isSkillSelected)
         {
             currentTarget = hit.collider.gameObject;
             MoveCursorToTarget();
+            outerCircle.SetActive(true);
             player.attackTarget = currentTarget.transform;
         
             // Execute the queued skill here since an enemy is tapped after selecting a skill
-            if (State == BattleState.PlayerTurn)
+            if (State == BattleState.PlayerTurn && isSkillSelected)
             {
                 ExecuteQueuedSkills();
             }
