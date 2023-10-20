@@ -1,36 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
 
-
-public class Goblin : Enemy
-{   
-    //This is because HP must intialize before the data in Start()
-    protected override void Awake()
-    {
-        base.Awake();
-        this.level = 1;
-        this.maxHealth = 12 + (this.level * 2);
-        this.health = this.maxHealth;
-        this.maxEnergy = 1;
-        
-    }
-     protected override void Start()
+public class Slime : Enemy
+{
+    protected override void Start()
     {
         // Assign the skills to this specific type of character
         this.skills = new List<Skill> // Make sure to initialize the skills list before adding to it
         {
-            new GoblinAttackSkill(),
-            new GoblinSpecialAttackSkill()
+            new SlimeAttackSkill(),
+            new SlimeSpecialAttackSkill()
         };
-        
-        this.expReward = 8;  //TODO: Add scaling
-        this.goldReward = 3;
+        this.level = 1;
+        this.expReward = (5 * this.level);
+        this.goldReward = (2 * this.level);
         this.attacksBeforeSpecial = 2;
-        this.damage = 6 + (this.level * 2);
-        this.defensePower = 2  + this.level;
-        this.speed = 4;
+        this.damage = (4 + (this.level * 2));
+        this.maxHealth = (18 + (this.level * 3));
+        this.health = this.maxHealth;
+        this.defensePower = 30 + (this.level * 3);
+        this.speed = 2;
+        this.maxEnergy = 2;
 
         // Assign the skills
         this.normalSkill = this.skills[0]; // Normal skill
@@ -43,7 +34,7 @@ public class Goblin : Enemy
 
         if (playerObject)
         {
-            // Set the attackTarget of the goblin to the player's transform object
+            // Set the attackTarget of the slime to the player's transform
             this.attackTarget = playerObject.transform;
         }
         else
@@ -52,4 +43,3 @@ public class Goblin : Enemy
         }
     }
 }
-

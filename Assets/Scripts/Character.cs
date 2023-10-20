@@ -123,8 +123,8 @@ public class Character : MonoBehaviour
 
     public void TakeDamage(int damageOfAttacker, Character attacker)
 {
-    Debug.Log("Damage being taken");
-    int damageDealt = damageOfAttacker * (1 - (this.defensePower / 100));
+    
+    int damageDealt = (int)(damageOfAttacker * (1 - (this.defensePower / 100.0)));
 
     health -= damageDealt;
     healthBar.value = health;

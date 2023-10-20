@@ -131,7 +131,9 @@ public abstract class Skill
             damageMultiplier = 1.25f;  // Boost damage by 25%
            // user.animator.SetTrigger(trigger);         
             target.animator.SetTrigger("IsHurtTrigger");   
+            Debug.Log("Damage before boost: " + ((int)(baseDamage), user) );
             target.TakeDamage((int)(baseDamage * damageMultiplier), user); // Apply damage boost
+            Debug.Log("Damage after boost: " + ((int)(baseDamage * damageMultiplier), user) );
             AudioManager.instance.PlaySlashSound();
             user.GainEnergy(energyGain);
             break;
