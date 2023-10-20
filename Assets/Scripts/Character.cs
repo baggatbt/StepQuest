@@ -202,7 +202,6 @@ public class Character : MonoBehaviour
     }
     else 
     {
-        strideEnergy -= energySpent;
         strideEnergyBar.value = strideEnergy;
     }
     

@@ -24,7 +24,12 @@ public class ButtonController : MonoBehaviour
        PopulateSkillPanelWithPlayerSkills();
     }
     
-    public void PopulateSkillPanelWithPlayerSkills()
+    private UnityEngine.Events.UnityAction GetSkillAction(Skill currentSkill)
+{
+    return () => { SelectAndUseSkill(currentSkill); };
+}
+
+public void PopulateSkillPanelWithPlayerSkills()
 {
     List<SkillType> availableSkills = PlayerData.Instance.CurrentJob.AvailableSkills;
 
@@ -49,14 +54,18 @@ public class ButtonController : MonoBehaviour
                 buttonText.text = currentSkill.skillName;
             }
 
+            // Create a new local variable to hold the currentSkill value
+            Skill buttonSkill = currentSkill;
+
             // Add a listener to the button to handle its click action
             buttonComponent.onClick.AddListener(() => 
             {
-                SelectAndUseSkill(currentSkill);
+                SelectAndUseSkill(buttonSkill);
             });
         }
     }
 }
+
 
 
 public void SelectAndUseSkill(Skill selectedSkill)
@@ -95,6 +104,7 @@ public void SelectAndUseSkill(Skill selectedSkill)
         {
             Debug.Log("Cannot queue skill due to some condition (isAttacking or IsAnyEnemyAttacking).");
         }
+        
     }
     else
     {
