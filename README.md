@@ -1,8 +1,9 @@
-# StepQuest
+# StepQuest(Placeholder Name)
  Android App developed in Unity
 
-2D Turn based RPG with active time events.
-In Active Development.
- 
- editor version 
-2021.3.25f1 lts
+
+2D Turn based RPG where progression is tied to real world step count, with action command combat system.
+In Active Development. 
+
+Code upon Request
+
