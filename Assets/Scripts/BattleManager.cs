@@ -214,12 +214,13 @@ public class BattleManager : MonoBehaviour
         */
     }
 
-    public void MoveCirclesToTarget(Character target)
+    public void MoveCursorToTarget()
      {
         // Move the circles to the targets position
-        outerCircle.transform.position = currentTarget.transform.position;
+        outerCircle.transform.position = new Vector3(currentTarget.transform.position.x, currentTarget.transform.position.y + 4f, currentTarget.transform.position.z);
 
-        innerCircle.transform.position = currentTarget.transform.position;
+
+       // innerCircle.transform.position = currentTarget.transform.position;
         //NEEDS OFFSET TO BE OFF SPRITE
             
     }
@@ -255,6 +256,7 @@ public class BattleManager : MonoBehaviour
         {
             Skill skill = skillQueue.Dequeue();
             player.currentSkill = skill;
+            player.SpendEnergy(skill.energyCost);
             skillsExecuted++;
             yield return StartCoroutine(PlayerAction());
             
@@ -320,7 +322,7 @@ public class BattleManager : MonoBehaviour
 
         if (player.currentSkill != null)
         {
-            MoveCirclesToTarget(targetEnemy);
+            
             yield return player.currentSkill.Execute(player, targetEnemy, this);
             
             //yield return new WaitForSeconds(0.1f);
@@ -383,7 +385,7 @@ public class BattleManager : MonoBehaviour
                 yield return attackingEnemy.MoveToTarget();
             }
 
-            MoveCirclesToTarget(player);
+            
             yield return attackingEnemy.currentSkill.Execute(attackingEnemy, player, this);
 
            
@@ -434,7 +436,7 @@ public class BattleManager : MonoBehaviour
    // outerCircle.SetActive(true);
     //innerCircle.SetActive(true);
     float totalWindowDuration = windowEnd - windowStart;
-    colorChanger.StartColorTransition(totalWindowDuration);
+   // colorChanger.StartColorTransition(totalWindowDuration);
     float timer = 0;
     bool buttonClicked = false;
 
@@ -443,6 +445,7 @@ public class BattleManager : MonoBehaviour
     Vector3 zeroScale = new Vector3(0, 0, 0); 
 
     float speedFactor = 1.25f; // Change this value to adjust speed. Higher means faster.
+
 
     try
     {
@@ -626,13 +629,15 @@ private void Update()
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
 
-        if (hit.collider != null && hit.collider.CompareTag("Enemy") && isSkillSelected)
+        if (hit.collider != null && hit.collider.CompareTag("Enemy")) //&& isSkillSelected)
         {
             currentTarget = hit.collider.gameObject;
+            MoveCursorToTarget();
+            outerCircle.SetActive(true);
             player.attackTarget = currentTarget.transform;
         
             // Execute the queued skill here since an enemy is tapped after selecting a skill
-            if (State == BattleState.PlayerTurn)
+            if (State == BattleState.PlayerTurn && isSkillSelected)
             {
                 ExecuteQueuedSkills();
             }

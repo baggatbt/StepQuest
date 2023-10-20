@@ -24,7 +24,12 @@ public class ButtonController : MonoBehaviour
        PopulateSkillPanelWithPlayerSkills();
     }
     
-    public void PopulateSkillPanelWithPlayerSkills()
+    private UnityEngine.Events.UnityAction GetSkillAction(Skill currentSkill)
+{
+    return () => { SelectAndUseSkill(currentSkill); };
+}
+
+public void PopulateSkillPanelWithPlayerSkills()
 {
     List<SkillType> availableSkills = PlayerData.Instance.CurrentJob.AvailableSkills;
 
@@ -49,20 +54,37 @@ public class ButtonController : MonoBehaviour
                 buttonText.text = currentSkill.skillName;
             }
 
+            // Create a new local variable to hold the currentSkill value
+            Skill buttonSkill = currentSkill;
+
             // Add a listener to the button to handle its click action
             buttonComponent.onClick.AddListener(() => 
             {
-                SelectAndUseSkill(currentSkill);
+                SelectAndUseSkill(buttonSkill);
             });
         }
     }
 }
 
 
+
 public void SelectAndUseSkill(Skill selectedSkill)
 {
+    if (battleManager.skillQueue.Count == 0)
+    {
+        //No skill has been selected yet
+         skill = selectedSkill;
+         battleManager.skillQueue.Enqueue(skill);
+         OnButtonClick();
+    }
+    else
+    { //Replacing the old skill
+    battleManager.skillQueue.Dequeue();
     skill = selectedSkill;
+    battleManager.skillQueue.Enqueue(skill);
     OnButtonClick();
+    }
+    
 }
 
         
@@ -72,18 +94,15 @@ public void SelectAndUseSkill(Skill selectedSkill)
 {
     Debug.Log("Button clicked for skill: " + skill.skillName);
 
-    if(skill.energyCost <= battleManager.player.energy)
+    if(skill.energyCost <= (battleManager.player.energy + battleManager.player.strideEnergy))
     {
        // skillSelectionPanel.SetActive(false);
         if (!battleManager.player.isAttacking && !battleManager.IsAnyEnemyAttacking())
         {
             if (!battleManager.isSkillSelected)
             {
-                // Set skill to the temporary variable and set the flag
-                battleManager.player.SpendEnergy(skill.energyCost);
-                Debug.Log("Energy after deduction: " + battleManager.player.energy);
-                battleManager.skillQueue.Enqueue(skill);
                 
+               
 
                 Debug.Log("Skill " + skill.skillName + " added to queue. Current queue size: " + battleManager.skillQueue.Count);
                 
@@ -95,6 +114,7 @@ public void SelectAndUseSkill(Skill selectedSkill)
         {
             Debug.Log("Cannot queue skill due to some condition (isAttacking or IsAnyEnemyAttacking).");
         }
+        
     }
     else
     {
