@@ -256,6 +256,7 @@ public class BattleManager : MonoBehaviour
         {
             Skill skill = skillQueue.Dequeue();
             player.currentSkill = skill;
+            player.SpendEnergy(skill.energyCost);
             skillsExecuted++;
             yield return StartCoroutine(PlayerAction());
             
