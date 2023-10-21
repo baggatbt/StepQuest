@@ -31,6 +31,7 @@ public class Goblin : Enemy
         this.damage = 6 + (this.level * 2);
         this.defensePower = 10  + this.level;
         this.speed = 4;
+        this.energy = 0;
 
         // Assign the skills
         this.normalSkill = this.skills[0]; // Normal skill

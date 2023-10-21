@@ -8,7 +8,7 @@ public class PlayerSpawnController : MonoBehaviour
     public Transform playerSpawnPoint; // You can assign this directly in the inspector
     public Slider associatedHealthBarSlider; // Reference to the slider
     public Slider associatedEnergyBarSlider;
-    public Slider associatedStrideEnergyBarSlider;
+    public Slider associatedtempEnergyBarSlider;
     public TextMeshProUGUI associatedHealthText;
     public TextMeshProUGUI associatedEnergyText;
     public BattleManager battleManager;
@@ -50,10 +50,10 @@ public class PlayerSpawnController : MonoBehaviour
     associatedEnergyBarSlider.value = spawnedPlayer.energy;
     spawnedPlayer.energyText = associatedEnergyText;
 
-    spawnedPlayer.strideEnergyBar = associatedStrideEnergyBarSlider;
-    associatedStrideEnergyBarSlider.gameObject.SetActive(true);
-    associatedStrideEnergyBarSlider.maxValue = (spawnedPlayer.maxEnergy / 2);
-    associatedStrideEnergyBarSlider.value = 0; //Always starts at 0
+    spawnedPlayer.tempEnergyBar = associatedtempEnergyBarSlider;
+    associatedtempEnergyBarSlider.gameObject.SetActive(true);
+    associatedtempEnergyBarSlider.maxValue = (spawnedPlayer.maxEnergy / 2);
+    associatedtempEnergyBarSlider.value = 0; //Always starts at 0
 
      
 

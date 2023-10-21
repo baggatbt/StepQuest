@@ -16,11 +16,11 @@ public class Character : MonoBehaviour
     public int attackPower;
     public int defensePower;
     public int speed;
-    public int strideEnergyMax;
-    public int strideEnergy;
+    public int tempEnergyMax;
+    public int tempEnergy;
     public Slider healthBar;
     public Slider energyBar;
-    public Slider strideEnergyBar;
+    public Slider tempEnergyBar;
     public Transform attackTarget;
     public Vector3 originalPosition;
     public bool isAttacking = false;
@@ -77,9 +77,9 @@ public class Character : MonoBehaviour
             }
             if (energyText != null)
             {
-                energyText.text = "MP: " + energy + " / " + strideEnergy;
-                strideEnergyBar.value = strideEnergy;
-                Debug.Log("Stride energy" + strideEnergy);
+                energyText.text = "MP: " + energy + " / " + tempEnergy;
+                tempEnergyBar.value = tempEnergy;
+                Debug.Log("temp energy" + tempEnergy);
                 
             }
         }
@@ -188,62 +188,66 @@ public class Character : MonoBehaviour
     private int remainingCost = 0;
     public void SpendEnergy(int energySpent)
 {
-    remainingCost = energySpent - strideEnergy;
+    remainingCost = energySpent - tempEnergy;
 
-    if (strideEnergy <= 0) //If player has no stride energy, just use mana
+    if (tempEnergy <= 0) //If player has no temp energy, just use mana
     {
         energy -= energySpent;
     }
-    if (strideEnergy >= 1 && remainingCost >= 0) //if player has stride energy but not enough to cover the whole cost
+    if (tempEnergy >= 1 && remainingCost >= 0) //if player has temp energy but not enough to cover the whole cost
     {
-        strideEnergy = 0;
+        tempEnergy = 0;
         energy -= remainingCost;
-        strideEnergyBar.value = strideEnergy;
+        tempEnergyBar.value = tempEnergy;
     }
     else 
     {
-        strideEnergyBar.value = strideEnergy;
+        tempEnergyBar.value = tempEnergy;
     }
     
    
     if (energyBar != null)
     {
         energyBar.value = energy;
-        energyText.text = "MP: " + energy + " / " + strideEnergy;
+        energyText.text = "MP: " + energy + " / " + tempEnergy;
     }
 }
 
 
-    public void GainEnergy(int energyGained)
+    public void GainTempEnergy(int energyGained)
 {
-    if (strideEnergy + energyGained > strideEnergyMax) // If the gained energy will bring the total over the max
+    if (tempEnergy + energyGained > tempEnergyMax) // If the gained energy will bring the total over the max
     {
-        strideEnergy = strideEnergyMax; // Set energy to the max
+        tempEnergy = tempEnergyMax; // Set energy to the max
 
     }
-    if (strideEnergy + energyGained < strideEnergyMax) // If the gained energy will not bring the total over the max
+    if (tempEnergy + energyGained < tempEnergyMax) // If the gained energy will not bring the total over the max
     {
-        strideEnergy += energyGained; // Add the gained energy to the total
+        tempEnergy += energyGained; // Add the gained energy to the total
     }
-    if (energy + energyGained > maxEnergy && strideEnergy + energyGained < strideEnergyMax) //Energy 
+    if (energy + energyGained > maxEnergy && tempEnergy + energyGained < tempEnergyMax) //Energy 
     {
 
     }
     
     if (energyBar != null)
     {
-        strideEnergyBar.value = strideEnergy;
+        
+        tempEnergyBar.value = tempEnergy;
         
     }
     if (energyText != null) //Had to separate this because monster energies do not use text.
     {
-        energyText.text = "MP: " + energy + " / " + strideEnergy;
+        energyText.text = "MP: " + energy + " / " + tempEnergy;
     }
 }
 
-   
-    
+    public void GainEnergy(int energyGained)
+    {
+        this.energy = energyGained;
+    }
 
+   
     public void IsHit() => animator.SetTrigger("IsHurtTrigger");
     
     public bool isAnimationDone = false;

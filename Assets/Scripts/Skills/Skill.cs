@@ -88,6 +88,7 @@ public abstract class Skill
             damageMultiplier = 0.5f;  // Reduce damage by 50%
           //  user.animator.SetTrigger(trigger);
             target.TakeDamage((int)(user.damage * damageMultiplier),user); // Apply damage multiplier
+            user.GainEnergy(1);
             target.animator.SetTrigger("BlockTrigger");      
             AudioManager.instance.PlayBlockSound();
             break;
@@ -96,12 +97,14 @@ public abstract class Skill
             damageMultiplier = 0.75f;  // Reduce damage by 25%
            // user.animator.SetTrigger(trigger);            
             target.TakeDamage((int)(user.damage * damageMultiplier),user); // Apply damage multiplier
+            user.GainEnergy(1);
             target.animator.SetTrigger("BlockTrigger");
             AudioManager.instance.PlayBlockSound();     
             break;
         case TimingEventResult.Miss:
           //  user.animator.SetTrigger(trigger);
             target.TakeDamage(user.damage, user); // Full damage as there's no reduction 
+            user.GainEnergy(1);
             target.animator.SetTrigger("IsHurtTrigger");       
             break;
     }
@@ -124,7 +127,7 @@ public abstract class Skill
             target.TakeDamage((int)(baseDamage * damageMultiplier),user); // Apply damage boost
             target.animator.SetTrigger("IsHurtTrigger");
             AudioManager.instance.PlaySlashSound();
-            user.GainEnergy(energyGain); //Perfect hits give +1 energy
+            user.GainTempEnergy(energyGain); //Perfect hits give +1 energy
             break;
         case TimingEventResult.Good:
             Debug.Log("Good Hit!");   
@@ -135,7 +138,7 @@ public abstract class Skill
             target.TakeDamage((int)(baseDamage * damageMultiplier), user); // Apply damage boost
             Debug.Log("Damage after boost: " + ((int)(baseDamage * damageMultiplier), user) );
             AudioManager.instance.PlaySlashSound();
-            user.GainEnergy(energyGain);
+            user.GainTempEnergy(energyGain);
             break;
         case TimingEventResult.Miss:
             Debug.Log("Missed!");
