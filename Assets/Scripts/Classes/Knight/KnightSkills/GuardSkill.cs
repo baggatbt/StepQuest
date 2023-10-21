@@ -19,11 +19,14 @@ public class GuardSkill : Skill
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
         user.isAttacking = true;
+        user.isAnimationDone = false;
         DefenseUp defenseUpEffect = new DefenseUp(2);
         battleManager.statusEffectController.AddEffect(defenseUpEffect, user, 2);
         Debug.Log("Guard skill applied");
         user.isAttacking = false;
         user.animator.SetTrigger("GuardTrigger");
-        yield return null;
+        yield return new WaitUntil(() => user.isAnimationDone == true);
+        
     }
+    
 }
