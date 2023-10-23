@@ -1,4 +1,4 @@
-/*using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using TMPro; 
 
@@ -10,6 +10,7 @@ public class CompanionSpawnController : MonoBehaviour
     public Slider associatedEnergyBarSlider;
     public TextMeshProUGUI associatedHealthText;
     public TextMeshProUGUI associatedEnergyText;
+    public Slider associatedtempEnergyBarSlider;
     public BattleManager battleManager;
 
 
@@ -48,7 +49,10 @@ public class CompanionSpawnController : MonoBehaviour
     associatedEnergyBarSlider.value = spawnedCompanion.energy;
     spawnedCompanion.energyText = associatedEnergyText;
 
-    Debug.Log(spawnedCompanion.attackPower);
+    spawnedCompanion.tempEnergyBar = associatedtempEnergyBarSlider;
+    associatedtempEnergyBarSlider.gameObject.SetActive(true);
+    associatedtempEnergyBarSlider.maxValue = (spawnedCompanion.maxEnergy / 2);
+    associatedtempEnergyBarSlider.value = 0; //Always starts at 0
 
   
 
@@ -58,4 +62,3 @@ public class CompanionSpawnController : MonoBehaviour
 }
 
 }
-*/

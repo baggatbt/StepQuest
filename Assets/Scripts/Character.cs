@@ -38,6 +38,7 @@ public class Character : MonoBehaviour
     public int attacksBeforeSpecial; 
     public Skill normalSkill; 
     public Skill specialSkill;
+    public bool hasNotGone = true;
 
     private bool checkCollisionsDuringMovement = true;
 

@@ -11,6 +11,8 @@ using System.Collections.Generic;
 public class BattleManager : MonoBehaviour
 {
     public Character player;
+    public Character companion;
+    public Character activePlayer;
     public PlayerData playerCharacterData;
     public Player playerClassReference;
     public List<Character> enemies = new List<Character>();
@@ -36,7 +38,7 @@ public class BattleManager : MonoBehaviour
     public enum BattleState
     {
         PlayerTurn,
-        CompanionTurn,
+        Player2Turn,
         EnemyTurn
     }
 
@@ -74,11 +76,14 @@ public class BattleManager : MonoBehaviour
             switch (state)
             {
                 case BattleState.PlayerTurn:
+                    activePlayer = player;
                     Debug.Log("Player Turn Started!");
+                    Debug.Log("Active player from Player1" + activePlayer);
                     break;
-                case BattleState.CompanionTurn:
+                case BattleState.Player2Turn:
                     Debug.Log("Companion Turn Started!");
-                    Debug.Log(currentTarget);
+                    activePlayer = companion;
+                    Debug.Log("Active player from Player2" + activePlayer);
                     break;
                 case BattleState.EnemyTurn:
                     Debug.Log("Enemy Turn Started!");
@@ -91,10 +96,16 @@ public class BattleManager : MonoBehaviour
        [SerializeField] private BattleConfig[] battleConfigs;  // List of battle configurations for each stage.
         private int currentStageIndex = 0;  // Index to track the current stage.
 
+    private void Awake()
+    {
+        activePlayer = player;
+    }
    private void Start()
 {
     
     State = BattleState.PlayerTurn;
+    activePlayer = player;
+    Debug.Log("Active player from Player1 in start method"  + activePlayer);
     outerCircleInitialScale = outerCircle.transform.localScale;
     innerCircleInitialScale = innerCircle.transform.localScale;
 
@@ -117,6 +128,7 @@ public class BattleManager : MonoBehaviour
         Debug.LogError("No battle configuration set!");
         // Handle error or default configuration
     }
+    Debug.Log(activePlayer);
 }
     public Button nextBattleButton;
     
@@ -187,7 +199,7 @@ public class BattleManager : MonoBehaviour
     private void ChangeState(BattleState newState)
     {
         State = newState;
-        if (State == BattleState.PlayerTurn || State == BattleState.CompanionTurn)
+        if (State == BattleState.PlayerTurn || State == BattleState.Player2Turn)
         {
             EnableAllButtons();
         }
@@ -228,7 +240,7 @@ public class BattleManager : MonoBehaviour
 
         public void ExecuteQueuedSkills()
     {
-        if (currentTarget != null && state == BattleState.PlayerTurn)
+        if (currentTarget != null && (state == BattleState.PlayerTurn || state == BattleState.Player2Turn))
         {
         DisableAllButtons();
         StartCoroutine(ExecuteAllSkillsCoroutine());
@@ -255,18 +267,20 @@ public class BattleManager : MonoBehaviour
         while(skillQueue.Count > 0)
         {
             Skill skill = skillQueue.Dequeue();
-            player.currentSkill = skill;
-            player.SpendEnergy(skill.energyCost);
+            activePlayer.currentSkill = skill;
+            activePlayer.SpendEnergy(skill.energyCost);
             skillsExecuted++;
             yield return StartCoroutine(PlayerAction());
             
         }
     
         skillsExecuted = 0;
+        //Make them unable to take a second turn.
+        activePlayer.hasNotGone = false;
         
         // Move player back to their original position after all skills executed.
        // yield return StartCoroutine(zoomEffect.ZoomOutEffect());
-        yield return player.ReturnToPosition();
+        yield return activePlayer.ReturnToPosition();
         ChangeState(BattleState.EnemyTurn);
       
       
@@ -282,14 +296,14 @@ public class BattleManager : MonoBehaviour
 
     public IEnumerator PlayerAction()
     {
-        if (state == BattleState.PlayerTurn && currentTarget)
+        if ((state == BattleState.PlayerTurn || state == BattleState.Player2Turn) && currentTarget)
         {
         //  Debug.Log("PlayerAction() being called");
 
             // Start zoom effect
             //StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position)); 
 
-            if (player.currentSkill.requiresMovement && skillsExecuted == 0)
+            if (activePlayer.currentSkill.requiresMovement && skillsExecuted == 0)
             {
                 yield return StartCoroutine(PlayerMoveAndAttackCoroutine());
             }
@@ -304,9 +318,9 @@ public class BattleManager : MonoBehaviour
     public IEnumerator PlayerMoveAndAttackCoroutine()
     {
         // Only move if the player is not already at the target
-        if (player.transform.position != currentTarget.transform.position)
+        if (activePlayer.transform.position != currentTarget.transform.position)
         {
-            yield return player.MoveToTarget();
+            yield return activePlayer.MoveToTarget();
             
             
         }
@@ -320,12 +334,15 @@ public class BattleManager : MonoBehaviour
         Character targetEnemy = currentTarget.GetComponent<Character>();
         yield return new WaitUntil(() => targetEnemy.isAttacking == false);
 
-        if (player.currentSkill != null)
+        if (activePlayer.currentSkill != null)
         {
             
-            yield return player.currentSkill.Execute(player, targetEnemy, this);
+            yield return activePlayer.currentSkill.Execute(activePlayer, targetEnemy, this);
             
             //yield return new WaitForSeconds(0.1f);
+            
+            //Reset active player after the turn
+            activePlayer = null;
 
             CheckBattleEnd();
         }
@@ -351,13 +368,13 @@ public class BattleManager : MonoBehaviour
         if (enemyTurnQueue.Count == 0)
         {
             statusEffectController.ProcessEffects();
-            ChangeState(BattleState.PlayerTurn);
+            ChangeState(BattleState.Player2Turn);
             return;
         }
 
         Character attackingEnemy = enemyTurnQueue.Dequeue();
         //Decide whether or not to use the special attack or the normal one
-        if (!player.isAttacking && !attackingEnemy.isAttacking && state == BattleState.EnemyTurn)
+        if (!activePlayer.isAttacking && !attackingEnemy.isAttacking && state == BattleState.EnemyTurn)
         {
             if (attackingEnemy.energy >= attackingEnemy.maxEnergy)
             {
@@ -376,7 +393,7 @@ public class BattleManager : MonoBehaviour
 
     public IEnumerator EnemyAttackCoroutine(Character attackingEnemy)
     {
-        yield return new WaitUntil(() => player.isAttacking == false);
+        yield return new WaitUntil(() => activePlayer.isAttacking == false);
 
         if (attackingEnemy.currentSkill != null)
         {
@@ -386,7 +403,7 @@ public class BattleManager : MonoBehaviour
             }
 
             
-            yield return attackingEnemy.currentSkill.Execute(attackingEnemy, player, this);
+            yield return attackingEnemy.currentSkill.Execute(attackingEnemy, activePlayer, this);
 
            
             if (attackingEnemy.currentSkill.requiresMovement)
@@ -418,7 +435,7 @@ public class BattleManager : MonoBehaviour
         else
         {
             
-            ChangeState(BattleState.PlayerTurn);  // If all enemies had their turns, it's the player's turn next.
+            ChangeState(BattleState.Player2Turn);  // If all enemies had their turns, it's the player's turn next.
          }
         CheckBattleEnd();
         }
@@ -623,30 +640,41 @@ public class BattleManager : MonoBehaviour
 
 private void Update()
 {
-    
     if (Input.GetMouseButtonDown(0))
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
 
-        if (hit.collider != null && hit.collider.CompareTag("Enemy")) //&& isSkillSelected)
+        if (hit.collider != null)
         {
-            currentTarget = hit.collider.gameObject;
-            MoveCursorToTarget();
-            outerCircle.SetActive(true);
-            player.attackTarget = currentTarget.transform;
-        
-            // Execute the queued skill here since an enemy is tapped after selecting a skill
-            if (State == BattleState.PlayerTurn && isSkillSelected)
+            // If the hit object is an enemy
+            if (hit.collider.CompareTag("Enemy")) // && isSkillSelected)
             {
-                ExecuteQueuedSkills();
+                currentTarget = hit.collider.gameObject;
+                MoveCursorToTarget();
+                outerCircle.SetActive(true);
+                activePlayer.attackTarget = currentTarget.transform;
+
+                // Execute the queued skill here since an enemy is tapped after selecting a skill
+                if ((state == BattleState.Player2Turn || state == BattleState.PlayerTurn) && isSkillSelected)
+                {
+                    ExecuteQueuedSkills();
+                }
+                isSkillSelected = false;  // Reset the flag
             }
-            isSkillSelected = false;  // Reset the flag
+            // If the hit object is a player and has not gone yet
+            else if (hit.collider.CompareTag("Player"))
+            {
+                Character clickedCharacter = hit.collider.GetComponent<Character>();
+                if (clickedCharacter != null && clickedCharacter.hasNotGone)
+                {
+                    activePlayer = clickedCharacter;
+                }
+            }
         }
     }
-   
-    
 }
+
 
 
 
