@@ -92,6 +92,11 @@ public class Character : MonoBehaviour
             energyBar.value = energy;
             
         }
+        if (!this.hasNotGone) 
+        {
+            this.GetComponent<SpriteRenderer>().color = Color.gray;
+        }
+
     }
 
     protected virtual void Start()

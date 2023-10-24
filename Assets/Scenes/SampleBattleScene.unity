@@ -1374,7 +1374,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -445, y: -40}
+  m_AnchoredPosition: {x: -521, y: 34}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &640964407
@@ -2035,7 +2035,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -442, y: -162}
+  m_AnchoredPosition: {x: -632, y: -142}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &861193681
@@ -2700,6 +2700,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   healthText: {fileID: 0}
   energyText: {fileID: 0}
+  hasNotGone: 0
   attackTrigger: 0
   animationEnded: 0
   attacksBeforeSpecial: 0
@@ -3106,7 +3107,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1209004216}
-  - component: {fileID: 1209004215}
   m_Layer: 0
   m_Name: SkillManager
   m_TagString: Untagged
@@ -3114,18 +3114,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1209004215
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1209004214}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 61a079b9194a033459727f595d315064, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1209004216
 Transform:
   m_ObjectHideFlags: 0
