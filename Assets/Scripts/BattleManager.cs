@@ -276,11 +276,12 @@ public class BattleManager : MonoBehaviour
     
         skillsExecuted = 0;
         //Make them unable to take a second turn.
-        activePlayer.hasNotGone = false;
+        
         
         // Move player back to their original position after all skills executed.
        // yield return StartCoroutine(zoomEffect.ZoomOutEffect());
         yield return activePlayer.ReturnToPosition();
+        
         ChangeState(BattleState.EnemyTurn);
       
       
@@ -341,9 +342,7 @@ public class BattleManager : MonoBehaviour
             
             //yield return new WaitForSeconds(0.1f);
             
-            //Reset active player after the turn
-            activePlayer = null;
-
+            
             CheckBattleEnd();
         }
 
@@ -434,7 +433,8 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            
+            //Reset active player after the turn
+            activePlayer = null;
             ChangeState(BattleState.Player2Turn);  // If all enemies had their turns, it's the player's turn next.
          }
         CheckBattleEnd();

@@ -28,9 +28,10 @@ public class Character : MonoBehaviour
     public Animator animator;
     public TextMeshProUGUI healthText; 
     public TextMeshProUGUI energyText;
+    
      
 
-
+    public bool hasNotGone;
     public bool attackTrigger;
     public bool animationEnded;
     public Skill currentSkill; 
@@ -38,7 +39,6 @@ public class Character : MonoBehaviour
     public int attacksBeforeSpecial; 
     public Skill normalSkill; 
     public Skill specialSkill;
-    public bool hasNotGone = true;
 
     private bool checkCollisionsDuringMovement = true;
 
@@ -242,7 +242,7 @@ public class Character : MonoBehaviour
         energyText.text = "MP: " + energy + " / " + tempEnergy;
     }
 }
-
+    //For enemy rage bars
     public void GainEnergy(int energyGained)
     {
         this.energy = energyGained;
