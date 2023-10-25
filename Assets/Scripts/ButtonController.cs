@@ -32,6 +32,8 @@ public class ButtonController : MonoBehaviour
 public void PopulateSkillPanelWithPlayerSkills()
 {
     List<SkillType> availableSkills = PlayerData.Instance.CurrentJob.AvailableSkills;
+   // will need to modify playerdata and handling List<SkillType> availableSkills2 = PlayerData.Instance.CurrentJob2.AvailableSkills;
+
 
     foreach (SkillType skillType in availableSkills)
     {
