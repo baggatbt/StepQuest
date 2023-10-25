@@ -53,6 +53,7 @@ public class Character : MonoBehaviour
         health = maxHealth; 
         originalPosition = transform.position;
         statusEffectController = GetComponent<StatusEffectController>();
+        this.hasNotGone = true;
         Debug.Log(gameObject.name + " original position: " + originalPosition);
         if (healthText != null)
     {
@@ -67,19 +68,19 @@ public class Character : MonoBehaviour
     }
 
     void Update(){
-        if (healthBar != null)
+        if (this.healthBar != null)
         {
-            healthBar.maxValue = maxHealth;
-            healthBar.value = health;
-            if (healthText != null )
+            this.healthBar.maxValue = maxHealth;
+            this.healthBar.value = health;
+            if (this.healthText != null )
             {
-                healthText.text = "HP: " + health; 
+                this.healthText.text = "HP: " + this.health; 
                 
             }
-            if (energyText != null)
+            if (this.energyText != null)
             {
-                energyText.text = "MP: " + energy + " / " + tempEnergy;
-                tempEnergyBar.value = tempEnergy;
+                this.energyText.text = "MP: " + this.energy + " / " + this.tempEnergy;
+                this.tempEnergyBar.value = this.tempEnergy;
                 Debug.Log("temp energy" + tempEnergy);
                 
             }
@@ -92,10 +93,7 @@ public class Character : MonoBehaviour
             energyBar.value = energy;
             
         }
-        if (!this.hasNotGone) 
-        {
-            this.GetComponent<SpriteRenderer>().color = Color.gray;
-        }
+        
 
     }
 

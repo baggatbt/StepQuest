@@ -25,11 +25,11 @@ public class Goblin : Enemy
             new GoblinSpecialAttackSkill()
         };
         
-        this.expReward = 8;  //TODO: Add scaling
+        this.expReward = 8;  
         this.goldReward = 3;
         this.attacksBeforeSpecial = 2;
-        this.damage = 6 + (this.level * 2);
-        this.defensePower = 10  + this.level;
+        this.damage = 6;
+        this.defensePower = 10; 
         this.speed = 4;
         this.energy = 0;
 

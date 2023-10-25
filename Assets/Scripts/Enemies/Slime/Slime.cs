@@ -13,13 +13,13 @@ public class Slime : Enemy
             new SlimeSpecialAttackSkill()
         };
         this.level = 1;
-        this.expReward = (5 * this.level);
-        this.goldReward = (2 * this.level);
+        this.expReward = 5;
+        this.goldReward = 2;
         this.attacksBeforeSpecial = 2;
-        this.damage = (4 + (this.level * 2));
-        this.maxHealth = (18 + (this.level * 3));
+        this.damage = 4;
+        this.maxHealth = 18;
         this.health = this.maxHealth;
-        this.defensePower = 30 + (this.level * 3);
+        this.defensePower = 30;
         this.speed = 2;
         this.maxEnergy = 2;
 

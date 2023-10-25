@@ -6,11 +6,11 @@ public class Knight : PlayerJob
 {
     private int playerLevel => PlayerData.Instance.level;
 
-    public override int BaseAtk => 8 + (playerLevel * 2);
-    public override int BaseDef => 3 + playerLevel;  
-    public override int BaseMagAtk => 5 + (playerLevel);  
-    public override int BaseMagDef => 2 + playerLevel;  
-    public override int BaseHealth => 27 + (playerLevel * 3);
+    public override int BaseAtk => 8; 
+    public override int BaseDef => 3; 
+    public override int BaseMagAtk => 5; 
+    public override int BaseMagDef => 2; 
+    public override int BaseHealth => 27; 
     public override int BaseEnergy => 10;
     public override int JobExp => 0; //Need to implement function to make this go up, and move skills to available
 

@@ -155,10 +155,10 @@ public class Player : Character
 
     private void Update()
     {
-        
-        // Update UI regularly or as per your needs
+       
        UpdateUI();
       // playerData.UpdatePlayerData();
+      
        
         
     }
@@ -174,6 +174,16 @@ public class Player : Character
     if (stepsText != null) stepsText.text = "Steps: " + playerData.inGameSteps.ToString();
     if (magicAttackText != null) magicAttackText.text = "M.Atk: 0";
     if (magicDefenseText != null) magicDefenseText.text = "M.Def: 0";
+
+    if (healthBar != null)
+        {
+            healthBar.maxValue = maxHealth;
+            healthBar.value = health;
+            if (healthText != null )
+            {
+                healthText.text = "HP: " + health; 
+                
+            }}
 }
 
 
