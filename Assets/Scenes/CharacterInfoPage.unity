@@ -1265,7 +1265,7 @@ RectTransform:
   - {fileID: 2064937890}
   - {fileID: 796405919}
   m_Father: {fileID: 1503855870}
-  m_RootOrder: 11
+  m_RootOrder: 15
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -2061,7 +2061,7 @@ RectTransform:
   - {fileID: 567007039}
   - {fileID: 1100030666}
   m_Father: {fileID: 1503855870}
-  m_RootOrder: 14
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -3300,7 +3300,7 @@ GameObject:
   - component: {fileID: 796405921}
   - component: {fileID: 796405920}
   m_Layer: 5
-  m_Name: APAmountText
+  m_Name: SPAmountText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3453,7 +3453,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1503855870}
-  m_RootOrder: 13
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &808262379
 SpriteRenderer:
@@ -3820,8 +3820,11 @@ MonoBehaviour:
   energy: 0
   maxTempEnergy: 0
   tempEnergy: 0
-  jobClass: 
+  jobClass: 0
   speed: 0
+  knightSkillPoints: 0
+  knightLevel: 0
+  knightExp: 0
   activeMissions: []
 --- !u!4 &937494370
 Transform:
@@ -5166,6 +5169,7 @@ MonoBehaviour:
   magicDefenseText: {fileID: 591875727}
   stepsText: {fileID: 978449236}
   jobText: {fileID: 1268384753}
+  knightSkillPointsText: {fileID: 796405920}
 --- !u!114 &1274183896
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6247,11 +6251,11 @@ RectTransform:
   - {fileID: 1211662998}
   - {fileID: 1477607123}
   - {fileID: 1575513911}
-  - {fileID: 146823825}
   - {fileID: 1980133684}
   - {fileID: 808262378}
   - {fileID: 513042677}
   - {fileID: 2037130038}
+  - {fileID: 146823825}
   - {fileID: 485463285}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -6523,7 +6527,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -673.9999, y: 90.880005}
+  m_AnchoredPosition: {x: -674, y: 90.880005}
   m_SizeDelta: {x: -1734.34, y: -988.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1649823201
@@ -8143,7 +8147,7 @@ RectTransform:
   m_Children:
   - {fileID: 1307675882}
   m_Father: {fileID: 1503855870}
-  m_RootOrder: 12
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -8404,7 +8408,7 @@ RectTransform:
   - {fileID: 1663805951}
   - {fileID: 1267232432}
   m_Father: {fileID: 1503855870}
-  m_RootOrder: 15
+  m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}

@@ -27,6 +27,13 @@ public class PlayerData : MonoBehaviour
     public int tempEnergy;
     public string jobClass;
     public int speed;
+    
+    //Knight specific
+    public int knightSkillPoints;
+    public int knightLevel;
+    public int knightExp;
+    
+    
     public Dictionary<string, int> skillLevels;
     public Dictionary<string, int> skillExp;
     public List<Mission> activeMissions = new List<Mission>();
@@ -141,6 +148,9 @@ public class PlayerData : MonoBehaviour
         PlayerPrefs.SetInt("PlayerMaxEnergy", maxEnergy); 
         PlayerPrefs.SetInt("PlayerSpeed", speed);
         PlayerPrefs.SetInt("PlayerMaxtempEnergy", maxTempEnergy);
+        PlayerPrefs.SetInt("KnightSkillPoints",knightSkillPoints);
+        PlayerPrefs.SetInt("KnightLevel",knightLevel);
+        PlayerPrefs.SetInt("KnightExp",knightExp);
         PlayerPrefs.Save();
         Debug.Log("Data saved");
     }
@@ -159,6 +169,9 @@ public class PlayerData : MonoBehaviour
             maxHealth = PlayerPrefs.GetInt("PlayerMaxHealth");
             maxEnergy = PlayerPrefs.GetInt("PlayerMaxEnergy");
             speed = PlayerPrefs.GetInt("PlayerSpeed");
+            knightSkillPoints = PlayerPrefs.GetInt("KnightSkillPoints");
+            knightLevel = PlayerPrefs.GetInt("KnightLevel");
+            knightExp = PlayerPrefs.GetInt("KnightExp");
         }
     }
 

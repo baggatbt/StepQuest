@@ -12,7 +12,9 @@ public class Knight : PlayerJob
     public override int BaseMagDef => 2; 
     public override int BaseHealth => 27; 
     public override int BaseEnergy => 10;
-    public override int JobExp => 0; //Need to implement function to make this go up, and move skills to available
+    public int JobExp = PlayerData.Instance.knightExp;
+    public  int JobLevel = PlayerData.Instance.knightLevel;
+    public  int JobPoints = PlayerData.Instance.knightSkillPoints;
 
     public override List<SkillType> AvailableSkills => new List<SkillType>
     {

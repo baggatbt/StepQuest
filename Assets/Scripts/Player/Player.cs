@@ -17,6 +17,7 @@ public class Player : Character
     public TextMeshProUGUI magicDefenseText;
     public TextMeshProUGUI stepsText;
     public TextMeshProUGUI jobText;
+    public TextMeshProUGUI knightSkillPointsText;
     public PlayerJob CurrentJob { get; private set; }
 
 
@@ -27,6 +28,7 @@ public class Player : Character
     private int gold;
     private string jobClass;
     private int inGameSteps;
+    
 
 
     protected override void Awake()
@@ -133,11 +135,8 @@ public class Player : Character
 
     private void ApplyJobStats()
     {
-        playerData.attackPower = CurrentJob.BaseAtk;
-        playerData.defensePower = CurrentJob.BaseDef;
-        playerData.maxHealth = CurrentJob.BaseHealth;
-        playerData.maxEnergy = CurrentJob.BaseEnergy;
-        // Handle magic attack and defense here...
+       
+        CurrentJob.JobLevel += 1;
 
         playerData.SavePlayerData();
         SyncStatsWithPlayerData();
@@ -174,6 +173,7 @@ public class Player : Character
     if (stepsText != null) stepsText.text = "Steps: " + playerData.inGameSteps.ToString();
     if (magicAttackText != null) magicAttackText.text = "M.Atk: 0";
     if (magicDefenseText != null) magicDefenseText.text = "M.Def: 0";
+    if (knightSkillPointsText != null) knightSkillPointsText.text = "SP: " + playerData.knightSkillPoints.ToString();
 
     if (healthBar != null)
         {
@@ -184,6 +184,7 @@ public class Player : Character
                 healthText.text = "HP: " + health; 
                 
             }}
+            LevelUp();
 }
 
 
@@ -218,10 +219,10 @@ public class Player : Character
 
     public void LevelUp()
     {
-        if (playerData.exp >= ExpRequiredToLevelUp(playerData.level))
+        if (CurrentJob.JobExp >= ExpRequiredToLevelUp(CurrentJob.JobLevel))
             {
                 Debug.Log("Level up");
-                playerData.level += 1;
+                CurrentJob.JobLevel += 1;
                 ApplyJobStats();
                 playerData.SavePlayerData();
                 UpdateUI();
