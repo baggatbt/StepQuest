@@ -16,9 +16,7 @@ public class Knight : PlayerJob
 
     public override List<SkillType> AvailableSkills => new List<SkillType>
     {
-        SkillType.Slash,
         SkillType.TripleHit,
-        SkillType.GuardSkill,
         SkillType.SwordWave,
         
     };
