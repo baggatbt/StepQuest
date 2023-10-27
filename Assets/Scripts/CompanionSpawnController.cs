@@ -4,7 +4,7 @@ using TMPro;
 
 public class CompanionSpawnController : MonoBehaviour
 {
-    public GameObject knightPrefab;
+    public GameObject companionPrefab;
     public Transform companionSpawnPoint; // You can assign this directly in the inspector
     public Slider associatedHealthBarSlider; // Reference to the slider
     public Slider associatedEnergyBarSlider;
@@ -32,7 +32,7 @@ public class CompanionSpawnController : MonoBehaviour
     public Character SpawnCompanionAtPoint(Transform spawnPoint)
 {
     // Instantiate the Companion at the position of spawnPoint and with its rotation
-    GameObject spawnedCompanionObject = Instantiate(knightPrefab, spawnPoint.position, spawnPoint.rotation);
+    GameObject spawnedCompanionObject = Instantiate(companionPrefab, spawnPoint.position, spawnPoint.rotation);
     Character spawnedCompanion = spawnedCompanionObject.GetComponent<Character>();
 
      
