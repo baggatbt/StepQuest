@@ -62,10 +62,10 @@ public class Player : Character
             playerData.jobClass = "Knight";
             playerData.exp = 0;
             playerData.gold = 100;
-            playerData.attackPower = 3;
-            playerData.defensePower = 5;
+            playerData.attackPower = 2;
+            playerData.defensePower = 1;
             playerData.inGameSteps = 0;
-            playerData.maxHealth = 10;
+            playerData.maxHealth = 5;
             playerData.health = playerData.maxHealth;
             playerData.maxEnergy = 5;
             playerData.energy = playerData.maxEnergy;
@@ -133,10 +133,13 @@ public class Player : Character
         ApplyJobStats();
     }
 
-    private void ApplyJobStats()
+   private void ApplyJobStats()
     {
-       
-        CurrentJob.JobLevel += 1;
+        playerData.attackPower = CurrentJob.BaseAtk;
+        playerData.defensePower = CurrentJob.BaseDef;
+        playerData.maxHealth = CurrentJob.BaseHealth;
+        playerData.maxEnergy = CurrentJob.BaseEnergy;
+        // Handle magic attack and defense here...
 
         playerData.SavePlayerData();
         SyncStatsWithPlayerData();

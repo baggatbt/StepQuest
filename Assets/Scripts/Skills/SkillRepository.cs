@@ -8,7 +8,15 @@ public class SkillRepository : MonoBehaviour
 
     public static Dictionary<SkillType, Skill> AvailableSkills { get; private set; }
 
-   
+   public enum SkillType
+    {
+        None,
+        Slash,
+        TripleHit,
+        SwordWave,
+        GuardSkill,
+        ShieldSlam,
+    }
 
     private void Awake()
     {
@@ -18,7 +26,8 @@ public class SkillRepository : MonoBehaviour
             { SkillType.Slash, new Slash() },
             { SkillType.TripleHit, new TripleHitSkill() },
             { SkillType.SwordWave, new SwordWave() }, // Use the initialized reference here.
-            { SkillType.GuardSkill, new GuardSkill() }
+            { SkillType.GuardSkill, new GuardSkill() },
+            { SkillType.ShieldSlam, new ShieldSlam() }
         };
     }
 }

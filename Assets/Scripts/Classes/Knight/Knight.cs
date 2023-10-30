@@ -6,18 +6,19 @@ public class Knight : PlayerJob
 {
     private int playerLevel => PlayerData.Instance.level;
 
-    public override int BaseAtk => 8; 
-    public override int BaseDef => 3; 
-    public override int BaseMagAtk => 5; 
+    public override int BaseAtk => 3; 
+    public override int BaseDef => 1; 
+    public override int BaseMagAtk => 2; 
     public override int BaseMagDef => 2; 
-    public override int BaseHealth => 27; 
+    public override int BaseHealth => 10; 
     public override int BaseEnergy => 10;
    
 
     public override List<SkillType> AvailableSkills => new List<SkillType>
     {
+        SkillType.Slash,
         SkillType.TripleHit,
-        SkillType.SwordWave,
+        SkillType.ShieldSlam
         
     };
 
@@ -39,8 +40,8 @@ public class Knight : PlayerJob
             case SkillType.SwordWave:
                 return new SwordWave();
 
-            case SkillType.GuardSkill:
-                return new GuardSkill();
+            case SkillType.ShieldSlam:
+                return new ShieldSlam();
 
             default:
                 Debug.LogError("Unknown skill type for Knight: " + skillType);

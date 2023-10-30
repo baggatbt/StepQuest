@@ -10,7 +10,7 @@ public class TripleHitSkill : Skill
         skillName = "Triple Slash";
         description = "Slash three times";
         requiresMovement = true;
-        energyCost = 4;
+        energyCost = 3;
         numberOfAttacksPossible = 3;
     }
 

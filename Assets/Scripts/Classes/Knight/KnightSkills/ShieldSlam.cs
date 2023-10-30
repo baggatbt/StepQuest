@@ -2,19 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Slash : Skill
+public class ShieldSlam : Skill
 {
     private int numberOfAttacks;
-    public Slash()
+    public ShieldSlam()
     {
-        skillName = "Slash";
-        description = "A slash that deals damage equal to the user's attack power.";
+        skillName = "Shield Slam";
+        description = "A skill to lower enemy rage";
         energyCost = 0; 
         energyGain = 2;
         skillLevel = 1; 
         requiresMovement = true; 
         skillExecutionComplete = false;
-        numberOfAttacks = 2;
+        numberOfAttacks = 1;
         
     }
 
@@ -32,7 +32,7 @@ public class Slash : Skill
 
         int baseDamage = CalculateBaseDamage(user);
 
-        user.animator.SetTrigger("Attack1Trigger");
+        user.animator.SetTrigger("ShieldSlamTrigger");
         for( int i = 0; i < numberOfAttacks; i++)
         {
              

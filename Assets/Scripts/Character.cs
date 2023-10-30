@@ -128,7 +128,10 @@ public class Character : MonoBehaviour
     public void TakeDamage(int damageOfAttacker, Character attacker)
 {
     
-    int damageDealt = (int)(damageOfAttacker * (1 - (this.defensePower / 100.0)));
+   // int damageDealt = (int)(damageOfAttacker * (1 - (this.defensePower / 100.0)));
+   //Got rid of scaling, testing dealing with low numbers directly
+    int damageDealt = damageOfAttacker - this.defensePower;
+    Debug.Log("Damaged reduced by Defense: " + (damageOfAttacker - damageDealt));
 
     health -= damageDealt;
     healthBar.value = health;

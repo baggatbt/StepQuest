@@ -10,5 +10,15 @@ public class ParticleController : MonoBehaviour
     public void PlayParticleEffect()
     {
         particleSystem.Play();
+        StartCoroutine(StopParticleAfterDuration());
+    }
+
+    private IEnumerator StopParticleAfterDuration()
+    {
+        // Wait for the duration of the particle system
+        yield return new WaitForSeconds(particleSystem.main.duration);
+
+        // Stop the particle system
+        particleSystem.Stop();
     }
 }
