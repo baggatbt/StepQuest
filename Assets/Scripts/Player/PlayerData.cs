@@ -112,6 +112,7 @@ public class PlayerData : MonoBehaviour
             inGameSteps += currentSteps - previousSteps;
             previousSteps = currentSteps;
         }
+
         
      //   Debug.Log("Steps in Update: " + inGameSteps);
     }
@@ -178,45 +179,44 @@ public class PlayerData : MonoBehaviour
     }
 
     private void OnApplicationPause(bool pauseStatus)
-    {
-        if (pauseStatus)
-        {
-            SaveStepsData();
-            SavePlayerData();
-        }
-        else
-        {
-            LoadStepsData();
-        }
-    }
-
-    private void OnApplicationQuit()
+{
+    if (pauseStatus)
     {
         SaveStepsData();
-        SavePlayerData();
-        Debug.Log("Saving steps on quit: " + inGameSteps);
     }
-
-    private void LoadStepsData()
+    else
     {
-       // if(PlayerPrefs.HasKey("StepsBeforeClosing") && PlayerPrefs.HasKey("InGameSteps"))
-        //{
-            int stepsBeforeClosing = PlayerPrefs.GetInt("StepsBeforeClosing", 0);
-            int stepsWhenReOpening = stepCounterController.GetSteps();
-            int previousInGameSteps = PlayerPrefs.GetInt("InGameSteps", 0);
-            int stepsDuringClosure = stepsWhenReOpening - stepsBeforeClosing;
-            inGameSteps = previousInGameSteps + stepsDuringClosure; 
-            previousSteps = inGameSteps;
-            Debug.Log("Loaded Steps: " + inGameSteps);
-       // }
+        LoadStepsData();
     }
+}
 
-    private void SaveStepsData()
-    {
-        PlayerPrefs.SetInt("StepsBeforeClosing", stepCounterController.GetSteps());
-        PlayerPrefs.SetInt("InGameSteps", inGameSteps);
-        PlayerPrefs.Save();
-    }
+private void SaveStepsData()
+{
+    // Save the total steps from the plugin when the app is paused or closed
+    PlayerPrefs.SetInt("TotalStepsWhenClosed", stepCounterController.GetSteps());
+    PlayerPrefs.Save();
+    Debug.Log("Saved total steps when closed: " + stepCounterController.GetSteps());
+}
+
+private void LoadStepsData()
+{
+    int totalStepsWhenClosed = PlayerPrefs.GetInt("TotalStepsWhenClosed", 0);
+    int totalStepsNow = stepCounterController.GetSteps();
+    int stepsTakenWhileAppClosed = totalStepsNow - totalStepsWhenClosed;
+
+    // Add the steps taken while the app was closed to the in-game steps
+    inGameSteps += stepsTakenWhileAppClosed;
+    Debug.Log("Loaded Steps: " + inGameSteps);
+}
+
+
+private void OnApplicationQuit()
+{
+    SaveStepsData();
+}
+
+
+
 
 
   

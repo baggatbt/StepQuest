@@ -5,7 +5,6 @@ public class StepCounterController : MonoBehaviour
     public static StepCounterController Instance { get; private set; }
 
     private AndroidJavaObject stepCounterPluginInstance;
-    private int inGameSteps;
 
     private void Awake()
     {
@@ -14,7 +13,6 @@ public class StepCounterController : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
-            // Your initialization code
             Debug.Log("Awake in StepCounterController");
             if (Application.platform == RuntimePlatform.Android)
             {
@@ -22,15 +20,15 @@ public class StepCounterController : MonoBehaviour
                 {
                     AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
                     
-                    using (AndroidJavaClass stepCounterPluginClass = new AndroidJavaClass("com.example.stepcounterplugin.StepCounterPlugin"))
+                    using (AndroidJavaClass stepCounterPluginClass = new AndroidJavaClass("com.example.mylibrary.StepCounterPlugin"))
                     {
                         stepCounterPluginClass.CallStatic("init", currentActivity);
                         Debug.Log("Plugin Initialized");
                     }
                 }
                 
-                stepCounterPluginInstance = new AndroidJavaObject("com.example.stepcounterplugin.StepCounterPlugin");
-                stepCounterPluginInstance.CallStatic("startCounting");
+                stepCounterPluginInstance = new AndroidJavaObject("com.example.mylibrary.StepCounterPlugin");
+                StartCounting();
             }
         }
         else
@@ -39,21 +37,29 @@ public class StepCounterController : MonoBehaviour
         }
     }
 
-    private void Update()
+    private void OnApplicationPause(bool pauseStatus)
     {
         if (Application.platform == RuntimePlatform.Android)
         {
-            Debug.Log("Steps since start: " + GetStepsSinceStart());
+            if (pauseStatus)
+            {
+                StopCounting();
+            }
+            else
+            {
+                StartCounting();
+            }
         }
     }
-    //CHECK ON DESTROY VS ONPAUSE
-    
-    private void OnDestroy()
+
+    private void StartCounting()
     {
-        if (Application.platform == RuntimePlatform.Android)
-        {
-            stepCounterPluginInstance.CallStatic("stopCounting");
-        }
+        stepCounterPluginInstance.CallStatic("startCounting");
+    }
+
+    private void StopCounting()
+    {
+        stepCounterPluginInstance.CallStatic("stopCounting");
     }
 
     public int GetStepsSinceStart()
