@@ -32,7 +32,6 @@ public class ShieldSlam : Skill
 
         int baseDamage = CalculateBaseDamage(user);
 
-        user.animator.SetTrigger("ShieldSlamTrigger");
         for( int i = 0; i < numberOfAttacks; i++)
         {
              
@@ -59,11 +58,11 @@ public class ShieldSlam : Skill
     private IEnumerator TimingWindow(Character user, Character target, BattleManager battleManager, float windowStart, float windowEnd)
     {
        
-        yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(windowStart, windowEnd, (timingResult) =>
+        yield return battleManager.StartCoroutine(battleManager.PlayerHoldReleaseTimeEvent(windowStart, windowEnd, (timingResult) =>
         {
+            user.animator.SetTrigger("ShieldSlamTrigger");
             result = timingResult;
         }));
-         
     }
 
 

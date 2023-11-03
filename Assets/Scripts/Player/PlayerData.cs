@@ -56,6 +56,7 @@ public class PlayerData : MonoBehaviour
         LoadPlayerData();
         
         
+        
     }
     else
     {
@@ -111,6 +112,7 @@ public class PlayerData : MonoBehaviour
             inGameSteps += currentSteps - previousSteps;
             previousSteps = currentSteps;
         }
+        
      //   Debug.Log("Steps in Update: " + inGameSteps);
     }
 
@@ -180,6 +182,7 @@ public class PlayerData : MonoBehaviour
         if (pauseStatus)
         {
             SaveStepsData();
+            SavePlayerData();
         }
         else
         {
@@ -196,8 +199,8 @@ public class PlayerData : MonoBehaviour
 
     private void LoadStepsData()
     {
-        if(PlayerPrefs.HasKey("StepsBeforeClosing") && PlayerPrefs.HasKey("InGameSteps"))
-        {
+       // if(PlayerPrefs.HasKey("StepsBeforeClosing") && PlayerPrefs.HasKey("InGameSteps"))
+        //{
             int stepsBeforeClosing = PlayerPrefs.GetInt("StepsBeforeClosing", 0);
             int stepsWhenReOpening = stepCounterController.GetSteps();
             int previousInGameSteps = PlayerPrefs.GetInt("InGameSteps", 0);
@@ -205,7 +208,7 @@ public class PlayerData : MonoBehaviour
             inGameSteps = previousInGameSteps + stepsDuringClosure; 
             previousSteps = inGameSteps;
             Debug.Log("Loaded Steps: " + inGameSteps);
-        }
+       // }
     }
 
     private void SaveStepsData()
