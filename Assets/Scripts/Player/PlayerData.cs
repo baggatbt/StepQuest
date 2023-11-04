@@ -200,14 +200,15 @@ private void SaveStepsData()
 
 private void LoadStepsData()
 {
-    int totalStepsWhenClosed = PlayerPrefs.GetInt("TotalStepsWhenClosed", 0);
+    int totalStepsWhenClosed = PlayerPrefs.GetInt("TotalStepsWhenClosed", stepCounterController.GetSteps());
     int totalStepsNow = stepCounterController.GetSteps();
-    int stepsTakenWhileAppClosed = totalStepsNow - totalStepsWhenClosed;
 
-    // Add the steps taken while the app was closed to the in-game steps
-    inGameSteps += stepsTakenWhileAppClosed;
+    // Calculate the steps taken after the game was started
+    inGameSteps = totalStepsNow - totalStepsWhenClosed;
+
     Debug.Log("Loaded Steps: " + inGameSteps);
 }
+
 
 
 private void OnApplicationQuit()
