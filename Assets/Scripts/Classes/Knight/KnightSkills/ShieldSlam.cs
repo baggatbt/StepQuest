@@ -15,6 +15,7 @@ public class ShieldSlam : Skill
         requiresMovement = true; 
         skillExecutionComplete = false;
         numberOfAttacks = 1;
+        int energyToTakeFromEnemy = -1; //Must be negative in order to use GainEnergy() from Character
         
     }
 
@@ -34,8 +35,8 @@ public class ShieldSlam : Skill
 
         for( int i = 0; i < numberOfAttacks; i++)
         {
+            
              
-
              yield return TimingWindow(user, target, battleManager, 0.0f, 0.9f);
              
 
@@ -48,6 +49,13 @@ public class ShieldSlam : Skill
         Debug.Log("waiting on animation to finish");
     
         yield return new WaitUntil(() => user.isAnimationDone == true);
+
+        if (result != TimingEventResult.Miss)
+            {
+                //Reduce the targets energy by 1 *didnt use spend energy because thats for the players temp energy only
+                target.GainEnergy(energyToTakeFromEnemy);
+            
+            }
         user.animationDamageTime = false;
         user.isAnimationDone = false;
         user.isAttacking = false;
@@ -62,6 +70,7 @@ public class ShieldSlam : Skill
         {
             user.animator.SetTrigger("ShieldSlamTrigger");
             result = timingResult;
+            
         }));
     }
 

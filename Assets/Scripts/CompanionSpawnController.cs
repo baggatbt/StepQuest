@@ -34,6 +34,10 @@ public class CompanionSpawnController : MonoBehaviour
     // Instantiate the Companion at the position of spawnPoint and with its rotation
     GameObject spawnedCompanionObject = Instantiate(companionPrefab, spawnPoint.position, spawnPoint.rotation);
     Character spawnedCompanion = spawnedCompanionObject.GetComponent<Character>();
+    
+    // Set the tag for the spawned companion object
+    spawnedCompanionObject.tag = "Companion";
+
 
      
     // Link this character to the health bar

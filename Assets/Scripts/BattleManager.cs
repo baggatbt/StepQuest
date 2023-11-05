@@ -387,11 +387,13 @@ public class BattleManager : MonoBehaviour
             
         }
     }
-
+    
 
     public IEnumerator EnemyAttackCoroutine(Character attackingEnemy)
     {
         yield return new WaitUntil(() => activePlayer.isAttacking == false);
+
+        
 
         if (attackingEnemy.currentSkill != null)
         {
@@ -662,7 +664,7 @@ private void Update()
                 isSkillSelected = false;  // Reset the flag
             }
             // If the hit object is a player and has not gone yet
-            else if (hit.collider.CompareTag("Player"))
+            else if (hit.collider.CompareTag("Player") || hit.collider.CompareTag("Companion"))
             {
                 Character clickedCharacter = hit.collider.GetComponent<Character>();
                 if (clickedCharacter != null && clickedCharacter.hasNotGone)
