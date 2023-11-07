@@ -56,6 +56,8 @@ public class BattleManager : MonoBehaviour
     private TextMeshProUGUI expGainedTextComponent;
     private TextMeshProUGUI goldGainedTextComponent;
 
+    
+
     private Camera mainCamera;
 
 
@@ -357,6 +359,7 @@ public class BattleManager : MonoBehaviour
         {
             foreach (var enemy in enemies)
             {
+                
                 if (enemy.health > 0) // Assuming you have some isDead flag on enemies
                     enemyTurnQueue.Enqueue(enemy);
             }
@@ -382,7 +385,18 @@ public class BattleManager : MonoBehaviour
             {
             attackingEnemy.currentSkill = attackingEnemy.normalSkill;
             }
-          
+
+            // This sets the enemies target for the turn, need to build out
+            //Each enemy can have a preference if needed in their own class
+            //For now it will just randomize between the player and companion
+            // Use UnityEngine.Random.Range to get a 50/50 chance
+            //UnityEngine.Random.Range(min, max) returns either 0 or 1
+            foreach (var enemy in enemies)
+            {
+                
+            attackingEnemy.attackTarget = player.transform; //UnityEngine.Random.Range(0, 2) == 0 ? companion.transform : player.transform;
+            }
+            
             StartCoroutine(EnemyAttackCoroutine(attackingEnemy));
             
         }

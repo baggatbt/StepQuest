@@ -5,6 +5,7 @@ using UnityEngine;
 public class ShieldSlam : Skill
 {
     private int numberOfAttacks;
+    private int energyToTakeFromEnemy = -1; //Must be negative in order to use GainEnergy() from Character
     public ShieldSlam()
     {
         skillName = "Shield Slam";
@@ -15,7 +16,6 @@ public class ShieldSlam : Skill
         requiresMovement = true; 
         skillExecutionComplete = false;
         numberOfAttacks = 1;
-        int energyToTakeFromEnemy = -1; //Must be negative in order to use GainEnergy() from Character
         
     }
 

@@ -292,20 +292,23 @@ public class Character : MonoBehaviour
      public IEnumerator MoveToTarget()
 {
     animator.SetTrigger("MovementAnimationTrigger");
-     
+
     Vector3 targetPosition = attackTarget.position;
     checkCollisionsDuringMovement = true;
-    
-    yield return Move(targetPosition);
-    animator.SetTrigger("StopMovementAnimationTrigger");  
+
+    // Start moving towards the target
+    yield return Move(targetPosition, stoppingDistance: 0.1f); // Set a small stopping distance
+
+    // Stop the movement animation when the target position is reached or a collision occurs
+    animator.SetTrigger("StopMovementAnimationTrigger");
 }
 
-     public IEnumerator ReturnToPosition()
+public IEnumerator ReturnToPosition()
 {
     animator.SetTrigger("MovementAnimationTrigger");
 
-    // You can keep this line if you want the character to move back over time
-    yield return Move(originalPosition);
+    // Move back to the original position
+    yield return Move(originalPosition, stoppingDistance: 0.0f); // Exact position, so stopping distance is 0
 
     // This line will ensure the character is exactly at the original position
     transform.position = originalPosition;
@@ -313,47 +316,47 @@ public class Character : MonoBehaviour
     animator.SetTrigger("StopMovementAnimationTrigger");
 }
 
+private IEnumerator Move(Vector3 targetPosition, float stoppingDistance)
+{
+    while (!HasReachedPosition(targetPosition, stoppingDistance))
+    {
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, 17.5f * Time.deltaTime);
 
-     private IEnumerator Move(Vector3 targetPosition)
+        if (checkCollisionsDuringMovement && IsCollidingWithCharacter())
         {
-            while (!HasReachedPosition(targetPosition))
-            {
-                transform.position = Vector3.MoveTowards(transform.position, targetPosition, 17.5f * Time.deltaTime);
-                
-                if (checkCollisionsDuringMovement && IsCollidingWithCharacter())
-                {
-                    animator.SetTrigger("StopMovementAnimationTrigger");  
-                    yield break;
-                }
-                yield return null;
-            }
+            animator.SetTrigger("StopMovementAnimationTrigger");
+            yield break; // Stop the coroutine if a collision is detected
         }
 
-    //This can cause a bug where a longer animation will snap back to pos and skip running
-    private bool HasReachedPosition(Vector3 targetPosition, float stoppingDistance = 0.0f)
-    {
-        return (transform.position - targetPosition).sqrMagnitude <= stoppingDistance * stoppingDistance;
+        // Use WaitForFixedUpdate for physics-based movement
+        yield return new WaitForFixedUpdate();
     }
+}
 
-    private bool IsCollidingWithCharacter()
+// Updated to check for an appropriate stopping distance
+private bool HasReachedPosition(Vector3 targetPosition, float stoppingDistance)
 {
+    // Adjusted to use magnitude instead of sqrMagnitude for more accurate comparison
+    return Vector3.Distance(transform.position, targetPosition) <= stoppingDistance;
+}
+
+private bool IsCollidingWithCharacter()
+{
+    // Consider using a more specific collision check if necessary
+    // For example, Physics2D.OverlapCircle might be replaced with Physics2D.OverlapBox if that's more appropriate for your game
     Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 2.0f);
 
     foreach (Collider2D collider in colliders)
     {
         if (collider.gameObject.GetInstanceID() == gameObject.GetInstanceID()) continue;
 
-        // If current object is an enemy and the colliding object is also an enemy, ignore the collision
         if (this.CompareTag("Enemy") && collider.CompareTag("Enemy")) continue;
 
         if (this.CompareTag("UI")) continue;
 
-        // If it's colliding with the target, then return true
         if (collider.gameObject.GetInstanceID() == attackTarget.gameObject.GetInstanceID()) return true;
     }
     return false;
 }
-
-
 
 }

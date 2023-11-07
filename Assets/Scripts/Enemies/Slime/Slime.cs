@@ -30,16 +30,6 @@ public class Slime : Enemy
         // Set the default currentSkill
         this.currentSkill = this.normalSkill;
 
-        GameObject playerObject = GameObject.FindWithTag("Player");
-
-        if (playerObject)
-        {
-            // Set the attackTarget of the slime to the player's transform
-            this.attackTarget = playerObject.transform;
-        }
-        else
-        {
-            Debug.LogWarning("Player object with tag 'Player' not found. Ensure your player GameObject is tagged 'Player'.");
-        }
+    
     }
 }

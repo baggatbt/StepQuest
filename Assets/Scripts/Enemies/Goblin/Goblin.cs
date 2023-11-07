@@ -40,17 +40,7 @@ public class Goblin : Enemy
         // Set the default currentSkill
         this.currentSkill = this.normalSkill;
 
-        GameObject playerObject = GameObject.FindWithTag("Player");
-
-        if (playerObject)
-        {
-            // Set the attackTarget of the goblin to the player's transform object
-            this.attackTarget = playerObject.transform;
-        }
-        else
-        {
-            Debug.LogWarning("Player object with tag 'Player' not found. Ensure your player GameObject is tagged 'Player'.");
-        }
+        
     }
 }
 
