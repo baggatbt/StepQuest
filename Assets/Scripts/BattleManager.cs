@@ -681,6 +681,7 @@ private void Update()
             else if (hit.collider.CompareTag("Player") || hit.collider.CompareTag("Companion"))
             {
                 Character clickedCharacter = hit.collider.GetComponent<Character>();
+                Debug.Log("THe click was detected but didnt pass IF");
                 if (clickedCharacter != null && clickedCharacter.hasNotGone)
                 {
                     activePlayer = clickedCharacter;
