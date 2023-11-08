@@ -6,13 +6,6 @@ public class Companion : Character
 {
    protected override void Start()
     {
-        // Assign the skills to this specific type of character
-        
-        this.skills = new List<Skill> // Make sure to initialize the skills list before adding to it
-        {
-             new SlimeAttackSkill() //Dont forget to put the comma back after adding new ones
-            //new SomeOtherAttackSkill()
-        };
         this.level = 1;
         this.damage = 2;
         this.maxHealth = 10;
@@ -22,16 +15,41 @@ public class Companion : Character
         this.maxEnergy = 5;
         this.energy = maxEnergy;
 
-        // Assign the skills
-        this.normalSkill = this.skills[0]; // Normal skill
-        
-
-        // Set the default currentSkill
-        this.currentSkill = this.normalSkill;
-
-    
     }
    
+    public  List<SkillType> AvailableSkills => new List<SkillType>
+    {
+        SkillType.Slash,
+        SkillType.TripleHit,
+        SkillType.ShieldSlam,
+        
+    };
 
+    public  List<SkillType> LockedSkills => new List<SkillType>
+    {
+        
+    };
+
+    public  Skill GetSkillInstance(SkillType skillType)
+    {
+        switch(skillType)
+        {
+            case SkillType.Slash:
+                return new Slash();
+
+            case SkillType.TripleHit:
+                return new TripleHitSkill();
+
+            case SkillType.SwordWave:
+                return new SwordWave();
+
+            case SkillType.ShieldSlam:
+                return new ShieldSlam();
+
+            default:
+                Debug.LogError("Unknown skill type for Knight: " + skillType);
+                return null;
+        }
+    }
     // Additional companion-specific properties and behavior
 }

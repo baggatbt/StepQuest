@@ -9,6 +9,7 @@ public class ButtonController : MonoBehaviour
     
     public BattleManager battleManager;
     public GameObject skillButtonPrefab;
+    public Companion companion;
 
     public List<Button> skillButtons = new List<Button>();
 
@@ -22,6 +23,7 @@ public class ButtonController : MonoBehaviour
     void Start()
     {
        PopulateSkillPanelWithPlayerSkills();
+       PopulateSkillPanelWithCompanionSkills();
     }
     
     private UnityEngine.Events.UnityAction GetSkillAction(Skill currentSkill)
@@ -48,6 +50,45 @@ public void PopulateSkillPanelWithPlayerSkills()
             
             // Get the Skill instance from the CurrentJob based on skillType
             Skill currentSkill = PlayerData.Instance.CurrentJob.GetSkillInstance(skillType);
+
+            // Set the button's text to the skill's name
+            TextMeshProUGUI buttonText = newButtonObj.GetComponentInChildren<TextMeshProUGUI>();
+            if (buttonText != null)
+            {
+                buttonText.text = currentSkill.skillName;
+            }
+
+            // Create a new local variable to hold the currentSkill value
+            Skill buttonSkill = currentSkill;
+
+            // Add a listener to the button to handle its click action
+            buttonComponent.onClick.AddListener(() => 
+            {
+                SelectAndUseSkill(buttonSkill);
+            });
+        }
+    }
+}
+
+public void PopulateSkillPanelWithCompanionSkills()
+{
+    List<SkillType> availableSkills = companion.AvailableSkills;
+   
+
+
+    foreach (SkillType skillType in availableSkills)
+    {
+        // Instantiate a new button
+        GameObject newButtonObj = Instantiate(skillButtonPrefab, skillSelectionPanel.transform);
+        Debug.Log("Tried to make skill buttons fam");
+        // Get the Button component
+        Button buttonComponent = newButtonObj.GetComponent<Button>();
+        if (buttonComponent != null)
+        {
+            skillButtons.Add(buttonComponent); // Add the button to the list
+            
+            // Get the Skill instance from the CurrentJob based on skillType
+            Skill currentSkill = companion.GetSkillInstance(skillType);
 
             // Set the button's text to the skill's name
             TextMeshProUGUI buttonText = newButtonObj.GetComponentInChildren<TextMeshProUGUI>();

@@ -440,6 +440,7 @@ GameObject:
   m_Component:
   - component: {fileID: 250696102}
   - component: {fileID: 250696101}
+  - component: {fileID: 250696103}
   m_Layer: 5
   m_Name: ButtonController
   m_TagString: Untagged
@@ -461,6 +462,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   battleManager: {fileID: 1020165693}
   skillButtonPrefab: {fileID: 1619622141431516161, guid: 9f82bb012655df641b2d8b1824140b13, type: 3}
+  companion: {fileID: 250696103}
   skillButtons: []
   skillSelectionPanel: {fileID: 873669125}
 --- !u!224 &250696102
@@ -483,6 +485,47 @@ RectTransform:
   m_AnchoredPosition: {x: 17513.348, y: 5369.782}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &250696103
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 250696100}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19076bd70534def42bc7b6cbf2f7ae5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  level: 0
+  health: 0
+  maxHealth: 0
+  damage: 0
+  energy: 0
+  maxEnergy: 0
+  attackPower: 0
+  defensePower: 0
+  speed: 0
+  tempEnergyMax: 0
+  tempEnergy: 0
+  healthBar: {fileID: 0}
+  energyBar: {fileID: 0}
+  tempEnergyBar: {fileID: 0}
+  attackTarget: {fileID: 0}
+  originalPosition: {x: 0, y: 0, z: 0}
+  isAttacking: 0
+  spriteRenderer: {fileID: 0}
+  animator: {fileID: 0}
+  healthText: {fileID: 0}
+  energyText: {fileID: 0}
+  hasNotGone: 0
+  attackTrigger: 0
+  animationEnded: 0
+  attacksBeforeSpecial: 0
+  statusEffectController: {fileID: 0}
+  cameraShake: {fileID: 0}
+  isAnimationDone: 0
+  animationDamageTime: 0
 --- !u!1 &347288433
 GameObject:
   m_ObjectHideFlags: 0
@@ -4044,6 +4087,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   battleManager: {fileID: 0}
   skillButtonPrefab: {fileID: 0}
+  companion: {fileID: 0}
   skillButtons: []
   skillSelectionPanel: {fileID: 0}
 --- !u!1 &1609319783
@@ -6419,6 +6463,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   battleManager: {fileID: 0}
   skillButtonPrefab: {fileID: 0}
+  companion: {fileID: 0}
   skillButtons: []
   skillSelectionPanel: {fileID: 0}
 --- !u!1 &2017007635
