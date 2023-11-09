@@ -1,3 +1,4 @@
+/*
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,6 +17,7 @@ public class SkillRepository : MonoBehaviour
         SwordWave,
         GuardSkill,
         ShieldSlam,
+        SlimeAttackSkill
     }
 
     private void Awake()
@@ -27,8 +29,10 @@ public class SkillRepository : MonoBehaviour
             { SkillType.TripleHit, new TripleHitSkill() },
             { SkillType.SwordWave, new SwordWave() }, // Use the initialized reference here.
             { SkillType.GuardSkill, new GuardSkill() },
-            { SkillType.ShieldSlam, new ShieldSlam() }
+            { SkillType.ShieldSlam, new ShieldSlam() },
+            { SkillType.Slime, new ShieldSlam() }
         };
     }
 }
 
+*/

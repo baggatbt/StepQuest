@@ -81,7 +81,7 @@ public class Character : MonoBehaviour
             {
                 this.energyText.text = "MP: " + this.energy + " / " + this.tempEnergy;
                 this.tempEnergyBar.value = this.tempEnergy;
-                Debug.Log("temp energy" + tempEnergy);
+                
                 
             }
         }

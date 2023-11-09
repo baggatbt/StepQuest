@@ -340,7 +340,7 @@ public class BattleManager : MonoBehaviour
             
             yield return activePlayer.currentSkill.Execute(activePlayer, targetEnemy, this);
             
-            //yield return new WaitForSeconds(0.1f);
+            
 
             
 
@@ -354,6 +354,7 @@ public class BattleManager : MonoBehaviour
     
     public void EnemyAttack()
     {
+        
         // If the queue is empty (or at the start of the enemy turn phase), populate it.
         if (enemyTurnQueue.Count == 0)
         {
@@ -406,7 +407,7 @@ public class BattleManager : MonoBehaviour
     public IEnumerator EnemyAttackCoroutine(Character attackingEnemy)
     {
         yield return new WaitUntil(() => activePlayer.isAttacking == false);
-
+        yield return new WaitForSeconds(1.0f); //Ensures player animation is all done
         
 
         if (attackingEnemy.currentSkill != null)
@@ -681,12 +682,12 @@ private void Update()
             else if (hit.collider.CompareTag("Player") || hit.collider.CompareTag("Companion"))
             {
                 Character clickedCharacter = hit.collider.GetComponent<Character>();
-                Debug.Log("THe click was detected but didnt pass IF");
+                
                 if (clickedCharacter != null && clickedCharacter.hasNotGone)
                 {
                     activePlayer = clickedCharacter;
                     Debug.Log("active player switched");// Move the circles to the targets position
-                    activePlayerIndicator.transform.position = new Vector3(activePlayer.transform.position.x, activePlayer.transform.position.y + 5f, activePlayer.transform.position.z);
+                    activePlayerIndicator.transform.position = new Vector3(activePlayer.transform.position.x, activePlayer.transform.position.y + 2f, activePlayer.transform.position.z);
                     activePlayerIndicator.SetActive(true);
 
                 }

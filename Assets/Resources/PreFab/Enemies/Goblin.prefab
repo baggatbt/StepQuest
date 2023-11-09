@@ -101,8 +101,8 @@ CapsuleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.020651545, y: 0.16061842}
-  m_Size: {x: 0.3417475, y: 0.37710893}
+  m_Offset: {x: 0.028866244, y: -0.015268984}
+  m_Size: {x: 0.19999732, y: 0.25408947}
   m_Direction: 0
 --- !u!95 &6178202463525426478
 Animator:
@@ -146,8 +146,11 @@ MonoBehaviour:
   attackPower: 4
   defensePower: 0
   speed: 0
+  tempEnergyMax: 0
+  tempEnergy: 0
   healthBar: {fileID: 0}
   energyBar: {fileID: 0}
+  tempEnergyBar: {fileID: 0}
   attackTarget: {fileID: 0}
   originalPosition: {x: 0, y: 0, z: 0}
   isAttacking: 0
@@ -155,6 +158,7 @@ MonoBehaviour:
   animator: {fileID: 6178202463525426478}
   healthText: {fileID: 0}
   energyText: {fileID: 0}
+  hasNotGone: 0
   attackTrigger: 0
   animationEnded: 0
   attacksBeforeSpecial: 0
@@ -185,8 +189,11 @@ MonoBehaviour:
   attackPower: 0
   defensePower: 0
   speed: 0
+  tempEnergyMax: 0
+  tempEnergy: 0
   healthBar: {fileID: 0}
   energyBar: {fileID: 0}
+  tempEnergyBar: {fileID: 0}
   attackTarget: {fileID: 0}
   originalPosition: {x: 0, y: 0, z: 0}
   isAttacking: 0
@@ -194,6 +201,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   healthText: {fileID: 0}
   energyText: {fileID: 0}
+  hasNotGone: 0
   attackTrigger: 0
   animationEnded: 0
   attacksBeforeSpecial: 0

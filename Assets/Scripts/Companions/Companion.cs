@@ -19,9 +19,8 @@ public class Companion : Character
    
     public  List<SkillType> AvailableSkills => new List<SkillType>
     {
-        SkillType.Slash,
-        SkillType.TripleHit,
-        SkillType.ShieldSlam,
+        SkillType.SlimeAttackSkill,
+        
         
     };
 
@@ -34,6 +33,8 @@ public class Companion : Character
     {
         switch(skillType)
         {
+            case SkillType.SlimeAttackSkill:
+                return new SlimeAttackSkill();
             case SkillType.Slash:
                 return new Slash();
 

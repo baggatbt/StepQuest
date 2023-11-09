@@ -19,6 +19,7 @@ public enum SkillType
         SwordWave,
         GuardSkill,
         ShieldSlam,
+        SlimeAttackSkill,
     }
 
 
