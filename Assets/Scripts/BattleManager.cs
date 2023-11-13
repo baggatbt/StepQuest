@@ -275,9 +275,7 @@ public class BattleManager : MonoBehaviour
     
         skillsExecuted = 0;
         //Make them unable to take a second turn.
-        if (activePlayer.hasNotGone != null){
-        //activePlayer.hasNotGone = false;
-        }
+        
         
         // Move player back to their original position after all skills executed.
        // yield return StartCoroutine(zoomEffect.ZoomOutEffect());

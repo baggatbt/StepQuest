@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Blue Jump Start-up - Animation
+  m_Name: Companion_Blue_Attack1
   serializedVersion: 6
   m_Legacy: 0
   m_Compressed: 0
@@ -21,27 +21,43 @@ AnimationClip:
   - curve:
     - time: 0
       value: {fileID: 5704156884885693787, guid: f617990383515fb4cbd1d986504bdd76, type: 3}
-    - time: 0.1
+    - time: 0.16666667
       value: {fileID: -8126010352769072749, guid: f617990383515fb4cbd1d986504bdd76, type: 3}
-    - time: 0.2
+    - time: 0.25
       value: {fileID: -4539103199394772846, guid: f617990383515fb4cbd1d986504bdd76, type: 3}
     - time: 0.3
       value: {fileID: -3253428629430836345, guid: f617990383515fb4cbd1d986504bdd76, type: 3}
-    - time: 0.4
+    - time: 0.41666666
       value: {fileID: -718380358525894524, guid: f617990383515fb4cbd1d986504bdd76, type: 3}
-    - time: 0.5
+    - time: 0.46666667
       value: {fileID: -2676425322560621361, guid: f617990383515fb4cbd1d986504bdd76, type: 3}
-    - time: 0.6
+    - time: 0.55
       value: {fileID: 1719011785091386411, guid: f617990383515fb4cbd1d986504bdd76, type: 3}
-    - time: 0.7
+    - time: 0.65
       value: {fileID: 4071128064442367207, guid: f617990383515fb4cbd1d986504bdd76, type: 3}
-    - time: 0.8
+    - time: 0.7
       value: {fileID: -1223713816557377742, guid: f617990383515fb4cbd1d986504bdd76, type: 3}
+    - time: 0.78333336
+      value: {fileID: -7484195833629091316, guid: 13a670e20d88e1d489acb123661a5046, type: 3}
+    - time: 0.8666667
+      value: {fileID: 3922477038715866601, guid: 13a670e20d88e1d489acb123661a5046, type: 3}
+    - time: 0.93333334
+      value: {fileID: -1559858571687980271, guid: 13a670e20d88e1d489acb123661a5046, type: 3}
+    - time: 0.98333335
+      value: {fileID: 1909360066693769652, guid: 13a670e20d88e1d489acb123661a5046, type: 3}
+    - time: 1.1
+      value: {fileID: -3951901653374556557, guid: 13a670e20d88e1d489acb123661a5046, type: 3}
+    - time: 1.2166667
+      value: {fileID: 338925204363467817, guid: 1a5590a95019bf74796087bf706839be, type: 3}
+    - time: 1.2666667
+      value: {fileID: 3925259120093280991, guid: 1a5590a95019bf74796087bf706839be, type: 3}
+    - time: 1.35
+      value: {fileID: 5393584417025584328, guid: 1a5590a95019bf74796087bf706839be, type: 3}
     attribute: m_Sprite
     path: 
     classID: 212
     script: {fileID: 0}
-  m_SampleRate: 10
+  m_SampleRate: 60
   m_WrapMode: 0
   m_Bounds:
     m_Center: {x: 0, y: 0, z: 0}
@@ -65,12 +81,20 @@ AnimationClip:
     - {fileID: 1719011785091386411, guid: f617990383515fb4cbd1d986504bdd76, type: 3}
     - {fileID: 4071128064442367207, guid: f617990383515fb4cbd1d986504bdd76, type: 3}
     - {fileID: -1223713816557377742, guid: f617990383515fb4cbd1d986504bdd76, type: 3}
+    - {fileID: -7484195833629091316, guid: 13a670e20d88e1d489acb123661a5046, type: 3}
+    - {fileID: 3922477038715866601, guid: 13a670e20d88e1d489acb123661a5046, type: 3}
+    - {fileID: -1559858571687980271, guid: 13a670e20d88e1d489acb123661a5046, type: 3}
+    - {fileID: 1909360066693769652, guid: 13a670e20d88e1d489acb123661a5046, type: 3}
+    - {fileID: -3951901653374556557, guid: 13a670e20d88e1d489acb123661a5046, type: 3}
+    - {fileID: 338925204363467817, guid: 1a5590a95019bf74796087bf706839be, type: 3}
+    - {fileID: 3925259120093280991, guid: 1a5590a95019bf74796087bf706839be, type: 3}
+    - {fileID: 5393584417025584328, guid: 1a5590a95019bf74796087bf706839be, type: 3}
   m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 0.90000004
+    m_StopTime: 1.4166666
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0
@@ -89,4 +113,18 @@ AnimationClip:
   m_EulerEditorCurves: []
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 0
-  m_Events: []
+  m_Events:
+  - time: 1.2166667
+    functionName: animationDamageTiming
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 1.4166666
+    functionName: AnimationEnded
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
