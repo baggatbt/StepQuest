@@ -373,6 +373,15 @@ public class BattleManager : MonoBehaviour
         }
 
         Character attackingEnemy = enemyTurnQueue.Dequeue();
+
+        //Decide target
+         // This sets the enemies target for the turn, need to build out
+            //Each enemy can have a preference if needed in their own class
+            //For now it will just randomize between the player and companion
+            // Use UnityEngine.Random.Range to get a 50/50 chance
+            //UnityEngine.Random.Range(min, max) returns either 0 or 1
+        attackingEnemy.attackTarget = UnityEngine.Random.Range(0, 2) == 0 ? companion.transform : player.transform;
+
         //Decide whether or not to use the special attack or the normal one
         if (!activePlayer.isAttacking && !attackingEnemy.isAttacking && state == BattleState.EnemyTurn)
         {
@@ -385,17 +394,7 @@ public class BattleManager : MonoBehaviour
             attackingEnemy.currentSkill = attackingEnemy.normalSkill;
             }
 
-            // This sets the enemies target for the turn, need to build out
-            //Each enemy can have a preference if needed in their own class
-            //For now it will just randomize between the player and companion
-            // Use UnityEngine.Random.Range to get a 50/50 chance
-            //UnityEngine.Random.Range(min, max) returns either 0 or 1
-            foreach (var enemy in enemies)
-            {
-                
-            attackingEnemy.attackTarget = player.transform; //UnityEngine.Random.Range(0, 2) == 0 ? companion.transform : player.transform;
-            }
-            
+           
             StartCoroutine(EnemyAttackCoroutine(attackingEnemy));
             
         }
@@ -416,7 +415,9 @@ public class BattleManager : MonoBehaviour
             }
 
             
-            yield return attackingEnemy.currentSkill.Execute(attackingEnemy, activePlayer, this);
+            Character targetCharacter = attackingEnemy.attackTarget.GetComponent<Character>();
+            yield return attackingEnemy.currentSkill.Execute(attackingEnemy, targetCharacter, this);
+
 
            
             if (attackingEnemy.currentSkill.requiresMovement)

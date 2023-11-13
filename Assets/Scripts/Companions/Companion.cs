@@ -7,7 +7,7 @@ public class Companion : Character
    protected override void Start()
     {
         this.level = 1;
-        this.damage = 2;
+        this.damage = 5;
         this.maxHealth = 10;
         this.health = this.maxHealth;
         this.defensePower = 1;
