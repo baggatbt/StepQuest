@@ -16,6 +16,7 @@ public class ButtonController : MonoBehaviour
     
 
     public GameObject skillSelectionPanel;
+    public GameObject companionSkillSelectionPanel;
    
     private Skill skill;
     
@@ -24,6 +25,22 @@ public class ButtonController : MonoBehaviour
     {
        PopulateSkillPanelWithPlayerSkills();
        PopulateSkillPanelWithCompanionSkills();
+    }
+
+    void Update()
+    {
+        if (battleManager.activePlayer == battleManager.player)
+        {
+            companionSkillSelectionPanel.SetActive(false);
+            skillSelectionPanel.SetActive(true);
+        }
+
+        if (battleManager.activePlayer == battleManager.companion)
+        {
+            companionSkillSelectionPanel.SetActive(true);
+            skillSelectionPanel.SetActive(false);
+        }
+
     }
     
     private UnityEngine.Events.UnityAction GetSkillAction(Skill currentSkill)
@@ -79,7 +96,7 @@ public void PopulateSkillPanelWithCompanionSkills()
     foreach (SkillType skillType in availableSkills)
     {
         // Instantiate a new button
-        GameObject newButtonObj = Instantiate(skillButtonPrefab, skillSelectionPanel.transform);
+        GameObject newButtonObj = Instantiate(skillButtonPrefab, companionSkillSelectionPanel.transform);
         Debug.Log("Tried to make skill buttons fam");
         // Get the Button component
         Button buttonComponent = newButtonObj.GetComponent<Button>();

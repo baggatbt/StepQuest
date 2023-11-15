@@ -11,7 +11,7 @@ public class Knight : PlayerJob
     public override int BaseMagAtk => 2; 
     public override int BaseMagDef => 2; 
     public override int BaseHealth => 10; 
-    public override int BaseEnergy => 10;
+    public override int BaseEnergy => 0;
    
 
     public override List<SkillType> AvailableSkills => new List<SkillType>

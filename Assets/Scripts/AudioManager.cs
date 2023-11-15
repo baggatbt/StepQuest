@@ -10,6 +10,7 @@ public class AudioManager : MonoBehaviour
     public AudioClip slashSound;
     public AudioClip blockSound;
     public AudioClip playerIsHitSound;
+    public AudioClip criticalSlashSound;
     public AudioClip battleMusic;
 
 
@@ -47,6 +48,11 @@ public class AudioManager : MonoBehaviour
     public void PlayPlayerIsHitSound()
     {
         audioSource.PlayOneShot(playerIsHitSound);
+    }
+
+    public void PlayCriticalSlashSound()
+    {
+        audioSource.PlayOneShot(criticalSlashSound);
     }
 
 

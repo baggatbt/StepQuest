@@ -67,10 +67,10 @@ public class Player : Character
             playerData.inGameSteps = 0;
             playerData.maxHealth = 5;
             playerData.health = playerData.maxHealth;
-            playerData.maxEnergy = 5;
-            playerData.energy = playerData.maxEnergy;
+            playerData.maxEnergy = 0;
+            playerData.energy = 0; //Set to zero to mimic the new system of just a shared AP bar.
             playerData.speed = 3;
-            playerData.maxTempEnergy = playerData.maxEnergy;
+            playerData.maxTempEnergy = 5;
             playerData.tempEnergy = 0;
 
             PlayerPrefs.SetInt("PlayerInitialized", 1);
