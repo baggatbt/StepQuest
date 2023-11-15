@@ -381,6 +381,15 @@ public class BattleManager : MonoBehaviour
             // Use UnityEngine.Random.Range to get a 50/50 chance
             //UnityEngine.Random.Range(min, max) returns either 0 or 1
         attackingEnemy.attackTarget = UnityEngine.Random.Range(0, 2) == 0 ? companion.transform : player.transform;
+        if (companion.health <= 0)
+        {
+            attackingEnemy.attackTarget = player.transform;
+        }
+
+        if (player.health <= 0)
+        {
+            attackingEnemy.attackTarget = companion.transform;
+        }
 
         //Decide whether or not to use the special attack or the normal one
         if (!activePlayer.isAttacking && !attackingEnemy.isAttacking && state == BattleState.EnemyTurn)
@@ -655,6 +664,8 @@ public class BattleManager : MonoBehaviour
 
 private void Update()
 {
+    if (!player.isAttacking || !companion.isAttacking)
+    {
     if (Input.GetMouseButtonDown(0))
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
@@ -693,7 +704,7 @@ private void Update()
             }
         }
     }
-
+    }
     ChangeColorAfterTurnTaken();
 }
 
