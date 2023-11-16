@@ -9,6 +9,7 @@ public class OpenSkillSelectionPanel : MonoBehaviour
     public GameObject missionGUI;
     public GameObject companionGUI;
     public GameObject characterGUI;
+    public GameObject overworldMapGUI;
 
     public void openSkillSelectionGUI()
     {
@@ -66,6 +67,14 @@ public class OpenSkillSelectionPanel : MonoBehaviour
         characterGUI.SetActive(false);
     }
 
-    
+    public void openOverworldMapInterface()
+    {
+        overworldMapGUI.SetActive(true);
+    }
+
+    public void closeOverworldMapInterface()
+    {
+        overworldMapGUI.SetActive(false);
+    }
    
 }

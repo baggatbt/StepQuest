@@ -116,6 +116,16 @@ public class BattleManager : MonoBehaviour
     expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
     goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
     mainCamera = Camera.main;
+    // Retrieve the BattleConfig from the GameManager after the scene is loaded
+        BattleConfig config = GameManager.Instance.CurrentBattleConfig;
+        if (config != null)
+        {
+            StartBattle(config);
+        }
+        else
+        {
+            Debug.LogError("No battle configuration found.");
+        }
     
 
     if (battleConfigs.Length > 0)

@@ -4,18 +4,18 @@ using UnityEngine;
 
 public class StageManager : MonoBehaviour
 {
+    public List<Stage> stages;
+    private int currentStageIndex = 0;
 
-    public bool isUnlocked;
-    
-    // Start is called before the first frame update
-    void Start()
+   
+
+    public void UnlockStage(int index)
     {
-        
+        if (index >= 0 && index < stages.Count)
+        {
+            stages[index].isUnlocked = true;
+        }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    // Additional methods as needed for managing stages
 }
