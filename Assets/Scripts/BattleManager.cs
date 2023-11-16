@@ -18,6 +18,7 @@ public class BattleManager : MonoBehaviour
     public List<Character> enemies = new List<Character>();
     public GameObject activePlayerIndicator;
     
+    
     public GameObject knightPrefab;
     private BattleState state;
     public int enemyAttackCount = 0;
@@ -128,15 +129,8 @@ public class BattleManager : MonoBehaviour
         }
     
 
-    if (battleConfigs.Length > 0)
-        {
-            StartBattle(battleConfigs[currentStageIndex]);  // Start the first battle.
-        }
-    else
-    {
-        Debug.LogError("No battle configuration set!");
-        // Handle error or default configuration
-    }
+
+
     Debug.Log(activePlayer);
 }
     public Button nextBattleButton;
@@ -757,6 +751,7 @@ public void CheckBattleEnd()
     if (allEnemiesDefeated)
     {
         EndOfBattleRewards(enemies);
+        GameManager.Instance.UnlockNextStage(GameManager.Instance.currentStageID); //Needs to move
         endOfBattlePanel.SetActive(true);
         
     }

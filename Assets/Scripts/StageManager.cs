@@ -5,15 +5,17 @@ using UnityEngine;
 public class StageManager : MonoBehaviour
 {
     public List<Stage> stages;
-    private int currentStageIndex = 0;
+    
 
    
 
-    public void UnlockStage(int index)
+    public void UnlockNextStage(int completedStageID)
     {
-        if (index >= 0 && index < stages.Count)
+        int nextStageID = completedStageID + 1;
+        if (nextStageID < stages.Count)
         {
-            stages[index].isUnlocked = true;
+            stages[nextStageID].isUnlocked = true;
+            stages[nextStageID].UpdateButtonColor(); 
         }
     }
 
