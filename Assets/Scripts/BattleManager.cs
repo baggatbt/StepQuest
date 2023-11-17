@@ -490,6 +490,7 @@ public class BattleManager : MonoBehaviour
     Vector3 zeroScale = new Vector3(0, 0, 0); 
 
     float speedFactor = 1.25f; // Change this value to adjust speed. Higher means faster.
+    outerCircle.SetActive(true);
 
 
     try
@@ -668,14 +669,14 @@ public class BattleManager : MonoBehaviour
 
 private void Update()
 {
-    if (!player.isAttacking || !companion.isAttacking)
+    if (!player.isAttacking && !companion.isAttacking)
     {
     if (Input.GetMouseButtonDown(0))
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
 
-        if (hit.collider != null)
+        if (hit.collider != null && (!player.isAttacking && !companion.isAttacking))
         {
             // If the hit object is an enemy
             if (hit.collider.CompareTag("Enemy")) // && isSkillSelected)

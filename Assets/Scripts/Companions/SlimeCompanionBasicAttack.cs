@@ -14,7 +14,7 @@ public class SlimeCompanionBasicAttack : Skill
         skillLevel = 1; 
         requiresMovement = true; 
         skillExecutionComplete = false;
-        numberOfAttacks = 1;
+        numberOfAttacks = 2;
         
     }
 
@@ -26,7 +26,6 @@ public class SlimeCompanionBasicAttack : Skill
      public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
         user.isAttacking = true;
-        user.animationDamageTime = false;
         user.isAnimationDone = false;  // Reset the flag at the start of each attack
 
 
