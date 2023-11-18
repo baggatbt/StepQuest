@@ -49,6 +49,7 @@ public class BattleManager : MonoBehaviour
     public GameObject ExpGainedText;
     public GameObject GoldGainedText;
     public GameObject endOfBattlePanel;
+    public GameObject endOfBattleLossPanel;
 
     public EnemySpawnController enemySpawnController;
 
@@ -363,7 +364,7 @@ public class BattleManager : MonoBehaviour
             foreach (var enemy in enemies)
             {
                 
-                if (enemy.health > 0) // Assuming you have some isDead flag on enemies
+                if (enemy.health > 0) 
                     enemyTurnQueue.Enqueue(enemy);
             }
         }
@@ -417,7 +418,7 @@ public class BattleManager : MonoBehaviour
     public IEnumerator EnemyAttackCoroutine(Character attackingEnemy)
     {
         yield return new WaitUntil(() => activePlayer.isAttacking == false);
-        yield return new WaitForSeconds(1.0f); //Ensures player animation is all done
+        //yield return new WaitForSeconds(1.0f); //Ensures player animation is all done
         
 
         if (attackingEnemy.currentSkill != null)
@@ -445,10 +446,12 @@ public class BattleManager : MonoBehaviour
             
         }
 
+        
         if (player.health <= 0)
         {
             Debug.Log("You lose ya jabroni");
-            SceneManager.LoadScene("CharacterInfoPage");
+            CheckBattleEnd();
+            
         }
         else
         {
@@ -739,6 +742,12 @@ private void Update()
 public void CheckBattleEnd()
 {
     bool allEnemiesDefeated = true;
+    bool allAlliesDefeated = false;
+
+    if (player.health <= 0 && companion.health <= 0)
+    {
+        allAlliesDefeated = true;
+    }
 
     foreach (var enemy in enemies)
     {
@@ -756,8 +765,12 @@ public void CheckBattleEnd()
         endOfBattlePanel.SetActive(true);
         
     }
+    if (allAlliesDefeated)
+    {
+        endOfBattleLossPanel.SetActive(true);
+    }
 }
-
+    
 
 
 
