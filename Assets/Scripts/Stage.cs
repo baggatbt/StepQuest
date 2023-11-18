@@ -33,6 +33,8 @@ public class Stage : MonoBehaviour
         }
     }
 
+
+
     private void OnStageButtonClicked()
     {
         if (isUnlocked)

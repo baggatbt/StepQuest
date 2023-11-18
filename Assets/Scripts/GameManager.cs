@@ -9,7 +9,8 @@ public class GameManager : MonoBehaviour
     public BattleConfig CurrentBattleConfig { get; set; } // Temporary storage for the battle config
 
     public int currentStageID = 0; //This will need to be replaced by loading data on start. for testing purposes setting to 0
-    public List<Stage> stages;
+    public int[] stageIDs = new int[] {0, 1, 2};
+
 
     private void Awake()
     {
@@ -25,16 +26,5 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void UnlockNextStage(int currentStageID)
-{
-    int nextStageID = currentStageID + 1;
-    if (nextStageID < stages.Count)
-    {
-        stages[nextStageID].isUnlocked = true;
-        stages[nextStageID].UpdateButtonColor(); // Update the button color
-
-        currentStageID = nextStageID; // Update the current stage index
-      //  SaveProgress(); // Save the new progress
-    }
-}
+    
 }
