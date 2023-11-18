@@ -761,7 +761,7 @@ public void CheckBattleEnd()
     if (allEnemiesDefeated)
     {
         EndOfBattleRewards(enemies);
-        GameManager.Instance.currentStageID++;
+       GameManager.Instance.UnlockNextStage();
         endOfBattlePanel.SetActive(true);
         
     }

@@ -12,8 +12,9 @@ public class Stage : MonoBehaviour
     public BattleConfig stageBattleConfig;
     public string battleSceneName = "BattleScene"; 
     public bool isUnlocked;
+    public bool isFirstCompletion;
 
-    public int stageID;
+
 
     private void Start()
     {
