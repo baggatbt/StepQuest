@@ -12,7 +12,8 @@ public class Companion : Character
         this.health = this.maxHealth;
         this.defensePower = 1;
         this.speed = 2;
-        
+        this.maxEnergy = 5;
+        this.teamEnergy = PlayerData.Instance.teamEnergy;
 
     }
    

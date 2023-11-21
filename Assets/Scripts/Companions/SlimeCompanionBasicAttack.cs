@@ -9,7 +9,7 @@ public class SlimeCompanionBasicAttack : Skill
     {
         skillName = "Bounce";
         description = "A bounce that deals damage equal to the user's attack power.";
-        energyCost = 2; 
+        energyCost = 0; 
         energyGain = 1;
         skillLevel = 1; 
         requiresMovement = true; 
@@ -47,9 +47,10 @@ public class SlimeCompanionBasicAttack : Skill
              
         }
         Debug.Log("waiting on animation to finish");
-    
         yield return new WaitUntil(() => user.isAnimationDone == true);
+        
         user.animationDamageTime = false;
+        user.GainTeamEnergy(energyGain);
         user.isAnimationDone = false;
         user.isAttacking = false;
         target.CheckForDeath();
