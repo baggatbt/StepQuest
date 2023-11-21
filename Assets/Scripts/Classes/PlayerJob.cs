@@ -11,7 +11,7 @@ public abstract class PlayerJob
     public abstract int BaseMagAtk { get; }
     public abstract int BaseMagDef { get; }
     public abstract int BaseHealth { get; } 
-    public abstract int BaseEnergy { get; }
+   
     public  int JobExp;
     public  int JobLevel;
     public  int JobPoints;

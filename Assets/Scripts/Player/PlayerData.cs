@@ -22,9 +22,7 @@ public class PlayerData : MonoBehaviour
     public int maxHealth;
     public int health;
     public int maxEnergy;
-    public int energy;
-    public int maxTempEnergy;
-    public int tempEnergy;
+    public int teamEnergy;
     public string jobClass;
     public int speed;
     
@@ -43,7 +41,7 @@ public class PlayerData : MonoBehaviour
 
     private void Awake()
 {
-    maxTempEnergy = (maxEnergy / 2);
+    
    //For testing, wipes saved data 
    //PlayerPrefs.DeleteAll();
 
@@ -66,8 +64,7 @@ public class PlayerData : MonoBehaviour
         skillLevels = new Dictionary<string, int>();
         skillExp = new Dictionary<string, int>();
 
-        maxTempEnergy = (maxEnergy / 2);
-        tempEnergy = 0;
+       
         stepCounterController = FindObjectOfType<StepCounterController>();
         if (stepCounterController == null)
         {
@@ -117,7 +114,7 @@ public class PlayerData : MonoBehaviour
      //   Debug.Log("Steps in Update: " + inGameSteps);
     }
 
-    public void UpdatePlayerData(int level, string jobClass, int exp, int gold, int attackPower, int defensePower, int inGameSteps, int maxHealth, int health, int maxEnergy, int energy, int speed, int maxTempEnergy, int tempEnergy)
+    public void UpdatePlayerData(int level, string jobClass, int exp, int gold, int attackPower, int defensePower, int inGameSteps, int maxHealth, int health, int maxEnergy, int teamEnergy, int speed )
     {
         this.level = level;
         this.jobClass = jobClass;
@@ -129,10 +126,9 @@ public class PlayerData : MonoBehaviour
         this.maxHealth = maxHealth;
         this.health = health;
         this.maxEnergy = maxEnergy;
-        this.energy = energy;
+        this.teamEnergy = teamEnergy;
         this.speed = speed;
-        this.maxTempEnergy = maxTempEnergy;
-        this.tempEnergy = tempEnergy;
+       
         
 
         SavePlayerData(); 
@@ -150,7 +146,6 @@ public class PlayerData : MonoBehaviour
         PlayerPrefs.SetInt("PlayerMaxHealth", maxHealth);
         PlayerPrefs.SetInt("PlayerMaxEnergy", maxEnergy); 
         PlayerPrefs.SetInt("PlayerSpeed", speed);
-        PlayerPrefs.SetInt("PlayerMaxtempEnergy", maxTempEnergy);
         PlayerPrefs.SetInt("KnightSkillPoints",knightSkillPoints);
         PlayerPrefs.SetInt("KnightLevel",knightLevel);
         PlayerPrefs.SetInt("KnightExp",knightExp);

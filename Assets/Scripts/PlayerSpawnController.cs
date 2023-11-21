@@ -50,10 +50,7 @@ public class PlayerSpawnController : MonoBehaviour
     associatedEnergyBarSlider.value = spawnedPlayer.energy;
     spawnedPlayer.energyText = associatedEnergyText;
 
-    spawnedPlayer.tempEnergyBar = associatedtempEnergyBarSlider;
-    associatedtempEnergyBarSlider.gameObject.SetActive(true);
-    associatedtempEnergyBarSlider.maxValue = (spawnedPlayer.maxEnergy / 2);
-    associatedtempEnergyBarSlider.value = 0; //Always starts at 0
+    
 
      
 

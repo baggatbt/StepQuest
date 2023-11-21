@@ -67,11 +67,10 @@ public class Player : Character
             playerData.inGameSteps = 0;
             playerData.maxHealth = 5;
             playerData.health = playerData.maxHealth;
-            playerData.maxEnergy = 0;
-            playerData.energy = 0; //Set to zero to mimic the new system of just a shared AP bar.
+            playerData.maxEnergy = 5;
+            playerData.teamEnergy = 0; //Set to zero to mimic the new system of just a shared AP bar.
             playerData.speed = 3;
-            playerData.maxTempEnergy = 5;
-            playerData.tempEnergy = 0;
+            
 
             PlayerPrefs.SetInt("PlayerInitialized", 1);
             
@@ -94,14 +93,13 @@ public class Player : Character
     maxHealth = playerData.maxHealth;
     health = maxHealth;
     maxEnergy = playerData.maxEnergy; 
-    energy = maxEnergy;
+    //teamEnergy = 0;
     attackPower = playerData.attackPower;
     defensePower = playerData.defensePower;
     exp = playerData.exp;
     jobClass = playerData.jobClass;
     inGameSteps = playerData.inGameSteps;
-    tempEnergyMax = playerData.maxTempEnergy;
-    tempEnergy = playerData.tempEnergy;
+    
     
     
     }
@@ -138,7 +136,6 @@ public class Player : Character
         playerData.attackPower = CurrentJob.BaseAtk;
         playerData.defensePower = CurrentJob.BaseDef;
         playerData.maxHealth = CurrentJob.BaseHealth;
-        playerData.maxEnergy = CurrentJob.BaseEnergy;
         // Handle magic attack and defense here...
 
         playerData.SavePlayerData();

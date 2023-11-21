@@ -9,7 +9,7 @@ public class SlimeCompanionBasicAttack : Skill
     {
         skillName = "Bounce";
         description = "A bounce that deals damage equal to the user's attack power.";
-        energyCost = 0; 
+        energyCost = 2; 
         energyGain = 1;
         skillLevel = 1; 
         requiresMovement = true; 

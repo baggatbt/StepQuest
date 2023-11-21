@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1468735932990810403}
   - component: {fileID: 2143173350018981299}
   - component: {fileID: 7115544801781403439}
+  - component: {fileID: 4300945247603260244}
   m_Layer: 0
   m_Name: Blue
   m_TagString: Companion
@@ -105,14 +106,12 @@ MonoBehaviour:
   damage: 0
   energy: 0
   maxEnergy: 0
+  teamEnergy: 0
   attackPower: 0
   defensePower: 0
   speed: 0
-  tempEnergyMax: 0
-  tempEnergy: 0
   healthBar: {fileID: 0}
   energyBar: {fileID: 0}
-  tempEnergyBar: {fileID: 0}
   attackTarget: {fileID: 0}
   originalPosition: {x: 0, y: 0, z: 0}
   isAttacking: 0
@@ -165,3 +164,42 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &4300945247603260244
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8048524908834707888}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22c208c25b22e834a860bdeb5f884e76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  level: 0
+  health: 0
+  maxHealth: 0
+  damage: 0
+  energy: 0
+  maxEnergy: 0
+  teamEnergy: 0
+  attackPower: 0
+  defensePower: 0
+  speed: 0
+  healthBar: {fileID: 0}
+  energyBar: {fileID: 0}
+  attackTarget: {fileID: 0}
+  originalPosition: {x: 0, y: 0, z: 0}
+  isAttacking: 0
+  spriteRenderer: {fileID: 0}
+  animator: {fileID: 0}
+  healthText: {fileID: 0}
+  energyText: {fileID: 0}
+  hasNotGone: 0
+  attackTrigger: 0
+  animationEnded: 0
+  attacksBeforeSpecial: 0
+  statusEffectController: {fileID: 0}
+  cameraShake: {fileID: 0}
+  isAnimationDone: 0
+  animationDamageTime: 0

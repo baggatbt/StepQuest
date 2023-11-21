@@ -12,8 +12,7 @@ public class Companion : Character
         this.health = this.maxHealth;
         this.defensePower = 1;
         this.speed = 2;
-        this.maxEnergy = 0;
-        this.energy = maxEnergy;
+        
 
     }
    

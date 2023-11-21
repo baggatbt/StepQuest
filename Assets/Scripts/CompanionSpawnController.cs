@@ -53,10 +53,7 @@ public class CompanionSpawnController : MonoBehaviour
     associatedEnergyBarSlider.value = spawnedCompanion.energy;
     spawnedCompanion.energyText = associatedEnergyText;
 
-    spawnedCompanion.tempEnergyBar = associatedtempEnergyBarSlider;
-    associatedtempEnergyBarSlider.gameObject.SetActive(true);
-    associatedtempEnergyBarSlider.maxValue = (spawnedCompanion.maxEnergy / 2);
-    associatedtempEnergyBarSlider.value = 0; //Always starts at 0
+
 
   
 

@@ -289,7 +289,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -489.00003, y: -365}
+  m_AnchoredPosition: {x: -489, y: -365}
   m_SizeDelta: {x: 211.55, y: -486.56}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &97259696
@@ -621,14 +621,12 @@ MonoBehaviour:
   damage: 0
   energy: 0
   maxEnergy: 0
+  teamEnergy: 0
   attackPower: 0
   defensePower: 0
   speed: 0
-  tempEnergyMax: 0
-  tempEnergy: 0
   healthBar: {fileID: 0}
   energyBar: {fileID: 0}
-  tempEnergyBar: {fileID: 0}
   attackTarget: {fileID: 0}
   originalPosition: {x: 0, y: 0, z: 0}
   isAttacking: 0
@@ -1108,7 +1106,7 @@ MonoBehaviour:
   companionPrefab: {fileID: 8048524908834707888, guid: 6dab528ea53eeba489429a176c686bf4, type: 3}
   companionSpawnPoint: {fileID: 828832546}
   associatedHealthBarSlider: {fileID: 1845656598}
-  associatedEnergyBarSlider: {fileID: 1845656597}
+  associatedEnergyBarSlider: {fileID: 9084266479964512963}
   associatedHealthText: {fileID: 1845656596}
   associatedEnergyText: {fileID: 1845656595}
   associatedtempEnergyBarSlider: {fileID: 5522651480266230014}
@@ -2410,7 +2408,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -489.00003, y: -365}
+  m_AnchoredPosition: {x: -489, y: -365}
   m_SizeDelta: {x: 211.55, y: -486.56}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &873669127
@@ -2797,6 +2795,7 @@ MonoBehaviour:
   ExpGainedText: {fileID: 1778247465}
   GoldGainedText: {fileID: 1153100819}
   endOfBattlePanel: {fileID: 1663765536}
+  endOfBattleLossPanel: {fileID: 2100539942}
   enemySpawnController: {fileID: 58845270}
   enemySpawnPoints:
   - {fileID: 1412309851}
@@ -2805,17 +2804,19 @@ MonoBehaviour:
   currentBattleConfig:
     poolName: Forest
     maxEnemiesToSpawn: 2
+    stageID: 0
   battleConfigs:
   - poolName: Forest
     maxEnemiesToSpawn: 2
+    stageID: 0
   - poolName: Forest
     maxEnemiesToSpawn: 2
+    stageID: 0
   nextBattleButton: {fileID: 1214940462}
   skillsExecuted: 0
   cameraShake: {fileID: 519420033}
   colorChanger: {fileID: 1420394429}
   isSkillSelected: 0
-  endOfBattleLossPanel: {fileID: 2100539942}
 --- !u!4 &1020165694
 Transform:
   m_ObjectHideFlags: 0
@@ -2984,14 +2985,12 @@ MonoBehaviour:
   damage: 0
   energy: 0
   maxEnergy: 0
+  teamEnergy: 0
   attackPower: 0
   defensePower: 0
   speed: 0
-  tempEnergyMax: 0
-  tempEnergy: 0
   healthBar: {fileID: 0}
   energyBar: {fileID: 0}
-  tempEnergyBar: {fileID: 0}
   attackTarget: {fileID: 0}
   originalPosition: {x: 0, y: 0, z: 0}
   isAttacking: 0
@@ -6163,11 +6162,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2531577445815764818, guid: 38dde5e3f3eb0a1448690176aee3dc6d, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2531577445815764818, guid: 38dde5e3f3eb0a1448690176aee3dc6d, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3848978727926076431, guid: 38dde5e3f3eb0a1448690176aee3dc6d, type: 3}
       propertyPath: m_Color.b
@@ -6321,6 +6320,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: CompanionInfoPanel
       objectReference: {fileID: 0}
+    - target: {fileID: 5968347364257815841, guid: 38dde5e3f3eb0a1448690176aee3dc6d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8306059691303096344, guid: 38dde5e3f3eb0a1448690176aee3dc6d, type: 3}
       propertyPath: m_AnchorMax.x
       value: 1
@@ -6372,17 +6375,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1845656597 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3654014111308065342, guid: 38dde5e3f3eb0a1448690176aee3dc6d, type: 3}
-  m_PrefabInstance: {fileID: 1845656593}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &1845656598 stripped
@@ -8121,6 +8113,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: strideTeamEnergyBar
       objectReference: {fileID: 0}
+    - target: {fileID: 922096852954731411, guid: 38dde5e3f3eb0a1448690176aee3dc6d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1069277653190008798, guid: 38dde5e3f3eb0a1448690176aee3dc6d, type: 3}
       propertyPath: m_Value
       value: 0
@@ -8139,6 +8135,22 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2531577445815764818, guid: 38dde5e3f3eb0a1448690176aee3dc6d, type: 3}
       propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2531577445815764818, guid: 38dde5e3f3eb0a1448690176aee3dc6d, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3654014111308065342, guid: 38dde5e3f3eb0a1448690176aee3dc6d, type: 3}
+      propertyPath: m_Value
+      value: 0.37
+      objectReference: {fileID: 0}
+    - target: {fileID: 3654014111308065342, guid: 38dde5e3f3eb0a1448690176aee3dc6d, type: 3}
+      propertyPath: m_MaxValue
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3654014111308065342, guid: 38dde5e3f3eb0a1448690176aee3dc6d, type: 3}
+      propertyPath: m_Direction
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3848978727926076431, guid: 38dde5e3f3eb0a1448690176aee3dc6d, type: 3}
@@ -8181,9 +8193,13 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -0.14
       objectReference: {fileID: 0}
+    - target: {fileID: 5522651478960391604, guid: 38dde5e3f3eb0a1448690176aee3dc6d, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -54
+      objectReference: {fileID: 0}
     - target: {fileID: 5522651478960391607, guid: 38dde5e3f3eb0a1448690176aee3dc6d, type: 3}
       propertyPath: m_text
-      value: 'MP:  10 / 0'
+      value: 'MP: 0/5'
       objectReference: {fileID: 0}
     - target: {fileID: 5522651478960391607, guid: 38dde5e3f3eb0a1448690176aee3dc6d, type: 3}
       propertyPath: m_fontSize
@@ -8299,7 +8315,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8306059691303096344, guid: 38dde5e3f3eb0a1448690176aee3dc6d, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8306059691303096344, guid: 38dde5e3f3eb0a1448690176aee3dc6d, type: 3}
       propertyPath: m_AnchorMin.x

@@ -12,15 +12,13 @@ public class Character : MonoBehaviour
     public int maxHealth;
     public int damage; //This is for the slime, so the next time you forget and wonder, what is this for again? Thats what. Everyone else has converted to AP
     public int energy;
-    public int maxEnergy;
+    public int maxEnergy = 5;
+    public int teamEnergy;
     public int attackPower;
     public int defensePower;
     public int speed;
-    public int tempEnergyMax;
-    public int tempEnergy;
     public Slider healthBar;
     public Slider energyBar;
-    public Slider tempEnergyBar;
     public Transform attackTarget;
     public Vector3 originalPosition;
     public bool isAttacking = false;
@@ -79,18 +77,19 @@ public class Character : MonoBehaviour
             }
             if (this.energyText != null)
             {
-                this.energyText.text = "MP: " + this.energy + " / " + this.tempEnergy;
-                this.tempEnergyBar.value = this.tempEnergy;
+                this.energyText.text = "MP: " + PlayerData.Instance.teamEnergy + " / " + maxEnergy;
+                this.energyBar.value = PlayerData.Instance.teamEnergy;
                 
                 
             }
         }
-        
-
         if (energyBar != null)
         {
+
+            this.teamEnergy = PlayerData.Instance.teamEnergy;
             energyBar.maxValue = maxEnergy;
-            energyBar.value = energy;
+            energyBar.value = PlayerData.Instance.teamEnergy;
+            
             
         }
         
@@ -115,7 +114,7 @@ public class Character : MonoBehaviour
 
         if (energyBar != null)
         {
-            energyBar.maxValue = maxEnergy;
+            energyBar.maxValue = maxenergy;
             energyBar.value = energy;
         }
         */
@@ -194,64 +193,50 @@ public class Character : MonoBehaviour
 
     private int remainingCost = 0;
     public void SpendEnergy(int energySpent)
+    {
+  
+        PlayerData.Instance.teamEnergy -= energySpent;
+        
+        
+        energyBar.value = PlayerData.Instance.teamEnergy;
+        if (energyBar != null)
+        {
+            energyBar.value = PlayerData.Instance.teamEnergy;
+            energyText.text = "MP: " + PlayerData.Instance.teamEnergy + " / " + maxEnergy;
+        }
+}   
+
+
+    public void GainTeamEnergy(int energyGained)
 {
-    remainingCost = energySpent - tempEnergy;
-
-    if (tempEnergy <= 0) //If player has no temp energy, just use mana
+    if (PlayerData.Instance.teamEnergy + energyGained > maxEnergy) // If the gained energy will bring the total over the max
     {
-        energy -= energySpent;
-    }
-    if (tempEnergy >= 1 && remainingCost >= 0) //if player has temp energy but not enough to cover the whole cost
-    {
-        tempEnergy = 0;
-        energy -= remainingCost;
-        tempEnergyBar.value = tempEnergy;
-    }
-    else 
-    {
-        tempEnergyBar.value = tempEnergy;
-    }
-    
-   
-    if (energyBar != null)
-    {
-        energyBar.value = energy;
-        energyText.text = "MP: " + energy + " / " + tempEnergy;
-    }
-}
-
-
-    public void GainTempEnergy(int energyGained)
-{
-    if (tempEnergy + energyGained > tempEnergyMax) // If the gained energy will bring the total over the max
-    {
-        tempEnergy = tempEnergyMax; // Set energy to the max
+        PlayerData.Instance.teamEnergy = maxEnergy; // Set energy to the max
+        
 
     }
-    if (tempEnergy + energyGained < tempEnergyMax) // If the gained energy will not bring the total over the max
+    if (PlayerData.Instance.teamEnergy + energyGained < maxEnergy) // If the gained energy will not bring the total over the max
     {
-        tempEnergy += energyGained; // Add the gained energy to the total
-    }
-    if (energy + energyGained > maxEnergy && tempEnergy + energyGained < tempEnergyMax) //Energy 
-    {
-
+        PlayerData.Instance.teamEnergy += energyGained; // Add the gained energy to the total
+       
     }
     
     if (energyBar != null)
     {
         
-        tempEnergyBar.value = tempEnergy;
+        energyBar.value = PlayerData.Instance.teamEnergy;
         
     }
     if (energyText != null) //Had to separate this because monster energies do not use text.
     {
-        energyText.text = "MP: " + energy + " / " + tempEnergy;
+        energyText.text = "MP: " + PlayerData.Instance.teamEnergy + " / " + maxEnergy;
     }
 }
     //For enemy rage bars
     public void GainEnergy(int energyGained)
     {
         this.energy = energyGained;
+        
     }
 
    
