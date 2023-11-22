@@ -18,7 +18,8 @@ public class PlayerData : MonoBehaviour
     public int attackPower;
     public int defensePower;
     public int inGameSteps;
-    public int stepsSinceStart;
+    public int stepsSinceStart; //Steps since the game was started once
+   // public int dailySteps; //Tracker for the 10k steps a day that will reset NOT IMPLEMENTED
     public int maxHealth;
     public int health;
     public int maxEnergy;
