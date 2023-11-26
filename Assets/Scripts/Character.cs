@@ -86,12 +86,10 @@ public class Character : MonoBehaviour
         }
         if (energyBar != null)
         {
-
+            
             this.energyText.text = "MP: " + PlayerData.Instance.teamEnergy + " / " + maxEnergy;
             energyBar.maxValue = maxEnergy;
             energyBar.value = PlayerData.Instance.teamEnergy;
-            
-            
         }
         
 
