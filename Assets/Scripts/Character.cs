@@ -126,10 +126,14 @@ public class Character : MonoBehaviour
     public void TakeDamage(int damageOfAttacker, Character attacker)
 {
     
-   // int damageDealt = (int)(damageOfAttacker * (1 - (this.defensePower / 100.0)));
-   //Got rid of scaling, testing dealing with low numbers directly
-    int damageDealt = damageOfAttacker - this.defensePower;
-    Debug.Log("Damaged reduced by Defense: " + (damageOfAttacker - damageDealt));
+   // Define a constant that will be used to adjust the effectiveness of defense.
+    const float defenseEffectiveness = 50.0f; // This is a balancing factor.
+    
+    // Calculate damage reduction using a diminishing returns formula.
+    float damageReduction = this.defensePower / (this.defensePower + defenseEffectiveness);
+    int damageDealt = (int)(damageOfAttacker * (1 - damageReduction));
+    
+    Debug.Log("Damage reduced by Defense: " + (damageOfAttacker - damageDealt));
 
     health -= damageDealt;
     healthBar.value = health;
