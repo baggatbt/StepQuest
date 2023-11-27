@@ -427,7 +427,7 @@ private Transform SelectBackTarget()
     public IEnumerator EnemyAttackCoroutine(Character attackingEnemy)
     {
         yield return new WaitUntil(() => activePlayer.isAttacking == false);
-        //yield return new WaitForSeconds(1.0f); //Ensures player animation is all done
+        yield return new WaitForSeconds(1.0f); //Ensures player animation is all done
         
 
         if (attackingEnemy.currentSkill != null)

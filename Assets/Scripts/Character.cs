@@ -87,7 +87,7 @@ public class Character : MonoBehaviour
         if (energyBar != null)
         {
             
-            this.energyText.text = "MP: " + PlayerData.Instance.teamEnergy + " / " + maxEnergy;
+            
             energyBar.maxValue = maxEnergy;
             energyBar.value = PlayerData.Instance.teamEnergy;
         }
@@ -215,12 +215,14 @@ public class Character : MonoBehaviour
     if (PlayerData.Instance.teamEnergy + energyGained > maxEnergy) // If the gained energy will bring the total over the max
     {
         PlayerData.Instance.teamEnergy = maxEnergy; // Set energy to the max
+        Debug.Log("Passing first if in gainteamenergy");
         
 
     }
     if (PlayerData.Instance.teamEnergy + energyGained < maxEnergy) // If the gained energy will not bring the total over the max
     {
         PlayerData.Instance.teamEnergy += energyGained; // Add the gained energy to the total
+        Debug.Log("Passing second if in gainteamenergy");
        
     }
     
@@ -234,6 +236,7 @@ public class Character : MonoBehaviour
     {
         energyText.text = "MP: " + PlayerData.Instance.teamEnergy + " / " + maxEnergy;
     }
+    Debug.Log("Not passing any");
 }
     //For enemy rage bars
     public void GainEnergy(int energyGained)
@@ -285,7 +288,7 @@ public class Character : MonoBehaviour
     checkCollisionsDuringMovement = true;
 
     // Start moving towards the target
-    yield return Move(targetPosition, stoppingDistance: 0.1f); // Set a small stopping distance
+    yield return Move(targetPosition, stoppingDistance: 0.2f); // Set a small stopping distance
 
     // Stop the movement animation when the target position is reached or a collision occurs
     animator.SetTrigger("StopMovementAnimationTrigger");
