@@ -47,9 +47,10 @@ public class SlimeCompanionBasicAttack : Skill
              
         }
         Debug.Log("waiting on animation to finish");
-    
         yield return new WaitUntil(() => user.isAnimationDone == true);
+        
         user.animationDamageTime = false;
+        user.GainTeamEnergy(energyGain);
         user.isAnimationDone = false;
         user.isAttacking = false;
         target.CheckForDeath();

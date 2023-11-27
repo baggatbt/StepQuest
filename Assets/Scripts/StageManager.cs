@@ -6,18 +6,24 @@ public class StageManager : MonoBehaviour
 {
     public List<Stage> stages;
     
-
+    private void Start()
+    {
+        UnlockNextStage(GameManager.Instance.currentStageID);
+    }
    
 
     public void UnlockNextStage(int completedStageID)
     {
-        int nextStageID = completedStageID + 1;
-        if (nextStageID < stages.Count)
+        int stagesUnlocked = 0;
+        int stagesComplete = completedStageID;
+        if (stagesComplete > stagesUnlocked)
         {
-            stages[nextStageID].isUnlocked = true;
-            stages[nextStageID].UpdateButtonColor(); 
+            stages[stagesComplete].isUnlocked = true;
+            stages[stagesComplete].UpdateButtonColor(); 
+            
         }
     }
+   
 
     // Additional methods as needed for managing stages
 }

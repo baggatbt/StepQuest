@@ -44,11 +44,14 @@ public class BattleManager : MonoBehaviour
         EnemyTurn
     }
 
+
+
     public GameObject outerCircle;
     public GameObject innerCircle;
     public GameObject ExpGainedText;
     public GameObject GoldGainedText;
     public GameObject endOfBattlePanel;
+    public GameObject endOfBattleLossPanel;
 
     public EnemySpawnController enemySpawnController;
 
@@ -355,69 +358,76 @@ public class BattleManager : MonoBehaviour
 
     
     public void EnemyAttack()
+{
+    // If the queue is empty, populate it.
+    if (enemyTurnQueue.Count == 0)
     {
-        
-        // If the queue is empty (or at the start of the enemy turn phase), populate it.
-        if (enemyTurnQueue.Count == 0)
+        foreach (var enemy in enemies)
         {
-            foreach (var enemy in enemies)
-            {
-                
-                if (enemy.health > 0) // Assuming you have some isDead flag on enemies
-                    enemyTurnQueue.Enqueue(enemy);
-            }
-        }
-
-        // If all enemies had their turns, it's the player's turn next.
-        if (enemyTurnQueue.Count == 0)
-        {
-            statusEffectController.ProcessEffects();
-            ChangeState(BattleState.PlayerTurn);
-            return;
-        }
-
-        Character attackingEnemy = enemyTurnQueue.Dequeue();
-
-        //Decide target
-         // This sets the enemies target for the turn, need to build out
-            //Each enemy can have a preference if needed in their own class
-            //For now it will just randomize between the player and companion
-            // Use UnityEngine.Random.Range to get a 50/50 chance
-            //UnityEngine.Random.Range(min, max) returns either 0 or 1
-        attackingEnemy.attackTarget = UnityEngine.Random.Range(0, 2) == 0 ? companion.transform : player.transform;
-        if (companion.health <= 0)
-        {
-            attackingEnemy.attackTarget = player.transform;
-        }
-
-        if (player.health <= 0)
-        {
-            attackingEnemy.attackTarget = companion.transform;
-        }
-
-        //Decide whether or not to use the special attack or the normal one
-        if (!activePlayer.isAttacking && !attackingEnemy.isAttacking && state == BattleState.EnemyTurn)
-        {
-            if (attackingEnemy.energy >= attackingEnemy.maxEnergy)
-            {
-                attackingEnemy.currentSkill = attackingEnemy.specialSkill;
-            }
-            else 
-            {
-            attackingEnemy.currentSkill = attackingEnemy.normalSkill;
-            }
-
-           
-            StartCoroutine(EnemyAttackCoroutine(attackingEnemy));
-            
+            // Ensure the object is an Enemy and is alive before enqueuing
+            if (enemy is Enemy e && e.health > 0)
+                enemyTurnQueue.Enqueue(enemy);
         }
     }
+
+    // If all enemies had their turns, switch to player's turn.
+    if (enemyTurnQueue.Count == 0)
+    {
+        statusEffectController.ProcessEffects();
+        ChangeState(BattleState.PlayerTurn);
+        return;
+    }
+
+    Character attackingCharacter = enemyTurnQueue.Dequeue();
+
+    // Check if the character is actually an Enemy
+    if (attackingCharacter is Enemy attackingEnemy)
+    {
+        // Decide target based on preferred position
+        switch (attackingEnemy.PreferredAttackPosition)
+        {
+            case BattlePosition.Front:
+                attackingEnemy.attackTarget = SelectFrontTarget();
+                break;
+            case BattlePosition.Back:
+                attackingEnemy.attackTarget = SelectBackTarget();
+                break;
+            default:
+                throw new InvalidOperationException("Unknown BattlePosition");
+        }
+
+        // Decide whether to use the special attack or the normal one
+        if (!activePlayer.isAttacking && !attackingEnemy.isAttacking && state == BattleState.EnemyTurn)
+        {
+            attackingEnemy.currentSkill = attackingEnemy.energy >= attackingEnemy.maxEnergy ? attackingEnemy.specialSkill : attackingEnemy.normalSkill;
+            StartCoroutine(EnemyAttackCoroutine(attackingEnemy));
+        }
+    }
+    else
+    {
+        // Handle the case where the dequeued character is not an Enemy
+        Debug.LogError("Dequeued character is not an Enemy.");
+    }
+}
+
+private Transform SelectFrontTarget()
+{
+    //'player' is always the front target
+    return player.health > 0 ? player.transform : companion.transform;
+}
+
+private Transform SelectBackTarget()
+{
+    // Assuming 'companion' is always the back target
+    return companion.health > 0 ? companion.transform : player.transform;
+}
+
     
 
     public IEnumerator EnemyAttackCoroutine(Character attackingEnemy)
     {
         yield return new WaitUntil(() => activePlayer.isAttacking == false);
-        yield return new WaitForSeconds(1.0f); //Ensures player animation is all done
+        //yield return new WaitForSeconds(1.0f); //Ensures player animation is all done
         
 
         if (attackingEnemy.currentSkill != null)
@@ -445,10 +455,12 @@ public class BattleManager : MonoBehaviour
             
         }
 
+        
         if (player.health <= 0)
         {
             Debug.Log("You lose ya jabroni");
-            SceneManager.LoadScene("CharacterInfoPage");
+            CheckBattleEnd();
+            
         }
         else
         {
@@ -739,6 +751,12 @@ private void Update()
 public void CheckBattleEnd()
 {
     bool allEnemiesDefeated = true;
+    bool allAlliesDefeated = false;
+
+    if (player.health <= 0 && companion.health <= 0)
+    {
+        allAlliesDefeated = true;
+    }
 
     foreach (var enemy in enemies)
     {
@@ -752,12 +770,16 @@ public void CheckBattleEnd()
     if (allEnemiesDefeated)
     {
         EndOfBattleRewards(enemies);
-        GameManager.Instance.UnlockNextStage(GameManager.Instance.currentStageID); //Needs to move
+       GameManager.Instance.UnlockNextStage();
         endOfBattlePanel.SetActive(true);
         
     }
+    if (allAlliesDefeated)
+    {
+        endOfBattleLossPanel.SetActive(true);
+    }
 }
-
+    
 
 
 

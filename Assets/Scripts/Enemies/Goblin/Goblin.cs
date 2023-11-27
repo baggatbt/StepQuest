@@ -10,6 +10,7 @@ public class Goblin : Enemy
     protected override void Awake()
     {
         base.Awake();
+        PreferredAttackPosition = BattlePosition.Front;
         this.level = 1;
         this.maxHealth = 7;
         this.health = this.maxHealth;

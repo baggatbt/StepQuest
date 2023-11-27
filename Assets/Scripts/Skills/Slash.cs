@@ -10,7 +10,7 @@ public class Slash : Skill
         skillName = "Slash";
         description = "A slash that deals damage equal to the user's attack power.";
         energyCost = 0; 
-        energyGain = 2;
+        energyGain = 1;
         skillLevel = 1; 
         requiresMovement = true; 
         skillExecutionComplete = false;
@@ -49,6 +49,7 @@ public class Slash : Skill
         Debug.Log("waiting on animation to finish");
     
         yield return new WaitUntil(() => user.isAnimationDone == true);
+        user.GainTeamEnergy(energyGain);
         user.animationDamageTime = false;
         user.isAnimationDone = false;
         user.isAttacking = false;

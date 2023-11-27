@@ -154,7 +154,7 @@ public void SelectAndUseSkill(Skill selectedSkill)
 {
     Debug.Log("Button clicked for skill: " + skill.skillName);
 
-    if(skill.energyCost <= (battleManager.activePlayer.energy + battleManager.activePlayer.tempEnergy))
+    if(skill.energyCost <= PlayerData.Instance.teamEnergy)
     {
        // skillSelectionPanel.SetActive(false);
         if (!battleManager.activePlayer.isAttacking && !battleManager.IsAnyEnemyAttacking())

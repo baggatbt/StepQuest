@@ -7,13 +7,13 @@ public class Companion : Character
    protected override void Start()
     {
         this.level = 1;
-        this.attackPower = 5;
+        this.attackPower = 2;
         this.maxHealth = 10;
         this.health = this.maxHealth;
         this.defensePower = 1;
         this.speed = 2;
-        this.maxEnergy = 0;
-        this.energy = maxEnergy;
+        this.maxEnergy = 5;
+        this.teamEnergy = PlayerData.Instance.teamEnergy;
 
     }
    

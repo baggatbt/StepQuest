@@ -8,8 +8,11 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
     public BattleConfig CurrentBattleConfig { get; set; } // Temporary storage for the battle config
 
-    public int currentStageID = 0; //This will need to be replaced by loading data on start. for testing purposes setting to 0
-    public List<Stage> stages;
+    public int currentStageID = 1; //This will need to be replaced by loading data on start. for testing purposes setting to 0
+    
+    //CURRENT ISSUE, STAGE ID ALWAYS INCREMENTS AFTER EVERY WIN EVEN IF REPLAYING STAGE.
+    //No replaying of old stages, spawn new ones?
+    //Use battle config to grab the stage ID, then use
 
     private void Awake()
     {
@@ -25,16 +28,13 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void UnlockNextStage(int currentStageID)
-{
-    int nextStageID = currentStageID + 1;
-    if (nextStageID < stages.Count)
+    public void UnlockNextStage()
     {
-        stages[nextStageID].isUnlocked = true;
-        stages[nextStageID].UpdateButtonColor(); // Update the button color
-
-        currentStageID = nextStageID; // Update the current stage index
-      //  SaveProgress(); // Save the new progress
+        if (CurrentBattleConfig.stageID > currentStageID)
+        {
+            currentStageID++;
+        }
     }
-}
+
+    
 }

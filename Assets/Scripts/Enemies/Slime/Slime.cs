@@ -13,6 +13,7 @@ public class Slime : Enemy
             new SlimeSpecialAttackSkill()
         };
         this.level = 1;
+        PreferredAttackPosition = BattlePosition.Front;
         this.expReward = 5;
         this.goldReward = 2;
         this.attacksBeforeSpecial = 2;
