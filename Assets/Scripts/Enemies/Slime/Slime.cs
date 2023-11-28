@@ -17,7 +17,7 @@ public class Slime : Enemy
         this.expReward = 5;
         this.goldReward = 2;
         this.attacksBeforeSpecial = 2;
-        this.damage = 4;
+        this.damage = 2;
         this.maxHealth = 10;
         this.health = this.maxHealth;
         this.defensePower = 1;
