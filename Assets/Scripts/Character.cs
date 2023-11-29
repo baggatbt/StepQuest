@@ -31,6 +31,7 @@ public class Character : MonoBehaviour
      
 
     public bool hasNotGone;
+    public bool isMoving;
     public bool attackTrigger;
     public bool animationEnded;
     public Skill currentSkill; 
@@ -284,20 +285,23 @@ public class Character : MonoBehaviour
      public IEnumerator MoveToTarget()
 {
     animator.SetTrigger("MovementAnimationTrigger");
+    this.isMoving = true;
 
     Vector3 targetPosition = attackTarget.position;
     checkCollisionsDuringMovement = true;
 
     // Start moving towards the target
-    yield return Move(targetPosition, stoppingDistance: 0.2f); // Set a small stopping distance
+    yield return Move(targetPosition, stoppingDistance: 0.1f); // Set a small stopping distance
 
     // Stop the movement animation when the target position is reached or a collision occurs
     animator.SetTrigger("StopMovementAnimationTrigger");
+    this.isMoving = false;
 }
 
 public IEnumerator ReturnToPosition()
 {
     animator.SetTrigger("MovementAnimationTrigger");
+    this.isMoving = true;
 
     // Move back to the original position
     yield return Move(originalPosition, stoppingDistance: 0.0f); // Exact position, so stopping distance is 0
@@ -306,6 +310,7 @@ public IEnumerator ReturnToPosition()
     transform.position = originalPosition;
 
     animator.SetTrigger("StopMovementAnimationTrigger");
+    this.isMoving = false;
 }
 
 private IEnumerator Move(Vector3 targetPosition, float stoppingDistance)

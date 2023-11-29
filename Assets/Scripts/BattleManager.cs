@@ -288,6 +288,8 @@ public class BattleManager : MonoBehaviour
         // Move player back to their original position after all skills executed.
        // yield return StartCoroutine(zoomEffect.ZoomOutEffect());
         yield return activePlayer.ReturnToPosition();
+        yield return new WaitUntil(() => activePlayer.isMoving == false);
+
         ChangeState(BattleState.EnemyTurn);
       
       

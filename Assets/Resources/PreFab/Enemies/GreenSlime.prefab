@@ -28,8 +28,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8370724005610461912}
   m_LocalRotation: {x: -0, y: -0.9999961, z: 0, w: -0.0027930697}
-  m_LocalPosition: {x: 319.81, y: 95.75, z: -16.46}
-  m_LocalScale: {x: 3.067618, y: 2.8086321, z: 3.3094273}
+  m_LocalPosition: {x: 320.47, y: 95.94, z: -16.46}
+  m_LocalScale: {x: 2.5, y: 2.5, z: 2.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -121,17 +121,16 @@ MonoBehaviour:
   damage: 2
   energy: 0
   maxEnergy: 0
+  teamEnergy: 0
   attackPower: 0
   defensePower: 0
   speed: 0
-  tempEnergyMax: 0
-  tempEnergy: 0
   healthBar: {fileID: 0}
   energyBar: {fileID: 0}
-  tempEnergyBar: {fileID: 0}
   attackTarget: {fileID: 0}
   originalPosition: {x: 0, y: 0, z: 0}
   isAttacking: 0
+  isFront: 0
   spriteRenderer: {fileID: 8370724005610461908}
   animator: {fileID: 8370724005610461913}
   healthText: {fileID: 0}
