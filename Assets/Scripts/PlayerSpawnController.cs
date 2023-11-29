@@ -26,6 +26,7 @@ public class PlayerSpawnController : MonoBehaviour
     if (spawnedPlayer != null && battleManager != null)
     {
         battleManager.player = spawnedPlayer;
+        battleManager.playerParty.Add(spawnedPlayer);
     }
    }
 
@@ -49,6 +50,8 @@ public class PlayerSpawnController : MonoBehaviour
     associatedEnergyBarSlider.maxValue = spawnedPlayer.maxEnergy;
     associatedEnergyBarSlider.value = spawnedPlayer.energy;
     spawnedPlayer.energyText = associatedEnergyText;
+
+    spawnedPlayer.isFront = true;
 
     
 

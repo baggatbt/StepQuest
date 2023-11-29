@@ -22,6 +22,7 @@ public class Character : MonoBehaviour
     public Transform attackTarget;
     public Vector3 originalPosition;
     public bool isAttacking = false;
+    public bool isFront;
     public SpriteRenderer spriteRenderer;
     public Animator animator;
     public TextMeshProUGUI healthText; 

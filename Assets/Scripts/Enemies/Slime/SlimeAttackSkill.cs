@@ -9,6 +9,7 @@ public class SlimeAttackSkill : Skill
         skillName = "Slime Attack";
         description = "The slime attacks the player. The damage can be reduced by timely action.";
         requiresMovement = true;
+        canHitBehind = true; //Controls whether or not the skill can hit any target or only the front
         energyCost = 0;
         numberOfAttacks = 1;
 

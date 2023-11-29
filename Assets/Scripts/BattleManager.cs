@@ -16,6 +16,7 @@ public class BattleManager : MonoBehaviour
     public PlayerData playerCharacterData;
     public Player playerClassReference;
     public List<Character> enemies = new List<Character>();
+    public List<Character> playerParty = new List<Character>();
     public GameObject activePlayerIndicator;
     
     
@@ -32,8 +33,6 @@ public class BattleManager : MonoBehaviour
     public Button launchAttacksButton; 
     public StatusEffectController statusEffectController;
     public TextMeshProUGUI timingFeedbackText;
-    public GameObject[] allyBattleGridTiles;
-    public GameObject[] enemyBattleGridTiles;
     
 
 
@@ -386,16 +385,14 @@ public class BattleManager : MonoBehaviour
     if (attackingCharacter is Enemy attackingEnemy)
     {
         // Decide target based on preferred position
-        switch (attackingEnemy.PreferredAttackPosition)
+        if (attackingCharacter.currentSkill.canHitBehind)
         {
-            case BattlePosition.Front:
-                attackingEnemy.attackTarget = SelectFrontTarget();
-                break;
-            case BattlePosition.Back:
-                attackingEnemy.attackTarget = SelectBackTarget();
-                break;
-            default:
-                throw new InvalidOperationException("Unknown BattlePosition");
+            attackingEnemy.attackTarget = SelectBackTarget();
+            
+        }
+        else 
+        {   
+            attackingEnemy.attackTarget = SelectFrontTarget();
         }
 
         // Decide whether to use the special attack or the normal one
@@ -415,12 +412,15 @@ public class BattleManager : MonoBehaviour
 private Transform SelectFrontTarget()
 {
     //'player' is always the front target
+    //Change this using the isFront property that now exists in playerSpawner
+
     return player.health > 0 ? player.transform : companion.transform;
 }
 
 private Transform SelectBackTarget()
 {
     // Assuming 'companion' is always the back target
+    //Change this using the isFront property that now exists in companionSpawner
     return companion.health > 0 ? companion.transform : player.transform;
 }
 

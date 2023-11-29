@@ -26,6 +26,7 @@ public class CompanionSpawnController : MonoBehaviour
     if (spawnedCompanion != null && battleManager != null)
     {
         battleManager.companion = spawnedCompanion;
+        battleManager.playerParty.Add(spawnedCompanion);
     }
    }
 
@@ -51,7 +52,7 @@ public class CompanionSpawnController : MonoBehaviour
     spawnedCompanion.energyText = associatedEnergyText;
 
 
-
+    spawnedCompanion.isFront = false;
   
 
    
