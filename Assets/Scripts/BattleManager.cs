@@ -32,6 +32,8 @@ public class BattleManager : MonoBehaviour
     public Button launchAttacksButton; 
     public StatusEffectController statusEffectController;
     public TextMeshProUGUI timingFeedbackText;
+    public GameObject[] allyBattleGridTiles;
+    public GameObject[] enemyBattleGridTiles;
     
 
 
