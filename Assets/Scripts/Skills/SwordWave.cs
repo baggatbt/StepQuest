@@ -44,7 +44,7 @@ public class SwordWave : Skill
             if (projectileScript != null)
             {
                 projectileScript.damage = baseDamage;
-                projectileScript.speed = 20f;
+                projectileScript.speed = 7.5f;
                 projectileScript.Spawner = user;  // Set the spawner
             }
 

@@ -18,7 +18,8 @@ public class Knight : PlayerJob
     {
         SkillType.Slash,
         SkillType.TripleHit,
-        SkillType.ShieldSlam
+        SkillType.ShieldSlam,
+        SkillType.SwordWave
         
     };
 
@@ -42,6 +43,7 @@ public class Knight : PlayerJob
 
             case SkillType.ShieldSlam:
                 return new ShieldSlam();
+   
 
             default:
                 Debug.LogError("Unknown skill type for Knight: " + skillType);
