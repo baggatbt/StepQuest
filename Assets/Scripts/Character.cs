@@ -291,7 +291,7 @@ public class Character : MonoBehaviour
     checkCollisionsDuringMovement = true;
 
     // Start moving towards the target
-    yield return Move(targetPosition, stoppingDistance: 0.1f); // Set a small stopping distance
+    yield return Move(targetPosition, stoppingDistance: 0.0f); // Set a small stopping distance
 
     // Stop the movement animation when the target position is reached or a collision occurs
     animator.SetTrigger("StopMovementAnimationTrigger");

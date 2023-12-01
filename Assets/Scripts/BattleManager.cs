@@ -719,7 +719,7 @@ private void Update()
                     activePlayer = clickedCharacter;
                     Debug.Log("active player switched");// Move the circles to the targets position
                     activePlayerIndicator.transform.position = new Vector3(activePlayer.transform.position.x, activePlayer.transform.position.y + 2f, activePlayer.transform.position.z);
-                    activePlayerIndicator.SetActive(true);
+                    activePlayerIndicator.SetActive(false); //Turned it off for now, dont think I need it anymore
 
                 }
             }
