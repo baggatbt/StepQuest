@@ -286,7 +286,7 @@ public class BattleManager : MonoBehaviour
         
         
         // Move player back to their original position after all skills executed.
-       // yield return StartCoroutine(zoomEffect.ZoomOutEffect());
+        yield return StartCoroutine(zoomEffect.ZoomOutEffect());
         yield return activePlayer.ReturnToPosition();
         yield return new WaitUntil(() => activePlayer.isMoving == false);
 
@@ -300,7 +300,7 @@ public class BattleManager : MonoBehaviour
 
     
 
-    //public ZoomEffect zoomEffect;
+    public ZoomEffect zoomEffect;
 
 
     public IEnumerator PlayerAction()
@@ -310,7 +310,7 @@ public class BattleManager : MonoBehaviour
         //  Debug.Log("PlayerAction() being called");
 
             // Start zoom effect
-            //StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position)); 
+            StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position)); 
             activePlayerIndicator.SetActive(false);
             if (activePlayer.currentSkill.requiresMovement && skillsExecuted == 0)
             {
