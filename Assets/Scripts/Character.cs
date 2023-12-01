@@ -74,7 +74,7 @@ public class Character : MonoBehaviour
             this.healthBar.value = health;
             if (this.healthText != null )
             {
-                this.healthText.text = "HP: " + this.health; 
+                this.healthText.text =  this.health + " / " + maxHealth;
                 
             }
             if (this.energyText != null)
