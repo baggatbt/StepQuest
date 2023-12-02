@@ -221,8 +221,9 @@ public class BattleManager : MonoBehaviour
         }
         launchAttacksButton.interactable = false;
         */
+        enemyUIPanel.SetActive(false);
     }
-   
+   public GameObject enemyUIPanel;
     public void EnableAllButtons()
     {
        /* foreach (Button btn in skillButtons)
@@ -231,6 +232,7 @@ public class BattleManager : MonoBehaviour
         }
         launchAttacksButton.interactable = true;
         */
+        enemyUIPanel.SetActive(true);
     }
 
     public void MoveCursorToTarget()
