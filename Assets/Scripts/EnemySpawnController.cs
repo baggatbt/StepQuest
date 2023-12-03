@@ -48,7 +48,7 @@ public class EnemySpawnController : MonoBehaviour
         for (int i = 0; i < numberToSpawn; i++)
         {
             GameObject enemyToSpawn = poolDictionary[poolName][Random.Range(0, poolDictionary[poolName].Count)];
-            float yOffset = 0.5f; // This is the offset value by which you want to spawn the object above the Y value of the spawnPoint
+            float yOffset = -0.5f; // This is the offset value by which you want to spawn the object above the Y value of the spawnPoint
             GameObject spawnedEnemy = Instantiate(enemyToSpawn, new Vector3(spawnPoint.position.x, spawnPoint.position.y + yOffset, spawnPoint.position.z), spawnPoint.rotation);
 
             
@@ -62,7 +62,7 @@ public class EnemySpawnController : MonoBehaviour
             lastSpawnedCharacter.healthText = healthTexts[enemiesSpawned];
             enemiesSpawned++;  // Increment the spawn count
 
-            lastSpawnedCharacter.healthText.text = "HP: " + lastSpawnedCharacter.health;
+            lastSpawnedCharacter.healthText.text =  lastSpawnedCharacter.health + " / " + lastSpawnedCharacter.maxHealth;
 
             associatedHealthBarSlider.gameObject.SetActive(true);
             associatedHealthBarSlider.maxValue = lastSpawnedCharacter.maxHealth;

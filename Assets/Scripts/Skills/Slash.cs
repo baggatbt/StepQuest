@@ -41,6 +41,7 @@ public class Slash : Skill
              
 
              HandleTimingResultForPlayerAttack(user, target, result, baseDamage);
+             AudioManager.instance.PlaySlashSound();
              Debug.Log("Timing for player attack has been handled waiting for animations");
              //Wait until the timing event happens to move on to next attack stage
              yield return new WaitUntil(() => user.animationDamageTime == true);

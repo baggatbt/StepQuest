@@ -130,7 +130,7 @@ public abstract class Skill
             target.TakeDamage((int)(baseDamage * damageMultiplier),user); // Apply damage boost
             target.animator.SetTrigger("IsHurtTrigger");
             AudioManager.instance.PlayCriticalSlashSound();
-            //user.GainTeamEnergy(energyGain); //Perfect hits give +1 energy
+            user.GainTeamEnergy(energyGain); //Perfect hits give +1 energy
             break;
         case TimingEventResult.Good:
             Debug.Log("Good Hit!");   
@@ -140,8 +140,7 @@ public abstract class Skill
             Debug.Log("Damage before boost: " + ((int)(baseDamage), user) );
             target.TakeDamage((int)(baseDamage * damageMultiplier), user); // Apply damage boost
             Debug.Log("Damage after boost: " + ((int)(baseDamage * damageMultiplier), user) );
-            AudioManager.instance.PlaySlashSound();
-            //user.GainTeamEnergy(energyGain);
+            user.GainTeamEnergy(energyGain);
             break;
         case TimingEventResult.Miss:
             Debug.Log("Missed!");

@@ -10,12 +10,12 @@ public class BattleConfig //Responsible for passing information to the battle sc
     public static BattleConfig ForestConfig = new BattleConfig
     {
         poolName = "Forest",
-        maxEnemiesToSpawn = 2
+        maxEnemiesToSpawn = 0
     };
 
     public static BattleConfig MountainConfig = new BattleConfig
     {
         poolName = "Mountains",
-        maxEnemiesToSpawn = 2
+        maxEnemiesToSpawn = 0
     };
 }
