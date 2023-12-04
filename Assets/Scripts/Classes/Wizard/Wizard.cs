@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Wizard : Character
+public class Wizard : Character 
 {
    protected override void Start()
     {
@@ -19,7 +19,8 @@ public class Wizard : Character
    
     public  List<SkillType> AvailableSkills => new List<SkillType>
     {
-        SkillType.SlimeCompanionBasicAttack,
+        SkillType.WizardBasicAttack,
+        
         
         
     };
@@ -33,8 +34,9 @@ public class Wizard : Character
     {
         switch(skillType)
         {
-            case SkillType.SlimeCompanionBasicAttack:
-                return new SlimeCompanionBasicAttack();
+            case SkillType.WizardBasicAttack:
+                return new WizardBasicAttack();
+            
             
 
             default:

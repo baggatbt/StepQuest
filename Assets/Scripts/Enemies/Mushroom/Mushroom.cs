@@ -22,8 +22,8 @@ public class Mushroom : Enemy
         // Assign the skills to this specific type of character
         this.skills = new List<Skill> // Make sure to initialize the skills list before adding to it
         {
-            new GoblinAttackSkill(),
-            new GoblinSpecialAttackSkill()
+            new MushroomAttackSkill(),
+            new MushroomSpecialAttackSkill()
         };
         
         this.expReward = 10;  

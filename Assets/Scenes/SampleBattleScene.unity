@@ -355,7 +355,6 @@ GameObject:
   - component: {fileID: 97259695}
   - component: {fileID: 97259699}
   - component: {fileID: 97259698}
-  - component: {fileID: 97259697}
   - component: {fileID: 97259696}
   m_Layer: 5
   m_Name: CompanionSkillsPanel
@@ -411,18 +410,6 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
---- !u!114 &97259697
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 97259694}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 28189170b5fa4fa43b05cba63846ad24, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &97259698
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -727,6 +714,7 @@ GameObject:
   - component: {fileID: 250696102}
   - component: {fileID: 250696101}
   - component: {fileID: 250696103}
+  - component: {fileID: 250696104}
   m_Layer: 5
   m_Name: ButtonController
   m_TagString: Untagged
@@ -781,7 +769,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 250696100}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 19076bd70534def42bc7b6cbf2f7ae5c, type: 3}
   m_Name: 
@@ -792,6 +780,47 @@ MonoBehaviour:
   damage: 0
   energy: 0
   maxEnergy: 0
+  teamEnergy: 0
+  attackPower: 0
+  defensePower: 0
+  speed: 0
+  healthBar: {fileID: 0}
+  energyBar: {fileID: 0}
+  attackTarget: {fileID: 0}
+  originalPosition: {x: 0, y: 0, z: 0}
+  isAttacking: 0
+  isFront: 0
+  spriteRenderer: {fileID: 0}
+  animator: {fileID: 0}
+  healthText: {fileID: 0}
+  energyText: {fileID: 0}
+  hasNotGone: 0
+  isMoving: 0
+  attackTrigger: 0
+  animationEnded: 0
+  attacksBeforeSpecial: 0
+  statusEffectController: {fileID: 0}
+  cameraShake: {fileID: 0}
+  isAnimationDone: 0
+  animationDamageTime: 0
+--- !u!114 &250696104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 250696100}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d33287586f1c2c840864466bce6fe34e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  level: 0
+  health: 0
+  maxHealth: 0
+  damage: 0
+  energy: 0
+  maxEnergy: 5
   teamEnergy: 0
   attackPower: 0
   defensePower: 0
@@ -2960,7 +2989,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -456, y: -431}
+  m_AnchoredPosition: {x: -456.00003, y: -431}
   m_SizeDelta: {x: 211.55, y: -486.56}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &873669127

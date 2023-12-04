@@ -45,7 +45,6 @@ public class GoblinAttackSkill : Skill
         
         yield return new WaitUntil(() => user.isAnimationDone == true);
         user.animationDamageTime = false;
-        Debug.Log(user.energy);
         user.isAnimationDone = false;
         user.isAttacking = false;
         target.CheckForDeath();
