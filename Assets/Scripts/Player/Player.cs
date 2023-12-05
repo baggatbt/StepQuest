@@ -67,7 +67,8 @@ public class Player : Character
             playerData.inGameSteps = 0;
             playerData.maxHealth = 5;
             playerData.health = playerData.maxHealth;
-            playerData.maxEnergy = 5;
+            playerData.maxEnergy = 10;
+            playerData.energy = maxEnergy;
             playerData.teamEnergy = 0; //Set to zero to mimic the new system of just a shared AP bar.
             playerData.speed = 3;
             
@@ -93,6 +94,7 @@ public class Player : Character
     maxHealth = playerData.maxHealth;
     health = maxHealth;
     maxEnergy = playerData.maxEnergy; 
+    energy = maxEnergy;
     //teamEnergy = 0;
     attackPower = playerData.attackPower;
     defensePower = playerData.defensePower;

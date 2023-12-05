@@ -31,7 +31,7 @@ public abstract class Skill
     public string description;
     public bool skillExecutionComplete; // Flag to track the completion of skill execution
     public bool requiresMovement; // Indicates if the attack requires movement towards the target
-
+//got rid of can hit behind
     public int energyCost;
     public int energyGain;
     public int skillLevel;
@@ -92,7 +92,7 @@ public abstract class Skill
             damageMultiplier = 0.5f;  // Reduce damage by 50%
           //  user.animator.SetTrigger(trigger);
             target.TakeDamage((int)(user.damage * damageMultiplier),user); // Apply damage multiplier
-            user.GainEnergy(1);
+          //  user.GainEnergy(1);
             target.animator.SetTrigger("BlockTrigger");      
             AudioManager.instance.PlayBlockSound();
             break;
@@ -101,14 +101,14 @@ public abstract class Skill
             damageMultiplier = 0.75f;  // Reduce damage by 25%
            // user.animator.SetTrigger(trigger);            
             target.TakeDamage((int)(user.damage * damageMultiplier),user); // Apply damage multiplier
-            user.GainEnergy(1);
+           // user.GainEnergy(1);
             target.animator.SetTrigger("BlockTrigger");
             AudioManager.instance.PlayBlockSound();     
             break;
         case TimingEventResult.Miss:
           //  user.animator.SetTrigger(trigger);
             target.TakeDamage(user.damage, user); // Full damage as there's no reduction 
-            user.GainEnergy(1);
+            //user.GainEnergy(1);
             target.animator.SetTrigger("IsHurtTrigger");       
             break;
     }
@@ -131,7 +131,7 @@ public abstract class Skill
             target.TakeDamage((int)(baseDamage * damageMultiplier),user); // Apply damage boost
             target.animator.SetTrigger("IsHurtTrigger");
             AudioManager.instance.PlayCriticalSlashSound();
-            user.GainTeamEnergy(energyGain); //Perfect hits give +1 energy
+            //user.GainEnergy(energyGain); //Perfect hits give +1 energy
             break;
         case TimingEventResult.Good:
             Debug.Log("Good Hit!");   
@@ -141,7 +141,7 @@ public abstract class Skill
             Debug.Log("Damage before boost: " + ((int)(baseDamage), user) );
             target.TakeDamage((int)(baseDamage * damageMultiplier), user); // Apply damage boost
             Debug.Log("Damage after boost: " + ((int)(baseDamage * damageMultiplier), user) );
-            user.GainTeamEnergy(energyGain);
+           // user.GainEnergy(energyGain);
             break;
         case TimingEventResult.Miss:
             Debug.Log("Missed!");

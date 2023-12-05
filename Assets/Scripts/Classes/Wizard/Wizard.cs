@@ -12,8 +12,8 @@ public class Wizard : Companion
         this.health = this.maxHealth;
         this.defensePower = 0;
         this.speed = 2;
-        this.maxEnergy = 5;
-        this.teamEnergy = PlayerData.Instance.teamEnergy;
+        this.maxEnergy = 10;
+        this.energy = this.maxEnergy;
     }
 
     public override List<SkillType> AvailableSkills => new List<SkillType>

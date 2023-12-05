@@ -80,8 +80,8 @@ public class Character : MonoBehaviour
             if (this.energyText != null)
             {
                 
-                this.energyText.text = "MP: " + PlayerData.Instance.teamEnergy + " / " + maxEnergy;
-                this.energyBar.value = PlayerData.Instance.teamEnergy;
+                this.energyText.text = this.energy +  " / " + this.maxEnergy;
+                this.energyBar.value = this.energy;
                 
                 
             }
@@ -91,7 +91,7 @@ public class Character : MonoBehaviour
             
             
             energyBar.maxValue = maxEnergy;
-            energyBar.value = PlayerData.Instance.teamEnergy;
+            energyBar.value = this.energy;
         }
         
 
@@ -99,7 +99,7 @@ public class Character : MonoBehaviour
 
     protected virtual void Start()
     {
-        /*
+        
         
         if (healthBar != null)
         {
@@ -115,10 +115,10 @@ public class Character : MonoBehaviour
 
         if (energyBar != null)
         {
-            energyBar.maxValue = maxenergy;
+            energyBar.maxValue = maxEnergy;
             energyBar.value = energy;
         }
-        */
+        
     }
 
     
@@ -200,14 +200,14 @@ public class Character : MonoBehaviour
     public void SpendEnergy(int energySpent)
     {
   
-        PlayerData.Instance.teamEnergy -= energySpent;
+        this.energy -= energySpent;
         
         
-        energyBar.value = PlayerData.Instance.teamEnergy;
+        energyBar.value = this.energy;
         if (energyBar != null)
         {
-            energyBar.value = PlayerData.Instance.teamEnergy;
-            energyText.text = "MP: " + PlayerData.Instance.teamEnergy + " / " + maxEnergy;
+            energyBar.value = this.energy;
+            energyText.text = this.energy + " / " + this.maxEnergy;
         }
 }   
 

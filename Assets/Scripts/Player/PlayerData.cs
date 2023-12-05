@@ -23,6 +23,7 @@ public class PlayerData : MonoBehaviour
     public int maxHealth;
     public int health;
     public int maxEnergy;
+    public int energy;
     public int teamEnergy;
     public string jobClass;
     public int speed;
