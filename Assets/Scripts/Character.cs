@@ -12,25 +12,26 @@ public class Character : MonoBehaviour
     public int maxHealth;
     public int damage; //This is for the slime, so the next time you forget and wonder, what is this for again? Thats what. Everyone else has converted to AP
     public int energy;
-    public int maxEnergy;
+    public int maxEnergy = 5;
+    public int teamEnergy;
     public int attackPower;
     public int defensePower;
     public int speed;
-    public int strideEnergyMax;
-    public int strideEnergy;
     public Slider healthBar;
     public Slider energyBar;
-    public Slider strideEnergyBar;
     public Transform attackTarget;
     public Vector3 originalPosition;
     public bool isAttacking = false;
+    public bool isFront;
     public SpriteRenderer spriteRenderer;
     public Animator animator;
     public TextMeshProUGUI healthText; 
     public TextMeshProUGUI energyText;
+    
      
 
-
+    public bool hasNotGone;
+    public bool isMoving;
     public bool attackTrigger;
     public bool animationEnded;
     public Skill currentSkill; 
@@ -52,6 +53,7 @@ public class Character : MonoBehaviour
         health = maxHealth; 
         originalPosition = transform.position;
         statusEffectController = GetComponent<StatusEffectController>();
+        this.hasNotGone = true;
         Debug.Log(gameObject.name + " original position: " + originalPosition);
         if (healthText != null)
     {
@@ -66,31 +68,33 @@ public class Character : MonoBehaviour
     }
 
     void Update(){
-        if (healthBar != null)
+        if (this.healthBar != null)
         {
-            healthBar.maxValue = maxHealth;
-            healthBar.value = health;
-            if (healthText != null )
+            this.healthBar.maxValue = maxHealth;
+            this.healthBar.value = health;
+            if (this.healthText != null )
             {
-                healthText.text = "HP: " + health; 
+                this.healthText.text =  this.health + " / " + maxHealth;
                 
             }
-            if (energyText != null)
+            if (this.energyText != null)
             {
-                energyText.text = "MP: " + energy + " / " + strideEnergy;
-                strideEnergyBar.value = strideEnergy;
-                Debug.Log("Stride energy" + strideEnergy);
+                
+                this.energyText.text = "MP: " + PlayerData.Instance.teamEnergy + " / " + maxEnergy;
+                this.energyBar.value = PlayerData.Instance.teamEnergy;
+                
                 
             }
+        }
+        if (energyBar != null)
+        {
+            
+            
+            energyBar.maxValue = maxEnergy;
+            energyBar.value = PlayerData.Instance.teamEnergy;
         }
         
 
-        if (energyBar != null)
-        {
-            energyBar.maxValue = maxEnergy;
-            energyBar.value = energy;
-            
-        }
     }
 
     protected virtual void Start()
@@ -111,7 +115,7 @@ public class Character : MonoBehaviour
 
         if (energyBar != null)
         {
-            energyBar.maxValue = maxEnergy;
+            energyBar.maxValue = maxenergy;
             energyBar.value = energy;
         }
         */
@@ -123,8 +127,15 @@ public class Character : MonoBehaviour
 
     public void TakeDamage(int damageOfAttacker, Character attacker)
 {
-    Debug.Log("Damage being taken");
-    int damageDealt = damageOfAttacker * (1 - (this.defensePower / 100));
+    
+   // Define a constant that will be used to adjust the effectiveness of defense.
+    const float defenseEffectiveness = 50.0f; // This is a balancing factor.
+    
+    // Calculate damage reduction using a diminishing returns formula.
+    float damageReduction = this.defensePower / (this.defensePower + defenseEffectiveness);
+    int damageDealt = (int)(damageOfAttacker * (1 - damageReduction));
+    
+    Debug.Log("Damage reduced by Defense: " + (damageOfAttacker - damageDealt));
 
     health -= damageDealt;
     healthBar.value = health;
@@ -187,63 +198,56 @@ public class Character : MonoBehaviour
 
     private int remainingCost = 0;
     public void SpendEnergy(int energySpent)
+    {
+  
+        PlayerData.Instance.teamEnergy -= energySpent;
+        
+        
+        energyBar.value = PlayerData.Instance.teamEnergy;
+        if (energyBar != null)
+        {
+            energyBar.value = PlayerData.Instance.teamEnergy;
+            energyText.text = "MP: " + PlayerData.Instance.teamEnergy + " / " + maxEnergy;
+        }
+}   
+
+
+    public void GainTeamEnergy(int energyGained)
 {
-    remainingCost = energySpent - strideEnergy;
-
-    if (strideEnergy <= 0) //If player has no stride energy, just use mana
+    if (PlayerData.Instance.teamEnergy + energyGained > maxEnergy) // If the gained energy will bring the total over the max
     {
-        energy -= energySpent;
-    }
-    if (strideEnergy >= 1 && remainingCost >= 0) //if player has stride energy but not enough to cover the whole cost
-    {
-        strideEnergy = 0;
-        energy -= remainingCost;
-        strideEnergyBar.value = strideEnergy;
-    }
-    else 
-    {
-        strideEnergyBar.value = strideEnergy;
-    }
-    
-   
-    if (energyBar != null)
-    {
-        energyBar.value = energy;
-        energyText.text = "MP: " + energy + " / " + strideEnergy;
-    }
-}
-
-
-    public void GainEnergy(int energyGained)
-{
-    if (strideEnergy + energyGained > strideEnergyMax) // If the gained energy will bring the total over the max
-    {
-        strideEnergy = strideEnergyMax; // Set energy to the max
+        PlayerData.Instance.teamEnergy = maxEnergy; // Set energy to the max
+        Debug.Log("Passing first if in gainteamenergy");
+        
 
     }
-    if (strideEnergy + energyGained < strideEnergyMax) // If the gained energy will not bring the total over the max
+    if (PlayerData.Instance.teamEnergy + energyGained < maxEnergy) // If the gained energy will not bring the total over the max
     {
-        strideEnergy += energyGained; // Add the gained energy to the total
-    }
-    if (energy + energyGained > maxEnergy && strideEnergy + energyGained < strideEnergyMax) //Energy 
-    {
-
+        PlayerData.Instance.teamEnergy += energyGained; // Add the gained energy to the total
+        Debug.Log("Passing second if in gainteamenergy");
+       
     }
     
     if (energyBar != null)
     {
-        strideEnergyBar.value = strideEnergy;
+        
+        energyBar.value = PlayerData.Instance.teamEnergy;
         
     }
     if (energyText != null) //Had to separate this because monster energies do not use text.
     {
-        energyText.text = "MP: " + energy + " / " + strideEnergy;
+        energyText.text = "MP: " + PlayerData.Instance.teamEnergy + " / " + maxEnergy;
     }
+    Debug.Log("Not passing any");
 }
+    //For enemy rage bars
+    public void GainEnergy(int energyGained)
+    {
+        this.energy = energyGained;
+        
+    }
 
    
-    
-
     public void IsHit() => animator.SetTrigger("IsHurtTrigger");
     
     public bool isAnimationDone = false;
@@ -281,68 +285,75 @@ public class Character : MonoBehaviour
      public IEnumerator MoveToTarget()
 {
     animator.SetTrigger("MovementAnimationTrigger");
-     
+    this.isMoving = true;
+
     Vector3 targetPosition = attackTarget.position;
     checkCollisionsDuringMovement = true;
-    
-    yield return Move(targetPosition);
-    animator.SetTrigger("StopMovementAnimationTrigger");  
+
+    // Start moving towards the target
+    yield return Move(targetPosition, stoppingDistance: 0.0f); // Set a small stopping distance
+
+    // Stop the movement animation when the target position is reached or a collision occurs
+    animator.SetTrigger("StopMovementAnimationTrigger");
+    this.isMoving = false;
 }
 
-     public IEnumerator ReturnToPosition()
+public IEnumerator ReturnToPosition()
 {
     animator.SetTrigger("MovementAnimationTrigger");
+    this.isMoving = true;
 
-    // You can keep this line if you want the character to move back over time
-    yield return Move(originalPosition);
+    // Move back to the original position
+    yield return Move(originalPosition, stoppingDistance: 0.0f); // Exact position, so stopping distance is 0
 
     // This line will ensure the character is exactly at the original position
     transform.position = originalPosition;
 
     animator.SetTrigger("StopMovementAnimationTrigger");
+    this.isMoving = false;
 }
 
+private IEnumerator Move(Vector3 targetPosition, float stoppingDistance)
+{
+    while (!HasReachedPosition(targetPosition, stoppingDistance))
+    {
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, 17.5f * Time.deltaTime);
 
-     private IEnumerator Move(Vector3 targetPosition)
+        if (checkCollisionsDuringMovement && IsCollidingWithCharacter())
         {
-            while (!HasReachedPosition(targetPosition))
-            {
-                transform.position = Vector3.MoveTowards(transform.position, targetPosition, 17.5f * Time.deltaTime);
-                
-                if (checkCollisionsDuringMovement && IsCollidingWithCharacter())
-                {
-                    animator.SetTrigger("StopMovementAnimationTrigger");  
-                    yield break;
-                }
-                yield return null;
-            }
+            animator.SetTrigger("StopMovementAnimationTrigger");
+            yield break; // Stop the coroutine if a collision is detected
         }
 
-    //This can cause a bug where a longer animation will snap back to pos and skip running
-    private bool HasReachedPosition(Vector3 targetPosition, float stoppingDistance = 0.0f)
-    {
-        return (transform.position - targetPosition).sqrMagnitude <= stoppingDistance * stoppingDistance;
+        // Use WaitForFixedUpdate for physics-based movement
+        yield return new WaitForFixedUpdate();
     }
+}
 
-    private bool IsCollidingWithCharacter()
+// Updated to check for an appropriate stopping distance
+private bool HasReachedPosition(Vector3 targetPosition, float stoppingDistance)
 {
+    // Adjusted to use magnitude instead of sqrMagnitude for more accurate comparison
+    return Vector3.Distance(transform.position, targetPosition) <= stoppingDistance;
+}
+
+private bool IsCollidingWithCharacter()
+{
+    // Consider using a more specific collision check if necessary
+    // For example, Physics2D.OverlapCircle might be replaced with Physics2D.OverlapBox if that's more appropriate for your game
     Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 2.0f);
 
     foreach (Collider2D collider in colliders)
     {
         if (collider.gameObject.GetInstanceID() == gameObject.GetInstanceID()) continue;
 
-        // If current object is an enemy and the colliding object is also an enemy, ignore the collision
         if (this.CompareTag("Enemy") && collider.CompareTag("Enemy")) continue;
 
         if (this.CompareTag("UI")) continue;
 
-        // If it's colliding with the target, then return true
         if (collider.gameObject.GetInstanceID() == attackTarget.gameObject.GetInstanceID()) return true;
     }
     return false;
 }
-
-
 
 }

@@ -18,15 +18,21 @@ public class PlayerData : MonoBehaviour
     public int attackPower;
     public int defensePower;
     public int inGameSteps;
-    public int stepsSinceStart;
+    public int stepsSinceStart; //Steps since the game was started once
+   // public int dailySteps; //Tracker for the 10k steps a day that will reset NOT IMPLEMENTED
     public int maxHealth;
     public int health;
     public int maxEnergy;
-    public int energy;
-    public int maxStrideEnergy;
-    public int strideEnergy;
+    public int teamEnergy;
     public string jobClass;
     public int speed;
+    
+    //Knight specific
+    public int knightSkillPoints;
+    public int knightLevel;
+    public int knightExp;
+    
+    
     public Dictionary<string, int> skillLevels;
     public Dictionary<string, int> skillExp;
     public List<Mission> activeMissions = new List<Mission>();
@@ -36,7 +42,7 @@ public class PlayerData : MonoBehaviour
 
     private void Awake()
 {
-    maxStrideEnergy = (maxEnergy / 2);
+    
    //For testing, wipes saved data 
    //PlayerPrefs.DeleteAll();
 
@@ -49,6 +55,7 @@ public class PlayerData : MonoBehaviour
         LoadPlayerData();
         
         
+        
     }
     else
     {
@@ -58,8 +65,7 @@ public class PlayerData : MonoBehaviour
         skillLevels = new Dictionary<string, int>();
         skillExp = new Dictionary<string, int>();
 
-        maxStrideEnergy = (maxEnergy / 2);
-        strideEnergy = 0;
+       
         stepCounterController = FindObjectOfType<StepCounterController>();
         if (stepCounterController == null)
         {
@@ -104,10 +110,12 @@ public class PlayerData : MonoBehaviour
             inGameSteps += currentSteps - previousSteps;
             previousSteps = currentSteps;
         }
+
+        
      //   Debug.Log("Steps in Update: " + inGameSteps);
     }
 
-    public void UpdatePlayerData(int level, string jobClass, int exp, int gold, int attackPower, int defensePower, int inGameSteps, int maxHealth, int health, int maxEnergy, int energy, int speed, int maxStrideEnergy, int strideEnergy)
+    public void UpdatePlayerData(int level, string jobClass, int exp, int gold, int attackPower, int defensePower, int inGameSteps, int maxHealth, int health, int maxEnergy, int teamEnergy, int speed )
     {
         this.level = level;
         this.jobClass = jobClass;
@@ -119,10 +127,9 @@ public class PlayerData : MonoBehaviour
         this.maxHealth = maxHealth;
         this.health = health;
         this.maxEnergy = maxEnergy;
-        this.energy = energy;
+        this.teamEnergy = teamEnergy;
         this.speed = speed;
-        this.maxStrideEnergy = maxStrideEnergy;
-        this.strideEnergy = strideEnergy;
+       
         
 
         SavePlayerData(); 
@@ -140,7 +147,9 @@ public class PlayerData : MonoBehaviour
         PlayerPrefs.SetInt("PlayerMaxHealth", maxHealth);
         PlayerPrefs.SetInt("PlayerMaxEnergy", maxEnergy); 
         PlayerPrefs.SetInt("PlayerSpeed", speed);
-        PlayerPrefs.SetInt("PlayerMaxStrideEnergy", maxStrideEnergy);
+        PlayerPrefs.SetInt("KnightSkillPoints",knightSkillPoints);
+        PlayerPrefs.SetInt("KnightLevel",knightLevel);
+        PlayerPrefs.SetInt("KnightExp",knightExp);
         PlayerPrefs.Save();
         Debug.Log("Data saved");
     }
@@ -159,48 +168,52 @@ public class PlayerData : MonoBehaviour
             maxHealth = PlayerPrefs.GetInt("PlayerMaxHealth");
             maxEnergy = PlayerPrefs.GetInt("PlayerMaxEnergy");
             speed = PlayerPrefs.GetInt("PlayerSpeed");
+            knightSkillPoints = PlayerPrefs.GetInt("KnightSkillPoints");
+            knightLevel = PlayerPrefs.GetInt("KnightLevel");
+            knightExp = PlayerPrefs.GetInt("KnightExp");
         }
     }
 
     private void OnApplicationPause(bool pauseStatus)
-    {
-        if (pauseStatus)
-        {
-            SaveStepsData();
-        }
-        else
-        {
-            LoadStepsData();
-        }
-    }
-
-    private void OnApplicationQuit()
+{
+    if (pauseStatus)
     {
         SaveStepsData();
-        SavePlayerData();
-        Debug.Log("Saving steps on quit: " + inGameSteps);
     }
-
-    private void LoadStepsData()
+    else
     {
-        if(PlayerPrefs.HasKey("StepsBeforeClosing") && PlayerPrefs.HasKey("InGameSteps"))
-        {
-            int stepsBeforeClosing = PlayerPrefs.GetInt("StepsBeforeClosing", 0);
-            int stepsWhenReOpening = stepCounterController.GetSteps();
-            int previousInGameSteps = PlayerPrefs.GetInt("InGameSteps", 0);
-            int stepsDuringClosure = stepsWhenReOpening - stepsBeforeClosing;
-            inGameSteps = previousInGameSteps + stepsDuringClosure; 
-            previousSteps = inGameSteps;
-            Debug.Log("Loaded Steps: " + inGameSteps);
-        }
+        LoadStepsData();
     }
+}
 
-    private void SaveStepsData()
-    {
-        PlayerPrefs.SetInt("StepsBeforeClosing", stepCounterController.GetSteps());
-        PlayerPrefs.SetInt("InGameSteps", inGameSteps);
-        PlayerPrefs.Save();
-    }
+private void SaveStepsData()
+{
+    // Save the total steps from the plugin when the app is paused or closed
+    PlayerPrefs.SetInt("TotalStepsWhenClosed", stepCounterController.GetSteps());
+    PlayerPrefs.Save();
+    Debug.Log("Saved total steps when closed: " + stepCounterController.GetSteps());
+}
+
+private void LoadStepsData()
+{
+    int totalStepsWhenClosed = PlayerPrefs.GetInt("TotalStepsWhenClosed", stepCounterController.GetSteps());
+    int totalStepsNow = stepCounterController.GetSteps();
+
+    // Calculate the steps taken after the game was started
+    inGameSteps = totalStepsNow - totalStepsWhenClosed;
+
+    Debug.Log("Loaded Steps: " + inGameSteps);
+}
+
+
+
+private void OnApplicationQuit()
+{
+    SaveStepsData();
+}
+
+
+
 
 
   

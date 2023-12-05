@@ -17,6 +17,7 @@ public class Player : Character
     public TextMeshProUGUI magicDefenseText;
     public TextMeshProUGUI stepsText;
     public TextMeshProUGUI jobText;
+    public TextMeshProUGUI knightSkillPointsText;
     public PlayerJob CurrentJob { get; private set; }
 
 
@@ -27,6 +28,7 @@ public class Player : Character
     private int gold;
     private string jobClass;
     private int inGameSteps;
+    
 
 
     protected override void Awake()
@@ -60,16 +62,15 @@ public class Player : Character
             playerData.jobClass = "Knight";
             playerData.exp = 0;
             playerData.gold = 100;
-            playerData.attackPower = 3;
-            playerData.defensePower = 5;
+            playerData.attackPower = 2;
+            playerData.defensePower = 1;
             playerData.inGameSteps = 0;
-            playerData.maxHealth = 10;
+            playerData.maxHealth = 5;
             playerData.health = playerData.maxHealth;
             playerData.maxEnergy = 5;
-            playerData.energy = playerData.maxEnergy;
+            playerData.teamEnergy = 0; //Set to zero to mimic the new system of just a shared AP bar.
             playerData.speed = 3;
-            playerData.maxStrideEnergy = playerData.maxEnergy;
-            playerData.strideEnergy = 0;
+            
 
             PlayerPrefs.SetInt("PlayerInitialized", 1);
             
@@ -92,14 +93,13 @@ public class Player : Character
     maxHealth = playerData.maxHealth;
     health = maxHealth;
     maxEnergy = playerData.maxEnergy; 
-    energy = maxEnergy;
+    //teamEnergy = 0;
     attackPower = playerData.attackPower;
     defensePower = playerData.defensePower;
     exp = playerData.exp;
     jobClass = playerData.jobClass;
     inGameSteps = playerData.inGameSteps;
-    strideEnergyMax = playerData.maxStrideEnergy;
-    strideEnergy = playerData.strideEnergy;
+    
     
     
     }
@@ -131,12 +131,11 @@ public class Player : Character
         ApplyJobStats();
     }
 
-    private void ApplyJobStats()
+   private void ApplyJobStats()
     {
         playerData.attackPower = CurrentJob.BaseAtk;
         playerData.defensePower = CurrentJob.BaseDef;
         playerData.maxHealth = CurrentJob.BaseHealth;
-        playerData.maxEnergy = CurrentJob.BaseEnergy;
         // Handle magic attack and defense here...
 
         playerData.SavePlayerData();
@@ -155,10 +154,10 @@ public class Player : Character
 
     private void Update()
     {
-        
-        // Update UI regularly or as per your needs
+       
        UpdateUI();
       // playerData.UpdatePlayerData();
+      
        
         
     }
@@ -174,6 +173,18 @@ public class Player : Character
     if (stepsText != null) stepsText.text = "Steps: " + playerData.inGameSteps.ToString();
     if (magicAttackText != null) magicAttackText.text = "M.Atk: 0";
     if (magicDefenseText != null) magicDefenseText.text = "M.Def: 0";
+    if (knightSkillPointsText != null) knightSkillPointsText.text = "SP: " + playerData.knightSkillPoints.ToString();
+
+    if (healthBar != null)
+        {
+            healthBar.maxValue = maxHealth;
+            healthBar.value = health;
+            if (healthText != null )
+            {
+                healthText.text = "HP: " + health; 
+                
+            }}
+            LevelUp();
 }
 
 
@@ -208,10 +219,10 @@ public class Player : Character
 
     public void LevelUp()
     {
-        if (playerData.exp >= ExpRequiredToLevelUp(playerData.level))
+        if (CurrentJob.JobExp >= ExpRequiredToLevelUp(CurrentJob.JobLevel))
             {
                 Debug.Log("Level up");
-                playerData.level += 1;
+                CurrentJob.JobLevel += 1;
                 ApplyJobStats();
                 playerData.SavePlayerData();
                 UpdateUI();

@@ -1,15 +1,16 @@
-/*using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using TMPro; 
 
 public class CompanionSpawnController : MonoBehaviour
 {
-    public GameObject knightPrefab;
+    public GameObject companionPrefab;
     public Transform companionSpawnPoint; // You can assign this directly in the inspector
     public Slider associatedHealthBarSlider; // Reference to the slider
     public Slider associatedEnergyBarSlider;
     public TextMeshProUGUI associatedHealthText;
     public TextMeshProUGUI associatedEnergyText;
+    public Slider associatedtempEnergyBarSlider;
     public BattleManager battleManager;
 
 
@@ -25,14 +26,19 @@ public class CompanionSpawnController : MonoBehaviour
     if (spawnedCompanion != null && battleManager != null)
     {
         battleManager.companion = spawnedCompanion;
+        battleManager.playerParty.Add(spawnedCompanion);
     }
    }
 
     public Character SpawnCompanionAtPoint(Transform spawnPoint)
 {
     // Instantiate the Companion at the position of spawnPoint and with its rotation
-    GameObject spawnedCompanionObject = Instantiate(knightPrefab, spawnPoint.position, spawnPoint.rotation);
+    GameObject spawnedCompanionObject = Instantiate(companionPrefab, spawnPoint.position, spawnPoint.rotation);
     Character spawnedCompanion = spawnedCompanionObject.GetComponent<Character>();
+    
+    // Set the tag for the spawned companion object
+    spawnedCompanionObject.tag = "Companion";
+
 
      
     // Link this character to the health bar
@@ -43,13 +49,10 @@ public class CompanionSpawnController : MonoBehaviour
     spawnedCompanion.healthText = associatedHealthText;
 
     spawnedCompanion.energyBar = associatedEnergyBarSlider;
-    associatedEnergyBarSlider.gameObject.SetActive(true); // Activate the energy bar
-    associatedEnergyBarSlider.maxValue = spawnedCompanion.maxEnergy;
-    associatedEnergyBarSlider.value = spawnedCompanion.energy;
     spawnedCompanion.energyText = associatedEnergyText;
 
-    Debug.Log(spawnedCompanion.attackPower);
 
+    spawnedCompanion.isFront = false;
   
 
    
@@ -58,4 +61,3 @@ public class CompanionSpawnController : MonoBehaviour
 }
 
 }
-*/

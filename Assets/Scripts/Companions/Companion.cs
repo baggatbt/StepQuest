@@ -2,11 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Companion : Character
+public abstract class Companion : Character
 {
-   
-   public string description;
+    public abstract List<SkillType> AvailableSkills { get; }
+    public abstract List<SkillType> LockedSkills { get; }
+    public abstract Skill GetSkillInstance(SkillType skillType);
+    
+    // Additional companion-specific properties and behavior
+}
+
    
 
-    // Additional enemy-specific properties and behavior
-}
+

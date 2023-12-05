@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 3094266824031159053}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 303.0992, y: 94.93, z: -34.39338}
-  m_LocalScale: {x: 12.34587, y: 12.82821, z: 12.82821}
+  m_LocalScale: {x: 10.185343, y: 12.186799, z: 12.82821}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -129,8 +129,11 @@ MonoBehaviour:
   attackPower: 0
   defensePower: 0
   speed: 0
+  tempEnergyMax: 0
+  tempEnergy: 0
   healthBar: {fileID: 0}
   energyBar: {fileID: 0}
+  tempEnergyBar: {fileID: 0}
   attackTarget: {fileID: 0}
   originalPosition: {x: 0, y: 0, z: 0}
   isAttacking: 0
@@ -138,6 +141,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   healthText: {fileID: 0}
   energyText: {fileID: 0}
+  hasNotGone: 0
   attackTrigger: 0
   animationEnded: 0
   attacksBeforeSpecial: 0
@@ -166,8 +170,11 @@ MonoBehaviour:
   attackPower: 5
   defensePower: 1
   speed: 1
+  tempEnergyMax: 0
+  tempEnergy: 0
   healthBar: {fileID: 0}
   energyBar: {fileID: 0}
+  tempEnergyBar: {fileID: 0}
   attackTarget: {fileID: 0}
   originalPosition: {x: 0, y: 0, z: 0}
   isAttacking: 0
@@ -175,6 +182,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   healthText: {fileID: 0}
   energyText: {fileID: 0}
+  hasNotGone: 0
   attackTrigger: 0
   animationEnded: 0
   attacksBeforeSpecial: 0
