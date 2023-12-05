@@ -12,7 +12,7 @@ public class Character : MonoBehaviour
     public int maxHealth;
     public int damage; //This is for the slime, so the next time you forget and wonder, what is this for again? Thats what. Everyone else has converted to AP
     public int energy;
-    public int maxEnergy = 5;
+    public int maxEnergy;
     public int teamEnergy;
     public int attackPower;
     public int defensePower;
@@ -108,7 +108,7 @@ public class Character : MonoBehaviour
             if (healthText !=null && energyText !=null)
             {
                 healthText.text = "HP: " + health; 
-                energyText.text = "MP: " + energy;
+                energyText.text = this.energy  + " / " + maxEnergy;
             }
         }
         
@@ -236,7 +236,7 @@ public class Character : MonoBehaviour
     }
     if (energyText != null) //Had to separate this because monster energies do not use text.
     {
-        energyText.text = "MP: " + PlayerData.Instance.teamEnergy + " / " + maxEnergy;
+        energyText.text = "MP: " + this.energy + " / " + maxEnergy;
     }
     Debug.Log("Not passing any");
 }

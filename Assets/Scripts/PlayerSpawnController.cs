@@ -50,8 +50,9 @@ public class PlayerSpawnController : MonoBehaviour
     associatedEnergyBarSlider.maxValue = spawnedPlayer.maxEnergy;
     associatedEnergyBarSlider.value = spawnedPlayer.energy;
     spawnedPlayer.energyText = associatedEnergyText;
-
-    spawnedPlayer.isFront = true;
+    
+    associatedEnergyText.text = spawnedPlayer.energy + " / " + spawnedPlayer.maxEnergy;
+    
 
     
 
