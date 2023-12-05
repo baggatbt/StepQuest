@@ -10,7 +10,6 @@ public class GoblinAttackSkill : Skill
         skillName = "Goblin Attack";
         description = "The Goblin attacks the player. The damage can be reduced by timely action.";
         requiresMovement = true;
-        canHitBehind = false;
         numberOfAttacksPossible = 1;
     }
 

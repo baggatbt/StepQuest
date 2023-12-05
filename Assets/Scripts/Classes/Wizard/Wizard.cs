@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Wizard : Character 
+public class Wizard : Companion
 {
-   protected override void Start()
+    protected override void Start()
     {
         this.level = 1;
         this.attackPower = 3;
@@ -14,33 +14,29 @@ public class Wizard : Character
         this.speed = 2;
         this.maxEnergy = 5;
         this.teamEnergy = PlayerData.Instance.teamEnergy;
-
     }
-   
-    public  List<SkillType> AvailableSkills => new List<SkillType>
+
+    public override List<SkillType> AvailableSkills => new List<SkillType>
     {
         SkillType.WizardBasicAttack,
-        
-        
-        
+        // ... other skills ...
     };
 
-    public  List<SkillType> LockedSkills => new List<SkillType>
+    public override List<SkillType> LockedSkills => new List<SkillType>
     {
-        
+        // ... skills
     };
 
-    public  Skill GetSkillInstance(SkillType skillType)
+    public override Skill GetSkillInstance(SkillType skillType)
     {
         switch(skillType)
         {
             case SkillType.WizardBasicAttack:
                 return new WizardBasicAttack();
-            
-            
+            // ... other cases ...
 
             default:
-                Debug.LogError("Unknown skill type for Knight: " + skillType);
+                Debug.LogError("Unknown skill type for Wizard: " + skillType);
                 return null;
         }
     }

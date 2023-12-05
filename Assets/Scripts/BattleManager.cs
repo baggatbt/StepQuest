@@ -363,70 +363,54 @@ public class BattleManager : MonoBehaviour
 
     
     public void EnemyAttack()
-{
-    // If the queue is empty, populate it.
-    if (enemyTurnQueue.Count == 0)
     {
-        foreach (var enemy in enemies)
+        // If the queue is empty (or at the start of the enemy turn phase), populate it.
+        if (enemyTurnQueue.Count == 0)
         {
-            // Ensure the object is an Enemy and is alive before enqueuing
-            if (enemy is Enemy e && e.health > 0)
-                enemyTurnQueue.Enqueue(enemy);
+            foreach (var enemy in enemies)
+            {
+                
+                if (enemy.health > 0) // Assuming you have some isDead flag on enemies
+                    enemyTurnQueue.Enqueue(enemy);
+            }
         }
-    }
 
-    // If all enemies had their turns, switch to player's turn.
-    if (enemyTurnQueue.Count == 0)
-    {
-        statusEffectController.ProcessEffects();
-        ChangeState(BattleState.PlayerTurn);
-        return;
-    }
-
-    Character attackingCharacter = enemyTurnQueue.Dequeue();
-
-    // Check if the character is actually an Enemy
-    if (attackingCharacter is Enemy attackingEnemy)
-    {
-        // Decide target based on preferred position
-        if (attackingCharacter.currentSkill.canHitBehind)
+        // If all enemies had their turns, it's the player's turn next.
+        if (enemyTurnQueue.Count == 0)
         {
-            attackingEnemy.attackTarget = SelectBackTarget();
-            
-        }
-        else 
-        {   
-            attackingEnemy.attackTarget = SelectFrontTarget();
+            statusEffectController.ProcessEffects();
+            ChangeState(BattleState.PlayerTurn);
+            return;
         }
 
-        // Decide whether to use the special attack or the normal one
+        Character attackingEnemy = enemyTurnQueue.Dequeue();
+        //Decide whether or not to use the special attack or the normal one
         if (!activePlayer.isAttacking && !attackingEnemy.isAttacking && state == BattleState.EnemyTurn)
         {
-            attackingEnemy.currentSkill = attackingEnemy.energy >= attackingEnemy.maxEnergy ? attackingEnemy.specialSkill : attackingEnemy.normalSkill;
+            if (attackingEnemy.energy >= attackingEnemy.maxEnergy)
+            {
+                attackingEnemy.currentSkill = attackingEnemy.specialSkill;
+            }
+            else 
+            {
+            attackingEnemy.currentSkill = attackingEnemy.normalSkill;
+            }
+
+            // This sets the enemies target for the turn, need to build out
+            //Each enemy can have a preference if needed in their own class
+            //For now it will just randomize between the player and companion
+            // Use UnityEngine.Random.Range to get a 50/50 chance
+            //UnityEngine.Random.Range(min, max) returns either 0 or 1
+            foreach (var enemy in enemies)
+            {
+                
+            attackingEnemy.attackTarget = player.transform; //UnityEngine.Random.Range(0, 2) == 0 ? companion.transform : player.transform;
+            }
+            
             StartCoroutine(EnemyAttackCoroutine(attackingEnemy));
+            
         }
     }
-    else
-    {
-        // Handle the case where the dequeued character is not an Enemy
-        Debug.LogError("Dequeued character is not an Enemy.");
-    }
-}
-
-private Transform SelectFrontTarget()
-{
-    //'player' is always the front target
-    //Change this using the isFront property that now exists in playerSpawner
-
-    return player.health > 0 ? player.transform : companion.transform;
-}
-
-private Transform SelectBackTarget()
-{
-    // Assuming 'companion' is always the back target
-    //Change this using the isFront property that now exists in companionSpawner
-    return companion.health > 0 ? companion.transform : player.transform;
-}
 
     
 
@@ -721,7 +705,7 @@ private void Update()
                     activePlayer = clickedCharacter;
                     Debug.Log("active player switched");// Move the circles to the targets position
                     activePlayerIndicator.transform.position = new Vector3(activePlayer.transform.position.x, activePlayer.transform.position.y + 2f, activePlayer.transform.position.z);
-                    activePlayerIndicator.SetActive(false); //Turned it off for now, dont think I need it anymore
+                   
 
                 }
             }

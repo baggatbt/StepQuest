@@ -10,7 +10,6 @@ public class MushroomAttackSkill : Skill
         skillName = "Mushroom attack";
         description = "The enemy attacks the player. The damage can be reduced by timely action.";
         requiresMovement = true;
-        canHitBehind = false;
         numberOfAttacksPossible = 1;
     }
 
