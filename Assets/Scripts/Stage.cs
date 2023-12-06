@@ -13,16 +13,23 @@ public class Stage : MonoBehaviour
     public string battleSceneName = "BattleScene"; 
     public bool isUnlocked;
     public bool isFirstCompletion;
+    public string stageID; // Unique identifier for the stage
     public List<Stage> connectedStages; // Stages that get unlocked after completing this one
 
     private void Start()
     {
-        stageButton.onClick.AddListener(OnStageButtonClicked);
+         stageButton.onClick.AddListener(OnStageButtonClicked);
+        // Initialize the unlocked state based on GameManager's data
+        isUnlocked = GameManager.Instance.UnlockedStageNames.Contains(this.stageID);
         UpdateButtonColor();
+        
     }
 
     
     public void UpdateButtonColor()
+{
+    // Check if the stageButton is not null before accessing it
+    if (stageButton != null)
     {
         if (isUnlocked)
         {
@@ -33,6 +40,8 @@ public class Stage : MonoBehaviour
             stageButton.GetComponent<Image>().color = Color.red;
         }
     }
+}
+
 
 
 

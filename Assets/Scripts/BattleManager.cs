@@ -759,39 +759,34 @@ private void Update()
     }
     return false;
 }
-
 public void CheckBattleEnd()
 {
     bool allEnemiesDefeated = true;
-    bool allAlliesDefeated = false;
-
-    if (player.health <= 0 && companion.health <= 0)
-    {
-        allAlliesDefeated = true;
-    }
+    bool allAlliesDefeated = player.health <= 0 && companion.health <= 0;
 
     foreach (var enemy in enemies)
     {
-        if (enemy.health > 0)  
+        if (enemy.health > 0)
         {
             allEnemiesDefeated = false;
             break;
         }
     }
-    new WaitForSeconds(3.0f);
+    
     if (allEnemiesDefeated)
     {
         EndOfBattleRewards(enemies);
-       GameManager.Instance.UnlockNextStage();
+        Debug.Log("Is this running");
+        Stage completedStage = GameManager.Instance.CurrentBattleConfig.stage;
+        GameManager.Instance.UnlockConnectedStages(completedStage);
         endOfBattlePanel.SetActive(true);
-        
     }
-    if (allAlliesDefeated)
+    else if (allAlliesDefeated)
     {
         endOfBattleLossPanel.SetActive(true);
     }
 }
-    
+
 
 
 

@@ -1707,7 +1707,7 @@ GameObject:
   - component: {fileID: 216808355}
   - component: {fileID: 216808354}
   m_Layer: 5
-  m_Name: Stage2Button (1)
+  m_Name: 2-2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1749,10 +1749,11 @@ MonoBehaviour:
   stageBattleConfig:
     poolName: Forest
     maxEnemiesToSpawn: 2
-    stageID: 3
+    stage: {fileID: 0}
   battleSceneName: SampleBattleScene
   isUnlocked: 0
   isFirstCompletion: 1
+  stageID: 4
   connectedStages:
   - {fileID: 987032038}
 --- !u!114 &216808355
@@ -1889,7 +1890,7 @@ GameObject:
   - component: {fileID: 293848963}
   - component: {fileID: 293848962}
   m_Layer: 5
-  m_Name: Stage3Button (2)
+  m_Name: 3-3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1911,10 +1912,11 @@ MonoBehaviour:
   stageBattleConfig:
     poolName: Forest
     maxEnemiesToSpawn: 3
-    stageID: 7
+    stage: {fileID: 0}
   battleSceneName: SampleBattleScene
   isUnlocked: 0
   isFirstCompletion: 1
+  stageID: 7
   connectedStages: []
 --- !u!114 &293848963
 MonoBehaviour:
@@ -2764,6 +2766,7 @@ GameObject:
   - component: {fileID: 485463285}
   - component: {fileID: 485463287}
   - component: {fileID: 485463286}
+  - component: {fileID: 485463288}
   m_Layer: 5
   m_Name: OverworldMapPanel
   m_TagString: Untagged
@@ -2789,7 +2792,7 @@ RectTransform:
   - {fileID: 1322231485}
   - {fileID: 685982854}
   m_Father: {fileID: 1503855870}
-  m_RootOrder: 19
+  m_RootOrder: 18
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -2834,6 +2837,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 485463284}
   m_CullTransparentMesh: 1
+--- !u!114 &485463288
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 485463284}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70e52eb965e23cb43847a74383140803, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allStages:
+  - {fileID: 1725917475}
+  - {fileID: 216808354}
+  - {fileID: 987032038}
+  - {fileID: 1322231486}
+  - {fileID: 1041864588}
+  - {fileID: 293848962}
+  - {fileID: 1673045477}
 --- !u!1 &513042676
 GameObject:
   m_ObjectHideFlags: 0
@@ -3315,59 +3338,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 591875725}
   m_CullTransparentMesh: 1
---- !u!1 &605467987
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 605467988}
-  - component: {fileID: 605467989}
-  m_Layer: 5
-  m_Name: Stage Manager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &605467988
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 605467987}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1503855870}
-  m_RootOrder: 18
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &605467989
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 605467987}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70e52eb965e23cb43847a74383140803, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  stages:
-  - {fileID: 1725917475}
-  - {fileID: 1673045477}
-  - {fileID: 1322231486}
 --- !u!1 &613731597
 GameObject:
   m_ObjectHideFlags: 0
@@ -3712,10 +3682,11 @@ MonoBehaviour:
   stageBattleConfig:
     poolName: Forest
     maxEnemiesToSpawn: 3
-    stageID: 8
+    stage: {fileID: 0}
   battleSceneName: SampleBattleScene
   isUnlocked: 0
   isFirstCompletion: 1
+  stageID: 8
   connectedStages:
   - {fileID: 987032038}
   - {fileID: 293848962}
@@ -4043,7 +4014,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 607aefc664c690848845413aeef12e0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentStageID: 0
 --- !u!4 &728042707
 Transform:
   m_ObjectHideFlags: 0
@@ -5769,7 +5739,7 @@ GameObject:
   - component: {fileID: 987032039}
   - component: {fileID: 987032038}
   m_Layer: 5
-  m_Name: Stage2Button (2)
+  m_Name: 2-3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5790,11 +5760,12 @@ MonoBehaviour:
   stageButton: {fileID: 987032039}
   stageBattleConfig:
     poolName: Forest
-    maxEnemiesToSpawn: 2
-    stageID: 4
+    maxEnemiesToSpawn: 1
+    stage: {fileID: 0}
   battleSceneName: SampleBattleScene
   isUnlocked: 0
   isFirstCompletion: 1
+  stageID: 5
   connectedStages: []
 --- !u!114 &987032039
 MonoBehaviour:
@@ -6090,7 +6061,7 @@ GameObject:
   - component: {fileID: 1041864589}
   - component: {fileID: 1041864588}
   m_Layer: 5
-  m_Name: Stage3Button (1)
+  m_Name: 3-2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6132,10 +6103,11 @@ MonoBehaviour:
   stageBattleConfig:
     poolName: Forest
     maxEnemiesToSpawn: 3
-    stageID: 6
+    stage: {fileID: 0}
   battleSceneName: SampleBattleScene
   isUnlocked: 0
   isFirstCompletion: 1
+  stageID: 6
   connectedStages:
   - {fileID: 293848962}
 --- !u!114 &1041864589
@@ -7599,7 +7571,7 @@ Transform:
   m_Children:
   - {fileID: 953565910}
   m_Father: {fileID: 1503855870}
-  m_RootOrder: 20
+  m_RootOrder: 19
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1270921461
 SpriteRenderer:
@@ -7994,7 +7966,7 @@ GameObject:
   - component: {fileID: 1322231487}
   - component: {fileID: 1322231486}
   m_Layer: 5
-  m_Name: Stage3Button
+  m_Name: Stage3-1Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8037,11 +8009,12 @@ MonoBehaviour:
   stageButton: {fileID: 1322231487}
   stageBattleConfig:
     poolName: Forest
-    maxEnemiesToSpawn: 3
-    stageID: 5
+    maxEnemiesToSpawn: 1
+    stage: {fileID: 1322231486}
   battleSceneName: SampleBattleScene
   isUnlocked: 0
   isFirstCompletion: 1
+  stageID: 3
   connectedStages:
   - {fileID: 1041864588}
 --- !u!114 &1322231487
@@ -9107,7 +9080,6 @@ RectTransform:
   - {fileID: 513042677}
   - {fileID: 2037130038}
   - {fileID: 146823825}
-  - {fileID: 605467988}
   - {fileID: 485463285}
   - {fileID: 1270921460}
   m_Father: {fileID: 0}
@@ -9570,7 +9542,7 @@ GameObject:
   - component: {fileID: 1673045478}
   - component: {fileID: 1673045477}
   m_Layer: 5
-  m_Name: Stage2Button
+  m_Name: Stage2-1Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9613,12 +9585,15 @@ MonoBehaviour:
   stageButton: {fileID: 1673045478}
   stageBattleConfig:
     poolName: Forest
-    maxEnemiesToSpawn: 2
-    stageID: 2
+    maxEnemiesToSpawn: 1
+    stage: {fileID: 1673045477}
   battleSceneName: SampleBattleScene
   isUnlocked: 0
   isFirstCompletion: 1
-  connectedStages: []
+  stageID: 2
+  connectedStages:
+  - {fileID: 216808354}
+  - {fileID: 1725917475}
 --- !u!114 &1673045478
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10241,11 +10216,12 @@ MonoBehaviour:
   stageButton: {fileID: 1725917471}
   stageBattleConfig:
     poolName: Forest
-    maxEnemiesToSpawn: 3
-    stageID: 1
+    maxEnemiesToSpawn: 1
+    stage: {fileID: 1725917475}
   battleSceneName: SampleBattleScene
   isUnlocked: 1
   isFirstCompletion: 1
+  stageID: 1
   connectedStages:
   - {fileID: 1673045477}
   - {fileID: 1322231486}

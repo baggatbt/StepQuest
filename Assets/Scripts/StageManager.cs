@@ -4,30 +4,33 @@ using UnityEngine;
 
 public class StageManager : MonoBehaviour
 {
-    public List<Stage> stages;
-    
+
+    public List<Stage> allStages;
+
     private void Start()
     {
-        UnlockNextStage(GameManager.Instance.currentStageID);
-    }
-    
-    private void Update()
-    {
-        UnlockNextStage(GameManager.Instance.currentStageID);
+        InitializeStages();
     }
 
-    public void UnlockNextStage(int completedStageID)
+   private void InitializeStages()
+{
+    if (GameManager.Instance.UnlockedStageNames.Count == 0 && allStages.Count > 0)
     {
-        Stage completedStage = stages[completedStageID];
-        foreach (Stage connectedStage in completedStage.connectedStages)
-        {
-            if (!connectedStage.isUnlocked)
-            {
-                connectedStage.isUnlocked = true;
-                connectedStage.UpdateButtonColor();
-            }
-        }
+        // Assuming the first stage is always at index 0
+        Stage firstStage = allStages[0];
+        firstStage.isUnlocked = true;
+        GameManager.Instance.UnlockedStageNames.Add(firstStage.stageID);
+        firstStage.UpdateButtonColor();
     }
+
+    // Continue initializing other stages
+    foreach (Stage stage in allStages)
+    {
+        stage.isUnlocked = GameManager.Instance.UnlockedStageNames.Contains(stage.stageID);
+        stage.UpdateButtonColor();
+    }
+}
+
    
 
     // Additional methods as needed for managing stages
