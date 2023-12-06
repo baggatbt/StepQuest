@@ -92,7 +92,7 @@ public abstract class Skill
             damageMultiplier = 0.5f;  // Reduce damage by 50%
           //  user.animator.SetTrigger(trigger);
             target.TakeDamage((int)(user.damage * damageMultiplier),user); // Apply damage multiplier
-          //  user.GainEnergy(1);
+            user.GainEnergy(1);
             target.animator.SetTrigger("BlockTrigger");      
             AudioManager.instance.PlayBlockSound();
             break;
@@ -101,14 +101,14 @@ public abstract class Skill
             damageMultiplier = 0.75f;  // Reduce damage by 25%
            // user.animator.SetTrigger(trigger);            
             target.TakeDamage((int)(user.damage * damageMultiplier),user); // Apply damage multiplier
-           // user.GainEnergy(1);
+            user.GainEnergy(1);
             target.animator.SetTrigger("BlockTrigger");
             AudioManager.instance.PlayBlockSound();     
             break;
         case TimingEventResult.Miss:
           //  user.animator.SetTrigger(trigger);
             target.TakeDamage(user.damage, user); // Full damage as there's no reduction 
-            //user.GainEnergy(1);
+            user.GainEnergy(1);
             target.animator.SetTrigger("IsHurtTrigger");       
             break;
     }
