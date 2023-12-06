@@ -3,6 +3,7 @@ using System;
 using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Linq;
 
 using UnityEngine.UI;
 using TMPro;
@@ -84,13 +85,11 @@ public class BattleManager : MonoBehaviour
             switch (state)
             {
                 case BattleState.PlayerTurn:
-                    activePlayer = player;
                     Debug.Log("Player Turn Started!");
                     Debug.Log("Active player from Player1" + activePlayer);
                     break;
                 case BattleState.EnemyTurn:
                     Debug.Log("Enemy Turn Started!");
-                    StartEnemyTurn();
                     break;
             }
         }
@@ -106,8 +105,7 @@ public class BattleManager : MonoBehaviour
    private void Start()
 {
     
-    State = BattleState.PlayerTurn;
-    activePlayer = player;
+    
     Debug.Log("Active player from Player1 in start method"  + activePlayer);
     outerCircleInitialScale = outerCircle.transform.localScale;
     innerCircleInitialScale = innerCircle.transform.localScale;
@@ -174,7 +172,8 @@ public class BattleManager : MonoBehaviour
             }
         }
        // if (player.speed >= companion.speed)
-            State = BattleState.PlayerTurn;
+          //  State = BattleState.PlayerTurn;
+          InitializeTurnOrder();
         
         
         
@@ -197,10 +196,7 @@ public class BattleManager : MonoBehaviour
     }
 
 
-    private void StartEnemyTurn()
-{
-    EnemyAttack();
-}
+   
 
 
     private void ChangeState(BattleState newState)
@@ -211,6 +207,75 @@ public class BattleManager : MonoBehaviour
             EnableAllButtons();
         }
     }
+
+    private List<Character> turnOrderList = new List<Character>();
+    public void InitializeTurnOrder()
+    {
+            // Clear the previous turn order list
+        turnOrderList.Clear();
+
+        // Add player and companion to the turn order list if they are not null
+        if (player != null) turnOrderList.Add(player);
+        if (companion != null) turnOrderList.Add(companion);
+
+        // Add all enemies to the turn order list
+        turnOrderList.AddRange(enemies);
+
+            // Sort the list by speed in descending order (highest speed first)
+        turnOrderList = turnOrderList.OrderByDescending(character => character.speed).ToList();
+
+        StartTurn();
+
+    }
+
+    public void StartTurn()
+{
+    if (turnOrderList.Count > 0)
+    {
+        var nextCharacter = turnOrderList[0];
+        ExecuteTurn(nextCharacter);
+    }
+    else
+    {
+        InitializeTurnOrder();
+    }
+}
+
+private void ExecuteTurn(Character character)
+{
+    if (character == player || character == companion)
+    {
+        activePlayer = character;
+        ChangeState(BattleState.PlayerTurn);
+    }
+    else // Assuming the character is an enemy
+    {
+        ChangeState(BattleState.EnemyTurn);
+        EnemyAttack(character); // Pass the current enemy character
+    }
+}
+
+
+public void EndTurn()
+{
+    turnOrderList.RemoveAt(0); // Remove the character from the list after their turn
+    Debug.Log("ENDING THE TURN");
+    if (turnOrderList.Count == 0)
+    {
+        InitializeTurnOrder();
+    }
+    else
+    {
+        StartTurn(); // Proceed to the next character's turn
+    }
+}
+
+// This method should be called when the player has finished their turn
+
+
+
+
+    
 
     public void DisableAllButtons()
     {
@@ -258,6 +323,7 @@ public class BattleManager : MonoBehaviour
         {
         Debug.Log("No target selected");
         }
+
     }
 
     
@@ -291,8 +357,9 @@ public class BattleManager : MonoBehaviour
         yield return StartCoroutine(zoomEffect.ZoomOutEffect());
         yield return activePlayer.ReturnToPosition();
         yield return new WaitUntil(() => activePlayer.isMoving == false);
+        EndTurn();
 
-        ChangeState(BattleState.EnemyTurn);
+        
       
       
         }
@@ -360,82 +427,56 @@ public class BattleManager : MonoBehaviour
     }
 
     private Queue<Character> enemyTurnQueue = new Queue<Character>();
-
+    public Character attackingEnemy;
     
-    public void EnemyAttack()
+    public void EnemyAttack(Character currentEnemy)
+{
+    // Ensure that we are in the enemy turn and attackingEnemy is set
+    if (state != BattleState.EnemyTurn || currentEnemy == null)
     {
-        // If the queue is empty (or at the start of the enemy turn phase), populate it.
-        if (enemyTurnQueue.Count == 0)
-        {
-            foreach (var enemy in enemies)
-            {
-                
-                if (enemy.health > 0) // Assuming you have some isDead flag on enemies
-                    enemyTurnQueue.Enqueue(enemy);
-            }
-        }
-
-        // If all enemies had their turns, it's the player's turn next.
-        if (enemyTurnQueue.Count == 0)
-        {
-            statusEffectController.ProcessEffects();
-            ChangeState(BattleState.PlayerTurn);
-            return;
-        }
-
-        Character attackingEnemy = enemyTurnQueue.Dequeue();
-        //Decide whether or not to use the special attack or the normal one
-        if (!activePlayer.isAttacking && !attackingEnemy.isAttacking && state == BattleState.EnemyTurn)
-        {
-            if (attackingEnemy.energy >= attackingEnemy.maxEnergy)
-            {
-                attackingEnemy.currentSkill = attackingEnemy.specialSkill;
-            }
-            else 
-            {
-            attackingEnemy.currentSkill = attackingEnemy.normalSkill;
-            }
-
-            // This sets the enemies target for the turn, need to build out
-            //Each enemy can have a preference if needed in their own class
-            //For now it will just randomize between the player and companion
-            // Use UnityEngine.Random.Range to get a 50/50 chance
-            //UnityEngine.Random.Range(min, max) returns either 0 or 1
-            foreach (var enemy in enemies)
-            {
-                
-            attackingEnemy.attackTarget = player.transform; //UnityEngine.Random.Range(0, 2) == 0 ? companion.transform : player.transform;
-            }
-            
-            StartCoroutine(EnemyAttackCoroutine(attackingEnemy));
-            
-        }
+        Debug.LogError("It's not an enemy's turn or attackingEnemy is null");
+        return;
     }
 
+    // Decide whether or not to use the special attack or the normal one
+    if (!currentEnemy.isAttacking)
+    {
+        currentEnemy.currentSkill = (currentEnemy.energy >= currentEnemy.maxEnergy) ? 
+            currentEnemy.specialSkill : currentEnemy.normalSkill;
+
+        // Set the target for the attacking enemy
+        currentEnemy.attackTarget = player.transform; //UnityEngine.Random.Range(0, 2) == 0 ? companion.transform : player.transform;
+
+        // Start the enemy attack coroutine
+        StartCoroutine(EnemyAttackCoroutine(currentEnemy));
+    }
+}
+
+
     
 
-    public IEnumerator EnemyAttackCoroutine(Character attackingEnemy)
+    public IEnumerator EnemyAttackCoroutine(Character currentEnemy)
     {
         yield return new WaitUntil(() => activePlayer.isAttacking == false);
         yield return new WaitForSeconds(1.0f); //Ensures player animation is all done
         
 
-        if (attackingEnemy.currentSkill != null)
+        if (currentEnemy.currentSkill != null)
         {
-            if (attackingEnemy.currentSkill.requiresMovement)
+            if (currentEnemy.currentSkill.requiresMovement)
             {
-                yield return attackingEnemy.MoveToTarget();
+                yield return currentEnemy.MoveToTarget();
             }
 
             
-            Character targetCharacter = attackingEnemy.attackTarget.GetComponent<Character>();
-            yield return attackingEnemy.currentSkill.Execute(attackingEnemy, targetCharacter, this);
+            Character targetCharacter = currentEnemy.attackTarget.GetComponent<Character>();
+            yield return currentEnemy.currentSkill.Execute(currentEnemy, targetCharacter, this);
 
 
            
-            if (attackingEnemy.currentSkill.requiresMovement)
+            if (currentEnemy.currentSkill.requiresMovement)
             {
-                yield return attackingEnemy.ReturnToPosition();
+                yield return currentEnemy.ReturnToPosition();
             }
            // Debug.Log("Enemy reurning to position");
         }
@@ -446,30 +487,11 @@ public class BattleManager : MonoBehaviour
         }
 
         
-        if (player.health <= 0)
-        {
-            Debug.Log("You lose ya jabroni");
-            CheckBattleEnd();
-            
-        }
-        else
-        {
-           // yield return new WaitForSeconds(0.5f);
-
-           // Check if there are more enemies to take their turns
-        if (enemyTurnQueue.Count > 0)
-        {
-            EnemyAttack();  // Next enemy's turn
-        }
-        else
-        {
-            
-            
-            ChangeState(BattleState.PlayerTurn);  // If all enemies had their turns, it's the player's turn next.
-         }
+          
+        EndTurn();
         CheckBattleEnd();
-        }
     }
+    
     
    
    public CameraShake cameraShake;
