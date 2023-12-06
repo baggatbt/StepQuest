@@ -96,7 +96,7 @@ public void PopulateSkillPanelWithPlayerSkills()
 
 private void OnSkillButtonHold(Skill skill)
 {
-    new WaitForSeconds(1.0f);
+    new WaitForSeconds(2.0f);
     skillDescriptionText.text = skill.description;
     skillDescriptionPanel.SetActive(true);
 }

@@ -4,17 +4,20 @@ using UnityEngine;
 
 public class Wizard : Companion
 {
-    protected override void Start()
+    protected override void Awake()
     {
+        base.Awake();
         this.level = 1;
         this.attackPower = 3;
         this.maxHealth = 8;
         this.health = this.maxHealth;
         this.defensePower = 0;
-        this.speed = 2;
+        this.speed = 6;
         this.maxEnergy = 10;
         this.energy = this.maxEnergy;
+        
     }
+    
 
     public override List<SkillType> AvailableSkills => new List<SkillType>
     {

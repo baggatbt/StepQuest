@@ -70,7 +70,7 @@ public class Player : Character
             playerData.maxEnergy = 10;
             playerData.energy = maxEnergy;
             playerData.teamEnergy = 0; //Set to zero to mimic the new system of just a shared AP bar.
-            playerData.speed = 3;
+            playerData.speed = 10;
             
 
             PlayerPrefs.SetInt("PlayerInitialized", 1);
@@ -101,6 +101,7 @@ public class Player : Character
     exp = playerData.exp;
     jobClass = playerData.jobClass;
     inGameSteps = playerData.inGameSteps;
+    speed = playerData.speed;
     
     
     

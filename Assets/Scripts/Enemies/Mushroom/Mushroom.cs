@@ -15,6 +15,7 @@ public class Mushroom : Enemy
         this.maxHealth = 12;
         this.health = this.maxHealth;
         this.maxEnergy = 3;
+        this.speed = 5;
         
     }
      protected override void Start()
@@ -31,7 +32,6 @@ public class Mushroom : Enemy
         this.attacksBeforeSpecial = 3;
         this.damage = 2;
         this.defensePower = 0; 
-        this.speed = 4;
         this.energy = 0;
 
         // Assign the skills
