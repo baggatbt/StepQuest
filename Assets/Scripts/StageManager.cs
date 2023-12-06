@@ -10,17 +10,22 @@ public class StageManager : MonoBehaviour
     {
         UnlockNextStage(GameManager.Instance.currentStageID);
     }
-   
+    
+    private void Update()
+    {
+        UnlockNextStage(GameManager.Instance.currentStageID);
+    }
 
     public void UnlockNextStage(int completedStageID)
     {
-        int stagesUnlocked = 0;
-        int stagesComplete = completedStageID;
-        if (stagesComplete > stagesUnlocked)
+        Stage completedStage = stages[completedStageID];
+        foreach (Stage connectedStage in completedStage.connectedStages)
         {
-            stages[stagesComplete].isUnlocked = true;
-            stages[stagesComplete].UpdateButtonColor(); 
-            
+            if (!connectedStage.isUnlocked)
+            {
+                connectedStage.isUnlocked = true;
+                connectedStage.UpdateButtonColor();
+            }
         }
     }
    

@@ -13,8 +13,7 @@ public class Stage : MonoBehaviour
     public string battleSceneName = "BattleScene"; 
     public bool isUnlocked;
     public bool isFirstCompletion;
-
-
+    public List<Stage> connectedStages; // Stages that get unlocked after completing this one
 
     private void Start()
     {
@@ -22,6 +21,7 @@ public class Stage : MonoBehaviour
         UpdateButtonColor();
     }
 
+    
     public void UpdateButtonColor()
     {
         if (isUnlocked)

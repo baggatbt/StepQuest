@@ -8,7 +8,7 @@ public class Slash : Skill
     public Slash()
     {
         skillName = "Slash";
-        description = "A slash that deals damage equal to the user's attack power.";
+        description = "A slash that deals " + PlayerData.Instance.attackPower + " damage.";
         energyCost = 0; 
         energyGain = 1;
         skillLevel = 1; 

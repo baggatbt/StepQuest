@@ -8,7 +8,7 @@ public class TripleHitSkill : Skill
     public TripleHitSkill()
     {
         skillName = "Triple Slash";
-        description = "Slash three times";
+        description = "Slash three times for " +(int)(PlayerData.Instance.attackPower * 0.8f) + " damage each hit.";
         requiresMovement = true;
         energyCost = 3;
         numberOfAttacksPossible = 3;
@@ -17,7 +17,7 @@ public class TripleHitSkill : Skill
     // Override the default base damage calculation.
     protected override int CalculateBaseDamage(Character user)
     {
-        return (int)(user.attackPower * 0.5f);  // 50% of the character's attack.
+        return (int)(user.attackPower * 0.8f);  // 80% of the character's attack.
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
