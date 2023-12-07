@@ -18,14 +18,14 @@ public class Knight : PlayerJob
     {
         SkillType.Slash,
         SkillType.TripleHit,
-        SkillType.ShieldSlam,
-        SkillType.SwordWave
+       
         
     };
 
     public override List<SkillType> LockedSkills => new List<SkillType>
     {
-        
+        SkillType.ShieldSlam,
+        SkillType.SwordWave
     };
 
     public override Skill GetSkillInstance(SkillType skillType)
