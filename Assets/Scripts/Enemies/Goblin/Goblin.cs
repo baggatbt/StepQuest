@@ -15,6 +15,7 @@ public class Goblin : Enemy
         this.health = this.maxHealth;
         this.maxEnergy = 1;
         this.speed = 9;
+        //this.damageReductionModifier =  0.85f; // Reduces the incoming damage by 15%
         
     }
      protected override void Start()
@@ -39,8 +40,8 @@ public class Goblin : Enemy
 
         // Set the default currentSkill
         this.currentSkill = this.normalSkill;
-
-        
     }
+
+   
 }
 
