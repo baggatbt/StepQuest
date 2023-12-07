@@ -4,13 +4,34 @@ using UnityEngine;
 
 public class Knight : PlayerJob
 {
+    private const int AttackPowerLevel69 = 604; // Attack power at level 69
+    private const int LevelTransition = 70; // Level where growth rate changes with the goal of 1000 atk by max level.
+
     private int playerLevel => PlayerData.Instance.level;
 
-    public override int BaseAtk => 10; 
-    public override int BaseDef => 1; 
-    public override int BaseMagAtk => 2; 
-    public override int BaseMagDef => 2; 
-    public override int BaseHealth => 10; 
+    public override int BaseAtk => CalculateAttackPower(playerLevel);
+    public override int BaseDef => 1;
+    public override int BaseMagAtk => 2;
+    public override int BaseMagDef => 2;
+    public override int BaseHealth => 10;
+
+    // Other methods and properties...
+
+    private int CalculateAttackPower(int level)
+    {
+        if (level < LevelTransition)
+        {
+            // Calculation for levels 1-69
+            return 10 + (int)(4.5f * (level - 1));
+        }
+        else
+        {
+            // Calculation for levels 70-100
+            return AttackPowerLevel69 + (int)(6.7f * (level - LevelTransition));
+        }
+       //At Level 69: The attack power would be approximately 316.
+       //At Level 100: The attack power would be approximately 523.7.
+    }
     
    
 
