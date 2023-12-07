@@ -14,7 +14,7 @@ public class Slash : Skill
         skillLevel = 1; 
         requiresMovement = true; 
         skillExecutionComplete = false;
-        numberOfAttacks = 2;
+        numberOfAttacks = 1;
         
     }
 
