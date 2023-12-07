@@ -6,7 +6,7 @@ public class Knight : PlayerJob
 {
     private int playerLevel => PlayerData.Instance.level;
 
-    public override int BaseAtk => 3; 
+    public override int BaseAtk => 10; 
     public override int BaseDef => 1; 
     public override int BaseMagAtk => 2; 
     public override int BaseMagDef => 2; 
