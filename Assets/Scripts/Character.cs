@@ -16,6 +16,7 @@ public class Character : MonoBehaviour
     public int teamEnergy;
     public int attackPower;
     public int defensePower;
+    public float enemyDamageReductionModifier;
     public int speed;
     public Slider healthBar;
     public Slider energyBar;
@@ -124,6 +125,50 @@ public class Character : MonoBehaviour
     
 
     public CameraShake cameraShake; // Reference to the CameraShake script
+
+    public void EnemyTakeDamage(int damageOfAttacker, Character attacker, float enemyDamageReductionModifier)
+    {
+        float damageReduction = (int)((damageOfAttacker * enemyDamageReductionModifier));
+        int damageDealt = (int)((damageOfAttacker - damageReduction));
+        Debug.Log("Dealt " + damageDealt + " damage!");
+
+        Debug.Log("Damage reduced by Defense: " + (damageOfAttacker - damageDealt));
+
+    health -= damageDealt;
+    healthBar.value = health;
+
+    // Update the health text.
+    if (healthText != null)
+    {
+        healthText.text = "HP: " + health;
+    }
+    
+    if (damageDealt > 0)
+    { 
+       // IsHit();
+       // Damage popup
+    GameObject damagePopupPrefab = Resources.Load<GameObject>("PreFab/DamagePopup");
+
+    // Find the EndOfBattleRewards GameObject in the scene
+    Transform endOfBattleRewardsTransform = GameObject.Find("EndOfBattleRewardsCanvas").transform;
+
+    if(damagePopupPrefab != null)
+    {
+        // Instantiate the damage popup as a child of the EndOfBattleRewards GameObject
+        GameObject damagePopupInstance = Instantiate(damagePopupPrefab, transform.position, Quaternion.identity, endOfBattleRewardsTransform);
+
+        DamagePopup damagePopupScript = damagePopupInstance.GetComponent<DamagePopup>();
+        damagePopupScript.Setup(damageDealt);
+        
+        
+    }
+    else
+    {
+        Debug.LogError("Failed to load DamagePopup prefab.");
+    }
+    }
+    Debug.Log("isAttadcking = " +attacker.isAttacking);
+    }
 
     public void TakeDamage(int damageOfAttacker, Character attacker)
 {

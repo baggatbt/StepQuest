@@ -204,11 +204,13 @@ public class BattleManager : MonoBehaviour
         State = newState;
         if (State == BattleState.PlayerTurn)
         {
+
+            
             EnableAllButtons();
         }
     }
 
-    private List<Character> turnOrderList = new List<Character>();
+    public List<Character> turnOrderList = new List<Character>();
     public void InitializeTurnOrder()
     {
             // Clear the previous turn order list
@@ -233,7 +235,15 @@ public class BattleManager : MonoBehaviour
     if (turnOrderList.Count > 0)
     {
         var nextCharacter = turnOrderList[0];
+        if (nextCharacter.health <= 0) //check to make sure the character is still alive.
+        {
+            turnOrderList.Remove(nextCharacter);
+            ExecuteTurn(turnOrderList[1]);
+        }
+    else
+    {
         ExecuteTurn(nextCharacter);
+    }
     }
     else
     {

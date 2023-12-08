@@ -128,7 +128,8 @@ public abstract class Skill
             Debug.Log("Perfect Hit!");
             damageMultiplier = 1.5f;  // Boost damage by 50%
            // user.animator.SetTrigger(trigger);
-            target.TakeDamage((int)(baseDamage * damageMultiplier),user); // Apply damage boost
+            //target.TakeDamage((int)(baseDamage * damageMultiplier),user); // Apply damage boost
+           target.EnemyTakeDamage((int)(baseDamage * damageMultiplier),user, target.enemyDamageReductionModifier);
             target.animator.SetTrigger("IsHurtTrigger");
             AudioManager.instance.PlayCriticalSlashSound();
             //user.GainEnergy(energyGain); //Perfect hits give +1 energy
@@ -139,7 +140,8 @@ public abstract class Skill
            // user.animator.SetTrigger(trigger);         
             target.animator.SetTrigger("IsHurtTrigger");   
             Debug.Log("Damage before boost: " + ((int)(baseDamage), user) );
-            target.TakeDamage((int)(baseDamage * damageMultiplier), user); // Apply damage boost
+            target.EnemyTakeDamage((int)(baseDamage * damageMultiplier),user, target.enemyDamageReductionModifier);
+           // target.TakeDamage((int)(baseDamage * damageMultiplier), user); // Apply damage boost
             Debug.Log("Damage after boost: " + ((int)(baseDamage * damageMultiplier), user) );
            // user.GainEnergy(energyGain);
             break;
@@ -147,7 +149,8 @@ public abstract class Skill
             Debug.Log("Missed!");
            // user.animator.SetTrigger(trigger); 
             target.animator.SetTrigger("IsHurtTrigger");
-            target.TakeDamage(baseDamage, user); // No damage boost
+             target.EnemyTakeDamage((int)(baseDamage * damageMultiplier),user, target.enemyDamageReductionModifier);
+            //target.TakeDamage(baseDamage, user); // No damage boost
             AudioManager.instance.PlaySlashSound();
             break;
     }

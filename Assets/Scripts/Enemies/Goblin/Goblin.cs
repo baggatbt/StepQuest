@@ -15,7 +15,7 @@ public class Goblin : Enemy
         this.health = this.maxHealth;
         this.maxEnergy = 1;
         this.speed = 9;
-        //this.damageReductionModifier =  0.85f; // Reduces the incoming damage by 15%
+        this.enemyDamageReductionModifier =  0.15f; // Reduces the incoming damage by 15%
         
     }
      protected override void Start()
