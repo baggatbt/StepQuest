@@ -238,7 +238,7 @@ public class BattleManager : MonoBehaviour
         if (nextCharacter.health <= 0) //check to make sure the character is still alive.
         {
             turnOrderList.Remove(nextCharacter);
-            ExecuteTurn(turnOrderList[1]);
+            ExecuteTurn(turnOrderList[0]);
         }
     else
     {
@@ -296,7 +296,7 @@ public void EndTurn()
         }
         launchAttacksButton.interactable = false;
         */
-        enemyUIPanel.SetActive(false);
+      //  enemyUIPanel.SetActive(false);
     }
    public GameObject enemyUIPanel;
     public void EnableAllButtons()
@@ -307,7 +307,7 @@ public void EndTurn()
         }
         launchAttacksButton.interactable = true;
         */
-        enemyUIPanel.SetActive(true);
+        //enemyUIPanel.SetActive(true);
     }
 
     public void MoveCursorToTarget()
@@ -364,7 +364,7 @@ public void EndTurn()
         
         
         // Move player back to their original position after all skills executed.
-        yield return StartCoroutine(zoomEffect.ZoomOutEffect());
+        StartCoroutine(zoomEffect.ZoomOutEffect());
         yield return activePlayer.ReturnToPosition();
         yield return new WaitUntil(() => activePlayer.isMoving == false);
         EndTurn();
@@ -388,12 +388,12 @@ public void EndTurn()
         {
         //  Debug.Log("PlayerAction() being called");
 
-            // Start zoom effect
-            StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position)); 
+             
             activePlayerIndicator.SetActive(false);
             if (activePlayer.currentSkill.requiresMovement && skillsExecuted == 0)
             {
                 yield return StartCoroutine(PlayerMoveAndAttackCoroutine());
+                
             }
             else
             {
@@ -405,6 +405,8 @@ public void EndTurn()
 
     public IEnumerator PlayerMoveAndAttackCoroutine()
     {
+        // Start zoom effect
+            StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position));
         // Only move if the player is not already at the target
         if (activePlayer.transform.position != currentTarget.transform.position)
         {

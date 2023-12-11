@@ -20,7 +20,8 @@ public enum SkillType
         GuardSkill,
         ShieldSlam,
         SlimeCompanionBasicAttack,
-        WizardBasicAttack
+        WizardBasicAttack,
+        FirePillar,
     }
 
 

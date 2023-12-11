@@ -22,6 +22,7 @@ public class Wizard : Companion
     public override List<SkillType> AvailableSkills => new List<SkillType>
     {
         SkillType.WizardBasicAttack,
+        SkillType.FirePillar,
         // ... other skills ...
     };
 
@@ -36,8 +37,11 @@ public class Wizard : Companion
         {
             case SkillType.WizardBasicAttack:
                 return new WizardBasicAttack();
-            // ... other cases ...
-
+            // ... other cases ..
+            
+            case SkillType.FirePillar:
+                return new FirePillar();
+          
             default:
                 Debug.LogError("Unknown skill type for Wizard: " + skillType);
                 return null;
