@@ -33,7 +33,10 @@ public class FirePillar : Skill
         {
             
             Vector3 spawnPosition = target.transform.position;
-            GameObject firePillar = UnityEngine.Object.Instantiate(firePillarPreFab, spawnPosition, Quaternion.identity);
+            Vector3 offsetPosition = new Vector3(spawnPosition.x, spawnPosition.y + 2, spawnPosition.z);
+            GameObject firePillar = UnityEngine.Object.Instantiate(firePillarPreFab, offsetPosition, Quaternion.identity);
+
+           
 
             HandleTimingResultForPlayerAttack(user, target, result, baseDamage);
           
