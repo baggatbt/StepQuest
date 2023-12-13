@@ -36,7 +36,7 @@ public class EnemySpawnController : MonoBehaviour
         healthTexts = new TextMeshProUGUI[] { healthText, healthText2, healthText3 };
     }
 
-    public Character SpawnEnemiesFromPool(string poolName, int numberToSpawn, Transform spawnPoint, Slider associatedHealthBarSlider, Slider associatedEnergyBarSlider)
+    public Character SpawnEnemiesFromPool(string poolName, int numberToSpawn, Transform spawnPoint, Slider associatedHealthBarSlider, Slider associatedEnergyBarSlider, int healthTextIndex)
     {
         if (!poolDictionary.ContainsKey(poolName))
         {
@@ -50,7 +50,7 @@ public class EnemySpawnController : MonoBehaviour
             GameObject enemyToSpawn = poolDictionary[poolName][Random.Range(0, poolDictionary[poolName].Count)];
             float yOffset = 0.4f; // This is the offset value by which you want to spawn the object above the Y value of the spawnPoint
             GameObject spawnedEnemy = Instantiate(enemyToSpawn, new Vector3(spawnPoint.position.x, spawnPoint.position.y + yOffset, spawnPoint.position.z), spawnPoint.rotation);
-
+            Debug.Log(spawnedEnemy);
             
             lastSpawnedCharacter = spawnedEnemy.GetComponent<Character>();
             if (lastSpawnedCharacter == null) continue;
@@ -58,12 +58,12 @@ public class EnemySpawnController : MonoBehaviour
             lastSpawnedCharacter.healthBar = associatedHealthBarSlider;
             lastSpawnedCharacter.energyBar = associatedEnergyBarSlider;
 
-            // Assign the healthText based on the enemiesSpawned count
-            lastSpawnedCharacter.healthText = healthTexts[enemiesSpawned];
+           
+             lastSpawnedCharacter.healthText = healthTexts[healthTextIndex];
             enemiesSpawned++;  // Increment the spawn count
 
             lastSpawnedCharacter.healthText.text =  lastSpawnedCharacter.health + " / " + lastSpawnedCharacter.maxHealth;
-
+            Debug.Log(lastSpawnedCharacter + " " + lastSpawnedCharacter.healthText.text);
             associatedHealthBarSlider.gameObject.SetActive(true);
             associatedHealthBarSlider.maxValue = lastSpawnedCharacter.maxHealth;
             associatedHealthBarSlider.value = lastSpawnedCharacter.health;

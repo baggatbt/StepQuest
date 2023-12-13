@@ -51,33 +51,29 @@ public class Character : MonoBehaviour
     protected virtual void Awake()
     {
         animator = GetComponent<Animator>();
-        health = maxHealth; 
         originalPosition = transform.position;
         statusEffectController = GetComponent<StatusEffectController>();
         this.hasNotGone = true;
-        Debug.Log(gameObject.name + " original position: " + originalPosition);
-        if (healthText != null)
-    {
-        healthText.text = "HP: " + health;
-        Debug.Log(health);
-    }
-    else 
-    {
-        Debug.Log("Healtexh is null");
-    }
-        
     }
 
     void Update(){
+        
         if (this.healthBar != null)
         {
+            
             this.healthBar.maxValue = maxHealth;
             this.healthBar.value = health;
             if (this.healthText != null )
             {
+                Debug.Log(this.healthText.text + " was not null");
                 this.healthText.text =  this.health + " / " + maxHealth;
                 
             }
+        }
+        if (this.energyBar != null)
+        {
+            energyBar.maxValue = maxEnergy;
+            energyBar.value = this.energy;
             if (this.energyText != null)
             {
                 
@@ -86,13 +82,6 @@ public class Character : MonoBehaviour
                 
                 
             }
-        }
-        if (energyBar != null)
-        {
-            
-            
-            energyBar.maxValue = maxEnergy;
-            energyBar.value = this.energy;
         }
         
 
@@ -108,7 +97,7 @@ public class Character : MonoBehaviour
             healthBar.value = health;
             if (healthText !=null && energyText !=null)
             {
-                healthText.text = "HP: " + health; 
+               this.healthText.text = this.health + " / " + this.maxHealth;
                 energyText.text = this.energy  + " / " + maxEnergy;
             }
         }
@@ -138,9 +127,9 @@ public class Character : MonoBehaviour
     healthBar.value = health;
 
     // Update the health text.
-    if (healthText != null)
+    if (this.healthText != null)
     {
-        healthText.text = "HP: " + health;
+        this.healthText.text =  this.health + " / " + this.maxHealth;
     }
     
     if (damageDealt > 0)
@@ -167,7 +156,7 @@ public class Character : MonoBehaviour
         Debug.LogError("Failed to load DamagePopup prefab.");
     }
     }
-    Debug.Log("isAttadcking = " +attacker.isAttacking);
+    Debug.Log("isAttacking = " +attacker.isAttacking);
     }
 
     public void TakeDamage(int damageOfAttacker, Character attacker)
@@ -185,10 +174,11 @@ public class Character : MonoBehaviour
     health -= damageDealt;
     healthBar.value = health;
 
+    
     // Update the health text.
-    if (healthText != null)
+    if (this.healthText != null)
     {
-        healthText.text = "HP: " + health;
+        this.healthText.text =  this.health + " / " + this.maxHealth;
     }
     
     if (damageDealt > 0)

@@ -156,29 +156,27 @@ public class BattleManager : MonoBehaviour
     
 
      public void StartBattle(BattleConfig config)
+{
+    endOfBattlePanel.SetActive(false);
+    for (int i = 0; i < config.maxEnemiesToSpawn; i++)
     {
-        // Use config.poolName and config.maxEnemiesToSpawn to set up battle
-        // use the enemySpawnController to spawn the desired enemy type and number
-        endOfBattlePanel.SetActive(false);
-        for (int i = 0; i < config.maxEnemiesToSpawn; i++)
-        {
-            // Spawn enemies based on the config.poolName
-            Character spawnedEnemy = enemySpawnController.SpawnEnemiesFromPool(config.poolName, 1, enemySpawnPoints[i], healthBars[i], energyBars[i]);
+        Character spawnedEnemy = enemySpawnController.SpawnEnemiesFromPool(
+            config.poolName,
+            1, // Spawn one enemy
+            enemySpawnPoints[i], // Pass the spawn point
+            healthBars[i], // Pass the health bar slider
+            energyBars[i], // Pass the energy bar slider
+            i // Pass the index for health text assignment
+        );
 
-            // Add spawned enemy to the list
-            if (spawnedEnemy != null)
-            {
-                enemies.Add(spawnedEnemy);
-            }
+        if (spawnedEnemy != null)
+        {
+            enemies.Add(spawnedEnemy);
         }
-       // if (player.speed >= companion.speed)
-          //  State = BattleState.PlayerTurn;
-          InitializeTurnOrder();
-        
-        
-        
-        // TODO: Continue with any other setup like setting backgrounds, play music, etc.
     }
+    InitializeTurnOrder();
+}
+
 
     public void NextBattle()
     {

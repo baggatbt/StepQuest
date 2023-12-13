@@ -10,7 +10,6 @@ public class Mushroom : Enemy
     protected override void Awake()
     {
         base.Awake();
-        PreferredAttackPosition = BattlePosition.Front;
         this.level = 1;
         this.maxHealth = 12;
         this.health = this.maxHealth;

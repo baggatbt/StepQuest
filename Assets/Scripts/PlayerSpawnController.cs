@@ -43,6 +43,8 @@ public class PlayerSpawnController : MonoBehaviour
     associatedHealthBarSlider.maxValue = spawnedPlayer.maxHealth;
     associatedHealthBarSlider.value = spawnedPlayer.health;
     spawnedPlayer.healthText = associatedHealthText;
+
+    associatedHealthText.text = spawnedPlayer.health + " / " + spawnedPlayer.maxHealth;
     
 
     spawnedPlayer.energyBar = associatedEnergyBarSlider;
