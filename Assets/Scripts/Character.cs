@@ -10,7 +10,7 @@ public class Character : MonoBehaviour
     public int level;
     public int health;
     public int maxHealth;
-    public int damage; //This is for the slime, so the next time you forget and wonder, what is this for again? Thats what. Everyone else has converted to AP
+    
     public int energy;
     public int maxEnergy;
     public int teamEnergy;
@@ -162,12 +162,9 @@ public class Character : MonoBehaviour
     public void TakeDamage(int damageOfAttacker, Character attacker)
 {
     
-   // Define a constant that will be used to adjust the effectiveness of defense.
-    const float defenseEffectiveness = 50.0f; // This is a balancing factor.
-    
-    // Calculate damage reduction using a diminishing returns formula.
-    float damageReduction = this.defensePower / (this.defensePower + defenseEffectiveness);
-    int damageDealt = (int)(damageOfAttacker * (1 - damageReduction));
+    // Calculate damage reduction 
+    float damageReduction = (damageOfAttacker - this.defensePower );
+    int damageDealt = (int)(damageOfAttacker - damageReduction);
     
     Debug.Log("Damage reduced by Defense: " + (damageOfAttacker - damageDealt));
 

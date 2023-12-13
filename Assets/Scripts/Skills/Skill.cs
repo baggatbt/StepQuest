@@ -92,8 +92,8 @@ public abstract class Skill
             Debug.Log("Perfect Block!");
             damageMultiplier = 0.5f;  // Reduce damage by 50%
           //  user.animator.SetTrigger(trigger);
-            target.TakeDamage((int)(user.damage * damageMultiplier),user); // Apply damage multiplier
-          //  user.GainEnergy(1);
+            target.TakeDamage((int)(user.attackPower * damageMultiplier),user); // Apply damage multiplier
+           user.GainEnergy(1);
             target.animator.SetTrigger("BlockTrigger");      
             AudioManager.instance.PlayBlockSound();
             break;
@@ -101,15 +101,15 @@ public abstract class Skill
             Debug.Log("Good Block!");   
             damageMultiplier = 0.75f;  // Reduce damage by 25%
            // user.animator.SetTrigger(trigger);            
-            target.TakeDamage((int)(user.damage * damageMultiplier),user); // Apply damage multiplier
-           // user.GainEnergy(1);
+            target.TakeDamage((int)(user.attackPower * damageMultiplier),user); // Apply damage multiplier
+           user.GainEnergy(1);
             target.animator.SetTrigger("BlockTrigger");
             AudioManager.instance.PlayBlockSound();     
             break;
         case TimingEventResult.Miss:
           //  user.animator.SetTrigger(trigger);
-            target.TakeDamage(user.damage, user); // Full damage as there's no reduction 
-            //user.GainEnergy(1);
+            target.TakeDamage(user.attackPower, user); // Full damage as there's no reduction 
+            user.GainEnergy(1);
             target.animator.SetTrigger("IsHurtTrigger");       
             break;
     }
@@ -129,8 +129,8 @@ public abstract class Skill
             Debug.Log("Perfect Hit!");
             damageMultiplier = 1.5f;  // Boost damage by 50%
            // user.animator.SetTrigger(trigger);
-            //target.TakeDamage((int)(baseDamage * damageMultiplier),user); // Apply damage boost
-           target.EnemyTakeDamage((int)(baseDamage * damageMultiplier),user, target.enemyDamageReductionModifier);
+            target.TakeDamage((int)(baseDamage * damageMultiplier),user); // Apply damage boost
+           //target.EnemyTakeDamage((int)(baseDamage * damageMultiplier),user, target.enemyDamageReductionModifier);
             target.animator.SetTrigger("IsHurtTrigger");
             AudioManager.instance.PlayCriticalSlashSound();
             //user.GainEnergy(energyGain); //Perfect hits give +1 energy
@@ -141,8 +141,8 @@ public abstract class Skill
            // user.animator.SetTrigger(trigger);         
             target.animator.SetTrigger("IsHurtTrigger");   
             Debug.Log("Damage before boost: " + ((int)(baseDamage), user) );
-            target.EnemyTakeDamage((int)(baseDamage * damageMultiplier),user, target.enemyDamageReductionModifier);
-           // target.TakeDamage((int)(baseDamage * damageMultiplier), user); // Apply damage boost
+            //target.EnemyTakeDamage((int)(baseDamage * damageMultiplier),user, target.enemyDamageReductionModifier);
+            target.TakeDamage((int)(baseDamage * damageMultiplier), user); // Apply damage boost
             Debug.Log("Damage after boost: " + ((int)(baseDamage * damageMultiplier), user) );
            // user.GainEnergy(energyGain);
             break;
@@ -150,8 +150,8 @@ public abstract class Skill
             Debug.Log("Missed!");
            // user.animator.SetTrigger(trigger); 
             target.animator.SetTrigger("IsHurtTrigger");
-             target.EnemyTakeDamage((int)(baseDamage * damageMultiplier),user, target.enemyDamageReductionModifier);
-            //target.TakeDamage(baseDamage, user); // No damage boost
+            // target.EnemyTakeDamage((int)(baseDamage * damageMultiplier),user, target.enemyDamageReductionModifier);
+            target.TakeDamage(baseDamage, user); // No damage boost
             AudioManager.instance.PlaySlashSound();
             break;
     }

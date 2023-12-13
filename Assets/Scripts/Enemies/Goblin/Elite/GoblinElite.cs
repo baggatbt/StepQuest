@@ -30,7 +30,7 @@ public class GoblinElite : Enemy
         this.expReward = 20;  
         this.goldReward = 11;
         this.attacksBeforeSpecial = 2;
-        this.damage = 2;
+        this.attackPower = 2;
         this.defensePower = 0; 
         this.energy = 0;
 

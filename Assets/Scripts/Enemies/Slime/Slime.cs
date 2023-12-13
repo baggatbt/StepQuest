@@ -16,7 +16,7 @@ public class Slime : Enemy
         this.maxEnergy = 3;
         this.speed = 3;
         this.defensePower = 1;
-        this.damage = 2;
+        this.attackPower = 2;
         this.attacksBeforeSpecial = 2;
         
     }

@@ -9,30 +9,14 @@ public class Knight : PlayerJob
 
     private int playerLevel => PlayerData.Instance.level;
 
-    public override int BaseAtk => CalculateAttackPower(playerLevel);
-    public override int BaseDef => 1;
+    public override int BaseAtk => 5;
+    public override int BaseDef => 4;
     public override int BaseMagAtk => 2;
-    public override int BaseMagDef => 2;
-    public override int BaseHealth => 10;
+    public override int BaseMagDef => 3;
+    public override int BaseHealth => 20;
 
     // Other methods and properties...
 
-    private int CalculateAttackPower(int level)
-    {
-        if (level < LevelTransition)
-        {
-            // Calculation for levels 1-69
-            return 10 + (int)(4.5f * (level - 1));
-        }
-        else
-        {
-            // Calculation for levels 70-100
-            return AttackPowerLevel69 + (int)(6.7f * (level - LevelTransition));
-        }
-       //At Level 69: The attack power would be approximately 316.
-       //At Level 100: The attack power would be approximately 523.7.
-    }
-    
    
 
     public override List<SkillType> AvailableSkills => new List<SkillType>

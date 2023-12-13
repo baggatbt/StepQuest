@@ -8,11 +8,11 @@ public class Wizard : Companion
     {
         base.Awake();
         this.level = 1;
-        this.attackPower = 3;
-        this.maxHealth = 8;
+        this.attackPower = 9;
+        this.maxHealth = 14;
         this.health = this.maxHealth;
-        this.defensePower = 0;
-        this.speed = 6;
+        this.defensePower = 1;
+        this.speed = 4;
         this.maxEnergy = 10;
         this.energy = this.maxEnergy;
         
