@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro; 
+using System;
 
 
 public class Character : MonoBehaviour 
@@ -164,8 +165,10 @@ public class Character : MonoBehaviour
 {
     
     
-    
-    int damageDealt = (damageOfAttacker - defensePower);
+    int defenseAfterPenetration = Math.Max(0, defensePower - attacker.defensePenetration); //The minimum defense is locked to 0 to prevent negative values
+    Debug.Log("The target  has " + defenseAfterPenetration + " defense left.");
+    int damageDealt = Math.Max(0, damageOfAttacker - defenseAfterPenetration) ; //To prevent negative damage from healing if def is too high
+    Debug.Log("Defense Penetrated: " + defensePenetration);
     Debug.Log("damage dealt = " + damageDealt);
     Debug.Log(this);
     
