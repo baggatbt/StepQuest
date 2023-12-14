@@ -16,6 +16,7 @@ public class Character : MonoBehaviour
     public int teamEnergy;
     public int attackPower;
     public int defensePower;
+    public int defensePenetration;
     public float enemyDamageReductionModifier;
     public int speed;
     public Slider healthBar;
@@ -162,9 +163,11 @@ public class Character : MonoBehaviour
     public void TakeDamage(int damageOfAttacker, Character attacker)
 {
     
-    // Calculate damage reduction 
-    float damageReduction = (damageOfAttacker - this.defensePower );
-    int damageDealt = (int)(damageOfAttacker - damageReduction);
+    
+    
+    int damageDealt = (damageOfAttacker - defensePower);
+    Debug.Log("damage dealt = " + damageDealt);
+    Debug.Log(this);
     
     Debug.Log("Damage reduced by Defense: " + (damageOfAttacker - damageDealt));
 

@@ -153,6 +153,7 @@ public abstract class Skill
             // target.EnemyTakeDamage((int)(baseDamage * damageMultiplier),user, target.enemyDamageReductionModifier);
             target.TakeDamage(baseDamage, user); // No damage boost
             AudioManager.instance.PlaySlashSound();
+            Debug.Log("BaseDamage going into TakeDamage = " + baseDamage);
             break;
     }
 }
