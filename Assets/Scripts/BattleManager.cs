@@ -744,10 +744,10 @@ private void Update()
         }
     }
     }
-    ChangeColorAfterTurnTaken();
+   // ChangeColorAfterTurnTaken();
 }
 
-
+/*
     public void ChangeColorAfterTurnTaken()
     {
         if (!activePlayer.hasNotGone) 
@@ -759,7 +759,7 @@ private void Update()
             activePlayer.GetComponent<SpriteRenderer>().color = Color.white;
         }
     }
-
+*/
     public bool IsAnyEnemyAttacking()
 {
     foreach (var enemy in enemies)

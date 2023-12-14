@@ -5,6 +5,7 @@ using UnityEngine;
 public class OpenSkillSelectionPanel : MonoBehaviour
 {
     public GameObject knightSkillPanel;
+    public GameObject wizardSkillPanel;
     public GameObject adventurerSkillPanel;
     public GameObject missionGUI;
     public GameObject companionGUI;
@@ -31,10 +32,21 @@ public class OpenSkillSelectionPanel : MonoBehaviour
         
     }
 
+    public void OpenKnightSkillPanel()
+    {
+        knightSkillPanel.SetActive(true);
+    }
+
+    public void OpenWizardSkillPanel()
+    {
+        wizardSkillPanel.SetActive(true);
+    }
+
     public void closeSkillSelectionGUI()
     {
         knightSkillPanel.SetActive(false);
         adventurerSkillPanel.SetActive(false);
+        wizardSkillPanel.SetActive(false);
     }
 
     public void openMissionInterface()

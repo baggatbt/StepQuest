@@ -55,7 +55,7 @@ public class Character : MonoBehaviour
         animator = GetComponent<Animator>();
         originalPosition = transform.position;
         statusEffectController = GetComponent<StatusEffectController>();
-        this.hasNotGone = true;
+       // this.hasNotGone = true;
     }
 
     void Update(){
