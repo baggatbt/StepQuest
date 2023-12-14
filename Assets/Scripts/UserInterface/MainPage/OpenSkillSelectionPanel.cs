@@ -16,12 +16,12 @@ public class OpenSkillSelectionPanel : MonoBehaviour
         //Case: if adventurer, adventurerskillpanel .setActive
         //Case: if class = knight, knightskillpanel . set active
         //etc etc
-        switch (PlayerData.Instance.jobClass)
+        switch (PlayerData.Instance.heroID)
         {
             case "Knight":
                 knightSkillPanel.SetActive(true);
                 break;
-            case "Adventurer":
+            case "Wizard":
                 adventurerSkillPanel.SetActive(true);
                 break;
             default:

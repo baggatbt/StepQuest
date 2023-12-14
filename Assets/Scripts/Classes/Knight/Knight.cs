@@ -2,22 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Knight : PlayerJob
+public class Knight : Companion
 {
-    private const int AttackPowerLevel69 = 604; // Attack power at level 69
-    private const int LevelTransition = 70; // Level where growth rate changes with the goal of 1000 atk by max level.
-
-    private int playerLevel => PlayerData.Instance.level;
-
-    public override int BaseAtk => 5;
-    public override int BaseDef => 4;
-    public override int BaseMagAtk => 2;
-    public override int BaseMagDef => 3;
-    public override int BaseHealth => 20;
-
-    // Other methods and properties...
-
-   
+    protected override void Awake()
+    {
+        base.Awake();
+        this.level = 1;
+        this.attackPower = 7;
+        this.maxHealth = 20;
+        this.health = this.maxHealth;
+        this.defensePower = 1;
+        this.speed = 4;
+        this.maxEnergy = 10;
+        this.energy = this.maxEnergy;
+        this.defensePenetration = 1;
+        this.heroID = "Knight";
+        
+    }
+    
 
     public override List<SkillType> AvailableSkills => new List<SkillType>
     {
@@ -29,8 +31,7 @@ public class Knight : PlayerJob
 
     public override List<SkillType> LockedSkills => new List<SkillType>
     {
-        SkillType.ShieldSlam,
-        SkillType.SwordWave
+        // ... skills
     };
 
     public override Skill GetSkillInstance(SkillType skillType)
@@ -39,20 +40,15 @@ public class Knight : PlayerJob
         {
             case SkillType.Slash:
                 return new Slash();
-
+            // ... other cases ..
+            
             case SkillType.TripleHit:
                 return new TripleHitSkill();
-
-            case SkillType.SwordWave:
-                return new SwordWave();
-
-            case SkillType.ShieldSlam:
-                return new ShieldSlam();
-   
-
+          
             default:
                 Debug.LogError("Unknown skill type for Knight: " + skillType);
                 return null;
         }
     }
+    // Additional companion-specific properties and behavior
 }

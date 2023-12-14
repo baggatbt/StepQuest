@@ -21,20 +21,20 @@ public class PlayerSpawnController : MonoBehaviour
         battleManager = FindObjectOfType<BattleManager>();
     }
 
-    Player spawnedPlayer = SpawnPlayerAtPoint(playerSpawnPoint);
+    Character spawnedPlayer = SpawnPlayerAtPoint(playerSpawnPoint);
     Debug.Log(spawnedPlayer.attackPower);
     if (spawnedPlayer != null && battleManager != null)
     {
-        battleManager.player = spawnedPlayer;
+        battleManager.companion1 = spawnedPlayer;
         battleManager.playerParty.Add(spawnedPlayer);
     }
    }
 
-    public Player SpawnPlayerAtPoint(Transform spawnPoint)
+    public Character SpawnPlayerAtPoint(Transform spawnPoint)
 {
     // Instantiate the player at the position of spawnPoint and with its rotation
     GameObject spawnedPlayerObject = Instantiate(knightPrefab, spawnPoint.position, spawnPoint.rotation);
-    Player spawnedPlayer = spawnedPlayerObject.GetComponent<Player>();
+    Character spawnedPlayer = spawnedPlayerObject.GetComponent<Character>();
 
      
     // Link this character to the health bar

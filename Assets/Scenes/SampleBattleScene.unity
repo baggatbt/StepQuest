@@ -361,7 +361,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &97259695
 RectTransform:
   m_ObjectHideFlags: 0
@@ -736,6 +736,7 @@ MonoBehaviour:
   battleManager: {fileID: 1020165693}
   skillButtonPrefab: {fileID: 1619622141431516161, guid: 9f82bb012655df641b2d8b1824140b13, type: 3}
   companion: {fileID: 3881154071949473850, guid: 58b48e8529f72e2439d59fce0fe167d1, type: 3}
+  companion1: {fileID: 9208496836561524610, guid: b4b862f04ff76be49b8874238e0e0f0d, type: 3}
   skillDescriptionPanel: {fileID: 1256410037}
   skillDescriptionText: {fileID: 647553936}
   skillButtons: []
@@ -793,6 +794,7 @@ MonoBehaviour:
   teamEnergy: 0
   attackPower: 0
   defensePower: 0
+  defensePenetration: 0
   enemyDamageReductionModifier: 0
   speed: 0
   healthBar: {fileID: 0}
@@ -814,6 +816,7 @@ MonoBehaviour:
   cameraShake: {fileID: 0}
   isAnimationDone: 0
   animationDamageTime: 0
+  heroID: 
 --- !u!1 &256235981
 GameObject:
   m_ObjectHideFlags: 0
@@ -3425,11 +3428,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a837cac04fdbf14f90c0acf24b8287f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
+  companion1: {fileID: 9208496836561524610, guid: b4b862f04ff76be49b8874238e0e0f0d, type: 3}
   companion: {fileID: 0}
   activePlayer: {fileID: 0}
   playerCharacterData: {fileID: 0}
-  playerClassReference: {fileID: 0}
   enemies: []
   playerParty: []
   activePlayerIndicator: {fileID: 2919695118749008499}
@@ -5638,6 +5640,7 @@ MonoBehaviour:
   battleManager: {fileID: 0}
   skillButtonPrefab: {fileID: 0}
   companion: {fileID: 0}
+  companion1: {fileID: 0}
   skillDescriptionPanel: {fileID: 0}
   skillDescriptionText: {fileID: 0}
   skillButtons: []
@@ -7829,6 +7832,7 @@ MonoBehaviour:
   battleManager: {fileID: 0}
   skillButtonPrefab: {fileID: 0}
   companion: {fileID: 0}
+  companion1: {fileID: 0}
   skillDescriptionPanel: {fileID: 0}
   skillDescriptionText: {fileID: 0}
   skillButtons: []

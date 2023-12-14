@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 358661848719693021}
   - component: {fileID: 358661848719693023}
   - component: {fileID: 358661848719693022}
-  - component: {fileID: 1446137178827732635}
+  - component: {fileID: 9208496836561524610}
   m_Layer: 0
   m_Name: Knight
   m_TagString: Player
@@ -77,7 +77,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: ae297123f091bbf4e8f1835eb98fb293, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -124,7 +124,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &1446137178827732635
+--- !u!114 &9208496836561524610
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -133,18 +133,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 358661848719693019}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dd52f750d63fb5542ba9490a2aed5c33, type: 3}
+  m_Script: {fileID: 11500000, guid: 102bb4db4df8f474aa531fee7fd2e77c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   level: 0
   health: 0
   maxHealth: 0
-  damage: 0
   energy: 0
   maxEnergy: 0
   teamEnergy: 0
   attackPower: 0
   defensePower: 0
+  defensePenetration: 0
   enemyDamageReductionModifier: 0
   speed: 0
   healthBar: {fileID: 0}
@@ -166,14 +166,4 @@ MonoBehaviour:
   cameraShake: {fileID: 0}
   isAnimationDone: 0
   animationDamageTime: 0
-  playerSpawnPoint: {fileID: 0}
-  levelText: {fileID: 0}
-  expText: {fileID: 0}
-  goldText: {fileID: 0}
-  attackPowerText: {fileID: 0}
-  defensePowerText: {fileID: 0}
-  magicAttackText: {fileID: 0}
-  magicDefenseText: {fileID: 0}
-  stepsText: {fileID: 0}
-  jobText: {fileID: 0}
-  knightSkillPointsText: {fileID: 0}
+  heroID: 

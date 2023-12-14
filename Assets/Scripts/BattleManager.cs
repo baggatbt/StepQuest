@@ -11,11 +11,11 @@ using System.Collections.Generic;
 
 public class BattleManager : MonoBehaviour
 {
-    public Character player;
+    public Character companion1;
     public Character companion;
     public Character activePlayer;
     public PlayerData playerCharacterData;
-    public Player playerClassReference;
+    //public Player playerClassReference;
     public List<Character> enemies = new List<Character>();
     public List<Character> playerParty = new List<Character>();
     public GameObject activePlayerIndicator;
@@ -100,7 +100,7 @@ public class BattleManager : MonoBehaviour
 
     private void Awake()
     {
-        activePlayer = player;
+        activePlayer = companion1;
     }
    private void Start()
 {
@@ -215,7 +215,7 @@ public class BattleManager : MonoBehaviour
         turnOrderList.Clear();
 
         // Add player and companion to the turn order list if they are not null
-        if (player != null) turnOrderList.Add(player);
+        if (companion1 != null) turnOrderList.Add(companion1);
         if (companion != null) turnOrderList.Add(companion);
 
         // Add all enemies to the turn order list
@@ -251,7 +251,7 @@ public class BattleManager : MonoBehaviour
 
 private void ExecuteTurn(Character character)
 {
-    if (character == player || character == companion)
+    if (character == companion1 || character == companion)
     {
         activePlayer = character;
         ChangeState(BattleState.PlayerTurn);
@@ -455,7 +455,7 @@ public void EndTurn()
             currentEnemy.specialSkill : currentEnemy.normalSkill;
 
         // Set the target for the attacking enemy
-        currentEnemy.attackTarget = player.transform; //UnityEngine.Random.Range(0, 2) == 0 ? companion.transform : player.transform;
+        currentEnemy.attackTarget = companion1.transform; //UnityEngine.Random.Range(0, 2) == 0 ? companion.transform : player.transform;
 
         // Start the enemy attack coroutine
         StartCoroutine(EnemyAttackCoroutine(currentEnemy));
@@ -703,14 +703,14 @@ public void EndTurn()
 
 private void Update()
 {
-    if (!player.isAttacking && !companion.isAttacking)
+    if (!companion1.isAttacking && !companion.isAttacking)
     {
     if (Input.GetMouseButtonDown(0))
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
 
-        if (hit.collider != null && (!player.isAttacking && !companion.isAttacking))
+        if (hit.collider != null && (!companion1.isAttacking && !companion.isAttacking))
         {
             // If the hit object is an enemy
             if (hit.collider.CompareTag("Enemy")) // && isSkillSelected)
@@ -772,7 +772,7 @@ private void Update()
 public void CheckBattleEnd()
 {
     bool allEnemiesDefeated = true;
-    bool allAlliesDefeated = player.health <= 0 && companion.health <= 0;
+    bool allAlliesDefeated = companion1.health <= 0 && companion.health <= 0;
 
     foreach (var enemy in enemies)
     {

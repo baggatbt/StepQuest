@@ -25,7 +25,7 @@ public class PlayerData : MonoBehaviour
     public int maxEnergy;
     public int energy;
     public int teamEnergy;
-    public string jobClass;
+    public string heroID;
     public int speed;
     
     //Knight specific
@@ -74,22 +74,8 @@ public class PlayerData : MonoBehaviour
         }
     }
 
-    private Dictionary<string, PlayerJob> jobInstances = new Dictionary<string, PlayerJob>
-    {
-        {"Knight", new Knight()} // Add other job instances as necessary
-    };
+   
 
-    public PlayerJob CurrentJob
-    {
-        get 
-        {
-            if (jobInstances.ContainsKey(jobClass))
-                return jobInstances[jobClass];
-
-            Debug.LogError("Job instance for " + jobClass + " not found.");
-            return null;
-        }
-    }
 
     private void Start()
     {
@@ -116,10 +102,10 @@ public class PlayerData : MonoBehaviour
      //   Debug.Log("Steps in Update: " + inGameSteps);
     }
 
-    public void UpdatePlayerData(int level, string jobClass, int exp, int gold, int attackPower, int defensePower, int inGameSteps, int maxHealth, int health, int maxEnergy, int teamEnergy, int speed )
+    public void UpdatePlayerData(int level, string heroID, int exp, int gold, int attackPower, int defensePower, int inGameSteps, int maxHealth, int health, int maxEnergy, int teamEnergy, int speed )
     {
         this.level = level;
-        this.jobClass = jobClass;
+        this.heroID = heroID;
         this.exp = exp;
         this.gold = gold;
         this.attackPower = attackPower;
@@ -139,7 +125,7 @@ public class PlayerData : MonoBehaviour
     public void SavePlayerData()
     {
         PlayerPrefs.SetInt("PlayerLevel", level);
-        PlayerPrefs.SetString("PlayerJob", jobClass);
+        PlayerPrefs.SetString("HeroID", heroID);
         PlayerPrefs.SetInt("PlayerExp", exp);
         PlayerPrefs.SetInt("PlayerGold", gold);
         PlayerPrefs.SetInt("PlayerAttackPower", attackPower);
@@ -160,7 +146,7 @@ public class PlayerData : MonoBehaviour
         if (PlayerPrefs.HasKey("PlayerLevel"))
         {
             level = PlayerPrefs.GetInt("PlayerLevel");
-            jobClass = PlayerPrefs.GetString("PlayerJob");
+            heroID = PlayerPrefs.GetString("HeroID");
             exp = PlayerPrefs.GetInt("PlayerExp");
             gold = PlayerPrefs.GetInt("PlayerGold");
             attackPower = PlayerPrefs.GetInt("PlayerAttackPower");
