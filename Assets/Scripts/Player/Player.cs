@@ -65,11 +65,12 @@ public class Player : Character
             playerData.attackPower = 2;
             playerData.defensePower = 1;
             playerData.inGameSteps = 0;
-            playerData.maxHealth = 5;
+            playerData.maxHealth = 10;
             playerData.health = playerData.maxHealth;
-            playerData.maxEnergy = 5;
+            playerData.maxEnergy = 10;
+            playerData.energy = maxEnergy;
             playerData.teamEnergy = 0; //Set to zero to mimic the new system of just a shared AP bar.
-            playerData.speed = 3;
+            playerData.speed = 10;
             
 
             PlayerPrefs.SetInt("PlayerInitialized", 1);
@@ -93,12 +94,14 @@ public class Player : Character
     maxHealth = playerData.maxHealth;
     health = maxHealth;
     maxEnergy = playerData.maxEnergy; 
+    energy = maxEnergy;
     //teamEnergy = 0;
     attackPower = playerData.attackPower;
     defensePower = playerData.defensePower;
     exp = playerData.exp;
     jobClass = playerData.jobClass;
     inGameSteps = playerData.inGameSteps;
+    speed = playerData.speed;
     
     
     
@@ -181,7 +184,7 @@ public class Player : Character
             healthBar.value = health;
             if (healthText != null )
             {
-                healthText.text = "HP: " + health; 
+                healthText.text = health + " / " + maxHealth;
                 
             }}
             LevelUp();
@@ -219,10 +222,10 @@ public class Player : Character
 
     public void LevelUp()
     {
-        if (CurrentJob.JobExp >= ExpRequiredToLevelUp(CurrentJob.JobLevel))
+        if (CurrentJob.JobExp >= ExpRequiredToLevelUp(level))
             {
                 Debug.Log("Level up");
-                CurrentJob.JobLevel += 1;
+                level += 1;
                 ApplyJobStats();
                 playerData.SavePlayerData();
                 UpdateUI();

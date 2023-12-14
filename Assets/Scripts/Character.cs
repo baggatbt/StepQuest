@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro; 
+using System;
 
 
 public class Character : MonoBehaviour 
@@ -10,12 +11,14 @@ public class Character : MonoBehaviour
     public int level;
     public int health;
     public int maxHealth;
-    public int damage; //This is for the slime, so the next time you forget and wonder, what is this for again? Thats what. Everyone else has converted to AP
+    
     public int energy;
-    public int maxEnergy = 5;
+    public int maxEnergy;
     public int teamEnergy;
     public int attackPower;
     public int defensePower;
+    public int defensePenetration;
+    public float enemyDamageReductionModifier;
     public int speed;
     public Slider healthBar;
     public Slider energyBar;
@@ -50,48 +53,37 @@ public class Character : MonoBehaviour
     protected virtual void Awake()
     {
         animator = GetComponent<Animator>();
-        health = maxHealth; 
         originalPosition = transform.position;
         statusEffectController = GetComponent<StatusEffectController>();
         this.hasNotGone = true;
-        Debug.Log(gameObject.name + " original position: " + originalPosition);
-        if (healthText != null)
-    {
-        healthText.text = "HP: " + health;
-        Debug.Log(health);
-    }
-    else 
-    {
-        Debug.Log("Healtexh is null");
-    }
-        
     }
 
     void Update(){
+        
         if (this.healthBar != null)
         {
+            
             this.healthBar.maxValue = maxHealth;
             this.healthBar.value = health;
             if (this.healthText != null )
             {
+                Debug.Log(this.healthText.text + " was not null");
                 this.healthText.text =  this.health + " / " + maxHealth;
                 
             }
+        }
+        if (this.energyBar != null)
+        {
+            energyBar.maxValue = maxEnergy;
+            energyBar.value = this.energy;
             if (this.energyText != null)
             {
                 
-                this.energyText.text = "MP: " + PlayerData.Instance.teamEnergy + " / " + maxEnergy;
-                this.energyBar.value = PlayerData.Instance.teamEnergy;
+                this.energyText.text = this.energy +  " / " + this.maxEnergy;
+                this.energyBar.value = this.energy;
                 
                 
             }
-        }
-        if (energyBar != null)
-        {
-            
-            
-            energyBar.maxValue = maxEnergy;
-            energyBar.value = PlayerData.Instance.teamEnergy;
         }
         
 
@@ -99,7 +91,7 @@ public class Character : MonoBehaviour
 
     protected virtual void Start()
     {
-        /*
+        
         
         if (healthBar != null)
         {
@@ -107,43 +99,89 @@ public class Character : MonoBehaviour
             healthBar.value = health;
             if (healthText !=null && energyText !=null)
             {
-                healthText.text = "HP: " + health; 
-                energyText.text = "MP: " + energy;
+               this.healthText.text = this.health + " / " + this.maxHealth;
+                energyText.text = this.energy  + " / " + maxEnergy;
             }
         }
         
 
         if (energyBar != null)
         {
-            energyBar.maxValue = maxenergy;
+            energyBar.maxValue = maxEnergy;
             energyBar.value = energy;
         }
-        */
+        
     }
 
     
 
     public CameraShake cameraShake; // Reference to the CameraShake script
 
+    public void EnemyTakeDamage(int damageOfAttacker, Character attacker, float enemyDamageReductionModifier)
+    {
+        float damageReduction = (int)((damageOfAttacker * enemyDamageReductionModifier));
+        int damageDealt = (int)((damageOfAttacker - damageReduction));
+        Debug.Log("Dealt " + damageDealt + " damage!");
+
+        Debug.Log("Damage reduced by Defense: " + (damageOfAttacker - damageDealt));
+
+    health -= damageDealt;
+    healthBar.value = health;
+
+    // Update the health text.
+    if (this.healthText != null)
+    {
+        this.healthText.text =  this.health + " / " + this.maxHealth;
+    }
+    
+    if (damageDealt > 0)
+    { 
+       // IsHit();
+       // Damage popup
+    GameObject damagePopupPrefab = Resources.Load<GameObject>("PreFab/DamagePopup");
+
+    // Find the EndOfBattleRewards GameObject in the scene
+    Transform endOfBattleRewardsTransform = GameObject.Find("EndOfBattleRewardsCanvas").transform;
+
+    if(damagePopupPrefab != null)
+    {
+        // Instantiate the damage popup as a child of the EndOfBattleRewards GameObject
+        GameObject damagePopupInstance = Instantiate(damagePopupPrefab, transform.position, Quaternion.identity, endOfBattleRewardsTransform);
+
+        DamagePopup damagePopupScript = damagePopupInstance.GetComponent<DamagePopup>();
+        damagePopupScript.Setup(damageDealt);
+        
+        
+    }
+    else
+    {
+        Debug.LogError("Failed to load DamagePopup prefab.");
+    }
+    }
+    Debug.Log("isAttacking = " +attacker.isAttacking);
+    }
+
     public void TakeDamage(int damageOfAttacker, Character attacker)
 {
     
-   // Define a constant that will be used to adjust the effectiveness of defense.
-    const float defenseEffectiveness = 50.0f; // This is a balancing factor.
     
-    // Calculate damage reduction using a diminishing returns formula.
-    float damageReduction = this.defensePower / (this.defensePower + defenseEffectiveness);
-    int damageDealt = (int)(damageOfAttacker * (1 - damageReduction));
+    int defenseAfterPenetration = Math.Max(0, defensePower - attacker.defensePenetration); //The minimum defense is locked to 0 to prevent negative values
+    Debug.Log("The target  has " + defenseAfterPenetration + " defense left.");
+    int damageDealt = Math.Max(0, damageOfAttacker - defenseAfterPenetration) ; //To prevent negative damage from healing if def is too high
+    Debug.Log("Defense Penetrated: " + defensePenetration);
+    Debug.Log("damage dealt = " + damageDealt);
+    Debug.Log(this);
     
     Debug.Log("Damage reduced by Defense: " + (damageOfAttacker - damageDealt));
 
     health -= damageDealt;
     healthBar.value = health;
 
+    
     // Update the health text.
-    if (healthText != null)
+    if (this.healthText != null)
     {
-        healthText.text = "HP: " + health;
+        this.healthText.text =  this.health + " / " + this.maxHealth;
     }
     
     if (damageDealt > 0)
@@ -200,14 +238,14 @@ public class Character : MonoBehaviour
     public void SpendEnergy(int energySpent)
     {
   
-        PlayerData.Instance.teamEnergy -= energySpent;
+        this.energy -= energySpent;
         
         
-        energyBar.value = PlayerData.Instance.teamEnergy;
+        energyBar.value = this.energy;
         if (energyBar != null)
         {
-            energyBar.value = PlayerData.Instance.teamEnergy;
-            energyText.text = "MP: " + PlayerData.Instance.teamEnergy + " / " + maxEnergy;
+            energyBar.value = this.energy;
+            energyText.text = this.energy + " / " + this.maxEnergy;
         }
 }   
 
@@ -236,7 +274,7 @@ public class Character : MonoBehaviour
     }
     if (energyText != null) //Had to separate this because monster energies do not use text.
     {
-        energyText.text = "MP: " + PlayerData.Instance.teamEnergy + " / " + maxEnergy;
+        energyText.text = "MP: " + this.energy + " / " + maxEnergy;
     }
     Debug.Log("Not passing any");
 }

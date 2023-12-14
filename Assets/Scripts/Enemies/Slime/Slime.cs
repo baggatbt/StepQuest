@@ -4,6 +4,22 @@ using UnityEngine;
 
 public class Slime : Enemy
 {
+    
+ 
+    //This is because HP must intialize before the data in Start()
+    protected override void Awake()
+    {
+        base.Awake();
+        this.level = 1;
+        this.maxHealth = 10;
+        this.health = this.maxHealth;
+        this.maxEnergy = 3;
+        this.speed = 3;
+        this.defensePower = 1;
+        this.attackPower = 2;
+        this.attacksBeforeSpecial = 2;
+        
+    }
     protected override void Start()
     {
         // Assign the skills to this specific type of character
@@ -12,17 +28,13 @@ public class Slime : Enemy
             new SlimeAttackSkill(),
             new SlimeSpecialAttackSkill()
         };
-        this.level = 1;
-        PreferredAttackPosition = BattlePosition.Back;
+        
         this.expReward = 5;
         this.goldReward = 2;
         this.attacksBeforeSpecial = 2;
-        this.damage = 2;
-        this.maxHealth = 10;
-        this.health = this.maxHealth;
-        this.defensePower = 1;
-        this.speed = 2;
-        this.maxEnergy = 2;
+        
+       
+       
 
         // Assign the skills
         this.normalSkill = this.skills[0]; // Normal skill

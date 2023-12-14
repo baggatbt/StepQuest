@@ -10,11 +10,11 @@ public class Mushroom : Enemy
     protected override void Awake()
     {
         base.Awake();
-        PreferredAttackPosition = BattlePosition.Front;
         this.level = 1;
         this.maxHealth = 12;
         this.health = this.maxHealth;
         this.maxEnergy = 3;
+        this.speed = 5;
         
     }
      protected override void Start()
@@ -29,9 +29,8 @@ public class Mushroom : Enemy
         this.expReward = 10;  
         this.goldReward = 4;
         this.attacksBeforeSpecial = 3;
-        this.damage = 2;
+        this.attackPower = 2;
         this.defensePower = 0; 
-        this.speed = 4;
         this.energy = 0;
 
         // Assign the skills

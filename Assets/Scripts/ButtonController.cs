@@ -94,17 +94,32 @@ public void PopulateSkillPanelWithPlayerSkills()
     }
 }
 
-private void OnSkillButtonHold(Skill skill)
+
+private IEnumerator ShowSkillDescriptionAfterDelay(Skill skill)
 {
-    new WaitForSeconds(1.0f);
+    yield return new WaitForSeconds(1.0f); // Wait for 1 second
     skillDescriptionText.text = skill.description;
     skillDescriptionPanel.SetActive(true);
 }
 
+private Coroutine holdCoroutine; // To keep track of the coroutine
+
+private void OnSkillButtonHold(Skill skill)
+{
+    holdCoroutine = StartCoroutine(ShowSkillDescriptionAfterDelay(skill));
+}
+
+
 private void OnSkillButtonRelease()
 {
+    if (holdCoroutine != null)
+    {
+        StopCoroutine(holdCoroutine);
+        holdCoroutine = null;
+    }
     skillDescriptionPanel.SetActive(false);
 }
+
 
 public void PopulateSkillPanelWithCompanionSkills()
 {
@@ -178,7 +193,7 @@ public void SelectAndUseSkill(Skill selectedSkill)
 {
     Debug.Log("Button clicked for skill: " + skill.skillName);
 
-    if(skill.energyCost <= PlayerData.Instance.teamEnergy)
+    if(skill.energyCost <= battleManager.activePlayer.energy)
     {
        // skillSelectionPanel.SetActive(false);
         if (!battleManager.activePlayer.isAttacking && !battleManager.IsAnyEnemyAttacking())

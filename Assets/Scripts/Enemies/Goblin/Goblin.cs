@@ -10,11 +10,12 @@ public class Goblin : Enemy
     protected override void Awake()
     {
         base.Awake();
-        PreferredAttackPosition = BattlePosition.Front;
         this.level = 1;
-        this.maxHealth = 7;
+        this.maxHealth = 9;
         this.health = this.maxHealth;
         this.maxEnergy = 1;
+        this.speed = 9;
+        this.defensePenetration = 2;
         
     }
      protected override void Start()
@@ -29,9 +30,8 @@ public class Goblin : Enemy
         this.expReward = 8;  
         this.goldReward = 3;
         this.attacksBeforeSpecial = 2;
-        this.damage = 2;
-        this.defensePower = 0; 
-        this.speed = 4;
+        this.attackPower = 6;
+        this.defensePower = 1; 
         this.energy = 0;
 
         // Assign the skills
@@ -40,8 +40,8 @@ public class Goblin : Enemy
 
         // Set the default currentSkill
         this.currentSkill = this.normalSkill;
-
-        
     }
+
+   
 }
 

@@ -4,21 +4,26 @@ using UnityEngine;
 
 public class Wizard : Companion
 {
-    protected override void Start()
+    protected override void Awake()
     {
+        base.Awake();
         this.level = 1;
-        this.attackPower = 3;
-        this.maxHealth = 8;
+        this.attackPower = 9;
+        this.maxHealth = 14;
         this.health = this.maxHealth;
-        this.defensePower = 0;
-        this.speed = 2;
-        this.maxEnergy = 5;
-        this.teamEnergy = PlayerData.Instance.teamEnergy;
+        this.defensePower = 1;
+        this.speed = 4;
+        this.maxEnergy = 10;
+        this.energy = this.maxEnergy;
+        this.defensePenetration = 4;
+        
     }
+    
 
     public override List<SkillType> AvailableSkills => new List<SkillType>
     {
         SkillType.WizardBasicAttack,
+        SkillType.FirePillar,
         // ... other skills ...
     };
 
@@ -33,8 +38,11 @@ public class Wizard : Companion
         {
             case SkillType.WizardBasicAttack:
                 return new WizardBasicAttack();
-            // ... other cases ...
-
+            // ... other cases ..
+            
+            case SkillType.FirePillar:
+                return new FirePillar();
+          
             default:
                 Debug.LogError("Unknown skill type for Wizard: " + skillType);
                 return null;
