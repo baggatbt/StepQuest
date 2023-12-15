@@ -7,17 +7,23 @@ public class Knight : Companion
     protected override void Awake()
     {
         base.Awake();
-        this.level = 1;
-        this.attackPower = 7;
-        this.maxHealth = 20;
-        this.health = this.maxHealth;
-        this.defensePower = 1;
-        this.speed = 4;
-        this.maxEnergy = 10;
-        this.energy = this.maxEnergy;
-        this.defensePenetration = 1;
-        this.heroID = "Knight";
-        
+        GameManager.Instance.RegisterCompanion(this);
+        LoadCharacterData(); // Load saved data
+
+        // Initialize with default values if no data is loaded
+        if (this.health <= 0)
+        {
+            this.level = 1;
+            this.attackPower = 7;
+            this.maxHealth = 20;
+            this.health = this.maxHealth;
+            this.defensePower = 20;
+            this.speed = 4;
+            this.maxEnergy = 10;
+            this.energy = this.maxEnergy;
+            this.defensePenetration = 0;
+            this.heroID = "Knight";
+        }
     }
     
 

@@ -12,7 +12,7 @@ using System.Collections.Generic;
 public class BattleManager : MonoBehaviour
 {
     public Character companion1;
-    public Character companion;
+    public Character companion2;
     public Character activePlayer;
     public PlayerData playerCharacterData;
     //public Player playerClassReference;
@@ -216,7 +216,7 @@ public class BattleManager : MonoBehaviour
 
         // Add player and companion to the turn order list if they are not null
         if (companion1 != null) turnOrderList.Add(companion1);
-        if (companion != null) turnOrderList.Add(companion);
+        if (companion2 != null) turnOrderList.Add(companion2);
 
         // Add all enemies to the turn order list
         turnOrderList.AddRange(enemies);
@@ -251,7 +251,7 @@ public class BattleManager : MonoBehaviour
 
 private void ExecuteTurn(Character character)
 {
-    if (character == companion1 || character == companion)
+    if (character == companion1 || character == companion2)
     {
         activePlayer = character;
         ChangeState(BattleState.PlayerTurn);
@@ -455,7 +455,7 @@ public void EndTurn()
             currentEnemy.specialSkill : currentEnemy.normalSkill;
 
         // Set the target for the attacking enemy
-        currentEnemy.attackTarget = companion1.transform; //UnityEngine.Random.Range(0, 2) == 0 ? companion.transform : player.transform;
+        currentEnemy.attackTarget = companion1.transform; //UnityEngine.Random.Range(0, 2) == 0 ? companion2.transform : player.transform;
 
         // Start the enemy attack coroutine
         StartCoroutine(EnemyAttackCoroutine(currentEnemy));
@@ -703,14 +703,14 @@ public void EndTurn()
 
 private void Update()
 {
-    if (!companion1.isAttacking && !companion.isAttacking)
+    if (!companion1.isAttacking && !companion2.isAttacking)
     {
     if (Input.GetMouseButtonDown(0))
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
 
-        if (hit.collider != null && (!companion1.isAttacking && !companion.isAttacking))
+        if (hit.collider != null && (!companion1.isAttacking && !companion2.isAttacking))
         {
             // If the hit object is an enemy
             if (hit.collider.CompareTag("Enemy")) // && isSkillSelected)
@@ -744,10 +744,10 @@ private void Update()
         }
     }
     }
-   // ChangeColorAfterTurnTaken();
+    //ChangeColorAfterTurnTaken();
 }
 
-/*
+//NOT BEING USED;Would need to implement for enemies and allies, maybe later due to changing battle
     public void ChangeColorAfterTurnTaken()
     {
         if (!activePlayer.hasNotGone) 
@@ -759,7 +759,8 @@ private void Update()
             activePlayer.GetComponent<SpriteRenderer>().color = Color.white;
         }
     }
-*/
+    
+
     public bool IsAnyEnemyAttacking()
 {
     foreach (var enemy in enemies)
@@ -772,7 +773,7 @@ private void Update()
 public void CheckBattleEnd()
 {
     bool allEnemiesDefeated = true;
-    bool allAlliesDefeated = companion1.health <= 0 && companion.health <= 0;
+    bool allAlliesDefeated = companion1.health <= 0 && companion2.health <= 0;
 
     foreach (var enemy in enemies)
     {

@@ -7,6 +7,10 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
     public BattleConfig CurrentBattleConfig { get; set; }
     public HashSet<string> UnlockedStageNames = new HashSet<string>();
+    public Character companion1;
+    public Character companion2;
+     public Character companion3;
+    private List<Companion> companions = new List<Companion>();
 
     private void Awake()
     {
@@ -19,6 +23,7 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+         Application.targetFrameRate = 60;  // Set target frame rate to 60 FPS.
     }
 
     public void UnlockConnectedStages(Stage completedStage)
@@ -40,5 +45,44 @@ public class GameManager : MonoBehaviour
         }
     }
 }
+
+    //Testing method for deleting all saved data
+    public void DeleteEverything()
+    {
+        PlayerPrefs.DeleteAll();
+        Debug.Log("Player prefs deleted");
+    }
+// Method to add a companion to the list
+    public void RegisterCompanion(Companion companion)
+    {
+        if (!companions.Contains(companion))
+        {
+            companions.Add(companion);
+        }
+    }
+
+    // Call this method to save the data of all companions
+    public void SaveAllCompanionData()
+    {
+        foreach (var companion in companions)
+        {
+            companion.SaveCharacterData();
+        }
+    }
+
+    
+    private void OnApplicationQuit()
+    {
+        SaveAllCompanionData();
+    }
+
+    private void OnApplicationPause()
+    {
+        SaveAllCompanionData();
+    }
+
+
+
+
 
 }

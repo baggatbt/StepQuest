@@ -117,6 +117,7 @@ public class Character : MonoBehaviour
 
     public CameraShake cameraShake; // Reference to the CameraShake script
 
+/*
     public void EnemyTakeDamage(int damageOfAttacker, Character attacker, float enemyDamageReductionModifier)
     {
         float damageReduction = (int)((damageOfAttacker * enemyDamageReductionModifier));
@@ -161,56 +162,50 @@ public class Character : MonoBehaviour
     Debug.Log("isAttacking = " +attacker.isAttacking);
     }
 
+*/
     public void TakeDamage(int damageOfAttacker, Character attacker)
 {
-    
-    
-    int defenseAfterPenetration = Math.Max(0, defensePower - attacker.defensePenetration); //The minimum defense is locked to 0 to prevent negative values
-    Debug.Log("The target  has " + defenseAfterPenetration + " defense left.");
-    int damageDealt = Math.Max(0, damageOfAttacker - defenseAfterPenetration) ; //To prevent negative damage from healing if def is too high
-    Debug.Log("Defense Penetrated: " + defensePenetration);
-    Debug.Log("damage dealt = " + damageDealt);
-    Debug.Log(this);
-    
-    Debug.Log("Damage reduced by Defense: " + (damageOfAttacker - damageDealt));
+    // Calculate effective defense after penetration
+    int effectiveDefense = Math.Max(0, defensePower - attacker.defensePenetration);
+    Debug.Log("The target has " + effectiveDefense + " defense left after penetration.");
 
+    // Calculate total damage using the new formula
+    float totalDamage = damageOfAttacker * (100f / (100f + effectiveDefense));
+    int damageDealt = Mathf.FloorToInt(totalDamage); // Convert to integer, adjust as needed
+
+    Debug.Log("Total damage dealt after defense penetration = " + damageDealt);
+
+    // Subtract the calculated damage from health
     health -= damageDealt;
     healthBar.value = health;
 
-    
-    // Update the health text.
+    // Update the health text
     if (this.healthText != null)
     {
-        this.healthText.text =  this.health + " / " + this.maxHealth;
+        this.healthText.text = this.health + " / " + this.maxHealth;
     }
     
+    // Check if damage was dealt for additional effects
     if (damageDealt > 0)
     { 
-       // IsHit();
-       // Damage popup
-    GameObject damagePopupPrefab = Resources.Load<GameObject>("PreFab/DamagePopup");
+        // Trigger hit reaction, damage popup, etc.
+        GameObject damagePopupPrefab = Resources.Load<GameObject>("PreFab/DamagePopup");
+        Transform endOfBattleRewardsTransform = GameObject.Find("EndOfBattleRewardsCanvas").transform;
 
-    // Find the EndOfBattleRewards GameObject in the scene
-    Transform endOfBattleRewardsTransform = GameObject.Find("EndOfBattleRewardsCanvas").transform;
+        if(damagePopupPrefab != null)
+        {
+            GameObject damagePopupInstance = Instantiate(damagePopupPrefab, transform.position, Quaternion.identity, endOfBattleRewardsTransform);
+            DamagePopup damagePopupScript = damagePopupInstance.GetComponent<DamagePopup>();
+            damagePopupScript.Setup(damageDealt);
+        }
+        else
+        {
+            Debug.LogError("Failed to load DamagePopup prefab.");
+        }
+    }
+    Debug.Log("isAttacking = " + attacker.isAttacking);
+}
 
-    if(damagePopupPrefab != null)
-    {
-        // Instantiate the damage popup as a child of the EndOfBattleRewards GameObject
-        GameObject damagePopupInstance = Instantiate(damagePopupPrefab, transform.position, Quaternion.identity, endOfBattleRewardsTransform);
-
-        DamagePopup damagePopupScript = damagePopupInstance.GetComponent<DamagePopup>();
-        damagePopupScript.Setup(damageDealt);
-        
-        
-    }
-    else
-    {
-        Debug.LogError("Failed to load DamagePopup prefab.");
-    }
-    }
-    Debug.Log("isAttacking = " +attacker.isAttacking);
-        
-}   
 
     IEnumerator FadeOutSprite()
 {

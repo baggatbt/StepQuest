@@ -7,16 +7,23 @@ public class Wizard : Companion
     protected override void Awake()
     {
         base.Awake();
-        this.level = 1;
-        this.attackPower = 9;
-        this.maxHealth = 14;
-        this.health = this.maxHealth;
-        this.defensePower = 1;
-        this.speed = 4;
-        this.maxEnergy = 10;
-        this.energy = this.maxEnergy;
-        this.defensePenetration = 4;
-        this.heroID = "Wizard";
+        GameManager.Instance.RegisterCompanion(this);
+        LoadCharacterData(); // Load saved data
+
+        // Initialize with default values if no data is loaded
+        if (this.health <= 0)
+        {
+            this.level = 1;
+            this.attackPower = 9;
+            this.maxHealth = 14;
+            this.health = this.maxHealth;
+            this.defensePower = 6;
+            this.speed = 4;
+            this.maxEnergy = 10;
+            this.energy = this.maxEnergy;
+            this.defensePenetration = 0;
+            this.heroID = "Wizard";
+        }
         
     }
     

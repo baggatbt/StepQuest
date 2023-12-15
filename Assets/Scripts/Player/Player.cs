@@ -92,11 +92,7 @@ public class Player : Character
     
 
 
-    public void DeleteEverything()
-    {
-        PlayerPrefs.DeleteAll();
-        Debug.Log("Player prefs deleted");
-    }
+    
 
 
 

@@ -31,7 +31,7 @@ public class Goblin : Enemy
         this.goldReward = 3;
         this.attacksBeforeSpecial = 2;
         this.attackPower = 6;
-        this.defensePower = 1; 
+        this.defensePower = 5; 
         this.energy = 0;
 
         // Assign the skills

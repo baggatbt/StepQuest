@@ -11,7 +11,7 @@ public class ButtonController : MonoBehaviour
     
     public BattleManager battleManager;
     public GameObject skillButtonPrefab;
-    public Companion companion;
+    public Companion companion2;
     public Companion companion1;
     public GameObject skillDescriptionPanel; // UI Panel to show the skill description
     public TextMeshProUGUI skillDescriptionText; // Text component to show the description
@@ -39,7 +39,7 @@ public class ButtonController : MonoBehaviour
             skillSelectionPanel.SetActive(true);
         }
 
-        if (battleManager.activePlayer == battleManager.companion)
+        if (battleManager.activePlayer == battleManager.companion2)
         {
             companionSkillSelectionPanel.SetActive(true);
             skillSelectionPanel.SetActive(false);
@@ -125,7 +125,7 @@ private void OnSkillButtonRelease()
 
 public void PopulateSkillPanelWithCompanionSkills()
 {
-    List<SkillType> availableSkills = companion.AvailableSkills;
+    List<SkillType> availableSkills = companion2.AvailableSkills;
 
     foreach (SkillType skillType in availableSkills)
     {
@@ -135,7 +135,7 @@ public void PopulateSkillPanelWithCompanionSkills()
         {
             skillButtons.Add(buttonComponent);
             
-            Skill currentSkill = companion.GetSkillInstance(skillType);
+            Skill currentSkill = companion2.GetSkillInstance(skillType);
 
             TextMeshProUGUI buttonText = newButtonObj.GetComponentInChildren<TextMeshProUGUI>();
             if (buttonText != null)
