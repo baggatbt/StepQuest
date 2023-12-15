@@ -23,8 +23,9 @@ public class Wizard : Companion
             this.energy = this.maxEnergy;
             this.defensePenetration = 0;
             this.heroID = "Wizard";
-        }
-        
+            this.heroLevel = 1;
+            this.heroExp = 0;
+        }  
     }
     
 

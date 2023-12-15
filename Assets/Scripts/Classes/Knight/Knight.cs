@@ -23,6 +23,8 @@ public class Knight : Companion
             this.energy = this.maxEnergy;
             this.defensePenetration = 0;
             this.heroID = "Knight";
+            this.heroLevel = 1;
+            this.heroExp = 0;
         }
     }
     

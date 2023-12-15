@@ -8,11 +8,10 @@ public abstract class Companion : Character
     public abstract List<SkillType> AvailableSkills { get; }
     public abstract List<SkillType> LockedSkills { get; }
     public abstract Skill GetSkillInstance(SkillType skillType);
-    public string heroID; //Name of the class/character 
-    public int heroSkillPoints;
-    public int heroStatPoints;
-    public int heroLevel;
-    public int heroExp;
+    public string heroID; // Name of the class/character 
+    public int heroLevel; // Level of the hero
+    public int heroExp;   // Experience of the hero
+    
     
     [Serializable]
     public struct SerializableCharacterData
@@ -27,7 +26,12 @@ public abstract class Companion : Character
         public int defensePower;
         public int defensePenetration;
         public int speed;
-        // Include any other relevant fields.
+        public int expToLevel;
+        public int heroSkillPoints;
+        public int heroStatPoints;
+        public int heroLevel;
+        public int heroExp;
+        
     }
 
     public void SaveCharacterData()
@@ -42,6 +46,8 @@ public abstract class Companion : Character
             defensePower = this.defensePower,
             defensePenetration = this.defensePenetration,
             speed = this.speed,
+            heroLevel = this.heroLevel,
+            heroExp = this.heroExp,
             
         };
 
@@ -58,12 +64,43 @@ public abstract class Companion : Character
     this.level = data.level;
     this.health = data.health;
     this.maxHealth = data.maxHealth;
-    this.maxEnergy = data.maxEnergy; // Changed comma to semicolon
-    this.attackPower = data.attackPower; // Changed comma to semicolon
-    this.defensePower = data.defensePower; // Changed comma to semicolon
-    this.defensePenetration = data.defensePenetration; // Changed comma to semicolon
-    this.speed = data.speed; // Changed comma to semicolon
+    this.maxEnergy = data.maxEnergy; 
+    this.attackPower = data.attackPower; 
+    this.defensePower = data.defensePower; 
+    this.defensePenetration = data.defensePenetration; 
+    this.speed = data.speed; 
+    this.heroLevel = data.heroLevel;
+    this.heroExp = data.heroExp;
 }
+
+    public int ExpToNextLevel(int heroLevel)
+{
+    // Parameters for levels 1-90
+    int baseExp = 100; // Base experience for the first level
+    int incrementPerLevel = 100; // Additional experience required for each subsequent level
+
+    // Parameter for levels 91-100
+    int expPerLevel91To100 = 81900; // Flat experience required for each level from 91 to 100
+
+    // Calculate experience for levels 1-90 using linear growth
+    if (heroLevel >= 1 && heroLevel <= 90)
+    {
+        return baseExp + (heroLevel - 1) * incrementPerLevel;
+    }
+    // Experience for levels 91-100
+    else if (heroLevel >= 91 && heroLevel <= 100)
+    {
+        return expPerLevel91To100;
+    }
+    else
+    {
+        // Handle levels outside 1-100, if necessary
+        return 0;
+    }
+}
+
+
+
 
     }
 
