@@ -229,7 +229,7 @@ public class Character : MonoBehaviour
     this.gameObject.SetActive(false);  // deactivate the GameObject after fade
 }
 
-    private int remainingCost = 0;
+   // private int remainingCost = 0;
     public void SpendEnergy(int energySpent)
     {
   

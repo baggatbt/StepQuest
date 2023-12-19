@@ -27,6 +27,22 @@ public class Wizard : Companion
             this.heroExp = 0;
         }  
     }
+
+    public override void LevelUp()
+    {
+        if (this.heroExp >= ExpToNextLevel(this.heroLevel))
+        {
+            this.heroLevel++;
+            this.attackPower += 3;
+            this.maxHealth += 2;
+            this.health = this.maxHealth;
+            this.defensePower += 1;
+            this.speed += 1;
+            this.maxEnergy += 3;
+            this.energy = this.maxEnergy;
+            this.heroExp = 0;  
+        } 
+    }
     
 
     public override List<SkillType> AvailableSkills => new List<SkillType>

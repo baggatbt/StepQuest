@@ -34,6 +34,9 @@ public abstract class Companion : Character
         
     }
 
+    //abstract LevelUp method
+    public abstract void LevelUp();
+    
     public void SaveCharacterData()
     {
         SerializableCharacterData data = new SerializableCharacterData
@@ -78,31 +81,13 @@ public abstract class Companion : Character
     // Parameters for levels 1-90
     int baseExp = 100; // Base experience for the first level
     int incrementPerLevel = 100; // Additional experience required for each subsequent level
-
-    // Parameter for levels 91-100
-    int expPerLevel91To100 = 81900; // Flat experience required for each level from 91 to 100
-
-    // Calculate experience for levels 1-90 using linear growth
-    if (heroLevel >= 1 && heroLevel <= 90)
-    {
-        return baseExp + (heroLevel - 1) * incrementPerLevel;
-    }
-    // Experience for levels 91-100
-    else if (heroLevel >= 91 && heroLevel <= 100)
-    {
-        return expPerLevel91To100;
-    }
-    else
-    {
-        // Handle levels outside 1-100, if necessary
-        return 0;
-    }
+    int expRequiredToLevel = baseExp + (incrementPerLevel * heroLevel);
+    return expRequiredToLevel;
 }
 
-
-
-
-    }
+    
+    
+}
 
    
 

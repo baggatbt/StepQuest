@@ -81,8 +81,15 @@ public class GameManager : MonoBehaviour
         SaveAllCompanionData();
     }
 
-
-
-
+    public void GainExp(int expGained)
+    {
+        foreach (Companion companion in companions)
+        {
+            companion.heroExp += expGained;
+            Debug.Log(companion + "exp gained" + expGained);
+            companion.LevelUp();
+            SaveAllCompanionData();
+        }
+    }
 
 }

@@ -682,7 +682,7 @@ public void EndTurn()
         totalGold += enemy.goldReward;
     }
 
-    PlayerData.Instance.exp += totalExp;
+    GameManager.Instance.GainExp(totalExp);
     PlayerData.Instance.gold += totalGold;
     PlayerData.Instance.SavePlayerData();
     
