@@ -13,6 +13,12 @@ public class BattleConfig //Responsible for passing information to the battle sc
         maxEnemiesToSpawn = 0
     };
 
+    public static BattleConfig ForestEliteConfig = new BattleConfig
+    {
+        poolName = "ForestElite",
+        maxEnemiesToSpawn = 0
+    };
+
     public static BattleConfig MountainConfig = new BattleConfig
     {
         poolName = "Mountains",
