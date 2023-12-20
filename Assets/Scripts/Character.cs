@@ -204,6 +204,7 @@ public class Character : MonoBehaviour
         }
     }
     Debug.Log("isAttacking = " + attacker.isAttacking);
+   
 }
 
 
@@ -227,6 +228,7 @@ public class Character : MonoBehaviour
 
     sr.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0);
     this.gameObject.SetActive(false);  // deactivate the GameObject after fade
+   // yield return new WaitForSeconds(0.5f); //Ensures fade is all done
 }
 
    // private int remainingCost = 0;
@@ -304,16 +306,16 @@ public class Character : MonoBehaviour
     
     }
 
-    public void CheckForDeath()
+   public void CheckForDeath()
+{
+    Debug.Log("Checking for death");
+    if (this.health <= 0)
     {
-        
-        Debug.Log("Checking for death");
-        if (this.health <= 0)
-        {
-            StartCoroutine(FadeOutSprite());
-        }
-       
+        StartCoroutine(FadeOutSprite());
+       // Destroy(gameObject); // Destroy the GameObject
     }
+}
+
 
      public IEnumerator MoveToTarget()
 {

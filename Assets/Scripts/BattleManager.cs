@@ -233,9 +233,10 @@ public class BattleManager : MonoBehaviour
     if (turnOrderList.Count > 0)
     {
         var nextCharacter = turnOrderList[0];
-        if (nextCharacter.health <= 0) //check to make sure the character is still alive.
+        if (nextCharacter.health <= 0) //check to make sure the character is dead and needs to be removed.
         {
             turnOrderList.Remove(nextCharacter);
+            
             ExecuteTurn(turnOrderList[0]);
         }
     else
@@ -441,28 +442,50 @@ public void EndTurn()
     
     public void EnemyAttack(Character currentEnemy)
 {
-    // Ensure that we are in the enemy turn and attackingEnemy is set
-    if (state != BattleState.EnemyTurn || currentEnemy == null)
-    {
-        Debug.LogError("It's not an enemy's turn or attackingEnemy is null");
-        return;
-    }
+        // Ensure that we are in the enemy turn and attackingEnemy is set
+        if (state != BattleState.EnemyTurn || currentEnemy == null)
+        {
+            Debug.LogError("It's not an enemy's turn or attackingEnemy is null");
+            return;
+        }
 
-    // Decide whether or not to use the special attack or the normal one
-    if (!currentEnemy.isAttacking)
-    {
-        currentEnemy.currentSkill = (currentEnemy.energy >= currentEnemy.maxEnergy) ? 
+        // Decide whether or not to use the special attack or the normal one
+        if (!currentEnemy.isAttacking)
+        {
+            currentEnemy.currentSkill = (currentEnemy.energy >= currentEnemy.maxEnergy) ? 
             currentEnemy.specialSkill : currentEnemy.normalSkill;
 
-        // Set the target for the attacking enemy
-        currentEnemy.attackTarget = companion1.transform; //UnityEngine.Random.Range(0, 2) == 0 ? companion2.transform : player.transform;
+            // List to hold potential targets
+            List<Transform> potentialTargets = new List<Transform>();
 
-        // Start the enemy attack coroutine
-        StartCoroutine(EnemyAttackCoroutine(currentEnemy));
-    }
+        // Add companion1 to potential targets if they are alive
+        if (companion1 != null && companion1.health > 0)
+        {
+            potentialTargets.Add(companion1.transform);
+        }
+
+        // Add companion2 to potential targets if they are alive
+        if (companion2 != null && companion2.health > 0)
+        {
+            potentialTargets.Add(companion2.transform);
+        }
+
+        // Check if there are any potential targets
+        if (potentialTargets.Count == 0)
+        {
+            Debug.LogError("No alive companions to target.");
+            return; // No valid target, so return
+        }
+
+            // Randomly select a target from the list of alive companions
+            currentEnemy.attackTarget = potentialTargets[UnityEngine.Random.Range(0, potentialTargets.Count)];
+
+            // Start the enemy attack coroutine
+            StartCoroutine(EnemyAttackCoroutine(currentEnemy));
+        }
 }
 
-
+   
     
 
     public IEnumerator EnemyAttackCoroutine(Character currentEnemy)
