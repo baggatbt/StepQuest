@@ -174,9 +174,18 @@ public class BattleManager : MonoBehaviour
             enemies.Add(spawnedEnemy);
         }
     }
+    RestoreHealthAndEnergy();
     InitializeTurnOrder();
 }
 
+    public void RestoreHealthAndEnergy()
+    {
+        companion1.energy = companion1.maxEnergy;
+        companion1.health = companion1.maxHealth;
+
+        companion2.energy = companion2.maxEnergy;
+        companion2.health = companion2.maxHealth;
+    }
 
     public void NextBattle()
     {

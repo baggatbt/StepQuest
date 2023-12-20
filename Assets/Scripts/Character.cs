@@ -282,6 +282,11 @@ public class Character : MonoBehaviour
         
     }
 
+    public void Gainhealth(int healthGained)
+    {
+        this.health = healthGained;
+    }
+
    
     public void IsHit() => animator.SetTrigger("IsHurtTrigger");
     
