@@ -96,6 +96,8 @@ public class PlayerData : MonoBehaviour
      //   Debug.Log("Steps in Update: " + inGameSteps);
     }
 
+   
+
     
 
     public void SavePlayerData()
