@@ -15,7 +15,7 @@ public class Wizard : Companion
         {
             this.level = 1;
             this.attackPower = 9;
-            this.maxHealth = 14;
+            this.maxHealth = 12;
             this.health = this.maxHealth;
             this.defensePower = 6;
             this.speed = 4;
