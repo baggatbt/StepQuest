@@ -18,15 +18,16 @@ public class Taunt : Skill
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
-        int baseDamage = 0;
         user.isAttacking = true;
         user.isAnimationDone = false;
-        HandleAoeAttack(user, battleManager.enemies, result, baseDamage);
-        Debug.Log("Taunt skill applied");
+        TauntEffect tauntEffect = new TauntEffect(1);
+        tauntEffect.ApplyEffect(user);
+        user.animator.SetTrigger("BlockTrigger");
+        Debug.Log("Taunt applied");
+        battleManager.SelectTargetForEnemy();
         user.isAttacking = false;
-        user.animator.SetTrigger("GuardTrigger");
-        yield return new WaitUntil(() => user.isAnimationDone == true);
-        
+        user.isAnimationDone = false;
+        yield return new WaitUntil(() => user.isAnimationDone == false);
     }
     
 }

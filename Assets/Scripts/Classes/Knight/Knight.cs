@@ -51,6 +51,7 @@ public class Knight : Companion
     {
         SkillType.Slash,
         SkillType.TripleHit,
+        SkillType.Taunt,
        
         
     };
@@ -70,6 +71,9 @@ public class Knight : Companion
             
             case SkillType.TripleHit:
                 return new TripleHitSkill();
+            
+            case SkillType.Taunt:
+                return new Taunt();
           
             default:
                 Debug.LogError("Unknown skill type for Knight: " + skillType);

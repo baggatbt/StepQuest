@@ -19,6 +19,9 @@ public class BattleManager : MonoBehaviour
     public List<Character> enemies = new List<Character>();
     public List<Character> playerParty = new List<Character>();
     public GameObject activePlayerIndicator;
+
+    
+    
     
     
     public GameObject knightPrefab;
@@ -219,23 +222,22 @@ public class BattleManager : MonoBehaviour
 
     public List<Character> turnOrderList = new List<Character>();
     public void InitializeTurnOrder()
+{
+    turnOrderList.Clear();
+
+    if (companion1 != null) turnOrderList.Add(companion1);
+    if (companion2 != null) turnOrderList.Add(companion2);
+
+    foreach (var enemy in enemies)
     {
-            // Clear the previous turn order list
-        turnOrderList.Clear();
-
-        // Add player and companion to the turn order list if they are not null
-        if (companion1 != null) turnOrderList.Add(companion1);
-        if (companion2 != null) turnOrderList.Add(companion2);
-
-        // Add all enemies to the turn order list
-        turnOrderList.AddRange(enemies);
-
-            // Sort the list by speed in descending order (highest speed first)
-        turnOrderList = turnOrderList.OrderByDescending(character => character.speed).ToList();
-
-        StartTurn();
-
+        turnOrderList.Add(enemy);
+        enemy.attackTarget = SelectTargetForEnemy(); // Assign a target to each enemy
     }
+
+    turnOrderList = turnOrderList.OrderByDescending(character => character.speed).ToList();
+    StartTurn();
+}
+
 
     public void StartTurn()
 {
@@ -276,11 +278,13 @@ private void ExecuteTurn(Character character)
 
 public void EndTurn()
 {
+    
     turnOrderList.RemoveAt(0); // Remove the character from the list after their turn
     Debug.Log("ENDING THE TURN");
     if (turnOrderList.Count == 0)
     {
         InitializeTurnOrder();
+        
     }
     else
     {
@@ -371,9 +375,7 @@ public void EndTurn()
         //Make them unable to take a second turn.
         
         
-        // Move player back to their original position after all skills executed.
-        StartCoroutine(zoomEffect.ZoomOutEffect());
-        yield return activePlayer.ReturnToPosition();
+
         yield return new WaitUntil(() => activePlayer.isMoving == false);
         EndTurn();
 
@@ -443,55 +445,79 @@ public void EndTurn()
 
             CheckBattleEnd();
         }
-
+        if (activePlayer.currentSkill.requiresMovement == true)
+        {
+        // Move player back to their original position after all skills executed.
+        StartCoroutine(zoomEffect.ZoomOutEffect());
+        yield return activePlayer.ReturnToPosition();
+        }
     }
 
     private Queue<Character> enemyTurnQueue = new Queue<Character>();
     public Character attackingEnemy;
     
-    public void EnemyAttack(Character currentEnemy)
+    public Transform GetWeightedRandomTarget(List<Transform> targets, List<float> weights)
 {
-        // Ensure that we are in the enemy turn and attackingEnemy is set
-        if (state != BattleState.EnemyTurn || currentEnemy == null)
+    float totalWeight = weights.Sum();
+    float randomNumber = UnityEngine.Random.Range(0, totalWeight);
+    float cumulativeWeight = 0;
+
+    for (int i = 0; i < targets.Count; i++)
+    {
+        cumulativeWeight += weights[i];
+        if (randomNumber <= cumulativeWeight)
         {
-            Debug.LogError("It's not an enemy's turn or attackingEnemy is null");
-            return;
+            return targets[i];
         }
+    }
 
-        // Decide whether or not to use the special attack or the normal one
-        if (!currentEnemy.isAttacking)
-        {
-            currentEnemy.currentSkill = (currentEnemy.energy >= currentEnemy.maxEnergy) ? 
-            currentEnemy.specialSkill : currentEnemy.normalSkill;
+    return null; // In case no target is selected, which should not happen
+}
+        public void EnemyAttack(Character currentEnemy)
+{
+    // Ensure that we are in the enemy turn and attackingEnemy is set
+    if (state != BattleState.EnemyTurn || currentEnemy == null)
+    {
+        Debug.LogError("It's not an enemy's turn or attackingEnemy is null");
+        return;
+    }
 
-            // List to hold potential targets
-            List<Transform> potentialTargets = new List<Transform>();
+    // Decide whether or not to use the special attack or the normal one
+    if (!currentEnemy.isAttacking)
+    {
+        currentEnemy.currentSkill = (currentEnemy.energy >= currentEnemy.maxEnergy) ? 
+        currentEnemy.specialSkill : currentEnemy.normalSkill;
 
-        // Add companion1 to potential targets if they are alive
-        if (companion1 != null && companion1.health > 0)
-        {
-            potentialTargets.Add(companion1.transform);
-        }
+        
+        StartCoroutine(EnemyAttackCoroutine(currentEnemy));
+    }
+}
 
-        // Add companion2 to potential targets if they are alive
-        if (companion2 != null && companion2.health > 0)
-        {
-            potentialTargets.Add(companion2.transform);
-        }
+    public Transform SelectTargetForEnemy()
+{
+    List<Transform> potentialTargets = new List<Transform>();
+    List<float> targetWeights = new List<float>();
 
-        // Check if there are any potential targets
-        if (potentialTargets.Count == 0)
-        {
-            Debug.LogError("No alive companions to target.");
-            return; // No valid target, so return
-        }
+    // Add players to potential targets if they are alive
+    if (companion1 != null && companion1.health > 0)
+    {
+        potentialTargets.Add(companion1.transform);
+        targetWeights.Add(GameManager.Instance.probabilityCompanion1);
+    }
+    if (companion2 != null && companion2.health > 0)
+    {
+        potentialTargets.Add(companion2.transform);
+        targetWeights.Add(GameManager.Instance.probabilityCompanion2);
+    }
 
-            // Randomly select a target from the list of alive companions
-            currentEnemy.attackTarget = potentialTargets[UnityEngine.Random.Range(0, potentialTargets.Count)];
+    if (potentialTargets.Count == 0)
+    {
+        Debug.LogError("No valid targets available.");
+        return null;
+    }
 
-            // Start the enemy attack coroutine
-            StartCoroutine(EnemyAttackCoroutine(currentEnemy));
-        }
+    // Use weighted random selection to choose a target
+    return GetWeightedRandomTarget(potentialTargets, targetWeights);
 }
 
    
