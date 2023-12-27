@@ -13,8 +13,8 @@ public class GameManager : MonoBehaviour
     private List<Companion> companions = new List<Companion>();
     
     //Used in EnemyAttack() to weight enemy targets
-    public float probabilityCompanion1 = 1f; // Default probability for companion1 to be attacked
-    public float probabilityCompanion2 = 1f; // Default probability for companion2 to be attacked
+    public float probabilityCompanion1; // Default probability for companion1 to be attacked
+    public float probabilityCompanion2;// Default probability for companion2 to be attacked
 
     private void Awake()
     {
@@ -22,6 +22,8 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            probabilityCompanion1 = 1f;
+            probabilityCompanion2 = 1f;
         }
         else
         {
