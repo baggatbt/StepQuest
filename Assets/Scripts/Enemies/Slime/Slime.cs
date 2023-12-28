@@ -11,12 +11,12 @@ public class Slime : Enemy
     {
         base.Awake();
         this.level = 1;
-        this.maxHealth = 10;
+        this.maxHealth = 15;
         this.health = this.maxHealth;
         this.maxEnergy = 3;
         this.speed = 3;
-        this.defensePower = 1;
-        this.attackPower = 2;
+        this.defensePower = 12;
+        this.attackPower = 4;
         this.attacksBeforeSpecial = 2;
         
     }

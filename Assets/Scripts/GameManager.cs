@@ -2,11 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
     public BattleConfig CurrentBattleConfig { get; set; }
     public HashSet<string> UnlockedStageNames = new HashSet<string>();
+    public Character companion1; //Battle Position
+    public Character companion2; 
+    public Character companion3;
+    public List<Companion> companions = new List<Companion>();
+
+    //Instantiate any unlocked characters
+    public Knight knight;
+    public Wizard wizard;
+    
+    //Used in EnemyAttack() to weight enemy targets
+    public float probabilityCompanion1; // Default probability for companion1 to be attacked
+    public float probabilityCompanion2;// Default probability for companion2 to be attacked
 
     private void Awake()
     {
@@ -14,11 +27,31 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            probabilityCompanion1 = 1f;
+            probabilityCompanion2 = 1f;
+            CreateAndRegisterKnight();
+            Debug.Log(companion1);
+           
         }
         else
         {
             Destroy(gameObject);
         }
+         Application.targetFrameRate = 60;  // Set target frame rate to 60 FPS.
+    }
+
+    private void CreateAndRegisterKnight()
+    {
+        // Assuming you have a Knight prefab, you can instantiate it like this:
+        // GameObject knightObject = Instantiate(knightPrefab);
+        // knight = knightObject.GetComponent<Knight>();
+
+        // If you don't use a prefab and want to create the Knight directly:
+        GameObject knightObject = new GameObject("Knight");
+        knight = knightObject.AddComponent<Knight>();
+
+        // Add the Knight to the companions list if necessary
+        RegisterCompanion(knight);
     }
 
     public void UnlockConnectedStages(Stage completedStage)
@@ -40,5 +73,55 @@ public class GameManager : MonoBehaviour
         }
     }
 }
+
+    //Testing method for deleting all saved data
+    public void DeleteEverything()
+    {
+        PlayerPrefs.DeleteAll();
+        Debug.Log("Player prefs deleted");
+    }
+// Method to add a companion to the list
+    public void RegisterCompanion(Companion companion)
+    {
+        if (!companions.Contains(companion))
+        {
+            companions.Add(companion);
+        }
+    }
+
+    // Call this method to save the data of all companions
+    public void SaveAllCompanionData()
+    {
+        foreach (var companion in companions)
+        {
+            if (companion != null)
+            {
+                Debug.Log("Saving " + companion);
+             companion.SaveCharacterData();
+            }
+        }
+    }
+
+    
+    private void OnApplicationQuit()
+    {
+        SaveAllCompanionData();
+    }
+
+    private void OnApplicationPause()
+    {
+        SaveAllCompanionData();
+    }
+
+    public void GainExp(int expGained)
+    {
+        foreach (Companion companion in companions)
+        {
+            companion.heroExp += expGained;
+            Debug.Log(companion + "exp gained" + expGained);
+            companion.LevelUp();
+            SaveAllCompanionData();
+        }
+    }
 
 }

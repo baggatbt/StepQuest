@@ -18,7 +18,7 @@ public class GoblinEliteSpecial : Skill
     // Override the default base damage calculation.
     protected override int CalculateBaseDamage(Character user)
     {
-        return (int)(user.attackPower * 0.8f);  // 60% of the character's attack.
+        return (int)(user.attackPower * 0.8f);  // 80% of the character's attack.
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)

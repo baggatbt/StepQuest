@@ -327,6 +327,8 @@ MonoBehaviour:
     - {fileID: 6178202463525426479, guid: 5171b942c59fa9d41bba4a218f810ee3, type: 3}
     - {fileID: 8370724005610461912, guid: a4e82078f888480488a4facac45ee018, type: 3}
     - {fileID: 7240057796284375691, guid: 73b9f837c05cd6542995bd5d71de3c2f, type: 3}
+  - poolName: ForestElite
+    enemies:
     - {fileID: 6770425177949068552, guid: 31aa6a97dae86bd428046c3b7cf6daa7, type: 3}
 --- !u!4 &58845271
 Transform:
@@ -361,7 +363,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &97259695
 RectTransform:
   m_ObjectHideFlags: 0
@@ -396,14 +398,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 0
+    m_Left: 200
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 4
-  m_Spacing: -600
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
+  m_ChildAlignment: 3
+  m_Spacing: 300
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
@@ -735,7 +737,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   battleManager: {fileID: 1020165693}
   skillButtonPrefab: {fileID: 1619622141431516161, guid: 9f82bb012655df641b2d8b1824140b13, type: 3}
-  companion: {fileID: 3881154071949473850, guid: 58b48e8529f72e2439d59fce0fe167d1, type: 3}
+  companion2: {fileID: 3881154071949473850, guid: 58b48e8529f72e2439d59fce0fe167d1, type: 3}
+  companion1: {fileID: 9208496836561524610, guid: b4b862f04ff76be49b8874238e0e0f0d, type: 3}
   skillDescriptionPanel: {fileID: 1256410037}
   skillDescriptionText: {fileID: 647553936}
   skillButtons: []
@@ -793,6 +796,7 @@ MonoBehaviour:
   teamEnergy: 0
   attackPower: 0
   defensePower: 0
+  defensePenetration: 0
   enemyDamageReductionModifier: 0
   speed: 0
   healthBar: {fileID: 0}
@@ -814,6 +818,9 @@ MonoBehaviour:
   cameraShake: {fileID: 0}
   isAnimationDone: 0
   animationDamageTime: 0
+  heroID: 
+  heroLevel: 0
+  heroExp: 0
 --- !u!1 &256235981
 GameObject:
   m_ObjectHideFlags: 0
@@ -3035,7 +3042,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -456.00003, y: -431}
+  m_AnchoredPosition: {x: -456, y: -431}
   m_SizeDelta: {x: 211.55, y: -486.56}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &873669127
@@ -3089,14 +3096,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 0
+    m_Left: 200
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 4
-  m_Spacing: -600
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
+  m_ChildAlignment: 3
+  m_Spacing: 300
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
@@ -3425,11 +3432,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a837cac04fdbf14f90c0acf24b8287f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
-  companion: {fileID: 0}
+  companion1: {fileID: 9208496836561524610, guid: b4b862f04ff76be49b8874238e0e0f0d, type: 3}
+  companion2: {fileID: 0}
   activePlayer: {fileID: 0}
   playerCharacterData: {fileID: 0}
-  playerClassReference: {fileID: 0}
   enemies: []
   playerParty: []
   activePlayerIndicator: {fileID: 2919695118749008499}
@@ -5637,7 +5643,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   battleManager: {fileID: 0}
   skillButtonPrefab: {fileID: 0}
-  companion: {fileID: 0}
+  companion2: {fileID: 0}
+  companion1: {fileID: 0}
   skillDescriptionPanel: {fileID: 0}
   skillDescriptionText: {fileID: 0}
   skillButtons: []
@@ -7828,7 +7835,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   battleManager: {fileID: 0}
   skillButtonPrefab: {fileID: 0}
-  companion: {fileID: 0}
+  companion2: {fileID: 0}
+  companion1: {fileID: 0}
   skillDescriptionPanel: {fileID: 0}
   skillDescriptionText: {fileID: 0}
   skillButtons: []

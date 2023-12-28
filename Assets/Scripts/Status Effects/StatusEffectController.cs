@@ -15,9 +15,11 @@ public class StatusEffectController : MonoBehaviour
         {
             activeEffects[target] = new List<(StatusEffect, float)>();
         }
-        
+
         effect.ApplyEffect(target);
         activeEffects[target].Add((effect, duration));
+
+        Debug.Log($"Added effect {effect.effectName} to {target.name} for {duration} turns.");
     }
 
     public void ProcessEffects()
@@ -29,10 +31,14 @@ public class StatusEffectController : MonoBehaviour
                 var effectTuple = entry.Value[i];
                 effectTuple.duration -= 1;
 
+                Debug.Log($"Processing effect {effectTuple.effect.effectName} on {entry.Key.name}. Duration remaining: {effectTuple.duration}");
+
                 if (effectTuple.duration <= 0)
                 {
                     effectTuple.effect.RemoveEffect(entry.Key);
                     entry.Value.RemoveAt(i);
+
+                    Debug.Log($"Effect {effectTuple.effect.effectName} on {entry.Key.name} has ended.");
                 }
                 else
                 {
@@ -43,6 +49,8 @@ public class StatusEffectController : MonoBehaviour
             if (entry.Value.Count == 0)
             {
                 activeEffects.Remove(entry.Key);
+
+                Debug.Log($"All effects on {entry.Key.name} have been processed and removed.");
             }
         }
     }
@@ -54,9 +62,13 @@ public class StatusEffectController : MonoBehaviour
             var effectsList = activeEffects[target];
             effectsList.RemoveAll(e => e.effect == effect);
 
+            Debug.Log($"Effect {effect.effectName} manually removed from {target.name}.");
+
             if (effectsList.Count == 0)
             {
                 activeEffects.Remove(target);
+
+                Debug.Log($"All effects on {target.name} have been manually removed.");
             }
         }
     }

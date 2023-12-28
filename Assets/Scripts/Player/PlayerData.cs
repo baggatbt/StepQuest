@@ -25,14 +25,8 @@ public class PlayerData : MonoBehaviour
     public int maxEnergy;
     public int energy;
     public int teamEnergy;
-    public string jobClass;
+    public string heroID;
     public int speed;
-    
-    //Knight specific
-    public int knightSkillPoints;
-    public int knightLevel;
-    public int knightExp;
-    
     
     public Dictionary<string, int> skillLevels;
     public Dictionary<string, int> skillExp;
@@ -74,26 +68,12 @@ public class PlayerData : MonoBehaviour
         }
     }
 
-    private Dictionary<string, PlayerJob> jobInstances = new Dictionary<string, PlayerJob>
-    {
-        {"Knight", new Knight()} // Add other job instances as necessary
-    };
+   
 
-    public PlayerJob CurrentJob
-    {
-        get 
-        {
-            if (jobInstances.ContainsKey(jobClass))
-                return jobInstances[jobClass];
-
-            Debug.LogError("Job instance for " + jobClass + " not found.");
-            return null;
-        }
-    }
 
     private void Start()
     {
-        Application.targetFrameRate = 60;  // Set target frame rate to 60 FPS.
+       
         LoadStepsData();
        
         int stepsSinceStart = stepCounterController.GetStepsSinceStart();
@@ -116,41 +96,16 @@ public class PlayerData : MonoBehaviour
      //   Debug.Log("Steps in Update: " + inGameSteps);
     }
 
-    public void UpdatePlayerData(int level, string jobClass, int exp, int gold, int attackPower, int defensePower, int inGameSteps, int maxHealth, int health, int maxEnergy, int teamEnergy, int speed )
-    {
-        this.level = level;
-        this.jobClass = jobClass;
-        this.exp = exp;
-        this.gold = gold;
-        this.attackPower = attackPower;
-        this.defensePower = defensePower;
-        this.inGameSteps = inGameSteps;
-        this.maxHealth = maxHealth;
-        this.health = health;
-        this.maxEnergy = maxEnergy;
-        this.teamEnergy = teamEnergy;
-        this.speed = speed;
-       
-        
+   
 
-        SavePlayerData(); 
-    }
+    
 
     public void SavePlayerData()
     {
         PlayerPrefs.SetInt("PlayerLevel", level);
-        PlayerPrefs.SetString("PlayerJob", jobClass);
-        PlayerPrefs.SetInt("PlayerExp", exp);
         PlayerPrefs.SetInt("PlayerGold", gold);
-        PlayerPrefs.SetInt("PlayerAttackPower", attackPower);
-        PlayerPrefs.SetInt("PlayerDefensePower", defensePower);
-        PlayerPrefs.SetInt("PlayerInGameSteps", inGameSteps);
-        PlayerPrefs.SetInt("PlayerMaxHealth", maxHealth);
-        PlayerPrefs.SetInt("PlayerMaxEnergy", maxEnergy); 
-        PlayerPrefs.SetInt("PlayerSpeed", speed);
-        PlayerPrefs.SetInt("KnightSkillPoints",knightSkillPoints);
-        PlayerPrefs.SetInt("KnightLevel",knightLevel);
-        PlayerPrefs.SetInt("KnightExp",knightExp);
+       
+       
         PlayerPrefs.Save();
         Debug.Log("Data saved");
     }
@@ -160,18 +115,9 @@ public class PlayerData : MonoBehaviour
         if (PlayerPrefs.HasKey("PlayerLevel"))
         {
             level = PlayerPrefs.GetInt("PlayerLevel");
-            jobClass = PlayerPrefs.GetString("PlayerJob");
-            exp = PlayerPrefs.GetInt("PlayerExp");
             gold = PlayerPrefs.GetInt("PlayerGold");
-            attackPower = PlayerPrefs.GetInt("PlayerAttackPower");
-            defensePower = PlayerPrefs.GetInt("PlayerDefensePower");
-            inGameSteps = PlayerPrefs.GetInt("PlayerInGameSteps");
-            maxHealth = PlayerPrefs.GetInt("PlayerMaxHealth");
-            maxEnergy = PlayerPrefs.GetInt("PlayerMaxEnergy");
-            speed = PlayerPrefs.GetInt("PlayerSpeed");
-            knightSkillPoints = PlayerPrefs.GetInt("KnightSkillPoints");
-            knightLevel = PlayerPrefs.GetInt("KnightLevel");
-            knightExp = PlayerPrefs.GetInt("KnightExp");
+            
+            
         }
     }
 

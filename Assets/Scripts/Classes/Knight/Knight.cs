@@ -2,35 +2,70 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Knight : PlayerJob
+public class Knight : Companion
 {
-    private const int AttackPowerLevel69 = 604; // Attack power at level 69
-    private const int LevelTransition = 70; // Level where growth rate changes with the goal of 1000 atk by max level.
+    protected override void Awake()
+    {
+        base.Awake();
+        GameManager.Instance.RegisterCompanion(this);
+        Debug.Log("Companion registered");
+        LoadCharacterData(); // Load saved data
 
-    private int playerLevel => PlayerData.Instance.level;
+        // Initialize with default values if no data is loaded
+        if (this.health <= 0)
+        {
+            this.level = 1;
+            this.attackPower = 7;
+            this.maxHealth = 20;
+            this.health = this.maxHealth;
+            this.defensePower = 20;
+            this.speed = 4;
+            this.maxEnergy = 10;
+            this.energy = this.maxEnergy;
+            this.defensePenetration = 0;
+            this.heroID = "Knight";
+            this.heroLevel = 1;
+            this.heroExp = 0;
+            this.heroSkillPoints = 0;
+            this.heroStatPoints = 0;
+        }
+    }
 
-    public override int BaseAtk => 5;
-    public override int BaseDef => 4;
-    public override int BaseMagAtk => 2;
-    public override int BaseMagDef => 3;
-    public override int BaseHealth => 20;
+    
 
-    // Other methods and properties...
+    public override void LevelUp()
+    {
+        if (this.heroExp >= ExpToNextLevel(this.heroLevel))
+        {
+            this.heroLevel++;
+            this.attackPower += 2;
+            this.maxHealth += 5;
+            this.health = this.maxHealth;
+            this.defensePower += 3;
+            this.speed += 1;
+            this.maxEnergy += 1;
+            this.energy = this.maxEnergy;
+            this.heroExp = 0;  
+            this.heroStatPoints += 3;
+            this.heroSkillPoints += 1;
+        } 
+    }
 
-   
+    
+    
 
     public override List<SkillType> AvailableSkills => new List<SkillType>
     {
         SkillType.Slash,
         SkillType.TripleHit,
+        SkillType.Taunt,
        
         
     };
 
     public override List<SkillType> LockedSkills => new List<SkillType>
     {
-        SkillType.ShieldSlam,
-        SkillType.SwordWave
+        // ... skills
     };
 
     public override Skill GetSkillInstance(SkillType skillType)
@@ -39,20 +74,18 @@ public class Knight : PlayerJob
         {
             case SkillType.Slash:
                 return new Slash();
-
+            // ... other cases ..
+            
             case SkillType.TripleHit:
                 return new TripleHitSkill();
-
-            case SkillType.SwordWave:
-                return new SwordWave();
-
-            case SkillType.ShieldSlam:
-                return new ShieldSlam();
-   
-
+            
+            case SkillType.Taunt:
+                return new Taunt();
+          
             default:
                 Debug.LogError("Unknown skill type for Knight: " + skillType);
                 return null;
         }
     }
+    // Additional companion-specific properties and behavior
 }

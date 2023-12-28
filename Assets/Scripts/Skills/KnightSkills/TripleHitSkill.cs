@@ -4,11 +4,12 @@ using UnityEngine;
 public class TripleHitSkill : Skill
 {
     private int numberOfAttacksPossible;
+    
 
     public TripleHitSkill()
     {
         skillName = "Triple Slash";
-        description = "Slash three times for " +(int)(PlayerData.Instance.attackPower * 0.8f) + " damage each hit.";
+        description = "Slash three times";
         requiresMovement = true;
         energyCost = 3;
         numberOfAttacksPossible = 3;
@@ -28,6 +29,7 @@ public class TripleHitSkill : Skill
 
 
         int baseDamage = CalculateBaseDamage(user);
+        description = "Slash three times for " + baseDamage + " damage each hit.";
         user.animator.SetTrigger("TripleSlashTrigger");
         for( int i = 0; i < numberOfAttacksPossible; i++)
         {

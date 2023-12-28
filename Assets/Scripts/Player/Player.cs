@@ -1,3 +1,4 @@
+/*
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,7 +19,7 @@ public class Player : Character
     public TextMeshProUGUI stepsText;
     public TextMeshProUGUI jobText;
     public TextMeshProUGUI knightSkillPointsText;
-    public PlayerJob CurrentJob { get; private set; }
+
 
 
     private PlayerData playerData;
@@ -26,7 +27,7 @@ public class Player : Character
     private int stepsAvailableToConsume;
     private int exp;
     private int gold;
-    private string jobClass;
+    private string heroID;
     private int inGameSteps;
     
 
@@ -37,13 +38,13 @@ public class Player : Character
         playerData = PlayerData.Instance;
         if (PlayerPrefs.HasKey("PlayerInitialized"))
         {
-            LoadFromPlayerData();
+           
            
         }
         else
         {
             InitializePlayer();
-            Debug.Log("making new player");
+           
         }
 
         UpdateUI();  // Update the UI with initial values.
@@ -51,7 +52,7 @@ public class Player : Character
 
     new private void  Start()
     {
-       SyncStatsWithPlayerData();
+       
     }
 
     private void InitializePlayer()
@@ -59,7 +60,7 @@ public class Player : Character
         if (!PlayerPrefs.HasKey("PlayerInitialized"))
         {
             playerData.level = 1;
-            playerData.jobClass = "Knight";
+            playerData.heroID = "Knight";
             playerData.exp = 0;
             playerData.gold = 100;
             playerData.attackPower = 2;
@@ -77,81 +78,22 @@ public class Player : Character
             
 
              // Save the initialized data
-            playerData.SavePlayerData();
-            SetJob(playerData.jobClass);
-            ApplyJobStats();
-            SyncStatsWithPlayerData();
+            
             UpdateUI();
             PlayerPrefs.Save();
         }
         else{
-            LoadFromPlayerData();
+            
         }
     }
 
-     private void SyncStatsWithPlayerData()
-    {
-    maxHealth = playerData.maxHealth;
-    health = maxHealth;
-    maxEnergy = playerData.maxEnergy; 
-    energy = maxEnergy;
-    //teamEnergy = 0;
-    attackPower = playerData.attackPower;
-    defensePower = playerData.defensePower;
-    exp = playerData.exp;
-    jobClass = playerData.jobClass;
-    inGameSteps = playerData.inGameSteps;
-    speed = playerData.speed;
+   
     
     
+
+
     
-    }
 
-
-    public void DeleteEverything()
-    {
-        PlayerPrefs.DeleteAll();
-        Debug.Log("Player prefs deleted");
-    }
-
-
-     private void SetJob(string jobClassName)
-    {
-        switch (jobClassName)
-        {
-            case "Knight":
-                CurrentJob = new Knight();
-                break;
-            // Add other cases for other jobs...
-            default:
-                Debug.LogError("Unknown job class: " + jobClassName);
-                break;
-        }
-    }
-    public void ChangeJob(string newJob)
-    {
-        SetJob(newJob);
-        ApplyJobStats();
-    }
-
-   private void ApplyJobStats()
-    {
-        playerData.attackPower = CurrentJob.BaseAtk;
-        playerData.defensePower = CurrentJob.BaseDef;
-        playerData.maxHealth = CurrentJob.BaseHealth;
-        // Handle magic attack and defense here...
-
-        playerData.SavePlayerData();
-        SyncStatsWithPlayerData();
-    }
-
-    private void LoadFromPlayerData()
-{
-    playerData.LoadPlayerData();
-    SetJob(playerData.jobClass);  // Set the job based on the loaded data
-    SyncStatsWithPlayerData();
-    UpdateUI();
-}
 
 
 
@@ -160,14 +102,13 @@ public class Player : Character
        
        UpdateUI();
       // playerData.UpdatePlayerData();
-      
        
-        
+  
     }
 
     private void UpdateUI()
 {
-    if (jobText != null) jobText.text = "Job: " + playerData.jobClass;
+    
     if (levelText != null) levelText.text = "Level: " + playerData.level.ToString();
     if (expText != null) expText.text = "Exp: " + playerData.exp.ToString();
     if (goldText != null) goldText.text = "Gold: " + playerData.gold.ToString();
@@ -187,7 +128,7 @@ public class Player : Character
                 healthText.text = health + " / " + maxHealth;
                 
             }}
-            LevelUp();
+         
 }
 
 
@@ -195,65 +136,22 @@ public class Player : Character
     public void GainGold(int amount)
     {
         playerData.gold += amount;
-        playerData.SavePlayerData();
+       
     }
 
     public void GainExperience(int amount)
     {
         playerData.exp += amount;
-        LevelUp();
-        playerData.SavePlayerData();
+        
+       
     }
 
-   public void ConsumeStepsToGainRewards()
-{
-    stepsAvailableToConsume = PlayerData.Instance.stepsSinceStart;
-    Debug.Log(stepsAvailableToConsume); 
-
-    int expReward = (int)Math.Round(stepsAvailableToConsume * 0.01);
-    int goldReward = (int)Math.Round(stepsAvailableToConsume * 0.01);
-
-    GainExperience(expReward);
-    GainGold(goldReward);
-    PlayerData.Instance.stepsSinceStart = 0;
-    playerData.SavePlayerData();
-}
-
-
-    public void LevelUp()
-    {
-        if (CurrentJob.JobExp >= ExpRequiredToLevelUp(level))
-            {
-                Debug.Log("Level up");
-                level += 1;
-                ApplyJobStats();
-                playerData.SavePlayerData();
-                UpdateUI();
-            }
-    }
-
-    //ExpRequiredToLevelUp(1) will return 25.
-    //ExpRequiredToLevelUp(2) will return 100.
-    //(3) will return 225
-    //ExpRequiredToLevelUp(50) will return 62,500.
-    private int ExpRequiredToLevelUp(int level)
-{
-    int a = 25; 
-    
-    int expRequiredToLevel = a * level * level;
-    
-    return expRequiredToLevel;
-}
-
-
-    
-
 
 }
 
 
 
-
+*/
 
 
 

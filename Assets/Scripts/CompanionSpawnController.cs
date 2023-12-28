@@ -25,7 +25,7 @@ public class CompanionSpawnController : MonoBehaviour
     Debug.Log(spawnedCompanion.attackPower);
     if (spawnedCompanion != null && battleManager != null)
     {
-        battleManager.companion = spawnedCompanion;
+        battleManager.companion2 = spawnedCompanion;
         battleManager.playerParty.Add(spawnedCompanion);
     }
    }

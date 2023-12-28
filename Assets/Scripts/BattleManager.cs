@@ -11,14 +11,17 @@ using System.Collections.Generic;
 
 public class BattleManager : MonoBehaviour
 {
-    public Character player;
-    public Character companion;
+    public Character companion1;
+    public Character companion2;
     public Character activePlayer;
     public PlayerData playerCharacterData;
-    public Player playerClassReference;
+    //public Player playerClassReference;
     public List<Character> enemies = new List<Character>();
     public List<Character> playerParty = new List<Character>();
     public GameObject activePlayerIndicator;
+
+    
+    
     
     
     public GameObject knightPrefab;
@@ -100,7 +103,7 @@ public class BattleManager : MonoBehaviour
 
     private void Awake()
     {
-        activePlayer = player;
+        activePlayer = companion1;
     }
    private void Start()
 {
@@ -174,9 +177,18 @@ public class BattleManager : MonoBehaviour
             enemies.Add(spawnedEnemy);
         }
     }
+    RestoreHealthAndEnergy();
     InitializeTurnOrder();
 }
 
+    public void RestoreHealthAndEnergy()
+    {
+        companion1.energy = companion1.maxEnergy;
+        companion1.health = companion1.maxHealth;
+
+        companion2.energy = companion2.maxEnergy;
+        companion2.health = companion2.maxHealth;
+    }
 
     public void NextBattle()
     {
@@ -210,32 +222,32 @@ public class BattleManager : MonoBehaviour
 
     public List<Character> turnOrderList = new List<Character>();
     public void InitializeTurnOrder()
+{
+    turnOrderList.Clear();
+
+    if (companion1 != null) turnOrderList.Add(companion1);
+    if (companion2 != null) turnOrderList.Add(companion2);
+
+    foreach (var enemy in enemies)
     {
-            // Clear the previous turn order list
-        turnOrderList.Clear();
-
-        // Add player and companion to the turn order list if they are not null
-        if (player != null) turnOrderList.Add(player);
-        if (companion != null) turnOrderList.Add(companion);
-
-        // Add all enemies to the turn order list
-        turnOrderList.AddRange(enemies);
-
-            // Sort the list by speed in descending order (highest speed first)
-        turnOrderList = turnOrderList.OrderByDescending(character => character.speed).ToList();
-
-        StartTurn();
-
+        turnOrderList.Add(enemy);
+        enemy.attackTarget = SelectTargetForEnemy(); // Assign a target to each enemy
     }
+
+    turnOrderList = turnOrderList.OrderByDescending(character => character.speed).ToList();
+    StartTurn();
+}
+
 
     public void StartTurn()
 {
     if (turnOrderList.Count > 0)
     {
         var nextCharacter = turnOrderList[0];
-        if (nextCharacter.health <= 0) //check to make sure the character is still alive.
+        if (nextCharacter.health <= 0) //check to make sure the character is dead and needs to be removed.
         {
             turnOrderList.Remove(nextCharacter);
+            
             ExecuteTurn(turnOrderList[0]);
         }
     else
@@ -251,7 +263,7 @@ public class BattleManager : MonoBehaviour
 
 private void ExecuteTurn(Character character)
 {
-    if (character == player || character == companion)
+    if (character == companion1 || character == companion2)
     {
         activePlayer = character;
         ChangeState(BattleState.PlayerTurn);
@@ -266,11 +278,13 @@ private void ExecuteTurn(Character character)
 
 public void EndTurn()
 {
+    
     turnOrderList.RemoveAt(0); // Remove the character from the list after their turn
     Debug.Log("ENDING THE TURN");
     if (turnOrderList.Count == 0)
     {
         InitializeTurnOrder();
+        
     }
     else
     {
@@ -361,9 +375,7 @@ public void EndTurn()
         //Make them unable to take a second turn.
         
         
-        // Move player back to their original position after all skills executed.
-        StartCoroutine(zoomEffect.ZoomOutEffect());
-        yield return activePlayer.ReturnToPosition();
+
         yield return new WaitUntil(() => activePlayer.isMoving == false);
         EndTurn();
 
@@ -433,13 +445,35 @@ public void EndTurn()
 
             CheckBattleEnd();
         }
-
+        if (activePlayer.currentSkill.requiresMovement == true)
+        {
+        // Move player back to their original position after all skills executed.
+        StartCoroutine(zoomEffect.ZoomOutEffect());
+        yield return activePlayer.ReturnToPosition();
+        }
     }
 
     private Queue<Character> enemyTurnQueue = new Queue<Character>();
     public Character attackingEnemy;
     
-    public void EnemyAttack(Character currentEnemy)
+    public Transform GetWeightedRandomTarget(List<Transform> targets, List<float> weights)
+{
+    float totalWeight = weights.Sum();
+    float randomNumber = UnityEngine.Random.Range(0, totalWeight);
+    float cumulativeWeight = 0;
+
+    for (int i = 0; i < targets.Count; i++)
+    {
+        cumulativeWeight += weights[i];
+        if (randomNumber <= cumulativeWeight)
+        {
+            return targets[i];
+        }
+    }
+
+    return null; // In case no target is selected, which should not happen
+}
+        public void EnemyAttack(Character currentEnemy)
 {
     // Ensure that we are in the enemy turn and attackingEnemy is set
     if (state != BattleState.EnemyTurn || currentEnemy == null)
@@ -452,17 +486,41 @@ public void EndTurn()
     if (!currentEnemy.isAttacking)
     {
         currentEnemy.currentSkill = (currentEnemy.energy >= currentEnemy.maxEnergy) ? 
-            currentEnemy.specialSkill : currentEnemy.normalSkill;
+        currentEnemy.specialSkill : currentEnemy.normalSkill;
 
-        // Set the target for the attacking enemy
-        currentEnemy.attackTarget = player.transform; //UnityEngine.Random.Range(0, 2) == 0 ? companion.transform : player.transform;
-
-        // Start the enemy attack coroutine
+        
         StartCoroutine(EnemyAttackCoroutine(currentEnemy));
     }
 }
 
+    public Transform SelectTargetForEnemy()
+{
+    List<Transform> potentialTargets = new List<Transform>();
+    List<float> targetWeights = new List<float>();
 
+    // Add players to potential targets if they are alive
+    if (companion1 != null && companion1.health > 0)
+    {
+        potentialTargets.Add(companion1.transform);
+        targetWeights.Add(GameManager.Instance.probabilityCompanion1);
+    }
+    if (companion2 != null && companion2.health > 0)
+    {
+        potentialTargets.Add(companion2.transform);
+        targetWeights.Add(GameManager.Instance.probabilityCompanion2);
+    }
+
+    if (potentialTargets.Count == 0)
+    {
+        Debug.LogError("No valid targets available.");
+        return null;
+    }
+
+    // Use weighted random selection to choose a target
+    return GetWeightedRandomTarget(potentialTargets, targetWeights);
+}
+
+   
     
 
     public IEnumerator EnemyAttackCoroutine(Character currentEnemy)
@@ -682,9 +740,10 @@ public void EndTurn()
         totalGold += enemy.goldReward;
     }
 
-    PlayerData.Instance.exp += totalExp;
+    GameManager.Instance.GainExp(totalExp);
     PlayerData.Instance.gold += totalGold;
     PlayerData.Instance.SavePlayerData();
+    GameManager.Instance.SaveAllCompanionData();
     
 
 
@@ -703,14 +762,14 @@ public void EndTurn()
 
 private void Update()
 {
-    if (!player.isAttacking && !companion.isAttacking)
+    if (!companion1.isAttacking && !companion2.isAttacking)
     {
     if (Input.GetMouseButtonDown(0))
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
 
-        if (hit.collider != null && (!player.isAttacking && !companion.isAttacking))
+        if (hit.collider != null && (!companion1.isAttacking && !companion2.isAttacking))
         {
             // If the hit object is an enemy
             if (hit.collider.CompareTag("Enemy")) // && isSkillSelected)
@@ -744,10 +803,10 @@ private void Update()
         }
     }
     }
-    ChangeColorAfterTurnTaken();
+    //ChangeColorAfterTurnTaken();
 }
 
-
+//NOT BEING USED;Would need to implement for enemies and allies, maybe later due to changing battle
     public void ChangeColorAfterTurnTaken()
     {
         if (!activePlayer.hasNotGone) 
@@ -759,6 +818,7 @@ private void Update()
             activePlayer.GetComponent<SpriteRenderer>().color = Color.white;
         }
     }
+    
 
     public bool IsAnyEnemyAttacking()
 {
@@ -772,7 +832,7 @@ private void Update()
 public void CheckBattleEnd()
 {
     bool allEnemiesDefeated = true;
-    bool allAlliesDefeated = player.health <= 0 && companion.health <= 0;
+    bool allAlliesDefeated = companion1.health <= 0 && companion2.health <= 0;
 
     foreach (var enemy in enemies)
     {

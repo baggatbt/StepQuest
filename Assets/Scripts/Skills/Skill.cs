@@ -22,6 +22,7 @@ public enum SkillType
         SlimeCompanionBasicAttack,
         WizardBasicAttack,
         FirePillar,
+        Taunt,
     }
 
 
