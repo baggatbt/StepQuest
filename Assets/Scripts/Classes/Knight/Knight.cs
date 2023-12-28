@@ -8,6 +8,7 @@ public class Knight : Companion
     {
         base.Awake();
         GameManager.Instance.RegisterCompanion(this);
+        Debug.Log("Companion registered");
         LoadCharacterData(); // Load saved data
 
         // Initialize with default values if no data is loaded
@@ -29,6 +30,8 @@ public class Knight : Companion
             this.heroStatPoints = 0;
         }
     }
+
+    
 
     public override void LevelUp()
     {

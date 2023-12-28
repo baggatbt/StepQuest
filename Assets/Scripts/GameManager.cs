@@ -2,15 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
     public BattleConfig CurrentBattleConfig { get; set; }
     public HashSet<string> UnlockedStageNames = new HashSet<string>();
-    public Character companion1;
-    public Character companion2;
-     public Character companion3;
-    private List<Companion> companions = new List<Companion>();
+    public Character companion1; //Battle Position
+    public Character companion2; 
+    public Character companion3;
+    public List<Companion> companions = new List<Companion>();
+
+    //Instantiate any unlocked characters
+    public Knight knight;
+    public Wizard wizard;
     
     //Used in EnemyAttack() to weight enemy targets
     public float probabilityCompanion1; // Default probability for companion1 to be attacked
@@ -24,12 +29,29 @@ public class GameManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
             probabilityCompanion1 = 1f;
             probabilityCompanion2 = 1f;
+            CreateAndRegisterKnight();
+            Debug.Log(companion1);
+           
         }
         else
         {
             Destroy(gameObject);
         }
          Application.targetFrameRate = 60;  // Set target frame rate to 60 FPS.
+    }
+
+    private void CreateAndRegisterKnight()
+    {
+        // Assuming you have a Knight prefab, you can instantiate it like this:
+        // GameObject knightObject = Instantiate(knightPrefab);
+        // knight = knightObject.GetComponent<Knight>();
+
+        // If you don't use a prefab and want to create the Knight directly:
+        GameObject knightObject = new GameObject("Knight");
+        knight = knightObject.AddComponent<Knight>();
+
+        // Add the Knight to the companions list if necessary
+        RegisterCompanion(knight);
     }
 
     public void UnlockConnectedStages(Stage completedStage)
@@ -72,7 +94,11 @@ public class GameManager : MonoBehaviour
     {
         foreach (var companion in companions)
         {
-            companion.SaveCharacterData();
+            if (companion != null)
+            {
+                Debug.Log("Saving " + companion);
+             companion.SaveCharacterData();
+            }
         }
     }
 

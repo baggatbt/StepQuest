@@ -743,6 +743,7 @@ public void EndTurn()
     GameManager.Instance.GainExp(totalExp);
     PlayerData.Instance.gold += totalGold;
     PlayerData.Instance.SavePlayerData();
+    GameManager.Instance.SaveAllCompanionData();
     
 
 
