@@ -25,6 +25,8 @@ public class Wizard : Companion
             this.heroID = "Wizard";
             this.heroLevel = 1;
             this.heroExp = 0;
+            this.heroSkillPoints = 0;
+            this.heroStatPoints = 0;
         }  
     }
 
@@ -41,6 +43,8 @@ public class Wizard : Companion
             this.maxEnergy += 3;
             this.energy = this.maxEnergy;
             this.heroExp = 0;  
+            this.heroStatPoints += 3;
+            this.heroSkillPoints += 1;
         } 
     }
     

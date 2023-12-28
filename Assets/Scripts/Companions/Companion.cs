@@ -11,6 +11,9 @@ public abstract class Companion : Character
     public string heroID; // Name of the class/character 
     public int heroLevel; // Level of the hero
     public int heroExp;   // Experience of the hero
+    public int heroStatPoints;
+    public int heroSkillPoints;
+    
     
     
     [Serializable]
@@ -31,8 +34,8 @@ public abstract class Companion : Character
         public int heroStatPoints;
         public int heroLevel;
         public int heroExp;
-        
     }
+
 
     //abstract LevelUp method
     public abstract void LevelUp();
@@ -51,6 +54,8 @@ public abstract class Companion : Character
             speed = this.speed,
             heroLevel = this.heroLevel,
             heroExp = this.heroExp,
+            heroSkillPoints = this.heroSkillPoints,
+            heroStatPoints = this.heroStatPoints,
             
         };
 
@@ -74,6 +79,8 @@ public abstract class Companion : Character
     this.speed = data.speed; 
     this.heroLevel = data.heroLevel;
     this.heroExp = data.heroExp;
+    this.heroStatPoints = data.heroStatPoints;
+    this.heroSkillPoints = data.heroSkillPoints;
 }
 
     public int ExpToNextLevel(int heroLevel)

@@ -25,6 +25,8 @@ public class Knight : Companion
             this.heroID = "Knight";
             this.heroLevel = 1;
             this.heroExp = 0;
+            this.heroSkillPoints = 0;
+            this.heroStatPoints = 0;
         }
     }
 
@@ -41,6 +43,8 @@ public class Knight : Companion
             this.maxEnergy += 1;
             this.energy = this.maxEnergy;
             this.heroExp = 0;  
+            this.heroStatPoints += 3;
+            this.heroSkillPoints += 1;
         } 
     }
 
