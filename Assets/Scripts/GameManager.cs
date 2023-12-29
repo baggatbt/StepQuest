@@ -52,6 +52,8 @@ public class GameManager : MonoBehaviour
 
         // Add the Knight to the companions list if necessary
         RegisterCompanion(knight);
+        // Load data after creating the Knight
+        knight.LoadCharacterData();
     }
 
     public void UnlockConnectedStages(Stage completedStage)
@@ -74,12 +76,25 @@ public class GameManager : MonoBehaviour
     }
 }
 
+    
     //Testing method for deleting all saved data
     public void DeleteEverything()
+{
+    // Delete data for each companion
+    foreach (var companion in companions)
     {
-        PlayerPrefs.DeleteAll();
-        Debug.Log("Player prefs deleted");
+        if (companion != null)
+        {
+            companion.DeleteCharacterData();
+            Debug.Log("Deleted data for " + companion.name);
+        }
     }
+
+    // After individual deletions, clear all PlayerPrefs
+    PlayerPrefs.DeleteAll();
+    Debug.Log("All PlayerPrefs deleted");
+}
+
 // Method to add a companion to the list
     public void RegisterCompanion(Companion companion)
     {
@@ -105,7 +120,7 @@ public class GameManager : MonoBehaviour
     
     private void OnApplicationQuit()
     {
-        SaveAllCompanionData();
+      //OUT FOR EASY DELETION  SaveAllCompanionData();
     }
 
     private void OnApplicationPause()

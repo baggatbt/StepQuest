@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-
+using UnityEngine.UI;
 public class MainMenuUIManager : MonoBehaviour
 {
     public GameObject knightSkillPanel;
@@ -19,24 +19,60 @@ public class MainMenuUIManager : MonoBehaviour
     public TextMeshProUGUI knightDefText;
     public TextMeshProUGUI knightSpdText;
     public TextMeshProUGUI knightSPText;
+    public Knight knight;
     
     private void Awake()
     {
+        knight = GameManager.Instance.knight;
         UpdateUI();
+        
     }
     private void UpdateUI()
     {  
         if (stepsText != null) stepsText.text =  PlayerData.Instance.inGameSteps.ToString();  
         UpdateKnightStatsUI();
+        AddKnightBtnListeners();
 
+    }
+    private void AddKnightBtnListeners()
+    {
+        knightHPBtn.onClick.AddListener(() => SpendStatPoint("HP"));
+        knightMPBtn.onClick.AddListener(() => SpendStatPoint("MP"));
+        knightATKBtn.onClick.AddListener(() => SpendStatPoint("ATK"));
+        knightDEFBtn.onClick.AddListener(() => SpendStatPoint("DEF"));
+        knightSPDBtn.onClick.AddListener(() => SpendStatPoint("SPD"));
+    }
+    void SpendStatPoint(string stat)
+    {
+        if (knight.heroStatPoints > 0)
+        {
+            switch (stat)
+            {
+                case "HP":
+                    knight.maxHealth += 2;
+                    break;
+                case "MP":
+                    knight.maxEnergy += 1;
+                    break;
+                case "ATK":
+                    knight.attackPower += 1;
+                    break;
+                case "DEF":
+                    knight.defensePower += 3;
+                    break;
+                case "SPD":
+                    knight.speed += 1;
+                    break;
+            }
+            knight.heroStatPoints -= 1;
+        }
+        UpdateUI();
+        GameManager.Instance.SaveAllCompanionData();
     }
     
 
     public void UpdateKnightStatsUI()
     {
-       
-        Knight knight = GameManager.Instance.knight;
-        
         if (knight != null)
         {
             if (knightHPText != null) knightHPText.text = "HP: " + knight.maxHealth.ToString();
@@ -44,11 +80,23 @@ public class MainMenuUIManager : MonoBehaviour
             if (knightAtkText != null) knightAtkText.text = "ATK: " + knight.attackPower.ToString();
             if (knightDefText != null) knightDefText.text = "DEF: " + knight.defensePower.ToString();
             if (knightSpdText != null) knightSpdText.text = "SPD: " + knight.speed.ToString();
-            if (knightSPText != null) knightSPText.text = "SP: " + knight.heroSkillPoints.ToString(); 
+            if (knightSPText != null) knightSPText.text = "SP: " + knight.heroStatPoints.ToString(); 
         }
         else
         {
             // Handle the case where knightData is null (e.g., clear the text or show default values)
+        }
+    }
+    public Button knightHPBtn;
+    public Button knightMPBtn;
+    public Button knightATKBtn;
+    public Button knightDEFBtn;
+    public Button knightSPDBtn;
+    public void KnightSpendStatPoints()
+    {
+        if (knight.heroStatPoints > 0)
+        {
+            
         }
     }
 

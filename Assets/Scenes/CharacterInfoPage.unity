@@ -7108,7 +7108,6 @@ GameObject:
   - component: {fileID: 1267232436}
   - component: {fileID: 1267232435}
   - component: {fileID: 1267232434}
-  - component: {fileID: 1267232433}
   m_Layer: 5
   m_Name: CloseCharacterInfoGUIBUtton
   m_TagString: Untagged
@@ -7136,32 +7135,6 @@ RectTransform:
   m_AnchoredPosition: {x: 994.51, y: 428.67}
   m_SizeDelta: {x: 74.97, y: 63.63}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1267232433
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1267232431}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9759f6ebf69ffc44ba185a4c88ae1206, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  knightSkillPanel: {fileID: 0}
-  wizardSkillPanel: {fileID: 0}
-  adventurerSkillPanel: {fileID: 0}
-  missionGUI: {fileID: 0}
-  companionGUI: {fileID: 0}
-  characterGUI: {fileID: 0}
-  overworldMapGUI: {fileID: 0}
-  stepsText: {fileID: 0}
-  knightHPText: {fileID: 0}
-  knightMPText: {fileID: 0}
-  knightAtkText: {fileID: 0}
-  knightDefText: {fileID: 0}
-  knightSpdText: {fileID: 0}
-  knightSPText: {fileID: 0}
 --- !u!114 &1267232434
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7268,7 +7241,6 @@ GameObject:
   - component: {fileID: 1267876216}
   - component: {fileID: 1267876215}
   - component: {fileID: 1267876214}
-  - component: {fileID: 1267876217}
   m_Layer: 5
   m_Name: CloseMapButton
   m_TagString: Untagged
@@ -7391,32 +7363,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1267876212}
   m_CullTransparentMesh: 1
---- !u!114 &1267876217
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1267876212}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9759f6ebf69ffc44ba185a4c88ae1206, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  knightSkillPanel: {fileID: 0}
-  wizardSkillPanel: {fileID: 0}
-  adventurerSkillPanel: {fileID: 0}
-  missionGUI: {fileID: 0}
-  companionGUI: {fileID: 0}
-  characterGUI: {fileID: 0}
-  overworldMapGUI: {fileID: 0}
-  stepsText: {fileID: 0}
-  knightHPText: {fileID: 0}
-  knightMPText: {fileID: 0}
-  knightAtkText: {fileID: 0}
-  knightDefText: {fileID: 0}
-  knightSpdText: {fileID: 0}
-  knightSPText: {fileID: 0}
 --- !u!1 &1268384751
 GameObject:
   m_ObjectHideFlags: 0
@@ -7863,6 +7809,12 @@ MonoBehaviour:
   knightDefText: {fileID: 1663805952}
   knightSpdText: {fileID: 613431793}
   knightSPText: {fileID: 1373186731}
+  knight: {fileID: 0}
+  knightHPBtn: {fileID: 1787975866}
+  knightMPBtn: {fileID: 341530817}
+  knightATKBtn: {fileID: 1164013981}
+  knightDEFBtn: {fileID: 495053030}
+  knightSPDBtn: {fileID: 914257724}
 --- !u!114 &1274183896
 MonoBehaviour:
   m_ObjectHideFlags: 0

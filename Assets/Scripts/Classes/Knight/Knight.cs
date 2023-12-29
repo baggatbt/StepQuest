@@ -12,7 +12,7 @@ public class Knight : Companion
         LoadCharacterData(); // Load saved data
 
         // Initialize with default values if no data is loaded
-        if (this.health <= 0)
+        if (this.level == 0)
         {
             this.level = 1;
             this.attackPower = 7;

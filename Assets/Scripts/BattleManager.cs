@@ -103,6 +103,8 @@ public class BattleManager : MonoBehaviour
 
     private void Awake()
     {
+        companion1 = GameManager.Instance.companion1;
+       // companion2 = GameManager.Instance.companion2;
         activePlayer = companion1;
     }
    private void Start()

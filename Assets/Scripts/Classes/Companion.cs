@@ -67,21 +67,54 @@ public abstract class Companion : Character
     public void LoadCharacterData()
 {
     string jsonData = PlayerPrefs.GetString("CharacterData_" + this.name, "{}");
-    SerializableCharacterData data = JsonUtility.FromJson<SerializableCharacterData>(jsonData);
+    if (jsonData != "{}") // Check if jsonData is not empty
+    {
+        SerializableCharacterData data = JsonUtility.FromJson<SerializableCharacterData>(jsonData);
 
-    this.level = data.level;
-    this.health = data.health;
-    this.maxHealth = data.maxHealth;
-    this.maxEnergy = data.maxEnergy; 
-    this.attackPower = data.attackPower; 
-    this.defensePower = data.defensePower; 
-    this.defensePenetration = data.defensePenetration; 
-    this.speed = data.speed; 
-    this.heroLevel = data.heroLevel;
-    this.heroExp = data.heroExp;
-    this.heroStatPoints = data.heroStatPoints;
-    this.heroSkillPoints = data.heroSkillPoints;
+        this.level = data.level;
+        this.health = data.health;
+        this.maxHealth = data.maxHealth;
+        this.maxEnergy = data.maxEnergy; 
+        this.attackPower = data.attackPower; 
+        this.defensePower = data.defensePower; 
+        this.defensePenetration = data.defensePenetration; 
+        this.speed = data.speed; 
+        this.heroLevel = data.heroLevel;
+        this.heroExp = data.heroExp;
+        this.heroStatPoints = data.heroStatPoints;
+        this.heroSkillPoints = data.heroSkillPoints;
+    }
+    else // Set default values if there is no data
+    {
+        this.level = 1;
+        this.health = 20;
+        this.maxHealth = 20;
+        this.maxEnergy = 10;
+        this.attackPower = 7;
+        this.defensePower = 20;
+        this.speed = 4;
+        this.heroLevel = 1;
+        this.heroExp = 0;
+        this.heroStatPoints = 0;
+        this.heroSkillPoints = 0;
+    }
 }
+
+
+    public void DeleteCharacterData()
+{
+    string key = "CharacterData_" + this.name;
+    if (PlayerPrefs.HasKey(key))
+    {
+        PlayerPrefs.DeleteKey(key);
+        Debug.Log("Deleted data for " + this.name);
+    }
+    else
+    {
+        Debug.Log("No data found for " + this.name);
+    }
+}
+
 
     public int ExpToNextLevel(int heroLevel)
 {
