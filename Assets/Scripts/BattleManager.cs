@@ -110,7 +110,7 @@ public class BattleManager : MonoBehaviour
    private void Start()
 {
     
-    
+    activePlayer = companion1;
     Debug.Log("Active player from Player1 in start method"  + activePlayer);
     outerCircleInitialScale = outerCircle.transform.localScale;
     innerCircleInitialScale = innerCircle.transform.localScale;
