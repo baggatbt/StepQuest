@@ -35,12 +35,14 @@ public class ButtonController : MonoBehaviour
     {
         if (battleManager.activePlayer == battleManager.companion1)
         {
+            Debug.Log("ButtonController: Active player com1");
             companionSkillSelectionPanel.SetActive(false);
             skillSelectionPanel.SetActive(true);
         }
 
         if (battleManager.activePlayer == battleManager.companion2)
         {
+            Debug.Log("ButtonController: Active player com2");
             companionSkillSelectionPanel.SetActive(true);
             skillSelectionPanel.SetActive(false);
         }
