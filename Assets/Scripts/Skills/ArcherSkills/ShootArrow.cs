@@ -54,7 +54,7 @@ public class ShootArrow : Skill
         if (projectileScript != null)
         {
             projectileScript.damage = baseDamage;
-            projectileScript.speed = 75.0f;
+            projectileScript.speed = 50.0f;
             projectileScript.Spawner = user;  // Set the spawner
         }
 

@@ -246,21 +246,31 @@ public class BattleManager : MonoBehaviour
     if (turnOrderList.Count > 0)
     {
         var nextCharacter = turnOrderList[0];
-        if (nextCharacter.health <= 0) //check to make sure the character is dead and needs to be removed.
+        if (nextCharacter.health <= 0) // Check to make sure the character is dead and needs to be removed.
         {
             turnOrderList.Remove(nextCharacter);
             
-            ExecuteTurn(turnOrderList[0]);
+            // Check if there are still characters left in the list before executing the next turn
+            if (turnOrderList.Count > 0)
+            {
+                ExecuteTurn(turnOrderList[0]);
+            }
+            else
+            {
+                // If no characters are left, re-initialize the turn order
+                InitializeTurnOrder();
+            }
         }
+        else
+        {
+            ExecuteTurn(nextCharacter);
+        }
+    }
     else
-    {
-        ExecuteTurn(nextCharacter);
-    }
-    }
-    else
-    {
-        InitializeTurnOrder();
-    }
+        {
+            InitializeTurnOrder();
+        }
+
 }
 
 private void ExecuteTurn(Character character)
