@@ -2,28 +2,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Knight : Companion
+public class Archer : Companion
 {
     protected override void Awake()
     {
         base.Awake();
         GameManager.Instance.RegisterCompanion(this);
-        Debug.Log("Companion registered");
+        Debug.Log("Archer Companion registered");
         LoadCharacterData(); // Load saved data
 
         // Initialize with default values if no data is loaded
         if (this.level == 0)
         {
             this.level = 1;
-            this.attackPower = 7;
-            this.maxHealth = 20;
+            this.attackPower = 8;
+            this.maxHealth = 14;
             this.health = this.maxHealth;
-            this.defensePower = 20;
-            this.speed = 4;
-            this.maxEnergy = 10;
+            this.defensePower = 12;
+            this.speed = 10;
+            this.maxEnergy = 6;
             this.energy = this.maxEnergy;
             this.defensePenetration = 0;
-            this.heroID = "Knight";
+            this.heroID = "Archer";
             this.heroLevel = 1;
             this.heroExp = 0;
             this.heroSkillPoints = 0;
@@ -38,11 +38,11 @@ public class Knight : Companion
         if (this.heroExp >= ExpToNextLevel(this.heroLevel))
         {
             this.heroLevel++;
-            this.attackPower += 2;
-            this.maxHealth += 5;
+            this.attackPower += 4;
+            this.maxHealth += 2;
             this.health = this.maxHealth;
-            this.defensePower += 3;
-            this.speed += 1;
+            this.defensePower += 1;
+            this.speed += 3;
             this.maxEnergy += 1;
             this.energy = this.maxEnergy;
             this.heroExp = 0;  
@@ -56,9 +56,8 @@ public class Knight : Companion
 
     public override List<SkillType> AvailableSkills => new List<SkillType>
     {
-        SkillType.Slash,
-        SkillType.TripleHit,
-        SkillType.Taunt,
+        SkillType.ShootArrow,
+        
         
        
         
@@ -73,17 +72,11 @@ public class Knight : Companion
     {
         switch(skillType)
         {
-            case SkillType.Slash:
-                return new Slash();
+            case SkillType.ShootArrow:
+                return new ShootArrow();
             // ... other cases ..
             
-            case SkillType.TripleHit:
-                return new TripleHitSkill();
-            
-            case SkillType.Taunt:
-                return new Taunt();
-
-          
+        
             default:
                 Debug.LogError("Unknown skill type for Knight: " + skillType);
                 return null;

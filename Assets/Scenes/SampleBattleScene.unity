@@ -849,7 +849,6 @@ GameObject:
   m_Component:
   - component: {fileID: 250696102}
   - component: {fileID: 250696101}
-  - component: {fileID: 250696103}
   - component: {fileID: 250696104}
   m_Layer: 5
   m_Name: ButtonController
@@ -899,18 +898,6 @@ RectTransform:
   m_AnchoredPosition: {x: 17513.348, y: 5369.782}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &250696103
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 250696100}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 19076bd70534def42bc7b6cbf2f7ae5c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &250696104
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1495,7 +1482,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 527276c31296bdd4597061350fabf1dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  companionPrefab: {fileID: 1719300229918294577, guid: 58b48e8529f72e2439d59fce0fe167d1, type: 3}
+  companionPrefab: {fileID: 3837466525552236748, guid: 4b1888b18dd457640b7968b34c1fc87d, type: 3}
   companionSpawnPoint: {fileID: 828832546}
   associatedHealthBarSlider: {fileID: 1063747083}
   associatedEnergyBarSlider: {fileID: 594905529}
@@ -3980,7 +3967,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1063650664}
   - component: {fileID: 1063650663}
-  - component: {fileID: 1063650665}
   m_Layer: 0
   m_Name: PlayerController
   m_TagString: Untagged
@@ -4023,18 +4009,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1063650665
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1063650662}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dd52f750d63fb5542ba9490a2aed5c33, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1063747081
 GameObject:
   m_ObjectHideFlags: 0
@@ -5442,7 +5416,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1063650665}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Player, Assembly-CSharp
         m_MethodName: LevelUp
         m_Mode: 1
@@ -7105,7 +7079,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1063650665}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Player, Assembly-CSharp
         m_MethodName: LevelUp
         m_Mode: 1

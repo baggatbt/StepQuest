@@ -16,10 +16,12 @@ public class GameManager : MonoBehaviour
     //Instantiate any unlocked characters
     public Knight knight;
     public Wizard wizard;
+    public Archer archer;
     
     //Used in EnemyAttack() to weight enemy targets
     public float probabilityCompanion1; // Default probability for companion1 to be attacked
     public float probabilityCompanion2;// Default probability for companion2 to be attacked
+    public float probabilityCompanion3;
 
     private void Awake()
     {
@@ -29,6 +31,7 @@ public class GameManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
             probabilityCompanion1 = 1f;
             probabilityCompanion2 = 1f;
+            probabilityCompanion3 = 1f;
             CreateAndRegisterKnight();
             Debug.Log(companion1);
            
