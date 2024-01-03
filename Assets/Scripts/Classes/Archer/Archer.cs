@@ -9,8 +9,7 @@ public class Archer : Companion
         base.Awake();
         GameManager.Instance.RegisterCompanion(this);
         Debug.Log("Archer Companion registered");
-        LoadCharacterData(); // Load saved data
-
+    
         // Initialize with default values if no data is loaded
         if (this.level == 0)
         {
@@ -29,6 +28,7 @@ public class Archer : Companion
             this.heroSkillPoints = 0;
             this.heroStatPoints = 0;
         }
+        LoadCharacterData(); // Load saved data
     }
 
     
@@ -78,7 +78,7 @@ public class Archer : Companion
             
         
             default:
-                Debug.LogError("Unknown skill type for Knight: " + skillType);
+                Debug.LogError("Unknown skill type for Archer: " + skillType);
                 return null;
         }
     }

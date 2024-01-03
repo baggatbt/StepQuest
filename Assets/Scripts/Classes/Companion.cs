@@ -60,13 +60,13 @@ public abstract class Companion : Character
         };
 
         string jsonData = JsonUtility.ToJson(data);
-        PlayerPrefs.SetString("CharacterData_" + this.name, jsonData);
+        PlayerPrefs.SetString("CharacterData_" + heroID, jsonData);
         PlayerPrefs.Save();
     }
 
     public void LoadCharacterData()
 {
-    string jsonData = PlayerPrefs.GetString("CharacterData_" + this.name, "{}");
+    string jsonData = PlayerPrefs.GetString("CharacterData_" + heroID, "{}");
     if (jsonData != "{}") // Check if jsonData is not empty
     {
         SerializableCharacterData data = JsonUtility.FromJson<SerializableCharacterData>(jsonData);
@@ -86,17 +86,7 @@ public abstract class Companion : Character
     }
     else // Set default values if there is no data
     {
-        this.level = 1;
-        this.health = 20;
-        this.maxHealth = 20;
-        this.maxEnergy = 10;
-        this.attackPower = 7;
-        this.defensePower = 20;
-        this.speed = 4;
-        this.heroLevel = 1;
-        this.heroExp = 0;
-        this.heroStatPoints = 0;
-        this.heroSkillPoints = 0;
+        
     }
 }
 

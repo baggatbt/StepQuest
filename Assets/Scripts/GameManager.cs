@@ -33,6 +33,7 @@ public class GameManager : MonoBehaviour
             probabilityCompanion2 = 1f;
             probabilityCompanion3 = 1f;
             CreateAndRegisterKnight();
+            CreateAndRegisterArcher();
             Debug.Log(companion1);
            
         }
@@ -45,18 +46,20 @@ public class GameManager : MonoBehaviour
 
     private void CreateAndRegisterKnight()
     {
-        // Assuming you have a Knight prefab, you can instantiate it like this:
-        // GameObject knightObject = Instantiate(knightPrefab);
-        // knight = knightObject.GetComponent<Knight>();
-
-        // If you don't use a prefab and want to create the Knight directly:
         GameObject knightObject = new GameObject("Knight");
         knight = knightObject.AddComponent<Knight>();
-
-        // Add the Knight to the companions list if necessary
+        knight.heroID = "Knight"; // This line ensures the GameObject name is unique and avoids saves being overwritten
         RegisterCompanion(knight);
-        // Load data after creating the Knight
         knight.LoadCharacterData();
+    }
+
+    private void CreateAndRegisterArcher()
+    {
+        GameObject archerObject = new GameObject("Archer");
+        archer = archerObject.AddComponent<Archer>();
+        archer.heroID = "Archer"; // This line ensures the GameObject name is unique and avoids saves being overwritten
+        RegisterCompanion(archer);
+        archer.LoadCharacterData();
     }
 
     public void UnlockConnectedStages(Stage completedStage)
