@@ -16,10 +16,12 @@ public class GameManager : MonoBehaviour
     //Instantiate any unlocked characters
     public Knight knight;
     public Wizard wizard;
+    public Archer archer;
     
     //Used in EnemyAttack() to weight enemy targets
     public float probabilityCompanion1; // Default probability for companion1 to be attacked
     public float probabilityCompanion2;// Default probability for companion2 to be attacked
+    public float probabilityCompanion3;
 
     private void Awake()
     {
@@ -29,7 +31,9 @@ public class GameManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
             probabilityCompanion1 = 1f;
             probabilityCompanion2 = 1f;
+            probabilityCompanion3 = 1f;
             CreateAndRegisterKnight();
+            CreateAndRegisterArcher();
             Debug.Log(companion1);
            
         }
@@ -42,16 +46,20 @@ public class GameManager : MonoBehaviour
 
     private void CreateAndRegisterKnight()
     {
-        // Assuming you have a Knight prefab, you can instantiate it like this:
-        // GameObject knightObject = Instantiate(knightPrefab);
-        // knight = knightObject.GetComponent<Knight>();
-
-        // If you don't use a prefab and want to create the Knight directly:
         GameObject knightObject = new GameObject("Knight");
         knight = knightObject.AddComponent<Knight>();
-
-        // Add the Knight to the companions list if necessary
+        knight.heroID = "Knight"; // This line ensures the GameObject name is unique and avoids saves being overwritten
         RegisterCompanion(knight);
+        knight.LoadCharacterData();
+    }
+
+    private void CreateAndRegisterArcher()
+    {
+        GameObject archerObject = new GameObject("Archer");
+        archer = archerObject.AddComponent<Archer>();
+        archer.heroID = "Archer"; // This line ensures the GameObject name is unique and avoids saves being overwritten
+        RegisterCompanion(archer);
+        archer.LoadCharacterData();
     }
 
     public void UnlockConnectedStages(Stage completedStage)
@@ -74,12 +82,25 @@ public class GameManager : MonoBehaviour
     }
 }
 
+    
     //Testing method for deleting all saved data
     public void DeleteEverything()
+{
+    // Delete data for each companion
+    foreach (var companion in companions)
     {
-        PlayerPrefs.DeleteAll();
-        Debug.Log("Player prefs deleted");
+        if (companion != null)
+        {
+            companion.DeleteCharacterData();
+            Debug.Log("Deleted data for " + companion.name);
+        }
     }
+
+    // After individual deletions, clear all PlayerPrefs
+    PlayerPrefs.DeleteAll();
+    Debug.Log("All PlayerPrefs deleted");
+}
+
 // Method to add a companion to the list
     public void RegisterCompanion(Companion companion)
     {
@@ -105,7 +126,7 @@ public class GameManager : MonoBehaviour
     
     private void OnApplicationQuit()
     {
-        SaveAllCompanionData();
+      //OUT FOR EASY DELETION  SaveAllCompanionData();
     }
 
     private void OnApplicationPause()

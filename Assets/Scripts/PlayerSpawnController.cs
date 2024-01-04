@@ -36,6 +36,12 @@ public class PlayerSpawnController : MonoBehaviour
     GameObject spawnedPlayerObject = Instantiate(knightPrefab, spawnPoint.position, spawnPoint.rotation);
     Character spawnedPlayer = spawnedPlayerObject.GetComponent<Character>();
 
+
+     // Load the character's data 
+    if (spawnedPlayer is Knight)
+    {
+        (spawnedPlayer as Knight).LoadCharacterData();
+    }
      
     // Link this character to the health bar
     spawnedPlayer.healthBar = associatedHealthBarSlider;

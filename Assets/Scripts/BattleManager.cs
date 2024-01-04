@@ -37,6 +37,9 @@ public class BattleManager : MonoBehaviour
     public Button launchAttacksButton; 
     public StatusEffectController statusEffectController;
     public TextMeshProUGUI timingFeedbackText;
+    [SerializeField] private GameObject damagePopupPrefab;
+    [SerializeField] private GameObject popupStartPoint; // Reference to the starting point of the timing feedback text found in PlayerActiveEvent
+
     
 
 
@@ -103,12 +106,14 @@ public class BattleManager : MonoBehaviour
 
     private void Awake()
     {
+        companion1 = GameManager.Instance.companion1;
+        companion2 = GameManager.Instance.companion2;
         activePlayer = companion1;
     }
    private void Start()
 {
     
-    
+    activePlayer = companion1;
     Debug.Log("Active player from Player1 in start method"  + activePlayer);
     outerCircleInitialScale = outerCircle.transform.localScale;
     innerCircleInitialScale = innerCircle.transform.localScale;
@@ -244,21 +249,31 @@ public class BattleManager : MonoBehaviour
     if (turnOrderList.Count > 0)
     {
         var nextCharacter = turnOrderList[0];
-        if (nextCharacter.health <= 0) //check to make sure the character is dead and needs to be removed.
+        if (nextCharacter.health <= 0) // Check to make sure the character is dead and needs to be removed.
         {
             turnOrderList.Remove(nextCharacter);
             
-            ExecuteTurn(turnOrderList[0]);
+            // Check if there are still characters left in the list before executing the next turn
+            if (turnOrderList.Count > 0)
+            {
+                ExecuteTurn(turnOrderList[0]);
+            }
+            else
+            {
+                // If no characters are left, re-initialize the turn order
+                InitializeTurnOrder();
+            }
         }
+        else
+        {
+            ExecuteTurn(nextCharacter);
+        }
+    }
     else
-    {
-        ExecuteTurn(nextCharacter);
-    }
-    }
-    else
-    {
-        InitializeTurnOrder();
-    }
+        {
+            InitializeTurnOrder();
+        }
+
 }
 
 private void ExecuteTurn(Character character)
@@ -566,7 +581,40 @@ public void EndTurn()
 
     public ColorChanger colorChanger;  // Reference to the ColorLerper script
     
-    
+    private void ShowTimingResult(string message)
+{
+    if (currentTarget == null)
+    {
+        Debug.LogError("No current target set for timing result popup.");
+        return;
+    }
+
+    // Position the popup above the current target
+    Vector3 targetPosition = currentTarget.transform.position;
+    float yOffset = 3.0f; // Adjust this value as needed for the correct height
+    Vector3 popupPosition = new Vector3(targetPosition.x, targetPosition.y + yOffset, targetPosition.z);
+
+    // Assuming that the DamagePopup prefab is correctly located at Resources/Prefab/DamagePopup
+    GameObject damagePopupPrefab = Resources.Load<GameObject>("Prefab/UI Elements/TimingResultPopup");
+    Transform canvasTransform = GameObject.Find("EndOfBattleRewardsCanvas").transform; // Replace with your actual Canvas name if different
+
+    if (damagePopupPrefab != null)
+    {
+        GameObject damagePopupInstance = Instantiate(damagePopupPrefab, popupPosition, Quaternion.identity, canvasTransform);
+        DamagePopup damagePopupScript = damagePopupInstance.GetComponent<DamagePopup>();
+        damagePopupScript.SetupTimingEventResult(message); // Call the method to set up timing result text
+    }
+    else
+    {
+        Debug.LogError("Failed to load DamagePopup prefab for timing result.");
+    }
+}
+
+
+
+
+
+        
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<TimingEventResult> callback)
 {
     // Enable the timing circles when the event starts
@@ -612,14 +660,13 @@ public void EndTurn()
             if (timer >= windowStart)
             {
                 result = GetTimingAccuracy(outerCircle.transform.localScale);
-                timingFeedbackText.text = result.ToString();
+                
             }
             else
             {
                 Debug.Log("Timing Missed!");
                 result = TimingEventResult.Miss;
-                timingFeedbackText.text = result.ToString();
-                skillQueue.Clear();
+                
             }
         }
         else
@@ -627,10 +674,9 @@ public void EndTurn()
           
             Debug.Log("No input detected. Missed!");
             result = TimingEventResult.Miss;
-            timingFeedbackText.text = result.ToString();
-            skillQueue.Clear();
+            
         }
-
+        ShowTimingResult(result.ToString());
         callback(result);
     }
     finally
@@ -719,6 +765,7 @@ public void EndTurn()
             result = TimingEventResult.Perfect;
         }
 
+        ShowTimingResult(result.ToString());
         callback(result);
         holdReleaseSlider.ResetSlider(); // Reset the slider at the end of the hold event
     }

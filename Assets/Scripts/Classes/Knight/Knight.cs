@@ -9,10 +9,10 @@ public class Knight : Companion
         base.Awake();
         GameManager.Instance.RegisterCompanion(this);
         Debug.Log("Companion registered");
-        LoadCharacterData(); // Load saved data
+        
 
         // Initialize with default values if no data is loaded
-        if (this.health <= 0)
+        if (this.level == 0)
         {
             this.level = 1;
             this.attackPower = 7;
@@ -29,6 +29,7 @@ public class Knight : Companion
             this.heroSkillPoints = 0;
             this.heroStatPoints = 0;
         }
+        LoadCharacterData(); // Load saved data
     }
 
     
@@ -59,6 +60,7 @@ public class Knight : Companion
         SkillType.Slash,
         SkillType.TripleHit,
         SkillType.Taunt,
+        
        
         
     };
@@ -81,6 +83,7 @@ public class Knight : Companion
             
             case SkillType.Taunt:
                 return new Taunt();
+
           
             default:
                 Debug.LogError("Unknown skill type for Knight: " + skillType);

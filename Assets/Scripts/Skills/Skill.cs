@@ -23,6 +23,7 @@ public enum SkillType
         WizardBasicAttack,
         FirePillar,
         Taunt,
+        ShootArrow,
     }
 
 

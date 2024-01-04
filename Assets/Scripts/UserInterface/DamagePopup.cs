@@ -20,6 +20,12 @@ public class DamagePopup : MonoBehaviour
         textMesh.text = damageAmount.ToString();
     }
 
+    // New method to setup text for timing event results
+    public void SetupTimingEventResult(string resultMessage)
+    {
+        textMesh.text = resultMessage;
+    }
+
     private void Update()
     {
         // Move text up and fade it out
