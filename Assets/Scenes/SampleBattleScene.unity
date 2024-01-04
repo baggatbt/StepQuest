@@ -2463,6 +2463,42 @@ Transform:
   m_Father: {fileID: 351433823}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &484004676
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 484004677}
+  m_Layer: 5
+  m_Name: TimingFeedBackTextOrigin
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &484004677
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 484004676}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1419551331}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 89, y: 252}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &508213951
 GameObject:
   m_ObjectHideFlags: 0
@@ -5121,6 +5157,8 @@ MonoBehaviour:
   launchAttacksButton: {fileID: 527478662}
   statusEffectController: {fileID: 175760104}
   timingFeedbackText: {fileID: 655014006}
+  damagePopupPrefab: {fileID: 1537480710157673141, guid: cc9a21cc11214a24384120534efdf528, type: 3}
+  popupStartPoint: {fileID: 484004676}
   outerCircle: {fileID: 1626096152}
   innerCircle: {fileID: 1227564317}
   ExpGainedText: {fileID: 1778247465}
@@ -7835,6 +7873,7 @@ RectTransform:
   - {fileID: 1955465192}
   - {fileID: 625594134}
   - {fileID: 828832546}
+  - {fileID: 484004677}
   m_Father: {fileID: 1792707033}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
