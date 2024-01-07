@@ -61,7 +61,7 @@ public class ShootArrow : Skill
           // Modify the projectile's damage based on the timing result
            projectileScript.Target = target;  // Set the target of the projectile
             HandlePlayerRangedAttack(user, projectileScript, result);
-            target.animator.SetTrigger("IsHurtTrigger");
+            
             
       
     });

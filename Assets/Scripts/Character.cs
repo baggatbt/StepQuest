@@ -178,7 +178,7 @@ public class Character : MonoBehaviour
     // Subtract the calculated damage from health
     health -= damageDealt;
     healthBar.value = health;
-   // this.IsHit();
+    this.EnemyIsHit(); //If the character taking damage is an enemy, they all share the same trigger
 
     // Update the health text
     if (this.healthText != null)
@@ -289,7 +289,7 @@ public class Character : MonoBehaviour
     }
 
    
-    public void IsHit() => animator.SetTrigger("IsHurtTrigger");
+    public void EnemyIsHit() => animator.SetTrigger("EnemyIsHurtTrigger");
     
     public bool isAnimationDone = false;
 
