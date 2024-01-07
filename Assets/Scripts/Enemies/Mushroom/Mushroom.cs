@@ -29,7 +29,7 @@ public class Mushroom : Enemy
         this.expReward = 10;  
         this.goldReward = 4;
         this.attacksBeforeSpecial = 3;
-        this.attackPower = 2;
+        this.attackPower = 8;
         this.defensePower = 15; 
         this.energy = 0;
 

@@ -160,6 +160,25 @@ public abstract class Skill
     }
 }
 
+public void HandlePlayerRangedAttack(Character user, Projectile projectile, TimingEventResult result)
+    {
+        float damageMultiplier = 1.0f;
+        switch (result)
+        {
+            case TimingEventResult.Perfect:
+                damageMultiplier = 1.5f; // Boost damage by 50%
+                break;
+            case TimingEventResult.Good:
+                damageMultiplier = 1.25f; // Boost damage by 25%
+                break;
+            case TimingEventResult.Miss:
+                // Optional: Reduce damage or keep as it is
+                break;
+        }
+
+        projectile.damage = (int)(projectile.damage * damageMultiplier);
+    }
+
 
 
     public int GetSkillLevel()

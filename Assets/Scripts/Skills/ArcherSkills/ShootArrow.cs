@@ -54,11 +54,12 @@ public class ShootArrow : Skill
         if (projectileScript != null)
         {
             projectileScript.damage = baseDamage;
-            projectileScript.speed = 50.0f;
+            projectileScript.speed = 40.0f;
             projectileScript.Spawner = user;  // Set the spawner
         }
-
-        HandleTimingResultForPlayerAttack(user, target, result, baseDamage);
+    
+          // Modify the projectile's damage based on the timing result
+            HandlePlayerRangedAttack(user, projectileScript, result);
       
     });
    

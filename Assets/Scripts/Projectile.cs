@@ -16,16 +16,24 @@ public class Projectile : MonoBehaviour
     }
 
     void OnTriggerEnter2D(Collider2D other)
+{
+    Debug.Log("Projectile collided");
+    Character character = other.GetComponent<Character>();
+
+    if (character != null && character != Spawner && !character.CompareTag("Player"))
     {
-        Debug.Log("Ive been collided");
-        Character character = other.GetComponent<Character>();
-        if (character != null && character != Spawner)
+        if (!isColliding)  // Check to prevent multiple collisions
         {
             isColliding = true;
-            Destroy(gameObject);  // destroy the projectile on hit
-            
+            character.TakeDamage(damage, Spawner);  // Pass Spawner as the attacker
+            Destroy(gameObject);  // Destroy the projectile on hit
         }
     }
+}
+
+
+
+     
 }
 
 
