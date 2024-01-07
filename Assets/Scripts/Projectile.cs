@@ -6,6 +6,7 @@ public class Projectile : MonoBehaviour
 {
     public float speed;
     public Character Spawner { get; set; }
+    public Character Target { get; set; }  // Add a target property
     public int damage;
     public bool isColliding;
 
@@ -16,20 +17,16 @@ public class Projectile : MonoBehaviour
     }
 
     void OnTriggerEnter2D(Collider2D other)
-{
-    Debug.Log("Projectile collided");
-    Character character = other.GetComponent<Character>();
-
-    if (character != null && character != Spawner && !character.CompareTag("Player"))
     {
-        if (!isColliding)  // Check to prevent multiple collisions
+        Debug.Log("Projectile collided");
+        if (!isColliding && other.GetComponent<Character>() == Target)  // Check if the collided object is the target
         {
             isColliding = true;
-            character.TakeDamage(damage, Spawner);  // Pass Spawner as the attacker
+            Target.TakeDamage(damage, Spawner);  // Pass Spawner as the attacker
             Destroy(gameObject);  // Destroy the projectile on hit
         }
     }
-}
+
 
 
 
