@@ -134,7 +134,7 @@ public abstract class Skill
             target.TakeDamage((int)(baseDamage * damageMultiplier),user); // Apply damage boost
            //target.EnemyTakeDamage((int)(baseDamage * damageMultiplier),user, target.enemyDamageReductionModifier);
             target.animator.SetTrigger("IsHurtTrigger");
-            AudioManager.instance.PlayCriticalSlashSound();
+            //AudioManager.instance.PlayCriticalSlashSound();
             //user.GainEnergy(energyGain); //Perfect hits give +1 energy
             break;
         case TimingEventResult.Good:

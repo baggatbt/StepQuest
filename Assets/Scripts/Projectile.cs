@@ -23,6 +23,7 @@ public class Projectile : MonoBehaviour
         {
             isColliding = true;
             Target.TakeDamage(damage, Spawner);  // Pass Spawner as the attacker
+            Target.CheckForDeath();
             Destroy(gameObject);  // Destroy the projectile on hit
         }
     }

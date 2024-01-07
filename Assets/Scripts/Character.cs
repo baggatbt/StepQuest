@@ -178,6 +178,7 @@ public class Character : MonoBehaviour
     // Subtract the calculated damage from health
     health -= damageDealt;
     healthBar.value = health;
+   // this.IsHit();
 
     // Update the health text
     if (this.healthText != null)
