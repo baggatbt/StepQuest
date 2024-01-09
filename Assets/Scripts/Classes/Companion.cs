@@ -14,6 +14,8 @@ public abstract class Companion : Character
     public int heroStatPoints;
     public int heroSkillPoints;
     
+    //public Sprite companionIcon; // Icon associated with the companion
+
     
     
     [Serializable]
