@@ -6,7 +6,7 @@ public class ChangeScene : MonoBehaviour
     public void LoadBattleScene()
     {
         
-        SceneManager.LoadScene("SampleBattleScene");
+        SceneManager.LoadScene("TestPortraitBattle");
     }
 
      public void GoToMainMenuScene()

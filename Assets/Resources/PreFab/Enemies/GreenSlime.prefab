@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 8370724005610461912}
   m_LocalRotation: {x: -0, y: -0.9999961, z: 0, w: -0.0027930697}
   m_LocalPosition: {x: 320.47, y: 95.94, z: -16.46}
-  m_LocalScale: {x: 2.5, y: 2.5, z: 2.5}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -118,12 +118,13 @@ MonoBehaviour:
   level: 1
   health: 8
   maxHealth: 8
-  damage: 2
   energy: 0
   maxEnergy: 0
   teamEnergy: 0
   attackPower: 0
   defensePower: 0
+  defensePenetration: 0
+  enemyDamageReductionModifier: 0
   speed: 0
   healthBar: {fileID: 0}
   energyBar: {fileID: 0}

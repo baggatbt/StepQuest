@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 1719300229918294577}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 510.49936, y: 341.38602, z: 0}
-  m_LocalScale: {x: 7, y: 7, z: 7}
+  m_LocalScale: {x: 6, y: 6, z: 6}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -123,12 +123,13 @@ MonoBehaviour:
   level: 0
   health: 0
   maxHealth: 0
-  damage: 0
   energy: 0
   maxEnergy: 5
   teamEnergy: 0
   attackPower: 0
   defensePower: 0
+  defensePenetration: 0
+  enemyDamageReductionModifier: 0
   speed: 0
   healthBar: {fileID: 0}
   energyBar: {fileID: 0}
@@ -149,6 +150,11 @@ MonoBehaviour:
   cameraShake: {fileID: 0}
   isAnimationDone: 0
   animationDamageTime: 0
+  heroID: 
+  heroLevel: 0
+  heroExp: 0
+  heroStatPoints: 0
+  heroSkillPoints: 0
 --- !u!70 &720051240943351146
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
