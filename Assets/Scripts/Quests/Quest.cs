@@ -4,9 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro; 
 
-public class Mission: MonoBehaviour
+public class Quest: MonoBehaviour
 {
-    public string missionName;
+    public string questName;
     public int stepCost; // The total steps required to complete this mission.
     public bool isActive; // This tracks if the mission is currently active.
     public int currentSteps;

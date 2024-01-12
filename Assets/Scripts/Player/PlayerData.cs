@@ -30,7 +30,7 @@ public class PlayerData : MonoBehaviour
     
     public Dictionary<string, int> skillLevels;
     public Dictionary<string, int> skillExp;
-    public List<Mission> activeMissions = new List<Mission>();
+    public List<Quest> activeMissions = new List<Quest>();
 
     private StepCounterController stepCounterController;
     

@@ -10,7 +10,7 @@ public class Stage : MonoBehaviour
 {
     public Button stageButton;
     public BattleConfig stageBattleConfig;
-    public string battleSceneName = "BattleScene"; 
+    public string battleSceneName = "TestPortraitBattle"; 
     public bool isUnlocked;
     public bool isFirstCompletion;
     public string stageID; // Unique identifier for the stage

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro; 
-public class MissionOne : Mission
+public class QuestOne : Quest
 {
     public Button missionOneStartButton;
     public TextMeshProUGUI stepCostText;
@@ -13,11 +13,10 @@ public class MissionOne : Mission
 
     private void Awake()
     {
-        missionName = "Test Mission";
+        questName = "Test Mission";
         stepCost = 500;
         isActive = false; // This tracks if the mission is currently active.
-        stepsAtMissionStart = 0;
-        currentSteps = 0;
+       
         
     }
 
@@ -30,6 +29,7 @@ public class MissionOne : Mission
     if (isActive && Time.time >= nextUpdate)
     {
         stepsToGo = stepCost - currentSteps;
+        Debug.Log(stepsToGo);
         nextUpdate = Time.time + updateInterval;
         UpdateCurrentSteps();
         if (stepsToGo > 0)
