@@ -68,7 +68,7 @@ public class Character : MonoBehaviour
             if (this.healthText != null )
             {
                 Debug.Log(this.healthText.text + " was not null");
-                this.healthText.text =  this.health + " / " + maxHealth;
+                this.healthText.text =  this.health + "";
                 
             }
         }
@@ -79,7 +79,7 @@ public class Character : MonoBehaviour
             if (this.energyText != null)
             {
                 
-                this.energyText.text = this.energy +  " / " + this.maxEnergy;
+                this.energyText.text = this.energy + "";
                 this.energyBar.value = this.energy;
                 
                 
@@ -99,8 +99,8 @@ public class Character : MonoBehaviour
             healthBar.value = health;
             if (healthText !=null && energyText !=null)
             {
-               this.healthText.text = this.health + " / " + this.maxHealth;
-                energyText.text = this.energy  + " / " + maxEnergy;
+               this.healthText.text = this.health + "";
+                energyText.text = this.energy  + "";
             }
         }
         
@@ -183,7 +183,7 @@ public class Character : MonoBehaviour
     // Update the health text
     if (this.healthText != null)
     {
-        this.healthText.text = this.health + " / " + this.maxHealth;
+        this.healthText.text = this.health + "";
     }
     
     // Check if damage was dealt for additional effects
@@ -243,7 +243,7 @@ public class Character : MonoBehaviour
         if (energyBar != null)
         {
             energyBar.value = this.energy;
-            energyText.text = this.energy + " / " + this.maxEnergy;
+            energyText.text = this.energy + "";
         }
 }   
 
@@ -272,7 +272,7 @@ public class Character : MonoBehaviour
     }
     if (energyText != null) //Had to separate this because monster energies do not use text.
     {
-        energyText.text = "MP: " + this.energy + " / " + maxEnergy;
+        energyText.text =  this.energy + "";
     }
     Debug.Log("Not passing any");
 }
