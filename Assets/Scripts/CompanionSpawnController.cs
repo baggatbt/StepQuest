@@ -31,33 +31,40 @@ public class CompanionSpawnController : MonoBehaviour
    }
 
     public Character SpawnCompanionAtPoint(Transform spawnPoint)
-{
-    // Instantiate the Companion at the position of spawnPoint and with its rotation
-    GameObject spawnedCompanionObject = Instantiate(companionPrefab, spawnPoint.position, spawnPoint.rotation);
-    Character spawnedCompanion = spawnedCompanionObject.GetComponent<Character>();
-    
-    // Set the tag for the spawned companion object
-    spawnedCompanionObject.tag = "Companion";
+    {
+        // Instantiate the Companion at the position of spawnPoint and with its rotation
+        GameObject spawnedCompanionObject = Instantiate(companionPrefab, spawnPoint.position, spawnPoint.rotation);
+        Character spawnedCompanion = spawnedCompanionObject.GetComponent<Character>();
 
+        // Set the tag for the spawned companion object
+        spawnedCompanionObject.tag = "Companion";
 
-     
-    // Link this character to the health bar
-    spawnedCompanion.healthBar = associatedHealthBarSlider;
-    associatedHealthBarSlider.gameObject.SetActive(true); // Activate the health bar
-    associatedHealthBarSlider.maxValue = spawnedCompanion.maxHealth;
-    associatedHealthBarSlider.value = spawnedCompanion.health;
-    spawnedCompanion.healthText = associatedHealthText;
+        // Calculate the position 3 units below the spawned companion
+        Renderer companionRenderer = spawnedCompanionObject.GetComponent<Renderer>();
+        float characterBottom = 0f;
+        if (companionRenderer != null)
+        {
+            characterBottom = companionRenderer.bounds.min.y; // Get the lowest point of the companion
+        }
+        Vector3 sliderPositionOffset = new Vector3(spawnedCompanionObject.transform.position.x, characterBottom - 0.5f, spawnedCompanionObject.transform.position.z);
 
-    spawnedCompanion.energyBar = associatedEnergyBarSlider;
-    spawnedCompanion.energyText = associatedEnergyText;
+        // Move health and energy bar sliders to the calculated position
+        associatedHealthBarSlider.transform.position = sliderPositionOffset;
+        associatedEnergyBarSlider.transform.position = sliderPositionOffset;
 
+        // Link this character to the health bar
+        spawnedCompanion.healthBar = associatedHealthBarSlider;
+        associatedHealthBarSlider.gameObject.SetActive(true); // Activate the health bar
+        associatedHealthBarSlider.maxValue = spawnedCompanion.maxHealth;
+        associatedHealthBarSlider.value = spawnedCompanion.health;
+        spawnedCompanion.healthText = associatedHealthText;
 
-    spawnedCompanion.isFront = false;
-  
+        spawnedCompanion.energyBar = associatedEnergyBarSlider;
+        spawnedCompanion.energyText = associatedEnergyText;
 
-   
+        spawnedCompanion.isFront = false;
 
-    return spawnedCompanion; // Ensure a Character is always returned
-}
+        return spawnedCompanion; // Ensure a Character is always returned
+    }
 
 }
