@@ -27,6 +27,7 @@ public class PlayerData : MonoBehaviour
     public int teamEnergy;
     public string heroID;
     public int speed;
+    public int currentStageIndex;
     
     public Dictionary<string, int> skillLevels;
     public Dictionary<string, int> skillExp;
@@ -49,6 +50,7 @@ public class PlayerData : MonoBehaviour
         
         LoadPlayerData();
         
+
         
         
     }
@@ -104,6 +106,7 @@ public class PlayerData : MonoBehaviour
     {
         PlayerPrefs.SetInt("PlayerLevel", level);
         PlayerPrefs.SetInt("PlayerGold", gold);
+        PlayerPrefs.SetInt("CurrentStageIndex", currentStageIndex);
        
        
         PlayerPrefs.Save();
@@ -116,6 +119,7 @@ public class PlayerData : MonoBehaviour
         {
             level = PlayerPrefs.GetInt("PlayerLevel");
             gold = PlayerPrefs.GetInt("PlayerGold");
+            currentStageIndex = PlayerPrefs.GetInt("CurrentStageIndex");
             
             
         }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 
 public class GameManager : MonoBehaviour
@@ -11,6 +12,9 @@ public class GameManager : MonoBehaviour
     public Character companion1; //Battle Position
     public Character companion2; 
     public Character companion3;
+    public int currentStageIndex;
+    public List<BattleConfig> allStages; // list is populated with all stages in order
+
     public List<Companion> companions = new List<Companion>();
 
     //Instantiate any unlocked characters
@@ -29,6 +33,9 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            currentStageIndex = PlayerData.Instance.currentStageIndex; //Gets the current stage from PlayerData
+
+            //Each companion has equal chance to be selected for attack, need to change so it uses the class's variable threat
             probabilityCompanion1 = 1f;
             probabilityCompanion2 = 1f;
             probabilityCompanion3 = 1f;
@@ -81,6 +88,24 @@ public class GameManager : MonoBehaviour
         }
     }
 }
+
+    public void GoToNextStage()
+    {
+        // Increment the stage index
+        currentStageIndex++;
+        
+        // Make sure we don't go out of bounds
+        if (currentStageIndex >= allStages.Count)
+        {
+            Debug.Log("The game is over, you win");
+        }
+        
+        // Set the current battle configuration to the next stage
+        CurrentBattleConfig = allStages[currentStageIndex];
+
+        // Load the battle scene with the new configuration
+        SceneManager.LoadScene("TestPortraitBattle");
+    }
 
     
     //Testing method for deleting all saved data

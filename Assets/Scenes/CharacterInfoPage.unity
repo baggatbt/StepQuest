@@ -6561,6 +6561,17 @@ MonoBehaviour:
   companion1: {fileID: 0}
   companion2: {fileID: 0}
   companion3: {fileID: 0}
+  currentStageIndex: 1
+  allStages:
+  - poolName: Forest
+    maxEnemiesToSpawn: 1
+    stage: {fileID: 0}
+  - poolName: Forest
+    maxEnemiesToSpawn: 3
+    stage: {fileID: 0}
+  - poolName: 
+    maxEnemiesToSpawn: 0
+    stage: {fileID: 0}
   companions: []
   knight: {fileID: 0}
   wizard: {fileID: 0}
@@ -8627,6 +8638,7 @@ MonoBehaviour:
   teamEnergy: 0
   heroID: 
   speed: 0
+  currentStageIndex: 0
   activeMissions: []
 --- !u!4 &937494370
 Transform:
@@ -16794,9 +16806,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Player, Assembly-CSharp
-        m_MethodName: ConsumeStepsToGainRewards
+      - m_Target: {fileID: 728042706}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: GoToNextStage
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
