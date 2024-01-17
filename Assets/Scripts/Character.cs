@@ -397,4 +397,11 @@ private bool IsCollidingWithCharacter()
     return false;
 }
 
+
+        public virtual void UpdateStats()
+    {   
+        //Each enemy implements its own growth
+    }
+    
+
 }

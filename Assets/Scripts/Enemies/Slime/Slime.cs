@@ -33,6 +33,7 @@ public class Slime : Enemy
         this.goldReward = 2;
         this.attacksBeforeSpecial = 2;
         
+        
        
        
 
@@ -43,6 +44,15 @@ public class Slime : Enemy
         // Set the default currentSkill
         this.currentSkill = this.normalSkill;
 
-    
+    }
+        public override void UpdateStats()
+    {
+        this.maxHealth = 9 + (this.level * 4);
+        this.health = maxHealth;
+        this.expReward = 8 + (this.level * 2);
+        this.goldReward = 3 + (this.level * 2);
+        this.attackPower = 6 + (this.level + 1);
+        this.defensePower = 5 + (this.level + 1);
+        this.energy = 0;
     }
 }

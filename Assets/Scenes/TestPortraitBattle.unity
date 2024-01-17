@@ -532,10 +532,10 @@ RectTransform:
   m_Father: {fileID: 1792707033}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.033, y: 0.018555555}
-  m_AnchorMax: {x: 0.5583704, y: 0.202}
-  m_AnchoredPosition: {x: -20, y: -81}
-  m_SizeDelta: {x: 1811.0542, y: 315.02673}
+  m_AnchorMin: {x: 0.117000006, y: 0.018555555}
+  m_AnchorMax: {x: 0.8443993, y: 0.20385186}
+  m_AnchoredPosition: {x: 10, y: 5.999939}
+  m_SizeDelta: {x: 547.83, y: 242.24}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &97259696
 MonoBehaviour:
@@ -3597,6 +3597,7 @@ GameObject:
   - component: {fileID: 873669126}
   - component: {fileID: 873669128}
   - component: {fileID: 873669127}
+  - component: {fileID: 873669129}
   m_Layer: 5
   m_Name: SkillsPanel
   m_TagString: Untagged
@@ -3613,16 +3614,16 @@ RectTransform:
   m_GameObject: {fileID: 873669125}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 50}
-  m_LocalScale: {x: 0.40743923, y: 0.40743923, z: 0.40743923}
+  m_LocalScale: {x: 0.3030044, y: 0.3030044, z: 0.3030044}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1792707033}
   m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 0.018555555}
   m_AnchorMax: {x: 1, y: 0.25637037}
-  m_AnchoredPosition: {x: 36, y: -95}
-  m_SizeDelta: {x: 798.44, y: 360.64}
+  m_AnchoredPosition: {x: -10, y: -29}
+  m_SizeDelta: {x: 797.43994, y: 380.64}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &873669127
 MonoBehaviour:
@@ -3662,6 +3663,32 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 873669125}
   m_CullTransparentMesh: 1
+--- !u!114 &873669129
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 873669125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 500
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_Spacing: 500
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 1
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1 &894455602
 GameObject:
   m_ObjectHideFlags: 0
@@ -4203,7 +4230,10 @@ MonoBehaviour:
   battleConfigs: []
   nextBattleButton: {fileID: 1214940462}
   turnOrderList: []
-  enemyUIPanel: {fileID: 1955465191}
+  enemyUIPanel: {fileID: 757580007}
+  heroUIPanels: {fileID: 351433822}
+  companionSkillsPanel: {fileID: 97259694}
+  SkillsPanel: {fileID: 873669125}
   skillsExecuted: 0
   zoomEffect: {fileID: 1629118930}
   attackingEnemy: {fileID: 0}
@@ -8604,7 +8634,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -34.423, y: -72.121}
+  m_AnchoredPosition: {x: -34.423004, y: -72.121}
   m_SizeDelta: {x: 254.6, y: 111.11}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1903386001

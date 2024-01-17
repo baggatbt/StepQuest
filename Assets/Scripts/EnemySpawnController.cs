@@ -36,7 +36,7 @@ public class EnemySpawnController : MonoBehaviour
         healthTexts = new TextMeshProUGUI[] { healthText, healthText2, healthText3 };
     }
 
-    public Character SpawnEnemiesFromPool(string poolName, int numberToSpawn, Transform spawnPoint, Slider associatedHealthBarSlider, Slider associatedEnergyBarSlider, int healthTextIndex)
+    public Character SpawnEnemiesFromPool(string poolName, int numberToSpawn, Transform spawnPoint, Slider associatedHealthBarSlider, Slider associatedEnergyBarSlider, int healthTextIndex, int level)
 {
     if (!poolDictionary.ContainsKey(poolName))
     {
@@ -54,6 +54,8 @@ public class EnemySpawnController : MonoBehaviour
         lastSpawnedCharacter = spawnedEnemy.GetComponent<Character>();
         if (lastSpawnedCharacter == null) continue;
 
+        lastSpawnedCharacter.level = level;
+        Debug.Log("Last spawned enemy  " + lastSpawnedCharacter.level);
         // Set health and energy bars
         lastSpawnedCharacter.healthBar = associatedHealthBarSlider;
         lastSpawnedCharacter.energyBar = associatedEnergyBarSlider;
@@ -84,6 +86,8 @@ public class EnemySpawnController : MonoBehaviour
         associatedEnergyBarSlider.gameObject.SetActive(true);
         associatedEnergyBarSlider.maxValue = lastSpawnedCharacter.maxEnergy;
         associatedEnergyBarSlider.value = 0;
+
+        lastSpawnedCharacter.UpdateStats();
     }
     enemiesSpawned = 0;
 

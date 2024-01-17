@@ -168,18 +168,21 @@ public class BattleManager : MonoBehaviour
     endOfBattlePanel.SetActive(false);
     for (int i = 0; i < config.maxEnemiesToSpawn; i++)
     {
+        Debug.Log(config.levelOfEnemies + "config levelOfEnemies");
         Character spawnedEnemy = enemySpawnController.SpawnEnemiesFromPool(
             config.poolName,
             1, // Spawn one enemy
             enemySpawnPoints[i], // Pass the spawn point
             healthBars[i], // Pass the health bar slider
             energyBars[i], // Pass the energy bar slider
-            i // Pass the index for health text assignment
+            i, // Pass the index for health text assignment
+            config.levelOfEnemies //For level assignment
         );
 
         if (spawnedEnemy != null)
         {
             enemies.Add(spawnedEnemy);
+            
         }
     }
     RestoreHealthAndEnergy();
@@ -316,25 +319,23 @@ public void EndTurn()
 
     public void DisableAllButtons()
     {
-        /*
-        foreach (Button btn in skillButtons)
-        {
-            btn.interactable = false;
-        }
-        launchAttacksButton.interactable = false;
-        */
-      //  enemyUIPanel.SetActive(false);
+        companionSkillsPanel.SetActive(false);
+        SkillsPanel.SetActive(false);
+        enemyUIPanel.SetActive(false);
+        heroUIPanels.SetActive(false);
     }
+
    public GameObject enemyUIPanel;
+   public GameObject heroUIPanels;
+   public GameObject companionSkillsPanel;
+   public GameObject SkillsPanel;
+
     public void EnableAllButtons()
     {
-       /* foreach (Button btn in skillButtons)
-        {
-            btn.interactable = true;
-        }
-        launchAttacksButton.interactable = true;
-        */
-        //enemyUIPanel.SetActive(true);
+        companionSkillsPanel.SetActive(true);
+        SkillsPanel.SetActive(true);
+        enemyUIPanel.SetActive(true);
+        heroUIPanels.SetActive(true);
     }
 
     public void MoveCursorToTarget()

@@ -15,6 +15,9 @@ public class Mushroom : Enemy
         this.health = this.maxHealth;
         this.maxEnergy = 3;
         this.speed = 3;
+        this.attackPower = 8;
+        this.defensePower = 15; 
+        this.energy = 0;
         
     }
      protected override void Start()
@@ -28,10 +31,7 @@ public class Mushroom : Enemy
         
         this.expReward = 10;  
         this.goldReward = 4;
-        this.attacksBeforeSpecial = 3;
-        this.attackPower = 8;
-        this.defensePower = 15; 
-        this.energy = 0;
+        
 
         // Assign the skills
         this.normalSkill = this.skills[0]; // Normal skill
@@ -40,7 +40,18 @@ public class Mushroom : Enemy
         // Set the default currentSkill
         this.currentSkill = this.normalSkill;
 
-        
+    
+    }
+        public override void UpdateStats()
+    {
+        this.maxHealth = 9 + (this.level * 3);
+        this.health = maxHealth;
+        this.expReward = 8 + (this.level * 2);
+        this.goldReward = 3 + (this.level * 2);
+        this.attacksBeforeSpecial = 2;
+        this.attackPower = 6 + (this.level + 1);
+        this.defensePower = 5 + (this.level + 1);
+        this.energy = 0;
     }
 }
 
