@@ -44,13 +44,13 @@ public class Mushroom : Enemy
     }
         public override void UpdateStats()
     {
-        this.maxHealth = 9 + (this.level * 3);
+        this.maxHealth = 9 + (this.level * 5);
         this.health = maxHealth;
-        this.expReward = 8 + (this.level * 2);
-        this.goldReward = 3 + (this.level * 2);
+        this.expReward = 8 + (this.level * 3);
+        this.goldReward = 3 + (this.level * 3);
         this.attacksBeforeSpecial = 2;
         this.attackPower = 6 + (this.level + 1);
-        this.defensePower = 5 + (this.level + 1);
+        this.defensePower = 5 + (this.level + 3);
         this.energy = 0;
     }
 }

@@ -110,6 +110,7 @@ public class BattleManager : MonoBehaviour
         companion2 = GameManager.Instance.companion2;
         activePlayer = companion1;
     }
+    
    private void Start()
 {
     
