@@ -14,21 +14,7 @@ public class PlayerSpawnController : MonoBehaviour
     public BattleManager battleManager;
 
 
-   private void Start()
-   {
-    if (battleManager == null)
-    {
-        battleManager = FindObjectOfType<BattleManager>();
-    }
-
-    Character spawnedPlayer = SpawnPlayerAtPoint(playerSpawnPoint);
-    Debug.Log(spawnedPlayer.attackPower);
-    if (spawnedPlayer != null && battleManager != null)
-    {
-        battleManager.companion1 = spawnedPlayer;
-        battleManager.playerParty.Add(spawnedPlayer);
-    }
-   }
+   
 
     public Character SpawnPlayerAtPoint(Transform spawnPoint)
     {

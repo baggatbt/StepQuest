@@ -234,18 +234,21 @@ public class Character : MonoBehaviour
 
    // private int remainingCost = 0;
     public void SpendEnergy(int energySpent)
+{
+    this.energy -= energySpent;
+    
+    // Check if energyBar and energyText are not null before accessing their properties
+    if (energyBar != null)
     {
-  
-        this.energy -= energySpent;
-        
-        
         energyBar.value = this.energy;
-        if (energyBar != null)
-        {
-            energyBar.value = this.energy;
-            energyText.text = this.energy + "";
-        }
-}   
+    }
+
+    if (energyText != null)
+    {
+        energyText.text = this.energy.ToString();
+    }
+}
+
 
 
     public void GainTeamEnergy(int energyGained)

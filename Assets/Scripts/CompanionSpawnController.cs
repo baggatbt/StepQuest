@@ -1,70 +1,91 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; 
+using TMPro;
 
 public class CompanionSpawnController : MonoBehaviour
 {
     public GameObject companionPrefab;
-    public Transform companionSpawnPoint; // You can assign this directly in the inspector
+    public Transform[] companionSpawnPoints; // Assign in the inspector
     public Slider associatedHealthBarSlider; // Reference to the slider
     public Slider associatedEnergyBarSlider;
     public TextMeshProUGUI associatedHealthText;
     public TextMeshProUGUI associatedEnergyText;
-    public Slider associatedtempEnergyBarSlider;
+    public Slider associatedHealthBarSlider2; // Reference to the slider
+    public Slider associatedEnergyBarSlider2;
+    public TextMeshProUGUI associatedHealthText2;
+    public TextMeshProUGUI associatedEnergyText2;
+    public Slider associatedtempEnergyBarSlider2;
     public BattleManager battleManager;
 
+    private Character[] activeCompanions;
 
-   private void Start()
-   {
-    if (battleManager == null)
+    private void Start()
     {
-        battleManager = FindObjectOfType<BattleManager>();
+        // Initialize the array based on the number of spawn points
+        activeCompanions = new Character[companionSpawnPoints.Length];
     }
 
-    Character spawnedCompanion = SpawnCompanionAtPoint(companionSpawnPoint);
-    Debug.Log(spawnedCompanion.attackPower);
-    if (spawnedCompanion != null && battleManager != null)
+    public void SetupCompanion(Character companionCharacter)
     {
-        battleManager.companion2 = spawnedCompanion;
-        battleManager.playerParty.Add(spawnedCompanion);
-    }
-   }
-
-    public Character SpawnCompanionAtPoint(Transform spawnPoint)
-    {
-        // Instantiate the Companion at the position of spawnPoint and with its rotation
-        GameObject spawnedCompanionObject = Instantiate(companionPrefab, spawnPoint.position, spawnPoint.rotation);
-        Character spawnedCompanion = spawnedCompanionObject.GetComponent<Character>();
-
-        // Set the tag for the spawned companion object
-        spawnedCompanionObject.tag = "Companion";
-
-        // Calculate the position 3 units below the spawned companion
-        Renderer companionRenderer = spawnedCompanionObject.GetComponent<Renderer>();
-        float characterBottom = 0f;
-        if (companionRenderer != null)
+        int spawnIndex = FindNextEmptySpot();
+        if (spawnIndex == -1)
         {
-            characterBottom = companionRenderer.bounds.min.y; // Get the lowest point of the companion
+            Debug.LogError("No empty spot available for the companion.");
+            return;
         }
-        Vector3 sliderPositionOffset = new Vector3(spawnedCompanionObject.transform.position.x, characterBottom - 0.5f, spawnedCompanionObject.transform.position.z);
 
-        // Move health and energy bar sliders to the calculated position
-        associatedHealthBarSlider.transform.position = sliderPositionOffset;
-        associatedEnergyBarSlider.transform.position = sliderPositionOffset;
+        Transform spawnPoint = companionSpawnPoints[spawnIndex];
+        companionCharacter.transform.position = spawnPoint.position;
+        companionCharacter.transform.rotation = spawnPoint.rotation;
 
-        // Link this character to the health bar
-        spawnedCompanion.healthBar = associatedHealthBarSlider;
-        associatedHealthBarSlider.gameObject.SetActive(true); // Activate the health bar
-        associatedHealthBarSlider.maxValue = spawnedCompanion.maxHealth;
-        associatedHealthBarSlider.value = spawnedCompanion.health;
-        spawnedCompanion.healthText = associatedHealthText;
+        // Setup health and energy bars based on spawn index
+        if (spawnIndex == 0)
+        {
+            SetupBars(companionCharacter, associatedHealthBarSlider2, associatedEnergyBarSlider2, associatedHealthText2, associatedEnergyText2);
+        }
+        else if (spawnIndex == 1)
+        {
+            SetupBars(companionCharacter, associatedHealthBarSlider, associatedEnergyBarSlider, associatedHealthText, associatedEnergyText);
+        }
 
-        spawnedCompanion.energyBar = associatedEnergyBarSlider;
-        spawnedCompanion.energyText = associatedEnergyText;
-
-        spawnedCompanion.isFront = false;
-
-        return spawnedCompanion; // Ensure a Character is always returned
+        // Update the active companions array
+        activeCompanions[spawnIndex] = companionCharacter;
     }
 
+    private void SetupBars(Character character, Slider healthBar, Slider energyBar, TextMeshProUGUI healthText, TextMeshProUGUI energyText)
+    {
+        healthBar.maxValue = character.maxHealth;
+        healthBar.value = character.health;
+        character.healthBar = healthBar;
+        healthText.text = character.health.ToString();
+
+        energyBar.maxValue = character.maxEnergy;
+        energyBar.value = character.energy;
+        character.energyBar = energyBar;
+        energyText.text = character.energy.ToString();
+    }
+
+    private int FindNextEmptySpot()
+    {
+        for (int i = 0; i < activeCompanions.Length; i++)
+        {
+            if (activeCompanions[i] == null)
+            {
+                return i;
+            }
+        }
+        return -1; // No empty spot found
+    }
+
+    public void RemoveCompanion(Character companionCharacter)
+    {
+        for (int i = 0; i < activeCompanions.Length; i++)
+        {
+            if (activeCompanions[i] == companionCharacter)
+            {
+                activeCompanions[i] = null; // Clear the spot
+                break;
+            }
+        }
+    }
 }

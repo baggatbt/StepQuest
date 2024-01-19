@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-
+//Storing and managing game states across scenes
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
+    public GameObject knightPrefab; // Assign in Unity Inspector
+    public GameObject archerPrefab; // Assign in Unity Inspector
     public BattleConfig CurrentBattleConfig { get; set; }
     public HashSet<string> UnlockedStageNames = new HashSet<string>();
     public Character companion1; //Battle Position
@@ -29,6 +31,14 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        Debug.Log("Game manager awake called");
+        if (Instance != null && Instance != this)
+        {
+            Debug.Log("Destroying duplicate GameManager");
+            Destroy(gameObject);
+            return;
+        }
+        
         if (Instance == null)
         {
             Instance = this;
@@ -51,23 +61,54 @@ public class GameManager : MonoBehaviour
          Application.targetFrameRate = 60;  // Set target frame rate to 60 FPS.
     }
 
+    public Character InstantiateSelectedCompanion(string heroID)
+    {
+        GameObject companionObject = null;
+
+        switch (heroID)
+        {
+            case "Knight":
+                companionObject = Instantiate(knightPrefab);
+                break;
+            case "Archer":
+                companionObject = Instantiate(archerPrefab);
+                break;
+            // Add cases for other companions
+        }
+         if (companionObject != null)
+        {
+            Companion companion = companionObject.GetComponent<Companion>();
+            companion.LoadCharacterData();
+            return companion;
+        }
+
+        return null;
+    }
+
     private void CreateAndRegisterKnight()
+{
+    if (knight == null) // Check if the knight is already created
     {
         GameObject knightObject = new GameObject("Knight");
         knight = knightObject.AddComponent<Knight>();
-        knight.heroID = "Knight"; // This line ensures the GameObject name is unique and avoids saves being overwritten
+        knight.heroID = "Knight";
         RegisterCompanion(knight);
         knight.LoadCharacterData();
     }
+}
 
-    private void CreateAndRegisterArcher()
+private void CreateAndRegisterArcher()
+{
+    if (archer == null) // Check if the archer is already created
     {
         GameObject archerObject = new GameObject("Archer");
         archer = archerObject.AddComponent<Archer>();
-        archer.heroID = "Archer"; // This line ensures the GameObject name is unique and avoids saves being overwritten
+        archer.heroID = "Archer";
         RegisterCompanion(archer);
         archer.LoadCharacterData();
     }
+}
+
 
     public void UnlockConnectedStages(Stage completedStage)
 {
@@ -128,12 +169,18 @@ public class GameManager : MonoBehaviour
 
 // Method to add a companion to the list
     public void RegisterCompanion(Companion companion)
+{
+    if (!companions.Contains(companion))
     {
-        if (!companions.Contains(companion))
-        {
-            companions.Add(companion);
-        }
+        companions.Add(companion);
+        Debug.Log("Registered companion: " + companion.heroID);
     }
+    else
+    {
+        Debug.LogWarning("Trying to register a companion that is already registered: " + companion.heroID);
+    }
+}
+
 
     // Call this method to save the data of all companions
     public void SaveAllCompanionData()

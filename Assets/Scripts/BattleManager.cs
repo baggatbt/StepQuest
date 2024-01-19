@@ -19,6 +19,9 @@ public class BattleManager : MonoBehaviour
     public List<Character> enemies = new List<Character>();
     public List<Character> playerParty = new List<Character>();
     public GameObject activePlayerIndicator;
+    public GameObject heroSelectionPanel; // Assign in inspector
+    public GameObject battleStartButton;
+    public GameObject heroButtonPrefab;   // Assign in inspector
 
     
     
@@ -62,6 +65,9 @@ public class BattleManager : MonoBehaviour
     public GameObject endOfBattleLossPanel;
 
     public EnemySpawnController enemySpawnController;
+     public CompanionSpawnController companionSpawnController; // Assign in inspector
+
+
 
     private Vector3 outerCircleInitialScale;
     private Vector3 innerCircleInitialScale;
@@ -74,6 +80,7 @@ public class BattleManager : MonoBehaviour
 
 
     public Transform[] enemySpawnPoints; // enemySpawnPoint1, enemySpawnPoint2....
+    
 
 
     //public PlayerSpawnController playerSpawnController;
@@ -106,15 +113,12 @@ public class BattleManager : MonoBehaviour
 
     private void Awake()
     {
-        companion1 = GameManager.Instance.companion1;
-        companion2 = GameManager.Instance.companion2;
-        activePlayer = companion1;
+        CreateHeroSelectionUI();
     }
-    
+    public bool isBattleStarted = false;
    private void Start()
 {
     
-    activePlayer = companion1;
     Debug.Log("Active player from Player1 in start method"  + activePlayer);
     outerCircleInitialScale = outerCircle.transform.localScale;
     innerCircleInitialScale = innerCircle.transform.localScale;
@@ -132,7 +136,7 @@ public class BattleManager : MonoBehaviour
         BattleConfig config = GameManager.Instance.CurrentBattleConfig;
         if (config != null)
         {
-            StartBattle(config);
+         //   StartBattle(config);
         }
         else
         {
@@ -140,8 +144,12 @@ public class BattleManager : MonoBehaviour
         }
     
 
+    Debug.Log("Hero Selection Panel: " + heroSelectionPanel);
+Debug.Log("Hero Button Prefab: " + heroButtonPrefab);
+Debug.Log("GameManager Instance: " + GameManager.Instance);
+Debug.Log("Companions: " + GameManager.Instance.companions);
 
-
+    
     Debug.Log(activePlayer);
 }
     public Button nextBattleButton;
@@ -166,7 +174,13 @@ public class BattleManager : MonoBehaviour
 
      public void StartBattle(BattleConfig config)
 {
+     if (isBattleStarted) return; // Prevent starting the battle multiple times
+        activePlayer = companion1; //Default
+        isBattleStarted = true;
+        // Existing logic to start the battle
     endOfBattlePanel.SetActive(false);
+    heroSelectionPanel.SetActive(false);
+    companionSkillsPanel.SetActive(true);
     for (int i = 0; i < config.maxEnemiesToSpawn; i++)
     {
         Debug.Log(config.levelOfEnemies + "config levelOfEnemies");
@@ -186,7 +200,7 @@ public class BattleManager : MonoBehaviour
             
         }
     }
-    RestoreHealthAndEnergy();
+    //RestoreHealthAndEnergy();
     InitializeTurnOrder();
 }
 
@@ -195,8 +209,8 @@ public class BattleManager : MonoBehaviour
         companion1.energy = companion1.maxEnergy;
         companion1.health = companion1.maxHealth;
 
-        companion2.energy = companion2.maxEnergy;
-        companion2.health = companion2.maxHealth;
+       // companion2.energy = companion2.maxEnergy;
+       // companion2.health = companion2.maxHealth;
     }
 
     public void NextBattle()
@@ -212,6 +226,74 @@ public class BattleManager : MonoBehaviour
             
             currentStageIndex = 0;  // Optional: Reset to the first battle.
         }
+    }
+
+    public void CreateHeroSelectionUI()
+{
+    Debug.Log("Creating Hero Selection UI");
+
+    // Clear existing buttons
+    foreach (Transform child in heroSelectionPanel.transform)
+    {
+        Debug.Log("Destroying existing button: " + child.gameObject.name);
+        Destroy(child.gameObject);
+    }
+
+    // Log the count of companions
+    Debug.Log("Number of companions: " + GameManager.Instance.companions.Count);
+
+    // Create a button for each companion
+    foreach (Companion companion in GameManager.Instance.companions)
+    {
+        Debug.Log("Creating button for: " + companion.heroID);
+        GameObject buttonObj = Instantiate(heroButtonPrefab, heroSelectionPanel.transform);
+        buttonObj.GetComponentInChildren<TextMeshProUGUI>().text = companion.heroID;
+        buttonObj.GetComponent<Button>().onClick.AddListener(() => OnHeroSelected(companion));
+    }
+
+    // Make the panel visible
+    heroSelectionPanel.SetActive(true);
+
+    // Activate the battle start button and add click listener
+        battleStartButton.SetActive(true);
+        battleStartButton.GetComponent<Button>().onClick.AddListener(() => StartBattle(GameManager.Instance.CurrentBattleConfig));
+   
+}
+
+ private int selectedCompanionCount = 0; // To track the number of companions selected
+
+    public void OnHeroSelected(Companion selectedCompanion)
+    {
+        // Instantiate and set up the selected companion
+        Character instantiatedCompanion = GameManager.Instance.InstantiateSelectedCompanion(selectedCompanion.heroID);
+        if (instantiatedCompanion != null)
+        {
+            SetupSelectedCompanion(instantiatedCompanion);
+            AssignCompanion(instantiatedCompanion);
+        }
+
+        // Check if all selections are made, then start the battle
+    }
+
+    private void AssignCompanion(Character companion)
+    {
+        if (selectedCompanionCount == 0)
+        {
+            companion1 = companion;
+        }
+        else if (selectedCompanionCount == 1)
+        {
+            companion2 = companion;
+        }
+
+        selectedCompanionCount++;
+    }
+
+
+    public void SetupSelectedCompanion(Character selectedCompanion)
+    {
+        companionSpawnController.SetupCompanion(selectedCompanion);
+        playerParty.Add(selectedCompanion);
     }
 
 
@@ -584,13 +666,13 @@ public void EndTurn()
     public ColorChanger colorChanger;  // Reference to the ColorLerper script
     
     private void ShowTimingResult(string message)
-{
+{/*
     if (currentTarget == null)
     {
         Debug.LogError("No current target set for timing result popup.");
         return;
     }
-
+    */
     // Position the popup above the current target
     Vector3 targetPosition = currentTarget.transform.position;
     float yOffset = 3.0f; // Adjust this value as needed for the correct height
@@ -809,8 +891,10 @@ public void EndTurn()
     public bool isSkillSelected = false;  // New variable
 
 
+
 private void Update()
 {
+    if (isBattleStarted){
     if (!companion1.isAttacking && !companion2.isAttacking)
     {
     if (Input.GetMouseButtonDown(0))
@@ -852,8 +936,10 @@ private void Update()
         }
     }
     }
+    }
     //ChangeColorAfterTurnTaken();
 }
+
 
 //NOT BEING USED;Would need to implement for enemies and allies, maybe later due to changing battle
     public void ChangeColorAfterTurnTaken()
