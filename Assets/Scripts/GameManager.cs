@@ -31,13 +31,6 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        Debug.Log("Game manager awake called");
-        if (Instance != null && Instance != this)
-        {
-            Debug.Log("Destroying duplicate GameManager");
-            Destroy(gameObject);
-            return;
-        }
         
         if (Instance == null)
         {

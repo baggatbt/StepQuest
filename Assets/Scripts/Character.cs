@@ -67,7 +67,7 @@ public class Character : MonoBehaviour
             this.healthBar.value = health;
             if (this.healthText != null )
             {
-                Debug.Log(this.healthText.text + " was not null");
+                
                 this.healthText.text =  this.health + "";
                 
             }
@@ -307,13 +307,21 @@ public class Character : MonoBehaviour
     //This will be called on an animation event so characters can call target.TakeDamage() at the exact moment
     public bool animationDamageTime = false;
 
+    private IEnumerator TimeStop(float duration)
+{
+    Time.timeScale = 0f; // Stops the game time
+    yield return new WaitForSecondsRealtime(duration); // Waits in real time
+    Time.timeScale = 1f; // Resumes the game time
+}
+
+
     public void animationDamageTiming()
-    {
-        Debug.Log("This is the damage moment");
-        //animator.SetTrigger("TimingFlashTrigger");
-        animationDamageTime = true;;
-    
-    }
+{
+    Debug.Log("This is the damage moment");
+    StartCoroutine(TimeStop(0.1f)); // Adjust the duration for timestop effect
+    animationDamageTime = true;
+}
+
 
    public void CheckForDeath()
 {

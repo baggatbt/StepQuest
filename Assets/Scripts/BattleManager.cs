@@ -666,13 +666,13 @@ public void EndTurn()
     public ColorChanger colorChanger;  // Reference to the ColorLerper script
     
     private void ShowTimingResult(string message)
-{/*
+{
     if (currentTarget == null)
     {
         Debug.LogError("No current target set for timing result popup.");
-        return;
+      
     }
-    */
+    
     // Position the popup above the current target
     Vector3 targetPosition = currentTarget.transform.position;
     float yOffset = 3.0f; // Adjust this value as needed for the correct height
@@ -939,6 +939,8 @@ private void Update()
     }
     //ChangeColorAfterTurnTaken();
 }
+
+    
 
 
 //NOT BEING USED;Would need to implement for enemies and allies, maybe later due to changing battle
