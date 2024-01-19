@@ -16,6 +16,8 @@ public class ButtonController : MonoBehaviour
     public GameObject skillDescriptionPanel; // UI Panel to show the skill description
     public TextMeshProUGUI skillDescriptionText; // Text component to show the description
     public List<Button> skillButtons = new List<Button>();
+    public Companion activeCompanion;
+    private Companion previousActiveCompanion; // For switching the skill panel
 
     
 
@@ -27,23 +29,33 @@ public class ButtonController : MonoBehaviour
 
     void Start()
     {
-       if (battleManager.isBattleStarted){
-       PopulateSkillPanelWithCompanionSkills();
-       }
+       activeCompanion = battleManager.activePlayer as Companion;
     }
 
-    void Update()
+   void Update()
+{
+    if (battleManager.isBattleStarted)
     {
-        
-
-        if (battleManager.activePlayer == battleManager.companion2 || battleManager.companion1)
+        // Check if the active player has changed
+        Companion currentActiveCompanion = battleManager.activePlayer as Companion;
+        if (currentActiveCompanion != null && currentActiveCompanion != previousActiveCompanion)
         {
-            Debug.Log("ButtonController: Active player com2");
-            companionSkillSelectionPanel.SetActive(true);
-            skillSelectionPanel.SetActive(false);
+            previousActiveCompanion = currentActiveCompanion;
+            UpdateUI();
         }
 
+        // UI panel activation/deactivation
+        bool isCompanionActive = battleManager.activePlayer is Companion;
+        companionSkillSelectionPanel.SetActive(isCompanionActive);
+        skillSelectionPanel.SetActive(!isCompanionActive);
     }
+}
+
+   private void UpdateUI()
+{
+    activeCompanion = previousActiveCompanion;
+    PopulateSkillPanelWithCompanionSkills();
+}
     
     private UnityEngine.Events.UnityAction GetSkillAction(Skill currentSkill)
 {
@@ -82,7 +94,7 @@ private void OnSkillButtonRelease()
 public void PopulateSkillPanelWithCompanionSkills()
 {
     // Get the active companion from the battle manager
-    Companion activeCompanion = battleManager.activePlayer as Companion;
+   // Companion activeCompanion = battleManager.activePlayer as Companion;
     if (activeCompanion == null)
     {
         Debug.LogError("Active player is not a Companion.");
