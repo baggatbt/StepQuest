@@ -200,7 +200,7 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
             
         }
     }
-    //RestoreHealthAndEnergy();
+    RestoreHealthAndEnergy();
     InitializeTurnOrder();
 }
 
@@ -627,7 +627,7 @@ public void EndTurn()
         yield return new WaitUntil(() => activePlayer.isAttacking == false);
         yield return new WaitForSeconds(1.0f); //Ensures player animation is all done
         
-
+       currentEnemy.attackTarget = SelectTargetForEnemy();
         if (currentEnemy.currentSkill != null)
         {
             if (currentEnemy.currentSkill.requiresMovement)
