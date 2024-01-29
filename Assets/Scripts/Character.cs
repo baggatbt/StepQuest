@@ -53,8 +53,9 @@ public class Character : MonoBehaviour
     protected virtual void Awake()
     {
         animator = GetComponent<Animator>();
-        originalPosition = transform.position;
         statusEffectController = GetComponent<StatusEffectController>();
+        originalPosition = transform.position;
+        Debug.Log("OP at Awake() " + originalPosition);
        // this.hasNotGone = true;
     }
 
@@ -110,6 +111,8 @@ public class Character : MonoBehaviour
             energyBar.maxValue = maxEnergy;
             energyBar.value = energy;
         }
+
+        
         
     }
 
@@ -355,6 +358,7 @@ public IEnumerator ReturnToPosition()
     animator.SetTrigger("MovementAnimationTrigger");
     this.isMoving = true;
 
+    Debug.Log("Returning to OP at : " + originalPosition);
     // Move back to the original position
     yield return Move(originalPosition, stoppingDistance: 0.0f); // Exact position, so stopping distance is 0
 

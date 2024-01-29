@@ -294,6 +294,7 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
     {
         companionSpawnController.SetupCompanion(selectedCompanion);
         playerParty.Add(selectedCompanion);
+        Debug.Log(selectedCompanion.transform.position);
     }
 
 
@@ -521,6 +522,8 @@ public void EndTurn()
         // Only move if the player is not already at the target
         if (activePlayer.transform.position != currentTarget.transform.position)
         {
+            activePlayer.originalPosition = activePlayer.transform.position;
+            Debug.Log("OP set to " + activePlayer.originalPosition);
             yield return activePlayer.MoveToTarget();
             
             
