@@ -27,7 +27,7 @@ public class BattleManager : MonoBehaviour
     
     
     
-    public GameObject knightPrefab;
+
     private BattleState state;
     public int enemyAttackCount = 0;
     public GameObject currentTarget;
@@ -424,8 +424,10 @@ public void EndTurn()
     public void MoveCursorToTarget()
      {
         // Move the circles to the targets position
-        outerCircle.transform.position = new Vector3(currentTarget.transform.position.x, currentTarget.transform.position.y + 4f, currentTarget.transform.position.z);
+        if (currentTarget != null){
 
+        outerCircle.transform.position = new Vector3(currentTarget.transform.position.x, currentTarget.transform.position.y + 4f, currentTarget.transform.position.z);
+        }
 
        // innerCircle.transform.position = currentTarget.transform.position;
         //NEEDS OFFSET TO BE OFF SPRITE
@@ -623,41 +625,40 @@ public void EndTurn()
     
 
     public IEnumerator EnemyAttackCoroutine(Character currentEnemy)
+{
+    yield return new WaitUntil(() => activePlayer.isAttacking == false);
+    yield return new WaitForSeconds(1.0f); //Ensures player animation is all done
+
+    // Select the target for the enemy and assign it
+    Transform enemyTargetTransform = SelectTargetForEnemy();
+    currentEnemy.attackTarget = enemyTargetTransform;
+    currentTarget = enemyTargetTransform.gameObject; // Update currentTarget to the selected target
+
+    if (currentEnemy.currentSkill != null)
     {
-        yield return new WaitUntil(() => activePlayer.isAttacking == false);
-        yield return new WaitForSeconds(1.0f); //Ensures player animation is all done
-        
-       currentEnemy.attackTarget = SelectTargetForEnemy();
-        if (currentEnemy.currentSkill != null)
+        if (currentEnemy.currentSkill.requiresMovement)
         {
-            if (currentEnemy.currentSkill.requiresMovement)
-            {
-                yield return currentEnemy.MoveToTarget();
-            }
-
-            
-            Character targetCharacter = currentEnemy.attackTarget.GetComponent<Character>();
-            yield return currentEnemy.currentSkill.Execute(currentEnemy, targetCharacter, this);
-
-
-           
-            if (currentEnemy.currentSkill.requiresMovement)
-            {
-                yield return currentEnemy.ReturnToPosition();
-            }
-           // Debug.Log("Enemy reurning to position");
-        }
-        else
-        {
-            Debug.Log("Standard Attack Performed - This should not happen");
-            
+            yield return currentEnemy.MoveToTarget();
         }
 
-        
-          
-        EndTurn();
-        CheckBattleEnd();
+        Character targetCharacter = enemyTargetTransform.GetComponent<Character>();
+
+        yield return currentEnemy.currentSkill.Execute(currentEnemy, targetCharacter, this);
+
+        if (currentEnemy.currentSkill.requiresMovement)
+        {
+            yield return currentEnemy.ReturnToPosition();
+        }
     }
+    else
+    {
+        Debug.Log("Standard Attack Performed - This should not happen");
+    }
+
+    EndTurn();
+    CheckBattleEnd();
+}
+
     
     
    
