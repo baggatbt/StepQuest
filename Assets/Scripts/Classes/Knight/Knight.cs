@@ -7,8 +7,8 @@ public class Knight : Companion
     protected override void Awake()
     {
         base.Awake();
-        GameManager.Instance.RegisterCompanion(this);
-        Debug.Log("Companion registered");
+        
+        
         
 
         // Initialize with default values if no data is loaded
@@ -28,6 +28,7 @@ public class Knight : Companion
             this.heroExp = 0;
             this.heroSkillPoints = 0;
             this.heroStatPoints = 0;
+            this.characterIDNumber = "1";
         }
         LoadCharacterData(); // Load saved data
     }

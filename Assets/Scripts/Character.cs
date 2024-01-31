@@ -11,6 +11,8 @@ public class Character : MonoBehaviour
     public int level;
     public int health;
     public int maxHealth;
+    public string characterIDNumber;
+    public bool isSelected;
     
     public int energy;
     public int maxEnergy;
@@ -52,6 +54,7 @@ public class Character : MonoBehaviour
 
     protected virtual void Awake()
     {
+        isSelected = false;
         animator = GetComponent<Animator>();
         statusEffectController = GetComponent<StatusEffectController>();
         originalPosition = transform.position;

@@ -7,8 +7,9 @@ public class Wizard : Companion
     protected override void Awake()
     {
         base.Awake();
-        GameManager.Instance.RegisterCompanion(this);
-        LoadCharacterData(); // Load saved data
+        
+        
+        
 
         // Initialize with default values if no data is loaded
         if (this.health <= 0)
@@ -27,6 +28,7 @@ public class Wizard : Companion
             this.heroExp = 0;
             this.heroSkillPoints = 0;
             this.heroStatPoints = 0;
+        
         }  
     }
 
@@ -45,6 +47,7 @@ public class Wizard : Companion
             this.heroExp = 0;  
             this.heroStatPoints += 3;
             this.heroSkillPoints += 1;
+            
         } 
     }
     

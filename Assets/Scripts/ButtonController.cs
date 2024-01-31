@@ -11,8 +11,7 @@ public class ButtonController : MonoBehaviour
     
     public BattleManager battleManager;
     public GameObject skillButtonPrefab;
-    public Companion companion2;
-    public Companion companion1;
+
     public GameObject skillDescriptionPanel; // UI Panel to show the skill description
     public TextMeshProUGUI skillDescriptionText; // Text component to show the description
     public List<Button> skillButtons = new List<Button>();

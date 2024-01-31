@@ -113,7 +113,7 @@ public class BattleManager : MonoBehaviour
 
     private void Awake()
     {
-        CreateHeroSelectionUI();
+        companionSpawnController.CreateHeroSelectionUI();
     }
     public bool isBattleStarted = false;
    private void Start()
@@ -228,74 +228,7 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
         }
     }
 
-    public void CreateHeroSelectionUI()
-{
-    Debug.Log("Creating Hero Selection UI");
-
-    // Clear existing buttons
-    foreach (Transform child in heroSelectionPanel.transform)
-    {
-        Debug.Log("Destroying existing button: " + child.gameObject.name);
-        Destroy(child.gameObject);
-    }
-
-    // Log the count of companions
-    Debug.Log("Number of companions: " + GameManager.Instance.companions.Count);
-
-    // Create a button for each companion
-    foreach (Companion companion in GameManager.Instance.companions)
-    {
-        Debug.Log("Creating button for: " + companion.heroID);
-        GameObject buttonObj = Instantiate(heroButtonPrefab, heroSelectionPanel.transform);
-        buttonObj.GetComponentInChildren<TextMeshProUGUI>().text = companion.heroID;
-        buttonObj.GetComponent<Button>().onClick.AddListener(() => OnHeroSelected(companion));
-    }
-
-    // Make the panel visible
-    heroSelectionPanel.SetActive(true);
-
-    // Activate the battle start button and add click listener
-        battleStartButton.SetActive(true);
-        battleStartButton.GetComponent<Button>().onClick.AddListener(() => StartBattle(GameManager.Instance.CurrentBattleConfig));
-   
-}
-
- private int selectedCompanionCount = 0; // To track the number of companions selected
-
-    public void OnHeroSelected(Companion selectedCompanion)
-    {
-        // Instantiate and set up the selected companion
-        Character instantiatedCompanion = GameManager.Instance.InstantiateSelectedCompanion(selectedCompanion.heroID);
-        if (instantiatedCompanion != null)
-        {
-            SetupSelectedCompanion(instantiatedCompanion);
-            AssignCompanion(instantiatedCompanion);
-        }
-
-        // Check if all selections are made, then start the battle
-    }
-
-    private void AssignCompanion(Character companion)
-    {
-        if (selectedCompanionCount == 0)
-        {
-            companion1 = companion;
-        }
-        else if (selectedCompanionCount == 1)
-        {
-            companion2 = companion;
-        }
-
-        selectedCompanionCount++;
-    }
-
-
-    public void SetupSelectedCompanion(Character selectedCompanion)
-    {
-        companionSpawnController.SetupCompanion(selectedCompanion);
-        playerParty.Add(selectedCompanion);
-        Debug.Log(selectedCompanion.transform.position);
-    }
+    
 
 
    
@@ -631,7 +564,7 @@ public void EndTurn()
 {
     yield return new WaitUntil(() => activePlayer.isAttacking == false);
     yield return new WaitForSeconds(1.0f); //Ensures player animation is all done
-    DisableAllButtons();
+
     // Select the target for the enemy and assign it
     Transform enemyTargetTransform = SelectTargetForEnemy();
     currentEnemy.attackTarget = enemyTargetTransform;
@@ -659,7 +592,6 @@ public void EndTurn()
     }
 
     EndTurn();
-    EnableAllButtons();
     CheckBattleEnd();
 }
 

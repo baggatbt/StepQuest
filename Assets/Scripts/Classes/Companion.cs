@@ -36,6 +36,7 @@ public abstract class Companion : Character
         public int heroStatPoints;
         public int heroLevel;
         public int heroExp;
+        
     }
 
 

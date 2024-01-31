@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
     public GameObject knightPrefab; // Assign in Unity Inspector
     public GameObject archerPrefab; // Assign in Unity Inspector
+    public GameObject wizardPrefab;
     public BattleConfig CurrentBattleConfig { get; set; }
     public HashSet<string> UnlockedStageNames = new HashSet<string>();
     public Character companion1; //Battle Position
@@ -44,7 +45,8 @@ public class GameManager : MonoBehaviour
             probabilityCompanion3 = 1f;
             CreateAndRegisterKnight();
             CreateAndRegisterArcher();
-            Debug.Log(companion1);
+            CreateAndRegisterWizard();
+            Debug.Log("Companion 1: " + companion1);
            
         }
         else
@@ -65,6 +67,9 @@ public class GameManager : MonoBehaviour
                 break;
             case "Archer":
                 companionObject = Instantiate(archerPrefab);
+                break;
+            case "Wizard":
+                companionObject = Instantiate(wizardPrefab);
                 break;
             // Add cases for other companions
         }
@@ -99,6 +104,18 @@ private void CreateAndRegisterArcher()
         archer.heroID = "Archer";
         RegisterCompanion(archer);
         archer.LoadCharacterData();
+    }
+}
+
+private void CreateAndRegisterWizard()
+{
+    if (wizard == null) // Check if the wizard is already created
+    {
+        GameObject wizardObject = new GameObject("Wizard");
+        wizard = wizardObject.AddComponent<Wizard>();
+        wizard.heroID = "Wizard";
+        RegisterCompanion(wizard);
+        wizard.LoadCharacterData();
     }
 }
 
@@ -167,6 +184,7 @@ private void CreateAndRegisterArcher()
     {
         companions.Add(companion);
         Debug.Log("Registered companion: " + companion.heroID);
+        Debug.Log("Amount of companions: " + companions.Count);
     }
     else
     {

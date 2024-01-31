@@ -7,8 +7,7 @@ public class Archer : Companion
     protected override void Awake()
     {
         base.Awake();
-        GameManager.Instance.RegisterCompanion(this);
-        Debug.Log("Archer Companion registered");
+        
     
         // Initialize with default values if no data is loaded
         if (this.level == 0)
@@ -27,6 +26,7 @@ public class Archer : Companion
             this.heroExp = 0;
             this.heroSkillPoints = 0;
             this.heroStatPoints = 0;
+            this.characterIDNumber = "2";
         }
         LoadCharacterData(); // Load saved data
     }
