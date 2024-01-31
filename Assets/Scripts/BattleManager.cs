@@ -631,7 +631,7 @@ public void EndTurn()
 {
     yield return new WaitUntil(() => activePlayer.isAttacking == false);
     yield return new WaitForSeconds(1.0f); //Ensures player animation is all done
-
+    DisableAllButtons();
     // Select the target for the enemy and assign it
     Transform enemyTargetTransform = SelectTargetForEnemy();
     currentEnemy.attackTarget = enemyTargetTransform;
@@ -659,6 +659,7 @@ public void EndTurn()
     }
 
     EndTurn();
+    EnableAllButtons();
     CheckBattleEnd();
 }
 
