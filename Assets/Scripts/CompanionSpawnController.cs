@@ -123,12 +123,16 @@ public class CompanionSpawnController : MonoBehaviour
 
     // Create a button for each companion
     foreach (Companion companion in GameManager.Instance.companions)
-    {
-        Debug.Log("Creating button for: " + companion.heroID);
-        GameObject buttonObj = Instantiate(battleManager.heroButtonPrefab, battleManager.heroSelectionPanel.transform);
-        buttonObj.GetComponentInChildren<TextMeshProUGUI>().text = companion.heroID;
-        buttonObj.GetComponent<Button>().onClick.AddListener(() => OnHeroSelected(companion));
-    }
+{
+    Debug.Log("Creating button for: " + companion.heroID);
+    GameObject buttonObj = Instantiate(battleManager.heroButtonPrefab, battleManager.heroSelectionPanel.transform);
+    buttonObj.GetComponentInChildren<TextMeshProUGUI>().text = companion.heroID;
+
+    Companion localCompanion = companion; // Local copy
+    Debug.Log("This button's attached companion is: " + localCompanion);
+    buttonObj.GetComponent<Button>().onClick.AddListener(() => OnHeroSelected(localCompanion));
+}
+
 
     // Make the panel visible
     battleManager.heroSelectionPanel.SetActive(true);
@@ -142,24 +146,42 @@ public class CompanionSpawnController : MonoBehaviour
  private int selectedCompanionCount = 0; // To track the number of companions selected
 
     public void OnHeroSelected(Companion selectedCompanion)
+{
+    // Check if the companion is already selected
+    if (selectedCompanion.isSelected)
     {
-        // Instantiate and set up the selected companion
-        Character instantiatedCompanion;
-
-        if (selectedCompanion.isSelected == false)
-        {
-            instantiatedCompanion = GameManager.Instance.InstantiateSelectedCompanion(selectedCompanion.heroID);
-             if (instantiatedCompanion != null)
+        // If already selected, remove the companion
+        Debug.Log("Companion is already selected, removing");
+        RemoveCompanionFromGame(selectedCompanion);
+        selectedCompanion.isSelected = false;
+    }
+    else
+    {
+        // If not selected, add the companion
+        Debug.Log("Companion wasn't selected, adding");
+        Character instantiatedCompanion = GameManager.Instance.InstantiateSelectedCompanion(selectedCompanion.heroID);
+        if (instantiatedCompanion != null)
         {
             SetupSelectedCompanion(instantiatedCompanion);
             AssignCompanion(instantiatedCompanion);
+            selectedCompanion.isSelected = true;
         }
-        
-        }
-       
-
-        // Check if all selections are made, then start the battle
     }
+}
+
+private void RemoveCompanionFromGame(Companion companion)
+{
+    // Find the instantiated character in the game and remove it
+    foreach (var character in activeCompanions)
+    {
+        if (character != null && character.characterIDNumber == companion.characterIDNumber)
+        {
+            RemoveCompanion(character);
+            break;
+        }
+    }
+}
+
 
     private void AssignCompanion(Character companion)
     {
