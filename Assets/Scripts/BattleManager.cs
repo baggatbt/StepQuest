@@ -266,34 +266,20 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
 
     public void StartTurn()
 {
+    // Remove all characters with health less than or equal to zero
+    turnOrderList.RemoveAll(character => character.health <= 0);
+
+    // Now check if there are characters left to take a turn
     if (turnOrderList.Count > 0)
     {
         var nextCharacter = turnOrderList[0];
-        if (nextCharacter.health <= 0) // Check to make sure the character is dead and needs to be removed.
-        {
-            turnOrderList.Remove(nextCharacter);
-            
-            // Check if there are still characters left in the list before executing the next turn
-            if (turnOrderList.Count > 0)
-            {
-                ExecuteTurn(turnOrderList[0]);
-            }
-            else
-            {
-                // If no characters are left, re-initialize the turn order
-                InitializeTurnOrder();
-            }
-        }
-        else
-        {
-            ExecuteTurn(nextCharacter);
-        }
+        ExecuteTurn(nextCharacter);
     }
     else
-        {
-            InitializeTurnOrder();
-        }
-
+    {
+        // If no characters are left, re-initialize the turn order
+        InitializeTurnOrder();
+    }
 }
 
 private void ExecuteTurn(Character character)

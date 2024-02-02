@@ -55,7 +55,7 @@ public class Slash : Skill
         user.animationDamageTime = false;
         user.isAnimationDone = false;
         user.isAttacking = false;
-        
+        target.CheckForDeath();
     }
 
 

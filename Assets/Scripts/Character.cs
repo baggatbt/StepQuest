@@ -200,7 +200,6 @@ public class Character : MonoBehaviour
         // Trigger hit reaction, damage popup, etc.
         GameObject damagePopupPrefab = Resources.Load<GameObject>("PreFab/DamagePopup");
         Transform endOfBattleRewardsTransform = GameObject.Find("EndOfBattleRewardsCanvas").transform;
-        CheckForDeath();
         if(damagePopupPrefab != null)
         {
             GameObject damagePopupInstance = Instantiate(damagePopupPrefab, transform.position, Quaternion.identity, endOfBattleRewardsTransform);
@@ -247,6 +246,7 @@ public class Character : MonoBehaviour
     {
         energyBar.gameObject.SetActive(false);  // Disable the energyBar's GameObject
     }
+
      yield return new WaitForSeconds(0.5f); //Ensures fade is all done
     }
 
@@ -346,6 +346,7 @@ public class Character : MonoBehaviour
     Debug.Log("Checking for death");
     if (this.health <= 0)
     {
+        
         StartCoroutine(FadeOutSprite());
         
       
