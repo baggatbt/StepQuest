@@ -47,7 +47,7 @@ public class FirePillar : Skill
     
     
         user.isAttacking = false;
-        target.CheckForDeath();
+       
         
     }
 }

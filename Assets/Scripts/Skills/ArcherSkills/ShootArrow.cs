@@ -73,7 +73,7 @@ public class ShootArrow : Skill
         user.animationDamageTime = false;
         user.isAnimationDone = false;
         user.isAttacking = false;
-        target.CheckForDeath();
+     
     
 }
 }

@@ -48,7 +48,7 @@ public class SlimeAttackSkill : Skill
         user.animationDamageTime = false;
         user.isAnimationDone = false;
         user.isAttacking = false;
-        target.CheckForDeath();
+        
     }
 
 

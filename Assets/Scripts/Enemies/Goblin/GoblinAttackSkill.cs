@@ -46,7 +46,7 @@ public class GoblinAttackSkill : Skill
         user.animationDamageTime = false;
         user.isAnimationDone = false;
         user.isAttacking = false;
-        target.CheckForDeath();
+        
     }
 
     private IEnumerator TimingWindow(Character user, Character target, BattleManager battleManager, float windowStart, float windowEnd)

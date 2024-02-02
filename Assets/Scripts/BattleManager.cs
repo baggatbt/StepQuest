@@ -338,8 +338,8 @@ public void EndTurn()
     {
         companionSkillsPanel.SetActive(false);
         SkillsPanel.SetActive(false);
-        enemyUIPanel.SetActive(false);
-        heroUIPanels.SetActive(false);
+       // enemyUIPanel.SetActive(false);
+       // heroUIPanels.SetActive(false);
     }
 
    public GameObject enemyUIPanel;
@@ -373,7 +373,7 @@ public void EndTurn()
     {
         if (currentTarget != null && (state == BattleState.PlayerTurn))
         {
-       // DisableAllButtons();
+        DisableAllButtons();
         StartCoroutine(ExecuteAllSkillsCoroutine());
         }
         else
@@ -452,6 +452,8 @@ public void EndTurn()
     {
         // Start zoom effect
             StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position));
+            enemyUIPanel.SetActive(false);
+            heroUIPanels.SetActive(false);
         // Only move if the player is not already at the target
         if (activePlayer.transform.position != currentTarget.transform.position)
         {
@@ -486,6 +488,8 @@ public void EndTurn()
         {
         // Move player back to their original position after all skills executed.
         StartCoroutine(zoomEffect.ZoomOutEffect());
+        enemyUIPanel.SetActive(true);
+       heroUIPanels.SetActive(true);
         yield return activePlayer.ReturnToPosition();
         }
     }

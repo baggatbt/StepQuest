@@ -200,7 +200,7 @@ public class Character : MonoBehaviour
         // Trigger hit reaction, damage popup, etc.
         GameObject damagePopupPrefab = Resources.Load<GameObject>("PreFab/DamagePopup");
         Transform endOfBattleRewardsTransform = GameObject.Find("EndOfBattleRewardsCanvas").transform;
-
+        CheckForDeath();
         if(damagePopupPrefab != null)
         {
             GameObject damagePopupInstance = Instantiate(damagePopupPrefab, transform.position, Quaternion.identity, endOfBattleRewardsTransform);
@@ -237,8 +237,18 @@ public class Character : MonoBehaviour
 
     sr.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0);
     this.gameObject.SetActive(false);  // deactivate the GameObject after fade
-   // yield return new WaitForSeconds(0.5f); //Ensures fade is all done
-}
+
+    if (healthBar != null)
+    {
+    healthBar.gameObject.SetActive(false);  // Disable the healthBar's GameObject
+    }
+
+    if (energyBar != null)
+    {
+        energyBar.gameObject.SetActive(false);  // Disable the energyBar's GameObject
+    }
+    // yield return new WaitForSeconds(0.5f); //Ensures fade is all done
+    }
 
    // private int remainingCost = 0;
     public void SpendEnergy(int energySpent)
