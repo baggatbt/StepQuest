@@ -62,8 +62,9 @@ public class Character : MonoBehaviour
        // this.hasNotGone = true;
     }
 
+    /*
     void Update(){
-        
+            
         if (this.healthBar != null)
         {
             
@@ -92,6 +93,7 @@ public class Character : MonoBehaviour
         
 
     }
+    */
 
     protected virtual void Start()
     {
@@ -182,10 +184,10 @@ public class Character : MonoBehaviour
     Debug.Log("Total damage dealt after defense penetration = " + damageDealt);
 
     // Subtract the calculated damage from health
-    health -= damageDealt;
-    healthBar.value = health;
+    this.health -= damageDealt;
+    this.healthBar.value = health;
     this.EnemyIsHit(); //If the character taking damage is an enemy, they all share the same trigger
-
+    Debug.Log("Takign damage but im null" + this.healthText);
     // Update the health text
     if (this.healthText != null)
     {

@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour
     public GameObject wizardPrefab;
     public BattleConfig CurrentBattleConfig { get; set; }
     public HashSet<string> UnlockedStageNames = new HashSet<string>();
-    public Character companion1; //Battle Position
+    public Character companion1; 
     public Character companion2; 
     public Character companion3;
     public int currentStageIndex;

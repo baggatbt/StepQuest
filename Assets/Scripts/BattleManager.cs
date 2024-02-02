@@ -373,7 +373,7 @@ public void EndTurn()
     {
         if (currentTarget != null && (state == BattleState.PlayerTurn))
         {
-        DisableAllButtons();
+       // DisableAllButtons();
         StartCoroutine(ExecuteAllSkillsCoroutine());
         }
         else

@@ -69,11 +69,13 @@ public class CompanionSpawnController : MonoBehaviour
 
     private void SetupBars(Character character, Slider healthBar, Slider energyBar, TextMeshProUGUI healthText, TextMeshProUGUI energyText)
     {
+        character.healthText = healthText;
         healthBar.maxValue = character.maxHealth;
         healthBar.value = character.health;
         character.healthBar = healthBar;
         healthText.text = character.health.ToString();
 
+        character.energyText = energyText;
         energyBar.maxValue = character.maxEnergy;
         energyBar.value = character.energy;
         character.energyBar = energyBar;
