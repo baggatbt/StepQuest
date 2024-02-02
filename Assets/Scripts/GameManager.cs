@@ -37,16 +37,14 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            SceneManager.sceneLoaded += OnSceneLoaded;
             currentStageIndex = PlayerData.Instance.currentStageIndex; //Gets the current stage from PlayerData
 
             //Each companion has equal chance to be selected for attack, need to change so it uses the class's variable threat
             probabilityCompanion1 = 1f;
             probabilityCompanion2 = 1f;
             probabilityCompanion3 = 1f;
-            CreateAndRegisterKnight();
-            CreateAndRegisterArcher();
-            CreateAndRegisterWizard();
-            Debug.Log("Companion 1: " + companion1);
+            
            
         }
         else
@@ -54,6 +52,15 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
          Application.targetFrameRate = 60;  // Set target frame rate to 60 FPS.
+    }
+
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Code to run every time a new scene is loaded
+            companions.Clear();
+            CreateAndRegisterKnight();
+            CreateAndRegisterArcher();
+            CreateAndRegisterWizard();
     }
 
     public Character InstantiateSelectedCompanion(string heroID)
@@ -207,9 +214,15 @@ private void CreateAndRegisterWizard()
     }
 
     
+    void OnDestroy()
+    {
+    // unsubscribe to avoid memory leaks
+    SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+    
     private void OnApplicationQuit()
     {
-      //OUT FOR EASY DELETION  SaveAllCompanionData();
+       SaveAllCompanionData();
     }
 
     private void OnApplicationPause()

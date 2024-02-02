@@ -811,7 +811,7 @@ public void EndTurn()
         totalExp += enemy.expReward;
         totalGold += enemy.goldReward;
     }
-
+    Debug.Log("Running end of battle rewards +" + totalExp + " +" + totalGold);
     GameManager.Instance.GainExp(totalExp);
     PlayerData.Instance.gold += totalGold;
     PlayerData.Instance.SavePlayerData();
@@ -909,7 +909,7 @@ private void Update()
 }
 public void CheckBattleEnd()
 {
-    bool allEnemiesDefeated = true;
+    bool allEnemiesDefeated = false;
     bool allAlliesDefeated = companion1.health <= 0 && companion2.health <= 0;
 
     foreach (var enemy in enemies)
@@ -919,14 +919,19 @@ public void CheckBattleEnd()
             allEnemiesDefeated = false;
             break;
         }
+        else 
+        {
+            allEnemiesDefeated = true;
+        }
+       
     }
     
     if (allEnemiesDefeated)
     {
         EndOfBattleRewards(enemies);
         Debug.Log("Is this running");
-        Stage completedStage = GameManager.Instance.CurrentBattleConfig.stage;
-        GameManager.Instance.UnlockConnectedStages(completedStage);
+       // Stage completedStage = GameManager.Instance.CurrentBattleConfig.stage;
+       // GameManager.Instance.UnlockConnectedStages(completedStage);
         endOfBattlePanel.SetActive(true);
     }
     else if (allAlliesDefeated)

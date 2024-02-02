@@ -247,7 +247,7 @@ public class Character : MonoBehaviour
     {
         energyBar.gameObject.SetActive(false);  // Disable the energyBar's GameObject
     }
-    // yield return new WaitForSeconds(0.5f); //Ensures fade is all done
+     yield return new WaitForSeconds(0.5f); //Ensures fade is all done
     }
 
    // private int remainingCost = 0;
@@ -347,7 +347,8 @@ public class Character : MonoBehaviour
     if (this.health <= 0)
     {
         StartCoroutine(FadeOutSprite());
-       // Destroy(gameObject); // Destroy the GameObject
+        
+      
     }
 }
 
