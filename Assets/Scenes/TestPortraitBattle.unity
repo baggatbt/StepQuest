@@ -416,8 +416,8 @@ RectTransform:
   m_Father: {fileID: 854322026}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -635,7 +635,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0.3999939, y: -0.5}
   m_SizeDelta: {x: -32.76, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -904,8 +904,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   battleManager: {fileID: 1020165693}
   skillButtonPrefab: {fileID: 1619622141431516161, guid: 9f82bb012655df641b2d8b1824140b13, type: 3}
-  companion2: {fileID: 0}
-  companion1: {fileID: 0}
   skillDescriptionPanel: {fileID: 1256410037}
   skillDescriptionText: {fileID: 647553936}
   skillButtons: []
@@ -1424,6 +1422,7 @@ MonoBehaviour:
   associatedEnergyText2: {fileID: 5522651480671795622}
   associatedtempEnergyBarSlider2: {fileID: 0}
   battleManager: {fileID: 1020165693}
+  activeCompanions: []
 --- !u!1 &439519252
 GameObject:
   m_ObjectHideFlags: 0
@@ -1516,7 +1515,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &446944931
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2109,7 +2108,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &594905528
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3502,8 +3501,8 @@ RectTransform:
   m_Father: {fileID: 731228367}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -4004,7 +4003,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &967052329
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4464,7 +4463,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1063747082
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4935,7 +4934,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0.44, y: 1}
   m_AnchoredPosition: {x: 0.3999939, y: -0.49999905}
   m_SizeDelta: {x: -32.76, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -5011,7 +5010,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0.428, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -5865,7 +5864,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1347133301
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6639,8 +6638,8 @@ RectTransform:
   m_Father: {fileID: 702199212}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.44, y: 0}
+  m_AnchorMax: {x: 0.44, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -7123,8 +7122,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   battleManager: {fileID: 0}
   skillButtonPrefab: {fileID: 0}
-  companion2: {fileID: 0}
-  companion1: {fileID: 0}
   skillDescriptionPanel: {fileID: 0}
   skillDescriptionText: {fileID: 0}
   skillButtons: []
@@ -7259,7 +7256,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0.3999939, y: -0.49999905}
   m_SizeDelta: {x: -32.76, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -8638,8 +8635,8 @@ RectTransform:
   m_Father: {fileID: 359829526}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -9499,7 +9496,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0.3999939, y: -0.49999905}
   m_SizeDelta: {x: -32.76, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -9864,8 +9861,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   battleManager: {fileID: 0}
   skillButtonPrefab: {fileID: 0}
-  companion2: {fileID: 0}
-  companion1: {fileID: 0}
   skillDescriptionPanel: {fileID: 0}
   skillDescriptionText: {fileID: 0}
   skillButtons: []
@@ -10798,7 +10793,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0.451, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -11354,8 +11349,8 @@ RectTransform:
   m_Father: {fileID: 5522651479363238649}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.48, y: 0}
+  m_AnchorMax: {x: 0.48, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -11679,7 +11674,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0.48, y: 1}
   m_AnchoredPosition: {x: 0.3999939, y: -0.5}
   m_SizeDelta: {x: -32.76, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -11813,7 +11808,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &5557771762688809531
 GameObject:
   m_ObjectHideFlags: 0
@@ -11907,7 +11902,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &6660993829456633266
 RectTransform:
   m_ObjectHideFlags: 0

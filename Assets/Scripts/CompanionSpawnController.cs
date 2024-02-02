@@ -99,6 +99,7 @@ public class CompanionSpawnController : MonoBehaviour
             if (activeCompanions[i] != null && activeCompanions[i].characterIDNumber == companionCharacter.characterIDNumber)
             {
                 activeCompanions[i].isSelected = false;
+                DisableHeroUI(activeCompanions[i]);
                 Destroy(activeCompanions[i].gameObject);
                 activeCompanions[i] = null;
                 break;
@@ -164,6 +165,7 @@ public class CompanionSpawnController : MonoBehaviour
         {
             SetupSelectedCompanion(instantiatedCompanion);
             AssignCompanion(instantiatedCompanion);
+            EnableHeroUI(instantiatedCompanion);
             selectedCompanion.isSelected = true;
         }
     }
@@ -203,6 +205,18 @@ private void RemoveCompanionFromGame(Companion companion)
         SetupCompanion(selectedCompanion);
         battleManager.playerParty.Add(selectedCompanion);
         Debug.Log(selectedCompanion.transform.position);
+    }
+
+    private void EnableHeroUI(Character selectedCompanion)
+    {
+        selectedCompanion.healthBar.gameObject.SetActive(true);
+        selectedCompanion.energyBar.gameObject.SetActive(true);
+    }
+
+    private void DisableHeroUI(Character selectedCompanion)
+    {
+        selectedCompanion.healthBar.gameObject.SetActive(false);
+        selectedCompanion.energyBar.gameObject.SetActive(false);
     }
 
 } 

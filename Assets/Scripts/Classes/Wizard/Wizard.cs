@@ -28,7 +28,7 @@ public class Wizard : Companion
             this.heroExp = 0;
             this.heroSkillPoints = 0;
             this.heroStatPoints = 0;
-            this.characterIDNumber = "1";
+            this.characterIDNumber = "3";
         
         }  
     }
