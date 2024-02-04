@@ -9,6 +9,7 @@ public class MainMenuUIManager : MonoBehaviour
     public GameObject wizardSkillPanel;
     public GameObject archerSkillPanel;
     public GameObject adventurerSkillPanel;
+    public GameObject forestTownPanel;
     public GameObject missionGUI;
     public GameObject companionGUI;
     public GameObject characterGUI;
@@ -247,6 +248,16 @@ public class MainMenuUIManager : MonoBehaviour
     public void closeOverworldMapInterface()
     {
         overworldMapGUI.SetActive(false);
+    }
+
+    public void openForestTownPanel()
+    {
+        forestTownPanel.SetActive(true);
+    }
+
+    public void closeForestTownPanel()
+    {
+        forestTownPanel.SetActive(false);
     }
    
 }
