@@ -407,6 +407,7 @@ private IEnumerator Move(Vector3 targetPosition, float stoppingDistance)
 private bool HasReachedPosition(Vector3 targetPosition, float stoppingDistance)
 {
     // Adjusted to use magnitude instead of sqrMagnitude for more accurate comparison
+    
     return Vector3.Distance(transform.position, targetPosition) <= stoppingDistance;
 }
 

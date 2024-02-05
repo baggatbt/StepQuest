@@ -175,6 +175,7 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
      public void StartBattle(BattleConfig config)
 {
      if (isBattleStarted) return; // Prevent starting the battle multiple times
+        battleStartButton.SetActive(false);
         activePlayer = companion1; //Default
         isBattleStarted = true;
         // Existing logic to start the battle
@@ -324,7 +325,7 @@ public void EndTurn()
     {
         companionSkillsPanel.SetActive(false);
         SkillsPanel.SetActive(false);
-       // enemyUIPanel.SetActive(false);
+        enemyUIPanel.SetActive(false);
        // heroUIPanels.SetActive(false);
     }
 
@@ -335,10 +336,12 @@ public void EndTurn()
 
     public void EnableAllButtons()
     {
+        
         companionSkillsPanel.SetActive(true);
         SkillsPanel.SetActive(true);
         enemyUIPanel.SetActive(true);
-        heroUIPanels.SetActive(true);
+       // heroUIPanels.SetActive(true);
+        
     }
 
     public void MoveCursorToTarget()
@@ -439,7 +442,7 @@ public void EndTurn()
         // Start zoom effect
             StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position));
             enemyUIPanel.SetActive(false);
-            heroUIPanels.SetActive(false);
+            
         // Only move if the player is not already at the target
         if (activePlayer.transform.position != currentTarget.transform.position)
         {
@@ -475,7 +478,7 @@ public void EndTurn()
         // Move player back to their original position after all skills executed.
         StartCoroutine(zoomEffect.ZoomOutEffect());
         enemyUIPanel.SetActive(true);
-       heroUIPanels.SetActive(true);
+       
         yield return activePlayer.ReturnToPosition();
         }
     }
