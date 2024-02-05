@@ -1682,7 +1682,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &146823823
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2300,12 +2300,12 @@ GameObject:
   - component: {fileID: 216808355}
   - component: {fileID: 216808354}
   m_Layer: 5
-  m_Name: 2-2
+  m_Name: Stage1-2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &216808353
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2315,15 +2315,15 @@ RectTransform:
   m_GameObject: {fileID: 216808352}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.7425, y: 1.7425, z: 1.7425}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 485463285}
-  m_RootOrder: 1
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -175.89984, y: -181.50137}
+  m_AnchoredPosition: {x: -186, y: -544}
   m_SizeDelta: {x: 21.42, y: 21.85}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &216808354
@@ -2342,12 +2342,12 @@ MonoBehaviour:
   stageBattleConfig:
     poolName: Forest
     maxEnemiesToSpawn: 2
-    levelOfEnemies: 0
+    levelOfEnemies: 1
     stage: {fileID: 0}
   battleSceneName: SampleBattleScene
   isUnlocked: 0
   isFirstCompletion: 1
-  stageID: 4
+  stageID: 2
   connectedStages:
   - {fileID: 987032038}
 --- !u!114 &216808355
@@ -4166,10 +4166,10 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 987032042}
-  - {fileID: 216808353}
   - {fileID: 1267876213}
   - {fileID: 1725917470}
   - {fileID: 1673045476}
+  - {fileID: 216808353}
   - {fileID: 27098814}
   - {fileID: 1322231485}
   - {fileID: 685982854}
@@ -10569,7 +10569,7 @@ RectTransform:
   m_Children:
   - {fileID: 2057007221}
   m_Father: {fileID: 485463285}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -14074,7 +14074,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 485463285}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -15406,7 +15406,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 485463285}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -15482,7 +15482,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 1, b: 0.029830456, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
