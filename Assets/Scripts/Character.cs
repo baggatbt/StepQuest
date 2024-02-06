@@ -363,7 +363,7 @@ public class Character : MonoBehaviour
     checkCollisionsDuringMovement = true;
 
     // Start moving towards the target
-    yield return Move(targetPosition, stoppingDistance: 0.0f); // Set a small stopping distance
+    yield return Move(targetPosition, stoppingDistance: 0.5f); // Set a small stopping distance
 
     // Stop the movement animation when the target position is reached or a collision occurs
     animator.SetTrigger("StopMovementAnimationTrigger");
@@ -415,7 +415,7 @@ private bool IsCollidingWithCharacter()
 {
     // Consider using a more specific collision check if necessary
     // For example, Physics2D.OverlapCircle might be replaced with Physics2D.OverlapBox if that's more appropriate for your game
-    Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 2.0f);
+    Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 0.5f);
 
     foreach (Collider2D collider in colliders)
     {
