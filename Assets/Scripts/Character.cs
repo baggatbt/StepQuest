@@ -359,16 +359,18 @@ public class Character : MonoBehaviour
     animator.SetTrigger("MovementAnimationTrigger");
     this.isMoving = true;
 
-    Vector3 targetPosition = attackTarget.position;
+    // Adjust the target position to include the target's Y level
+    Vector3 targetPosition = new Vector3(attackTarget.position.x, attackTarget.position.y, attackTarget.position.z);
     checkCollisionsDuringMovement = true;
 
-    // Start moving towards the target
-    yield return Move(targetPosition, stoppingDistance: 0.5f); // Set a small stopping distance
+    // Start moving towards the adjusted target position
+    yield return Move(targetPosition, stoppingDistance: 0.0f); // Use the adjusted target position
 
     // Stop the movement animation when the target position is reached or a collision occurs
     animator.SetTrigger("StopMovementAnimationTrigger");
     this.isMoving = false;
 }
+
 
 public IEnumerator ReturnToPosition()
 {
@@ -376,15 +378,16 @@ public IEnumerator ReturnToPosition()
     this.isMoving = true;
 
     Debug.Log("Returning to OP at : " + originalPosition);
-    // Move back to the original position
-    yield return Move(originalPosition, stoppingDistance: 0.0f); // Exact position, so stopping distance is 0
+    // Move back to the exact original position, including Y level
+    yield return Move(originalPosition, stoppingDistance: 0.0f); // Ensure originalPosition has the correct Y value
 
-    // This line will ensure the character is exactly at the original position
+    // This line will ensure the character is exactly at the original position, including Y level
     transform.position = originalPosition;
 
     animator.SetTrigger("StopMovementAnimationTrigger");
     this.isMoving = false;
 }
+
 
 private IEnumerator Move(Vector3 targetPosition, float stoppingDistance)
 {
@@ -415,7 +418,7 @@ private bool IsCollidingWithCharacter()
 {
     // Consider using a more specific collision check if necessary
     // For example, Physics2D.OverlapCircle might be replaced with Physics2D.OverlapBox if that's more appropriate for your game
-    Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 0.5f);
+    Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 2.0f);
 
     foreach (Collider2D collider in colliders)
     {
