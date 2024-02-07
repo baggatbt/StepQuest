@@ -567,6 +567,8 @@ public void EndTurn()
     {
         if (currentEnemy.currentSkill.requiresMovement)
         {
+            StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position));
+            enemyUIPanel.SetActive(false);
             yield return currentEnemy.MoveToTarget();
         }
 
@@ -576,6 +578,7 @@ public void EndTurn()
 
         if (currentEnemy.currentSkill.requiresMovement)
         {
+            StartCoroutine(zoomEffect.ZoomOutEffect());
             yield return currentEnemy.ReturnToPosition();
         }
     }
