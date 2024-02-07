@@ -14,6 +14,7 @@ public class MainMenuUIManager : MonoBehaviour
     public GameObject companionGUI;
     public GameObject characterGUI;
     public GameObject overworldMapGUI;
+    public GameObject knightSkillListView;
     public TextMeshProUGUI stepsText;
 
     //KNIGHT 
@@ -258,6 +259,21 @@ public class MainMenuUIManager : MonoBehaviour
     public void closeForestTownPanel()
     {
         forestTownPanel.SetActive(false);
+    }
+
+    public void openKnightSkillTree()
+    {
+        knightSkillListView.SetActive(true);
+    }
+
+    
+    public void openKnightSkillList()
+    {
+        knightSkillListView.SetActive(true);
+    }
+    public void closeKnightSkillList()
+    {
+        knightSkillListView.SetActive(false);
     }
    
 }

@@ -336,7 +336,7 @@ public class Character : MonoBehaviour
     public void animationDamageTiming()
 {
     Debug.Log("This is the damage moment");
-    StartCoroutine(TimeStop(0.1f)); // Adjust the duration for timestop effect
+    //StartCoroutine(TimeStop(0.1f)); // Adjust the duration for timestop effect
     animationDamageTime = true;
 }
 
@@ -359,58 +359,52 @@ public class Character : MonoBehaviour
     animator.SetTrigger("MovementAnimationTrigger");
     this.isMoving = true;
 
-    // Adjust the target position to include the target's Y level
+    // Define a speed for moving to the target. 
+    float moveSpeed = 17f; 
+
     Vector3 targetPosition = new Vector3(attackTarget.position.x, attackTarget.position.y, attackTarget.position.z);
     checkCollisionsDuringMovement = true;
 
-    // Start moving towards the adjusted target position
-    yield return Move(targetPosition, stoppingDistance: 0.0f); // Use the adjusted target position
+    // Pass the moveSpeed as the third argument to the Move coroutine
+    yield return Move(targetPosition, 2.5f, moveSpeed);
 
-    // Stop the movement animation when the target position is reached or a collision occurs
     animator.SetTrigger("StopMovementAnimationTrigger");
     this.isMoving = false;
 }
 
 
-public IEnumerator ReturnToPosition()
+
+private IEnumerator Move(Vector3 targetPosition, float stoppingDistance, float speed)
 {
+    Debug.Log($"Starting Move towards {targetPosition}");
+    while (Vector3.Distance(transform.position, targetPosition) > stoppingDistance)
+    {
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
+        yield return null; // Wait for the next frame
+    }
+    Debug.Log("Completed Move");
+}
+
+public IEnumerator ReturnToPosition(float returnSpeed = 16f)
+{
+    Debug.Log($"Returning to original position at: {originalPosition}");
     animator.SetTrigger("MovementAnimationTrigger");
     this.isMoving = true;
 
-    Debug.Log("Returning to OP at : " + originalPosition);
-    // Move back to the exact original position, including Y level
-    yield return Move(originalPosition, stoppingDistance: 0.0f); // Ensure originalPosition has the correct Y value
+    yield return Move(originalPosition, 0.00f, returnSpeed); // Use a small stopping distance and adjustable speed
 
-    // This line will ensure the character is exactly at the original position, including Y level
-    transform.position = originalPosition;
-
+    transform.position = originalPosition; // Ensure exact original position, consider removing if snapping still occurs
     animator.SetTrigger("StopMovementAnimationTrigger");
     this.isMoving = false;
+    Debug.Log("Returned to original position");
 }
 
-
-private IEnumerator Move(Vector3 targetPosition, float stoppingDistance)
-{
-    while (!HasReachedPosition(targetPosition, stoppingDistance))
-    {
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, 17.5f * Time.deltaTime);
-
-        if (checkCollisionsDuringMovement && IsCollidingWithCharacter())
-        {
-            animator.SetTrigger("StopMovementAnimationTrigger");
-            yield break; // Stop the coroutine if a collision is detected
-        }
-
-        // Use WaitForFixedUpdate for physics-based movement
-        yield return new WaitForFixedUpdate();
-    }
-}
 
 // Updated to check for an appropriate stopping distance
 private bool HasReachedPosition(Vector3 targetPosition, float stoppingDistance)
 {
     // Adjusted to use magnitude instead of sqrMagnitude for more accurate comparison
-    
+     
     return Vector3.Distance(transform.position, targetPosition) <= stoppingDistance;
 }
 
