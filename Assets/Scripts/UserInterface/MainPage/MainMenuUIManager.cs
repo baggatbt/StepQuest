@@ -249,6 +249,7 @@ public class MainMenuUIManager : MonoBehaviour
     public void closeOverworldMapInterface()
     {
         overworldMapGUI.SetActive(false);
+        Debug.Log("ACTIVATED");
     }
 
     public void openForestTownPanel()
