@@ -45,6 +45,8 @@ public class MainMenuUIManager : MonoBehaviour
     public Button archerDEFBtn;
     public Button archerSPDBtn;
     
+  
+
     private void Awake()
     {
         knight = GameManager.Instance.knight;
@@ -169,7 +171,34 @@ public class MainMenuUIManager : MonoBehaviour
         }
     }
     
+   //OPEN AND CLOSING OF UI ELEMENTS
+
+    
+    public CanvasGroup currentPanel;
+    public CanvasGroup ForestMapCanvasGroup;
+
+   public void SwitchPanel(CanvasGroup newPanel)
+    {
+        // Hide the current panel, if it exists
+        if (currentPanel != null)
+        {
+            currentPanel.alpha = 0;
+            currentPanel.interactable = false;
+            currentPanel.blocksRaycasts = false;
+        }
+
+        // Show the new panel
+        newPanel.alpha = 1;
+        newPanel.interactable = true;
+        newPanel.blocksRaycasts = true;
+
+        // Update the current panel reference to the new panel
+        currentPanel = newPanel;
+    }
+
    
+
+
 
     public void openSkillSelectionGUI()
     {
