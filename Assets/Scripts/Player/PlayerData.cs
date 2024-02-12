@@ -101,29 +101,31 @@ public class PlayerData : MonoBehaviour
    
 
     
-
+    public bool firstTimeLogin;
     public void SavePlayerData()
-    {
-        PlayerPrefs.SetInt("PlayerLevel", level);
-        PlayerPrefs.SetInt("PlayerGold", gold);
-        PlayerPrefs.SetInt("CurrentStageIndex", currentStageIndex);
-       
-       
-        PlayerPrefs.Save();
-        Debug.Log("Data saved");
-    }
+{
+    PlayerPrefs.SetInt("PlayerLevel", level);
+    PlayerPrefs.SetInt("PlayerGold", gold);
+    PlayerPrefs.SetInt("CurrentStageIndex", currentStageIndex);
+    PlayerPrefs.SetInt("FirstLogin", firstTimeLogin ? 1 : 0); // Convert bool to int
+    
+    PlayerPrefs.Save();
+    Debug.Log("Data saved");
+}
+
 
     public void LoadPlayerData()
+{
+    if (PlayerPrefs.HasKey("PlayerLevel"))
     {
-        if (PlayerPrefs.HasKey("PlayerLevel"))
-        {
-            level = PlayerPrefs.GetInt("PlayerLevel");
-            gold = PlayerPrefs.GetInt("PlayerGold");
-            currentStageIndex = PlayerPrefs.GetInt("CurrentStageIndex");
-            
-            
-        }
+        level = PlayerPrefs.GetInt("PlayerLevel");
+        gold = PlayerPrefs.GetInt("PlayerGold");
+        currentStageIndex = PlayerPrefs.GetInt("CurrentStageIndex");
+        // Convert int back to bool
+        firstTimeLogin = PlayerPrefs.GetInt("FirstLogin", 1) == 1; // Default to true if not set
     }
+}
+
 
     private void OnApplicationPause(bool pauseStatus)
 {
