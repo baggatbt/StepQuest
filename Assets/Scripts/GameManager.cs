@@ -7,9 +7,10 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
-    public GameObject knightPrefab; // Assign in Unity Inspector
-    public GameObject archerPrefab; // Assign in Unity Inspector
+    public GameObject knightPrefab; 
+    public GameObject archerPrefab; 
     public GameObject wizardPrefab;
+    public GameObject characterSelectionPanel;
     public BattleConfig CurrentBattleConfig { get; set; }
     public HashSet<string> UnlockedStageNames = new HashSet<string>();
     public Character companion1; 
@@ -45,7 +46,11 @@ public class GameManager : MonoBehaviour
             probabilityCompanion2 = 1f;
             probabilityCompanion3 = 1f;
             
-           
+            Debug.Log(PlayerData.Instance.firstTimeLogin);
+           if (PlayerData.Instance.firstTimeLogin)
+        {
+            ShowCharacterSelectionPanel(); 
+        }
         }
         else
         {
@@ -62,6 +67,15 @@ public class GameManager : MonoBehaviour
             CreateAndRegisterArcher();
             CreateAndRegisterWizard();
     }
+
+    public void ShowCharacterSelectionPanel()
+{
+    Debug.Log("ShowingCharSelectPanel");
+    characterSelectionPanel.SetActive(true);
+    PlayerData.Instance.firstTimeLogin = false;
+    PlayerData.Instance.SavePlayerData(); 
+}
+
 
     public Character InstantiateSelectedCompanion(string heroID)
     {

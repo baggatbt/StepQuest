@@ -40,19 +40,22 @@ public class PlayerData : MonoBehaviour
 {
     
    //For testing, wipes saved data 
-   //PlayerPrefs.DeleteAll();
+  // PlayerPrefs.DeleteAll();
 
+    Debug.Log("PlayerData Awake is running");
     if (_instance == null)
     {
         _instance = this;
         DontDestroyOnLoad(gameObject);
-        
+
+        // Ensure default value for first login
+        if (!PlayerPrefs.HasKey("FirstLogin"))
+        {
+            firstTimeLogin = true;
+        }
         
         LoadPlayerData();
-        
-
-        
-        
+        Debug.Log($"First time login after LoadPlayerData: {firstTimeLogin}");
     }
     else
     {
@@ -71,7 +74,7 @@ public class PlayerData : MonoBehaviour
     }
 
    
-
+    
 
     private void Start()
     {
@@ -101,7 +104,7 @@ public class PlayerData : MonoBehaviour
    
 
     
-    public bool firstTimeLogin;
+    public bool firstTimeLogin = true;
     public void SavePlayerData()
 {
     PlayerPrefs.SetInt("PlayerLevel", level);
