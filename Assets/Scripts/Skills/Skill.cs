@@ -119,46 +119,37 @@ public abstract class Skill
     
 
     public void HandleTimingResultForPlayerAttack(Character user, Character target, TimingEventResult timingResult, int baseDamage)
-    {
-        float damageMultiplier = 1.0f;
-        
-        result = timingResult;
-        baseDamage = user.attackPower;
-        
+{
+    float damageMultiplier = 1.0f;
+    
+    result = timingResult;
+    baseDamage = user.attackPower;
+    
     switch (result)
     {
         case TimingEventResult.Perfect:
             Debug.Log("Perfect Hit!");
             damageMultiplier = 1.5f;  // Boost damage by 50%
-           // user.animator.SetTrigger(trigger);
-            target.TakeDamage((int)(baseDamage * damageMultiplier),user); // Apply damage boost
-           //target.EnemyTakeDamage((int)(baseDamage * damageMultiplier),user, target.enemyDamageReductionModifier);
+            target.TakeDamage((int)(baseDamage * damageMultiplier), user);
             target.animator.SetTrigger("IsHurtTrigger");
-            //AudioManager.instance.PlayCriticalSlashSound();
-            //user.GainEnergy(energyGain); //Perfect hits give +1 energy
+            user.PlayCriticalHitSound(); // Play critical hit sound
             break;
         case TimingEventResult.Good:
-            Debug.Log("Good Hit!");   
+            Debug.Log("Good Hit!");
             damageMultiplier = 1.25f;  // Boost damage by 25%
-           // user.animator.SetTrigger(trigger);         
-            target.animator.SetTrigger("IsHurtTrigger");   
-            Debug.Log("Damage before boost: " + ((int)(baseDamage), user) );
-            //target.EnemyTakeDamage((int)(baseDamage * damageMultiplier),user, target.enemyDamageReductionModifier);
-            target.TakeDamage((int)(baseDamage * damageMultiplier), user); // Apply damage boost
-            Debug.Log("Damage after boost: " + ((int)(baseDamage * damageMultiplier), user) );
-           // user.GainEnergy(energyGain);
+            target.animator.SetTrigger("IsHurtTrigger");
+            target.TakeDamage((int)(baseDamage * damageMultiplier), user);
+            user.PlayHitSound(); // Play normal hit sound
             break;
         case TimingEventResult.Miss:
             Debug.Log("Missed!");
-           // user.animator.SetTrigger(trigger); 
             target.animator.SetTrigger("IsHurtTrigger");
-            // target.EnemyTakeDamage((int)(baseDamage * damageMultiplier),user, target.enemyDamageReductionModifier);
             target.TakeDamage(baseDamage, user); // No damage boost
-            AudioManager.instance.PlaySlashSound();
-            Debug.Log("BaseDamage going into TakeDamage = " + baseDamage);
+            // Optionally play a miss sound or no sound
             break;
     }
 }
+
 
 public void HandlePlayerRangedAttack(Character user, Projectile projectile, TimingEventResult result)
     {
@@ -167,9 +158,11 @@ public void HandlePlayerRangedAttack(Character user, Projectile projectile, Timi
         {
             case TimingEventResult.Perfect:
                 damageMultiplier = 1.5f; // Boost damage by 50%
+                user.PlayCriticalHitSound(); // Play critical hit sound
                 break;
             case TimingEventResult.Good:
                 damageMultiplier = 1.25f; // Boost damage by 25%
+                user.PlayHitSound();
                 break;
             case TimingEventResult.Miss:
                 // Optional: Reduce damage or keep as it is

@@ -44,6 +44,7 @@ public class Character : MonoBehaviour
     public int attacksBeforeSpecial; 
     public Skill normalSkill; 
     public Skill specialSkill;
+    
 
     private bool checkCollisionsDuringMovement = true;
 
@@ -431,6 +432,24 @@ private bool IsCollidingWithCharacter()
         public virtual void UpdateStats()
     {   
         //Each enemy implements its own growth
+    }
+
+    public AudioSource audioSource; // Attach this in the inspector
+    public AudioClip hitSound; // Assign this in the inspector
+    public AudioClip criticalHitSound; // Assign this in the inspector
+
+    public void PlayHitSound()
+    {
+        audioSource.clip = hitSound;
+        audioSource.Play();
+        Debug.Log("hit sound");
+    }
+
+    public void PlayCriticalHitSound()
+    {
+        audioSource.clip = criticalHitSound;
+        audioSource.Play();
+        Debug.Log("crit sound");
     }
     
 

@@ -718,12 +718,12 @@ public void EndTurn()
 
     if (outerCircleScale.x <= perfectThreshold) 
     {
-        StartCoroutine(cameraShake.Shake());
+        StartCoroutine(cameraShake.Shake(0.5f));
         return TimingEventResult.Perfect;
     }
     else if (outerCircleScale.x <= goodThreshold)
     {
-        StartCoroutine(cameraShake.Shake());
+        StartCoroutine(cameraShake.Shake(0.3f));
         return TimingEventResult.Good;
     }
     else
