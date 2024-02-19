@@ -326,7 +326,7 @@ public void EndTurn()
         companionSkillsPanel.SetActive(false);
         SkillsPanel.SetActive(false);
         enemyUIPanel.SetActive(false);
-       // heroUIPanels.SetActive(false);
+        heroUIPanels.SetActive(false);
     }
 
    public GameObject enemyUIPanel;
@@ -340,7 +340,7 @@ public void EndTurn()
         companionSkillsPanel.SetActive(true);
         SkillsPanel.SetActive(true);
         enemyUIPanel.SetActive(true);
-       // heroUIPanels.SetActive(true);
+        heroUIPanels.SetActive(true);
         
     }
 
@@ -569,6 +569,7 @@ public void EndTurn()
         {
             StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position));
             enemyUIPanel.SetActive(false);
+            DisableAllButtons();
             yield return currentEnemy.MoveToTarget();
         }
 
@@ -580,6 +581,7 @@ public void EndTurn()
         {
             StartCoroutine(zoomEffect.ZoomOutEffect());
             yield return currentEnemy.ReturnToPosition();
+            EnableAllButtons();
         }
     }
     else
