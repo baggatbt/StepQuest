@@ -830,14 +830,14 @@ public void EndTurn()
 private void Update()
 {
     if (isBattleStarted){
-    if (!playerParty.Any(character => character.isAttacking))
+    if (!playerParty.Any(character => character.isAttacking) && !enemies.Any(character => character.isAttacking))
     {
     if (Input.GetMouseButtonDown(0))
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
 
-        if (hit.collider != null && (!companion1.isAttacking && !companion2.isAttacking))
+        if (hit.collider != null && !playerParty.Any(character => character.isAttacking))
         {
             // If the hit object is an enemy
             if (hit.collider.CompareTag("Enemy")) // && isSkillSelected)
@@ -924,8 +924,14 @@ public void CheckBattleEnd()
     {
         EndOfBattleRewards(enemies);
         Debug.Log("Is this running");
-       // Stage completedStage = GameManager.Instance.CurrentBattleConfig.stage;
-       // GameManager.Instance.UnlockConnectedStages(completedStage);
+        
+       Stage completedStage = GameManager.Instance.CurrentBattleConfig.stage;
+       GameManager.Instance.UnlockConnectedStages(completedStage);
+       if (completedStage.isFirstCompletion){
+        PlayerData.Instance.currentStageIndex++;
+        completedStage.isFirstCompletion = false;
+       }
+       
         endOfBattlePanel.SetActive(true);
     }
     else if (allAlliesDefeated)

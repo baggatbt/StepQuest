@@ -16,8 +16,8 @@ public class GameManager : MonoBehaviour
     public Character companion1; 
     public Character companion2; 
     public Character companion3;
-    public int currentStageIndex;
-    public List<BattleConfig> allStages; // list is populated with all stages in order
+    private int currentStageIndex;
+  //  public List<BattleConfig> allStages; // list is populated with all stages in order
 
     public List<Companion> companions = new List<Companion>();
 
@@ -161,12 +161,13 @@ private void CreateAndRegisterWizard()
     }
 }
 
+/*
     public void GoToNextStage()
     {
         // Increment the stage index
         currentStageIndex++;
         
-        // Make sure we don't go out of bounds
+        
         if (currentStageIndex >= allStages.Count)
         {
             Debug.Log("The game is over, you win");
@@ -178,7 +179,7 @@ private void CreateAndRegisterWizard()
         // Load the battle scene with the new configuration
         SceneManager.LoadScene("TestPortraitBattle");
     }
-
+*/
     
     //Testing method for deleting all saved data
     public void DeleteEverything()
