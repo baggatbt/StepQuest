@@ -29,6 +29,7 @@ public class Stage : MonoBehaviour
     public void UpdateButtonColor()
 {
     // Check if the stageButton is not null before accessing it
+    /*
     if (stageButton != null)
     {
         if (isUnlocked)
@@ -40,6 +41,7 @@ public class Stage : MonoBehaviour
             stageButton.GetComponent<Image>().color = Color.red;
         }
     }
+    */
 }
 
 

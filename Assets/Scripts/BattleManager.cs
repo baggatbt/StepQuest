@@ -830,7 +830,7 @@ public void EndTurn()
 private void Update()
 {
     if (isBattleStarted){
-    if (!companion1.isAttacking && !companion2.isAttacking)
+    if (!playerParty.Any(character => character.isAttacking))
     {
     if (Input.GetMouseButtonDown(0))
     {
