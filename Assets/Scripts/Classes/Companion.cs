@@ -39,6 +39,16 @@ public abstract class Companion : Character
         
     }
 
+    public int expToLevel
+{
+    get
+    {
+        
+        return ExpToNextLevel(heroLevel);
+    }
+}
+
+
 
     //abstract LevelUp method
     public abstract void LevelUp();

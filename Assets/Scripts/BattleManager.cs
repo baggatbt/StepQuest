@@ -302,6 +302,7 @@ public void EndTurn()
 {
     
     turnOrderList.RemoveAt(0); // Remove the character from the list after their turn
+    turnOrderList.RemoveAll(character => character.health <= 0);
     Debug.Log("ENDING THE TURN");
     if (turnOrderList.Count == 0)
     {
@@ -314,7 +315,6 @@ public void EndTurn()
     }
 }
 
-// This method should be called when the player has finished their turn
 
 
 
@@ -795,20 +795,88 @@ public void EndTurn()
         return state;
     }
 
+    public Companion companion;
+    public Slider[] expSliders; // Ensure this array size matches the max party size in the Inspector
+    public TextMeshProUGUI[] expTexts; // Match this array size with expSliders
+
+
+    private void DisplayExpToLevel(List<Character> playerParty)
+{
+    // Hide all UI elements initially
+    foreach (var slider in expSliders) slider.gameObject.SetActive(false);
+    foreach (var text in expTexts) text.gameObject.SetActive(false);
+
+    for (int i = 0; i < playerParty.Count; i++)
+    {
+        if (playerParty[i] is Companion companion)
+        {
+            // Calculate EXP to next level
+            int expToLevel = companion.ExpToNextLevel(companion.heroLevel);
+
+            // Ensure we don't exceed the UI elements array bounds
+            if (i < expSliders.Length && i < expTexts.Length)
+            {
+                // Update the slider value and text
+                expSliders[i].value = CalculateSliderValue(companion.heroExp, expToLevel);
+                expTexts[i].text = "Exp to level: " + (expToLevel - companion.heroExp).ToString();
+
+                // Make sure the UI elements for this character are visible
+                expSliders[i].gameObject.SetActive(true);
+                expTexts[i].gameObject.SetActive(true);
+            }
+            Debug.Log(expTexts[i].text);
+        }
+    }
+}
+
+private float CalculateSliderValue(int currentExp, int expToNextLevel)
+{
+    // Example calculation, adjust according to your EXP system
+    // This assumes 'expToNextLevel' is the total EXP needed to level up from the current level
+    // and 'currentExp' is the current EXP amount towards that goal.
+    return (float)currentExp / expToNextLevel;
+}
+
+
+
     public void EndOfBattleRewards(List<Character> enemies)
 {
     int totalExp = 0;
     int totalGold = 0;
 
+    // Calculate total EXP and gold from defeated enemies
     foreach (Enemy enemy in enemies)
     {
         totalExp += enemy.expReward;
         totalGold += enemy.goldReward;
     }
     Debug.Log("Running end of battle rewards +" + totalExp + " +" + totalGold);
-    GameManager.Instance.GainExp(totalExp);
+
+    // Update EXP for each companion in the playerParty
+    foreach (Character character in playerParty)
+    {
+        if (character is Companion companion)
+        {
+            // Update companion EXP in playerParty
+            companion.heroExp += totalExp;
+
+            // Now find and update the matching companion in GameManager.Instance.companions
+            foreach (Companion gmCompanion in GameManager.Instance.companions)
+            {
+                if (gmCompanion.heroID == companion.heroID)
+                {
+                    gmCompanion.heroExp += totalExp;
+                    break; // Stop searching once we've found and updated the matching companion
+                }
+            }
+        }
+    }
+
+    // Update the player's gold
     PlayerData.Instance.gold += totalGold;
     PlayerData.Instance.SavePlayerData();
+
+    // Assuming this method saves the updated companion data in GameManager
     GameManager.Instance.SaveAllCompanionData();
     
 
@@ -819,6 +887,7 @@ public void EndTurn()
     TextMeshProUGUI goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
     goldGainedTextComponent.text = totalGold.ToString();
 
+    DisplayExpToLevel(playerParty);
 }
 
 
