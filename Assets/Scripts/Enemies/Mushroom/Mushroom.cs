@@ -3,55 +3,48 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-
 public class Mushroom : Enemy
-{   
-    //This is because HP must intialize before the data in Start()
+{
     protected override void Awake()
     {
-        base.Awake();
+        base.Awake(); // Calls Enemy.Awake(), ensuring base class initialization, including exp and gold reward calculations
         this.level = 1;
         this.maxHealth = 18;
         this.health = this.maxHealth;
         this.maxEnergy = 3;
         this.speed = 3;
         this.attackPower = 8;
-        this.defensePower = 15; 
+        this.defensePower = 15;
         this.energy = 0;
-        
     }
-     protected override void Start()
+
+    protected override void Start()
     {
-        // Assign the skills to this specific type of character
-        this.skills = new List<Skill> // Make sure to initialize the skills list before adding to it
+        base.Start(); // Ensure any base class initialization happens
+
+        // Initialize Mushroom-specific skills
+        this.skills = new List<Skill>
         {
             new MushroomAttackSkill(),
             new MushroomSpecialAttackSkill()
         };
         
-        this.expReward = 10;  
-        this.goldReward = 4;
-        
-
-        // Assign the skills
+        // Skills assignment
         this.normalSkill = this.skills[0]; // Normal skill
         this.specialSkill = this.skills[1]; // Special skill
-
-        // Set the default currentSkill
         this.currentSkill = this.normalSkill;
-
-    
     }
-        public override void UpdateStats()
+
+    public override void UpdateStats()
     {
-        this.maxHealth = 9 + (this.level * 5);
-        this.health = maxHealth;
-        this.expReward = 8 + (this.level * 3);
-        this.goldReward = 3 + (this.level * 3);
-        this.attacksBeforeSpecial = 2;
-        this.attackPower = 6 + (this.level + 1);
-        this.defensePower = 5 + (this.level + 3);
+        base.UpdateStats(); // Ensures that any updates that happen in the base class, including expReward and goldReward updates, are applied
+
+        // Apply any Mushroom-specific stat updates
+        this.maxHealth = 18 + (this.level * 5); // Adjusted to match the original pattern
+        this.health = this.maxHealth;
+        this.goldReward = 4 + (this.level * 3); // You can keep or modify this if you want specific gold logic for Mushrooms
+        this.attackPower = 8 + (this.level + 1); // Adjusted to match the original pattern
+        this.defensePower = 15 + (this.level + 3); // Adjusted to match the original pattern
         this.energy = 0;
     }
 }
-

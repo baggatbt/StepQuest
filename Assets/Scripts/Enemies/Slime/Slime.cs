@@ -47,9 +47,9 @@ public class Slime : Enemy
     }
         public override void UpdateStats()
     {
+        base.UpdateStats();
         this.maxHealth = 9 + (this.level * 4);
         this.health = maxHealth;
-        this.expReward = 8 + (this.level * 2);
         this.goldReward = 3 + (this.level * 2);
         this.attackPower = 6 + (this.level + 1);
         this.defensePower = 5 + (this.level + 1);

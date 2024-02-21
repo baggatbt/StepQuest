@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-
 public class Goblin : Enemy
 {   
-    //This is because HP must intialize before the data in Start()
     protected override void Awake()
     {
-        base.Awake();
+        base.Awake(); // Calls Enemy.Awake(), which now includes the call to UpdateExpAndGoldRewards
         this.level = 1;
         this.maxHealth = 9;
         this.health = this.maxHealth;
@@ -17,46 +15,39 @@ public class Goblin : Enemy
         this.speed = 9;
         this.defensePenetration = 2;
         this.attacksBeforeSpecial = 2;
-        this.attackPower = 6 ;
+        this.attackPower = 6;
         this.defensePower = 5;
         this.energy = 0;
-        
     }
-     protected override void Start()
+
+    protected override void Start()
     {
-        // Assign the skills to this specific type of character
-        this.skills = new List<Skill> // Make sure to initialize the skills list before adding to it
+        base.Start(); // Ensure any base class initialization happens. Currently, Enemy.Start() might not exist or do anything, but it's good practice.
+
+        // Initialize Goblin-specific skills
+        this.skills = new List<Skill>
         {
             new GoblinAttackSkill(),
             new GoblinSpecialAttackSkill()
         };
         
-        this.expReward = 8 + (this.level * 2);
-        this.goldReward = 3 + (this.level * 2);
-        
-
-        // Assign the skills
+        // Skills assignment
         this.normalSkill = this.skills[0]; // Normal skill
         this.specialSkill = this.skills[1]; // Special skill
-
-        // Set the default currentSkill
         this.currentSkill = this.normalSkill;
     }
 
-
-   public override void UpdateStats()
+    public override void UpdateStats()
     {
+        base.UpdateStats(); // Ensures that any updates that happen in the base class, including expReward and goldReward updates, are applied
+
+        // Goblin-specific updates
         this.maxHealth = 9 + (this.level * 2);
-        this.health = maxHealth;
-        this.expReward = 8 + (this.level * 2);
-        this.goldReward = 3 + (this.level * 2);
+        this.health = this.maxHealth;
+        this.goldReward = 3 + (this.level * 2); // You can keep or modify this if you want specific gold logic for Goblins
         this.attacksBeforeSpecial = 2;
-        this.attackPower = 6 + (this.level + 2);
+        this.attackPower = 6 + (this.level * 2); 
         this.defensePower = 5 + (this.level + 1);
         this.energy = 0;
     }
-    
-
-   
 }
-

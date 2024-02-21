@@ -452,7 +452,7 @@ public void EndTurn()
             
             
         }
-
+//ARROW DOESNT USE MOVE AND ATTACK INVESTIGATE THERE
         yield return StartCoroutine(PlayerAttackCoroutine(null));
     }
 
@@ -861,11 +861,11 @@ private float CalculateSliderValue(int currentExp, int expToNextLevel)
             companion.heroExp += totalExp;
 
             // Now find and update the matching companion in GameManager.Instance.companions
-            foreach (Companion gmCompanion in GameManager.Instance.companions)
+            foreach (Companion Companion in GameManager.Instance.companions)
             {
-                if (gmCompanion.heroID == companion.heroID)
+                if (Companion.heroID == companion.heroID)
                 {
-                    gmCompanion.heroExp += totalExp;
+                    Companion.heroExp += totalExp;
                     break; // Stop searching once we've found and updated the matching companion
                 }
             }
