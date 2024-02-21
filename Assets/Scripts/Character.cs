@@ -44,8 +44,7 @@ public class Character : MonoBehaviour
     public int attacksBeforeSpecial; 
     public Skill normalSkill; 
     public Skill specialSkill;
-    
-
+   
     private bool checkCollisionsDuringMovement = true;
 
     //STATUS EFFECTS
@@ -213,6 +212,7 @@ public class Character : MonoBehaviour
         }
     }
     Debug.Log("isAttacking = " + attacker.isAttacking);
+    
    
 }
 

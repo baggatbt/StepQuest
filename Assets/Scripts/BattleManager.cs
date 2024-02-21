@@ -237,11 +237,11 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
 
     private void ChangeState(BattleState newState)
     {
+        CheckBattleEnd();
+        turnOrderList.RemoveAll(character => character.health <= 0);
         State = newState;
         if (State == BattleState.PlayerTurn)
         {
-
-            
             EnableAllButtons();
         }
     }
@@ -250,7 +250,7 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
     public void InitializeTurnOrder()
 {
     turnOrderList.Clear();
-
+    
     if (companion1 != null) turnOrderList.Add(companion1);
     if (companion2 != null) turnOrderList.Add(companion2);
 
@@ -258,6 +258,7 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
     {
         turnOrderList.Add(enemy);
         enemy.attackTarget = SelectTargetForEnemy(); // Assign a target to each enemy
+        
     }
 
     turnOrderList = turnOrderList.OrderByDescending(character => character.speed).ToList();
@@ -267,12 +268,12 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
 
     public void StartTurn()
 {
-    // Remove all characters with health less than or equal to zero
-    turnOrderList.RemoveAll(character => character.health <= 0);
+    
 
     // Now check if there are characters left to take a turn
     if (turnOrderList.Count > 0)
     {
+        turnOrderList.RemoveAll(character => character.health <= 0);
         var nextCharacter = turnOrderList[0];
         ExecuteTurn(nextCharacter);
     }
@@ -285,6 +286,7 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
 
 private void ExecuteTurn(Character character)
 {
+   
     if (character == companion1 || character == companion2)
     {
         activePlayer = character;
@@ -292,6 +294,7 @@ private void ExecuteTurn(Character character)
     }
     else // Assuming the character is an enemy
     {
+       
         ChangeState(BattleState.EnemyTurn);
         EnemyAttack(character); // Pass the current enemy character
     }
@@ -398,10 +401,10 @@ public void EndTurn()
         skillsExecuted = 0;
         //Make them unable to take a second turn.
         
-        
-
-        yield return new WaitUntil(() => activePlayer.isMoving == false);
+        turnOrderList.RemoveAll(character => character.health <= 0);
         EndTurn();
+        yield return new WaitUntil(() => activePlayer.isMoving == false);
+        
 
         
       
@@ -459,6 +462,7 @@ public void EndTurn()
 
     public IEnumerator PlayerAttackCoroutine(System.Action successCallback)
     {
+        
         Character targetEnemy = currentTarget.GetComponent<Character>();
         yield return new WaitUntil(() => targetEnemy.isAttacking == false);
 
@@ -467,10 +471,6 @@ public void EndTurn()
             
             yield return activePlayer.currentSkill.Execute(activePlayer, targetEnemy, this);
             
-            
-
-            
-
             CheckBattleEnd();
         }
         if (activePlayer.currentSkill.requiresMovement == true)
@@ -481,6 +481,11 @@ public void EndTurn()
        
         yield return activePlayer.ReturnToPosition();
         }
+        if(activePlayer.currentSkill.requiresMovement == false)
+        {
+            yield return new WaitForSeconds(0.5f); //Ensures fade is all done
+        }
+        
     }
 
     private Queue<Character> enemyTurnQueue = new Queue<Character>();
@@ -898,6 +903,7 @@ private float CalculateSliderValue(int currentExp, int expToNextLevel)
 
 private void Update()
 {
+    
     if (isBattleStarted){
     if (!playerParty.Any(character => character.isAttacking) && !enemies.Any(character => character.isAttacking))
     {
@@ -920,6 +926,7 @@ private void Update()
                 if ((state == BattleState.PlayerTurn) && isSkillSelected)
                 {
                     ExecuteQueuedSkills();
+                   // turnOrderList.RemoveAll(character => character.health <= 0);
                 }
                 isSkillSelected = false;  // Reset the flag
             }

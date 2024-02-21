@@ -165,7 +165,7 @@ public void HandlePlayerRangedAttack(Character user, Projectile projectile, Timi
                 user.PlayHitSound();
                 break;
             case TimingEventResult.Miss:
-                // Optional: Reduce damage or keep as it is
+                
                 break;
         }
 

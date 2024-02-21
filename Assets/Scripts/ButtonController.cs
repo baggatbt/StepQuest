@@ -213,22 +213,9 @@ public void SelectAndUseSkill(Skill selectedSkill)
 
 
 
-    public void AttackButtonClick()
-{
-    // Set the skill
-    if (skill != null)
-    {
-        OnButtonClick();
-    }
-    else
-    {
-        //Default skill to use if nothing selected, eventually needs to be assigned based on player job.
-        skill = new Slash();
-        Debug.Log("Using Slash.");
-        OnButtonClick();
-    }
+   
 
-}
+
 
 
     public void OpenSkillPanel()
