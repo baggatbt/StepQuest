@@ -23,25 +23,30 @@ public class ArrowRain : Skill
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
-    {
-        user.isAttacking = true;
-        int baseDamage = CalculateBaseDamage(user) / 3;  // Split total damage into 3 parts
+{
+    user.isAttacking = true;
+    int baseDamage = CalculateBaseDamage(user) / 3;  // Split total damage into 3 parts
 
+    // Trigger the player hold release time event without waiting for damage application
+    yield return battleManager.PlayerHoldReleaseTimeEvent(0.0f, 1.0f, (result) =>
+    {
         Vector3 spawnPosition = target.transform.position;
         Vector3 offsetPosition = new Vector3(spawnPosition.x, spawnPosition.y + 2, spawnPosition.z);
+        // Instantiate the arrow rain prefab at the offset position
         GameObject arrowRain = UnityEngine.Object.Instantiate(arrowRainFallPreFab, offsetPosition, Quaternion.identity);
+    });
 
-        // Assume HandleTimingResultForPlayerAttack is where you apply damage.
-        // Loop to apply damage 3 times with a delay
-        for (int i = 0; i < 3; i++)
-        {
-            yield return new WaitForSeconds(0.2f); // Wait for 0.5 seconds between each hit
-            HandleTimingResultForPlayerAttack(user, target, result, baseDamage); // Apply one third of the damage
-        }
-
-        yield return new WaitForSeconds(1.0f); 
-        user.isAttacking = false;
+    // Separate loop outside the lambda expression for applying damage with delay
+    for (int i = 0; i < 3; i++)
+    {
+        yield return new WaitForSeconds(0.2f); // Wait for 0.2 seconds between each hit
+        HandleTimingResultForPlayerAttack(user, target, result, baseDamage); // Apply one third of the damage
     }
+
+    yield return new WaitForSeconds(1.0f); 
+    user.isAttacking = false;
+}
+
 }
 
 
