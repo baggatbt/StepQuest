@@ -47,12 +47,11 @@ public class MainMenuUIManager : MonoBehaviour
     
   
 
-    private void Awake()
+    private void Start()
     {
         knight = GameManager.Instance.knight;
         archer = GameManager.Instance.archer;
         UpdateUI();
-        
     }
     private void Update()
     {
@@ -60,8 +59,8 @@ public class MainMenuUIManager : MonoBehaviour
     }
     private void UpdateUI()
     {  
-        UpdateKnightStatsUI();
         UpdateArcherStatsUI();
+        UpdateKnightStatsUI();
         AddKnightBtnListeners();
         AddArcherBtnListeners();
 
@@ -151,7 +150,7 @@ public class MainMenuUIManager : MonoBehaviour
         }
         else
         {
-            // Handle the case where knightData is null (e.g., clear the text or show default values)
+            Debug.Log("Knight was not found");
         }
     }
     public void UpdateArcherStatsUI()
@@ -220,6 +219,7 @@ public class MainMenuUIManager : MonoBehaviour
 
     public void OpenKnightSkillPanel()
     {
+        UpdateKnightStatsUI();
         knightSkillPanel.SetActive(true);
     }
 
@@ -293,6 +293,7 @@ public class MainMenuUIManager : MonoBehaviour
 
     public void openKnightSkillTree()
     {
+        
         knightSkillListView.SetActive(true);
     }
 
