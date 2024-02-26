@@ -24,6 +24,7 @@ public enum SkillType
         FirePillar,
         Taunt,
         ShootArrow,
+        ArrowRain,
     }
 
 

@@ -57,6 +57,7 @@ public class Archer : Companion
     public override List<SkillType> AvailableSkills => new List<SkillType>
     {
         SkillType.ShootArrow,
+        SkillType.ArrowRain,
         
         
        
@@ -74,6 +75,9 @@ public class Archer : Companion
         {
             case SkillType.ShootArrow:
                 return new ShootArrow();
+
+            case SkillType.ArrowRain:
+                return new ArrowRain();
             // ... other cases ..
             
         
