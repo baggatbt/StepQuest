@@ -40,6 +40,7 @@ public abstract class Skill
     public int energyCost;
     public int energyGain;
     public int skillLevel;
+    public bool noZoom; //Allows zoom to be disabled
     public int requiredLevel;  // New field
     protected TimingEventResult result; 
 

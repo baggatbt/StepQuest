@@ -443,7 +443,10 @@ public void EndTurn()
     public IEnumerator PlayerMoveAndAttackCoroutine()
     {
         // Start zoom effect
+        if (!activePlayer.currentSkill.noZoom)
+        {
             StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position));
+        }
             enemyUIPanel.SetActive(false);
             
         // Only move if the player is not already at the target
@@ -476,7 +479,12 @@ public void EndTurn()
         if (activePlayer.currentSkill.requiresMovement == true)
         {
         // Move player back to their original position after all skills executed.
-        StartCoroutine(zoomEffect.ZoomOutEffect());
+
+        if (!activePlayer.currentSkill.noZoom)
+        {
+            StartCoroutine(zoomEffect.ZoomOutEffect());
+        }
+        
         enemyUIPanel.SetActive(true);
        
         yield return activePlayer.ReturnToPosition();

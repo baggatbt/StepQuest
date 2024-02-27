@@ -14,8 +14,9 @@ public class MeleeCombo : Skill
     {
         skillName = "ComboName";
         description = "Melee combo";
-        requiresMovement = false;
+        requiresMovement = true;
         energyCost = 0;
+        noZoom = true;
     }
 
     // Override the default base damage calculation.
@@ -27,6 +28,7 @@ public class MeleeCombo : Skill
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
 {
     user.isAttacking = true;
+    user.isAnimationDone = false;  // Reset the flag at the start of each attack
     user.animator.SetTrigger("MeleeCombo");
     Projectile projectileScript = null;  
     int baseDamage = CalculateBaseDamage(user);
@@ -39,6 +41,14 @@ public class MeleeCombo : Skill
         Debug.LogError("ArrowSpawnLocation not found in user's hierarchy");
         yield break; // Exit the coroutine if the transform is not found
     }
+
+     yield return TimingWindow(user, target, battleManager, 0.0f, 0.9f);
+             
+
+             HandleTimingResultForPlayerAttack(user, target, result, baseDamage);
+             Debug.Log("Timing for player attack has been handled waiting for animations");
+             //Wait until the timing event happens to move on to next attack stage
+             yield return new WaitUntil(() => user.animationDamageTime == true);
 
     yield return battleManager.PlayerHoldReleaseTimeEvent(0.0f, 1.0f, (result) =>
     {
@@ -57,7 +67,7 @@ public class MeleeCombo : Skill
             projectileScript.speed = 40.0f;
             projectileScript.Spawner = user;  // Set the spawner
         }
-    
+          
           // Modify the projectile's damage based on the timing result
            projectileScript.Target = target;  // Set the target of the projectile
             HandlePlayerRangedAttack(user, projectileScript, result);
@@ -65,7 +75,7 @@ public class MeleeCombo : Skill
             
       
     });
-   
+        user.animator.SetBool("ChargeIsOver", true);
         Debug.Log("waiting on animation to finish");
     
         yield return new WaitUntil(() => user.isAnimationDone == true);
@@ -77,4 +87,15 @@ public class MeleeCombo : Skill
      
     
 }
+
+
+private IEnumerator TimingWindow(Character user, Character target, BattleManager battleManager, float windowStart, float windowEnd)
+    {
+       
+        yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(windowStart, windowEnd, (timingResult) =>
+        {
+            result = timingResult;
+        }));
+         
+    }
 }
