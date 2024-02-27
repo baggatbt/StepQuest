@@ -26,10 +26,11 @@ public class ArrowRain : Skill
 {
     user.isAttacking = true;
     int baseDamage = CalculateBaseDamage(user) / 3;  // Split total damage into 3 parts
-
+    user.animator.SetTrigger("ArrowRainHold");
     // Trigger the player hold release time event without waiting for damage application
     yield return battleManager.PlayerHoldReleaseTimeEvent(0.0f, 1.0f, (result) =>
     {
+        user.animator.SetBool("isHoldOver", true);
         Vector3 spawnPosition = target.transform.position;
         Vector3 offsetPosition = new Vector3(spawnPosition.x, spawnPosition.y + 2, spawnPosition.z);
         // Instantiate the arrow rain prefab at the offset position
