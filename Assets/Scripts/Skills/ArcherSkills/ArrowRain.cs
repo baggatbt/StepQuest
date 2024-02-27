@@ -30,11 +30,14 @@ public class ArrowRain : Skill
     // Trigger the player hold release time event without waiting for damage application
     yield return battleManager.PlayerHoldReleaseTimeEvent(0.0f, 1.0f, (result) =>
     {
+        foreach (Character target in battleManager.enemies)
+        {
         user.animator.SetBool("isHoldOver", true);
         Vector3 spawnPosition = target.transform.position;
         Vector3 offsetPosition = new Vector3(spawnPosition.x, spawnPosition.y + 2, spawnPosition.z);
         // Instantiate the arrow rain prefab at the offset position
         GameObject arrowRain = UnityEngine.Object.Instantiate(arrowRainFallPreFab, offsetPosition, Quaternion.identity);
+        }
     });
 
     // Separate loop outside the lambda expression for applying damage with delay

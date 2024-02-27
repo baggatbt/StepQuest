@@ -65,12 +65,13 @@ public abstract class Skill
         if (result == TimingEventResult.Miss)
         {
              target.animator.SetTrigger("IsHurtTrigger");
-             AudioManager.instance.PlaySlashSound();
+             user.PlayCriticalHitSound(); // Play critical hit sound
         }
         else if (result == TimingEventResult.Perfect)
         {
             damageMultiplier = 1.5f;  // Boost damage by 50%                      
-            target.TakeDamage((int)(baseDamage * damageMultiplier),user); // Apply damage boost
+            target.TakeDamage((int)(baseDamage * damageMultiplier),user); 
+            user.PlayHitSound();
         }
         else 
         {
