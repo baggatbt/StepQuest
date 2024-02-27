@@ -40,7 +40,7 @@ public class ArrowRain : Skill
     for (int i = 0; i < 3; i++)
     {
         yield return new WaitForSeconds(0.2f); // Wait for 0.2 seconds between each hit
-        HandleTimingResultForPlayerAttack(user, target, result, baseDamage); // Apply one third of the damage
+        HandleAoeAttack(user, battleManager.enemies, result, baseDamage);
     }
 
     yield return new WaitForSeconds(1.0f); 

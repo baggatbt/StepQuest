@@ -77,7 +77,7 @@ public abstract class Skill
             damageMultiplier = 1.25f;  // Boost damage by 25%                      
             target.TakeDamage((int)(baseDamage * damageMultiplier),user); // Apply damage boost
         }
-        target.CheckForDeath();
+       // target.CheckForDeath();
     }
 }
 
