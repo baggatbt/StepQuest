@@ -42,16 +42,19 @@ public class MeleeCombo : Skill
         yield break; // Exit the coroutine if the transform is not found
     }
 
-     yield return TimingWindow(user, target, battleManager, 0.0f, 0.9f);
+     yield return TimingWindow(user, target, battleManager, 0.0f, 0.5f);
              
 
              HandleTimingResultForPlayerAttack(user, target, result, baseDamage);
              Debug.Log("Timing for player attack has been handled waiting for animations");
              //Wait until the timing event happens to move on to next attack stage
              yield return new WaitUntil(() => user.animationDamageTime == true);
+             
+             yield return new WaitForSeconds(0.5f);
 
-    yield return battleManager.PlayerHoldReleaseTimeEvent(0.0f, 1.0f, (result) =>
-    {
+    yield return TimingWindow(user, target, battleManager, 0.0f, 0.5f);
+    
+        HandleTimingResultForPlayerAttack(user, target, result, baseDamage);
         // Use the position and rotation of the ArrowSpawnLocation
         Vector3 spawnPosition = arrowSpawnTransform.position;
         Vector2 direction = (target.transform.position - spawnPosition).normalized;
@@ -70,11 +73,11 @@ public class MeleeCombo : Skill
           
           // Modify the projectile's damage based on the timing result
            projectileScript.Target = target;  // Set the target of the projectile
-            HandlePlayerRangedAttack(user, projectileScript, result);
+           // HandlePlayerRangedAttack(user, projectileScript, result);
             
             
       
-    });
+    
         user.animator.SetBool("ChargeIsOver", true);
         Debug.Log("waiting on animation to finish");
     
@@ -98,4 +101,6 @@ private IEnumerator TimingWindow(Character user, Character target, BattleManager
         }));
          
     }
-}
+
+}   
+
