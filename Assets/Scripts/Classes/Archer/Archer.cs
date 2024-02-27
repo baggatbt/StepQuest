@@ -58,6 +58,7 @@ public class Archer : Companion
     {
         SkillType.ShootArrow,
         SkillType.ArrowRain,
+        SkillType.MeleeCombo,
         
         
        
@@ -78,6 +79,9 @@ public class Archer : Companion
 
             case SkillType.ArrowRain:
                 return new ArrowRain();
+
+            case SkillType.MeleeCombo:
+                return new MeleeCombo();
             // ... other cases ..
             
         

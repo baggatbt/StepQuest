@@ -25,6 +25,7 @@ public enum SkillType
         Taunt,
         ShootArrow,
         ArrowRain,
+        MeleeCombo,
     }
 
 

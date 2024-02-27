@@ -102,7 +102,7 @@ Animator:
   m_Controller: {fileID: 9100000, guid: f01a117da94c23846973ebef969001d0, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
-  m_ApplyRootMotion: 0
+  m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_WarningMessage: 
@@ -170,14 +170,14 @@ MonoBehaviour:
   cameraShake: {fileID: 0}
   isAnimationDone: 0
   animationDamageTime: 0
+  audioSource: {fileID: 7111989942290979110}
+  hitSound: {fileID: 8300000, guid: 6cf83724a179e418e9c0fd0f17384fcc, type: 3}
+  criticalHitSound: {fileID: 8300000, guid: 94f827a27b434434d85138f924464fe7, type: 3}
   heroID: 
   heroLevel: 0
   heroExp: 0
   heroStatPoints: 0
   heroSkillPoints: 0
-  audioSource: {fileID: 7111989942290979110}
-  hitSound: {fileID: 8300000, guid: 6cf83724a179e418e9c0fd0f17384fcc, type: 3}
-  criticalHitSound: {fileID: 8300000, guid: 94f827a27b434434d85138f924464fe7, type: 3}
 --- !u!82 &7111989942290979110
 AudioSource:
   m_ObjectHideFlags: 0
