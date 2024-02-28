@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
     public Character companion2; 
     public Character companion3;
     private int currentStageIndex;
+    private bool isUnlocked;
   //  public List<BattleConfig> allStages; // list is populated with all stages in order
 
     public List<Companion> companions = new List<Companion>();

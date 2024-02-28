@@ -748,73 +748,68 @@ public void EndTurn()
 }
 
 
-   public IEnumerator PlayerHoldReleaseTimeEvent(float holdStart, float holdEnd, Action<TimingEventResult> callback)
-{
-    float totalHoldDuration = holdEnd - holdStart;
-    float holdTimer = 0;
-    float timeoutDuration = 1.0f; // Duration to wait for a tap before ending
-    bool tapDetected = false;
+  // Set the sizes: outer starts bigger and shrinks to size (0,0,0)
+    
+    Vector3 zeroScale = new Vector3(0, 0, 0); 
 
-    colorChanger.StartColorTransition(totalHoldDuration);
+    
+	
 
-    holdReleaseSlider.ResetSlider(); // Reset the slider at the start of the hold event
-    holdReleaseSlider.gameObject.SetActive(true);
 
-    while (holdTimer < totalHoldDuration && !tapDetected)
+
+    public IEnumerator PlayerHoldReleaseTimeEvent(float holdStart, float holdEnd, Action<TimingEventResult> callback)
     {
-        if (Input.GetMouseButton(0)) // Button is currently held down
-        {
-            tapDetected = true;
-            holdTimer += Time.deltaTime;
+        float totalHoldDuration = holdEnd - holdStart;
+        float holdTimer = 0;
+        
+        colorChanger.StartColorTransition(totalHoldDuration);
 
-            // Update the slider value as the hold time increases
-            holdReleaseSlider.UpdateSlider(holdTimer / totalHoldDuration);
+        holdReleaseSlider.ResetSlider(); // Reset the slider at the start of the hold event
+        holdReleaseSlider.gameObject.SetActive(true);
+
+
+        while (holdTimer < totalHoldDuration)
+        {
+            if (Input.GetMouseButton(0)) // Button is currently held down
+            {
+
+                holdTimer += Time.deltaTime;
+
+                // Update the slider value as the hold time increases
+                holdReleaseSlider.UpdateSlider(holdTimer / totalHoldDuration);
+            }
+
+            if (Input.GetMouseButtonUp(0)) // Button was just released
+            {
+                holdReleaseSlider.gameObject.SetActive(false);  
+                break;
+            }
+
+            yield return null;
         }
 
-        if (Input.GetMouseButtonUp(0)) // Button was just released
+        TimingEventResult result;
+
+        if (holdTimer < totalHoldDuration / 3)
         {
-            holdReleaseSlider.gameObject.SetActive(false);
-            break;
+            Debug.Log("Button was released too early. Miss!");
+            result = TimingEventResult.Miss;
+        }
+        else if (holdTimer < 2 * totalHoldDuration / 3)
+        {
+            Debug.Log("Button was released early. Good!");
+            result = TimingEventResult.Good;
+        }
+        else
+        {
+            Debug.Log("Button was held for the full duration. Perfect!");
+            result = TimingEventResult.Perfect;
         }
 
-        if (!tapDetected && holdTimer >= timeoutDuration) // No tap detected within the timeout duration
-        {
-            Debug.Log("No tap detected within the timeout duration. Ending the event.");
-            break; // Exit the loop and end the event early
-        }
-
-        holdTimer += Time.deltaTime; // Increment the timer outside of tap detection to account for the timeout
-        yield return null;
+        ShowTimingResult(result.ToString());
+        callback(result);
+        holdReleaseSlider.ResetSlider(); // Reset the slider at the end of the hold event
     }
-
-    TimingEventResult result;
-
-    if (!tapDetected)
-    {
-        Debug.Log("No tap was detected. Ending the event.");
-        result = TimingEventResult.Miss; // Or a new result type if you want to differentiate this case
-    }
-    else if (holdTimer < totalHoldDuration / 3)
-    {
-        Debug.Log("Button was released too early. Miss!");
-        result = TimingEventResult.Miss;
-    }
-    else if (holdTimer < 2 * totalHoldDuration / 3)
-    {
-        Debug.Log("Button was released early. Good!");
-        result = TimingEventResult.Good;
-    }
-    else
-    {
-        Debug.Log("Button was held for the full duration. Perfect!");
-        result = TimingEventResult.Perfect;
-    }
-
-    ShowTimingResult(result.ToString());
-    callback(result);
-    holdReleaseSlider.ResetSlider(); // Reset the slider at the end of the hold event
-    holdReleaseSlider.gameObject.SetActive(false); // Ensure the slider is disabled at the end
-}
 
 
     public BattleState GetState()
