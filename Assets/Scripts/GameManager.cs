@@ -62,11 +62,7 @@ public class GameManager : MonoBehaviour
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // Code to run every time a new scene is loaded
-            companions.Clear();
-            CreateAndRegisterKnight();
-            CreateAndRegisterArcher();
-            CreateAndRegisterWizard();
+         LoadAllCompanionData();
     }
 
     public void ShowCharacterSelectionPanel()
@@ -105,41 +101,17 @@ public class GameManager : MonoBehaviour
         return null;
     }
 
-    private void CreateAndRegisterKnight()
-{
-    if (knight == null) // Check if the knight is already created
+    private void CreateAndLoadCompanion(GameObject prefab, string heroID)
     {
-        GameObject knightObject = new GameObject("Knight");
-        knight = knightObject.AddComponent<Knight>();
-        knight.heroID = "Knight";
-        RegisterCompanion(knight);
-        knight.LoadCharacterData();
+        GameObject companionObject = Instantiate(prefab);
+        Companion companion = companionObject.GetComponent<Companion>();
+        if (companion != null)
+        {
+            companion.heroID = heroID;
+            companion.LoadCharacterData(); // Load saved data or initialize with default values
+            RegisterCompanion(companion);
+        }
     }
-}
-
-private void CreateAndRegisterArcher()
-{
-    if (archer == null) // Check if the archer is already created
-    {
-        GameObject archerObject = new GameObject("Archer");
-        archer = archerObject.AddComponent<Archer>();
-        archer.heroID = "Archer";
-        RegisterCompanion(archer);
-        archer.LoadCharacterData();
-    }
-}
-
-private void CreateAndRegisterWizard()
-{
-    if (wizard == null) // Check if the wizard is already created
-    {
-        GameObject wizardObject = new GameObject("Wizard");
-        wizard = wizardObject.AddComponent<Wizard>();
-        wizard.heroID = "Wizard";
-        RegisterCompanion(wizard);
-        wizard.LoadCharacterData();
-    }
-}
 
 
     public void UnlockConnectedStages(Stage completedStage)
@@ -201,19 +173,26 @@ private void CreateAndRegisterWizard()
 }
 
 // Method to add a companion to the list
-    public void RegisterCompanion(Companion companion)
-{
-    if (!companions.Contains(companion))
+   public void RegisterCompanion(Companion companion)
     {
-        companions.Add(companion);
-        Debug.Log("Registered companion: " + companion.heroID);
-        Debug.Log("Amount of companions: " + companions.Count);
+        if (!companions.Contains(companion))
+        {
+            companions.Add(companion);
+        }
     }
-    else
+
+    public void UpdateCompanionExp(string heroID, int expGained)
     {
-        Debug.LogWarning("Trying to register a companion that is already registered: " + companion.heroID);
+        foreach (var companion in companions)
+        {
+            if (companion.heroID == heroID)
+            {
+                companion.heroExp += expGained;
+                companion.LevelUp(); // Check and apply level up if applicable
+                companion.SaveCharacterData(); // Save updated data
+            }
+        }
     }
-}
 
 
     // Call this method to save the data of all companions
@@ -221,19 +200,26 @@ private void CreateAndRegisterWizard()
     {
         foreach (var companion in companions)
         {
-            if (companion != null)
-            {
-                Debug.Log("Saving " + companion);
-             companion.SaveCharacterData();
-            }
+            companion?.SaveCharacterData();
         }
     }
 
-    
-    void OnDestroy()
+
+    private void LoadAllCompanionData()
     {
-    // unsubscribe to avoid memory leaks
-    SceneManager.sceneLoaded -= OnSceneLoaded;
+        // Clear existing companions list to repopulate it
+        companions.Clear();
+        
+        // Instantiate and load data for each companion type
+        CreateAndLoadCompanion(knightPrefab, "Knight");
+        CreateAndLoadCompanion(archerPrefab, "Archer");
+        CreateAndLoadCompanion(wizardPrefab, "Wizard");
+    }
+
+    
+     void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
     
     private void OnApplicationQuit()
@@ -241,9 +227,12 @@ private void CreateAndRegisterWizard()
        SaveAllCompanionData();
     }
 
-    private void OnApplicationPause()
+    private void OnApplicationPause(bool pause)
     {
-        SaveAllCompanionData();
+        if (pause)
+        {
+            SaveAllCompanionData();
+        }
     }
 
     

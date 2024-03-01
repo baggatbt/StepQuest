@@ -872,36 +872,25 @@ private float CalculateSliderValue(int currentExp, int expToNextLevel)
         totalExp += enemy.expReward;
         totalGold += enemy.goldReward;
     }
-    Debug.Log("Running end of battle rewards +" + totalExp + " +" + totalGold);
 
-    // Update EXP for each companion in the playerParty
+    Debug.Log($"Running end of battle rewards +{totalExp} EXP +{totalGold} Gold");
+
+    // Update EXP for each companion
     foreach (Character character in playerParty)
     {
         if (character is Companion companion)
         {
-            // Update companion EXP in playerParty
-            companion.heroExp += totalExp;
-
-            // Now find and update the matching companion in GameManager.Instance.companions
-            foreach (Companion Companion in GameManager.Instance.companions)
-            {
-                if (Companion.heroID == companion.heroID)
-                {
-                    Companion.heroExp += totalExp;
-                    break; // Stop searching once we've found and updated the matching companion
-                }
-            }
+            // Directly update companion EXP using GameManager
+            GameManager.Instance.UpdateCompanionExp(companion.heroID, totalExp);
         }
     }
 
-    // Update the player's gold
+    // Update the player's gold and save player data
     PlayerData.Instance.gold += totalGold;
     PlayerData.Instance.SavePlayerData();
 
-    // Assuming this method saves the updated companion data in GameManager
+    // Save all companion data after updating EXP
     GameManager.Instance.SaveAllCompanionData();
-    
-
 
     TextMeshProUGUI expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
     expGainedTextComponent.text = totalExp.ToString();
@@ -909,8 +898,10 @@ private float CalculateSliderValue(int currentExp, int expToNextLevel)
     TextMeshProUGUI goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
     goldGainedTextComponent.text = totalGold.ToString();
 
+    // Optionally, display EXP to next level for each companion
     DisplayExpToLevel(playerParty);
 }
+
 
 
 

@@ -10,9 +10,9 @@ public class Archer : Companion
         
     
         // Initialize with default values if no data is loaded
-        if (this.level == 0)
+        if (this.heroLevel == 0)
         {
-            this.level = 1;
+          //  this.level = 1;
             this.attackPower = 8;
             this.maxHealth = 14;
             this.health = this.maxHealth;
@@ -27,8 +27,12 @@ public class Archer : Companion
             this.heroSkillPoints = 0;
             this.heroStatPoints = 0;
             this.characterIDNumber = "2";
+            this.stamina = 10;
         }
+        else
+        {
         LoadCharacterData(); // Load saved data
+        }
     }
 
     

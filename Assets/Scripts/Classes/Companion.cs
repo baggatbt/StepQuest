@@ -13,6 +13,7 @@ public abstract class Companion : Character
     public int heroExp;   // Experience of the hero
     public int heroStatPoints;
     public int heroSkillPoints;
+    public int stamina;
     
     //public Sprite companionIcon; // Icon associated with the companion
 
@@ -21,7 +22,7 @@ public abstract class Companion : Character
     [Serializable]
     public struct SerializableCharacterData
     {
-        public int level;
+      //  public int level;
         public int health;
         public int maxHealth;
         public int energy;
@@ -36,6 +37,7 @@ public abstract class Companion : Character
         public int heroStatPoints;
         public int heroLevel;
         public int heroExp;
+        public int stamina;
         
     }
 
@@ -57,7 +59,7 @@ public abstract class Companion : Character
     {
         SerializableCharacterData data = new SerializableCharacterData
         {
-            level = this.level,
+            //level = this.level,
             health = this.health,
             maxHealth = this.maxHealth,
             maxEnergy = this.maxEnergy,
@@ -69,6 +71,7 @@ public abstract class Companion : Character
             heroExp = this.heroExp,
             heroSkillPoints = this.heroSkillPoints,
             heroStatPoints = this.heroStatPoints,
+            stamina = this.stamina,
             
         };
 
@@ -84,7 +87,7 @@ public abstract class Companion : Character
     {
         SerializableCharacterData data = JsonUtility.FromJson<SerializableCharacterData>(jsonData);
 
-        this.level = data.level;
+       // this.level = data.level;
         this.health = data.health;
         this.maxHealth = data.maxHealth;
         this.maxEnergy = data.maxEnergy; 
@@ -96,10 +99,11 @@ public abstract class Companion : Character
         this.heroExp = data.heroExp;
         this.heroStatPoints = data.heroStatPoints;
         this.heroSkillPoints = data.heroSkillPoints;
+        this.stamina = data.stamina;
     }
     else // Set default values if there is no data
     {
-        
+        this.stamina = 10;
     }
 }
 

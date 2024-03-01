@@ -12,9 +12,9 @@ public class Knight : Companion
         
 
         // Initialize with default values if no data is loaded
-        if (this.level == 0)
+        if (this.heroLevel == 0)
         {
-            this.level = 1;
+           // this.level = 1;
             this.attackPower = 7;
             this.maxHealth = 20;
             this.health = this.maxHealth;
@@ -29,8 +29,12 @@ public class Knight : Companion
             this.heroSkillPoints = 0;
             this.heroStatPoints = 0;
             this.characterIDNumber = "1";
+            this.stamina = 10;
         }
+        else
+        {
         LoadCharacterData(); // Load saved data
+        }
     }
 
     

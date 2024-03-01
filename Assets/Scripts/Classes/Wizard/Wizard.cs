@@ -14,7 +14,7 @@ public class Wizard : Companion
         // Initialize with default values if no data is loaded
         if (this.health <= 0)
         {
-            this.level = 1;
+           // this.level = 1;
             this.attackPower = 9;
             this.maxHealth = 12;
             this.health = this.maxHealth;
@@ -29,6 +29,7 @@ public class Wizard : Companion
             this.heroSkillPoints = 0;
             this.heroStatPoints = 0;
             this.characterIDNumber = "3";
+             this.stamina = 10;
         
         }  
     }
