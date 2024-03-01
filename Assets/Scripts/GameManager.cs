@@ -194,6 +194,18 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void UpdateCompanionStamina(string heroID)
+    {
+        foreach (var companion in companions)
+        {
+            if (companion.heroID == heroID)
+            {
+                companion.stamina -= 1;
+                companion.SaveCharacterData(); // Save updated data
+            }
+        }
+    }
+
 
     // Call this method to save the data of all companions
     public void SaveAllCompanionData()

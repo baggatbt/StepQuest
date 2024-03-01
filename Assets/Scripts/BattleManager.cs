@@ -474,7 +474,7 @@ public void EndTurn()
             
             yield return activePlayer.currentSkill.Execute(activePlayer, targetEnemy, this);
             
-            CheckBattleEnd();
+           // CheckBattleEnd();
         }
         if (activePlayer.currentSkill.requiresMovement == true)
         {
@@ -603,7 +603,7 @@ public void EndTurn()
     }
 
     EndTurn();
-    CheckBattleEnd();
+   // CheckBattleEnd();
 }
 
     
@@ -987,42 +987,59 @@ private void Update()
 }
 public void CheckBattleEnd()
 {
-    bool allEnemiesDefeated = false;
-    bool allAlliesDefeated = companion1.health <= 0 && companion2.health <= 0;
+    bool allEnemiesDefeated = enemies.All(enemy => enemy.health <= 0);
+    bool allAlliesDefeated = playerParty.All(hero => hero.health <= 0);
 
-    foreach (var enemy in enemies)
+    // Check if the battle has ended
+    if (allEnemiesDefeated || allAlliesDefeated)
     {
-        if (enemy.health > 0)
+        // Deduct stamina from participating companions only once after battle ends
+        DeductStaminaFromParticipants();
+
+        if (allEnemiesDefeated)
         {
-            allEnemiesDefeated = false;
-            break;
+            ProcessVictory();
         }
-        else 
+        else if (allAlliesDefeated)
         {
-            allEnemiesDefeated = true;
+            ProcessDefeat();
         }
-       
-    }
-    
-    if (allEnemiesDefeated)
-    {
-        EndOfBattleRewards(enemies);
-        Debug.Log("Is this running");
-        
-       Stage completedStage = GameManager.Instance.CurrentBattleConfig.stage;
-       GameManager.Instance.UnlockConnectedStages(completedStage);
-       if (completedStage.isFirstCompletion){
-        PlayerData.Instance.currentStageIndex++;
-        completedStage.isFirstCompletion = false;
-       }
-       
-        endOfBattlePanel.SetActive(true);
-    }
-    else if (allAlliesDefeated)
-    {
-        endOfBattleLossPanel.SetActive(true);
     }
 }
+
+private void DeductStaminaFromParticipants()
+{
+    foreach (Character character in playerParty)
+    {
+        if (character is Companion companion)
+        {
+            GameManager.Instance.UpdateCompanionStamina(companion.heroID);
+        }
+    }
+}
+
+private void ProcessVictory()
+{
+    EndOfBattleRewards(enemies);
+    Debug.Log("Battle won");
+
+    Stage completedStage = GameManager.Instance.CurrentBattleConfig.stage;
+    GameManager.Instance.UnlockConnectedStages(completedStage);
+    if (completedStage.isFirstCompletion)
+    {
+        PlayerData.Instance.currentStageIndex++;
+        completedStage.isFirstCompletion = false;
+    }
+    
+    endOfBattlePanel.SetActive(true);
+}
+
+private void ProcessDefeat()
+{
+    Debug.Log("Battle lost");
+    endOfBattleLossPanel.SetActive(true);
+}
+
 
 
 
