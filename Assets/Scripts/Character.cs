@@ -57,6 +57,7 @@ public class Character : MonoBehaviour
         isSelected = false;
         animator = GetComponent<Animator>();
         statusEffectController = GetComponent<StatusEffectController>();
+        enemyDeathEffect = GetComponent<EnemyDeathEffect>();
         originalPosition = transform.position;
         Debug.Log("OP at Awake() " + originalPosition);
        // this.hasNotGone = true;
@@ -341,13 +342,13 @@ public class Character : MonoBehaviour
     animationDamageTime = true;
 }
 
-
+    public EnemyDeathEffect enemyDeathEffect;
    public void CheckForDeath()
 {
     Debug.Log("Checking for death");
     if (this.health <= 0)
     {
-        
+        enemyDeathEffect.TriggerExplosion();
         StartCoroutine(FadeOutSprite());
         
       
@@ -367,7 +368,7 @@ public class Character : MonoBehaviour
     checkCollisionsDuringMovement = true;
 
     // Pass the moveSpeed as the third argument to the Move coroutine
-    yield return Move(targetPosition, 2.5f, moveSpeed);
+    yield return Move(targetPosition, 3.0f, moveSpeed);
 
     animator.SetTrigger("StopMovementAnimationTrigger");
     this.isMoving = false;
