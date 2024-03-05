@@ -27,9 +27,10 @@ public class ShootArrow : Skill
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
 {
     user.isAttacking = true;
-    user.animator.SetTrigger("Attack1Trigger");
     Projectile projectileScript = null;  
     int baseDamage = CalculateBaseDamage(user);
+    user.animator.SetBool("isHoldOver", false);
+    user.animator.SetTrigger("IsHolding");
     
 
     // Find the ArrowSpawnLocation in the user's hierarchy
@@ -42,6 +43,7 @@ public class ShootArrow : Skill
 
     yield return battleManager.PlayerHoldReleaseTimeEvent(0.0f, 1.0f, (result) =>
     {
+        user.animator.SetBool("isHoldOver", true);
         // Use the position and rotation of the ArrowSpawnLocation
         Vector3 spawnPosition = arrowSpawnTransform.position;
         Vector2 direction = (target.transform.position - spawnPosition).normalized;
@@ -60,12 +62,14 @@ public class ShootArrow : Skill
     
           // Modify the projectile's damage based on the timing result
            projectileScript.Target = target;  // Set the target of the projectile
+           
             HandlePlayerRangedAttack(user, projectileScript, result);
+            
             
             
       
     });
-   
+        
         Debug.Log("waiting on animation to finish");
     
         yield return new WaitUntil(() => user.isAnimationDone == true);

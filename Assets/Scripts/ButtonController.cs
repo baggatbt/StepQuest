@@ -154,21 +154,29 @@ public void PopulateSkillPanelWithCompanionSkills()
 
 public void SelectAndUseSkill(Skill selectedSkill)
 {
-    if (battleManager.skillQueue.Count == 0)
+    // Check if the selected skill is the same as the one already in the queue
+    if (battleManager.skillQueue.Count > 0 && skill == selectedSkill)
     {
-        //No skill has been selected yet
-         skill = selectedSkill;
-         battleManager.skillQueue.Enqueue(skill);
-         OnButtonClick();
+        // The same skill was selected again, so launch the attack
+        Debug.Log("Same skill selected, launching attack with skill: " + skill.skillName);
+        battleManager.ExecuteQueuedSkills();
     }
     else
-    { //Replacing the old skill
-    battleManager.skillQueue.Dequeue();
-    skill = selectedSkill;
-    battleManager.skillQueue.Enqueue(skill);
-    OnButtonClick();
+    {
+        // No skill has been selected yet or a different skill is selected
+        if (battleManager.skillQueue.Count > 0)
+        {
+            // If there was another skill in the queue, remove it
+            battleManager.skillQueue.Dequeue();
+        }
+
+        // Queue the new skill
+        skill = selectedSkill;
+        battleManager.skillQueue.Enqueue(skill);
+        Debug.Log("Skill " + skill.skillName + " queued. Current queue size: " + battleManager.skillQueue.Count);
+        
+        
     }
-    
 }
 
         

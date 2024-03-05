@@ -275,7 +275,7 @@ public class GameManager : MonoBehaviour
     
     private void OnApplicationQuit()
     {
-       SaveAllCompanionData();
+      // SaveAllCompanionData();
     }
 
     private void OnApplicationPause(bool pause)
