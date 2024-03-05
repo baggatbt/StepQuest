@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using TMPro;
 
 //Storing and managing game states across scenes
 public class GameManager : MonoBehaviour
@@ -16,6 +18,13 @@ public class GameManager : MonoBehaviour
     public Character companion1; 
     public Character companion2; 
     public Character companion3;
+    public GameObject companionButtonPrefab;
+    public GameObject companionListPanel;
+    public GameObject companionStatsPanel;
+
+    // References to stat UI Text elements
+    public TextMeshProUGUI atkText, hpText, defText, staminaText, spdText; 
+
     private int currentStageIndex;
     private bool isUnlocked;
   //  public List<BattleConfig> allStages; // list is populated with all stages in order
@@ -47,10 +56,11 @@ public class GameManager : MonoBehaviour
             probabilityCompanion2 = 1f;
             probabilityCompanion3 = 1f;
             
+            
             Debug.Log(PlayerData.Instance.firstTimeLogin);
            if (PlayerData.Instance.firstTimeLogin)
         {
-            ShowCharacterSelectionPanel(); 
+           
         }
         }
         else
@@ -63,16 +73,45 @@ public class GameManager : MonoBehaviour
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
          LoadAllCompanionData();
+         
     }
 
-    public void ShowCharacterSelectionPanel()
+    
+
+    public void PopulateCompanionList()
 {
-    Debug.Log("ShowingCharSelectPanel");
-    characterSelectionPanel.SetActive(true);
-    PlayerData.Instance.firstTimeLogin = false;
-    PlayerData.Instance.SavePlayerData(); 
+    GameObject companionButtonContainer = GameObject.Find("Companion Button Container"); // Find or reference directly
+
+    foreach (Companion companion in companions)
+    {
+        if (companion.isUnlocked)
+        {
+            GameObject buttonObject = Instantiate(companionButtonPrefab, companionButtonContainer.transform); // Use the container as parent
+            buttonObject.GetComponentInChildren<TextMeshProUGUI>().text = companion.heroID;
+            Button btn = buttonObject.GetComponent<Button>();
+            btn.onClick.AddListener(delegate { OnCompanionSelected(companion); });
+        }
+    }
 }
 
+
+    void OnCompanionSelected(Companion companion)
+    {
+        // Assuming your Companion class has these fields or properties
+        atkText.text = "ATK: " + companion.attackPower.ToString();
+        hpText.text = "HP: " + companion.health.ToString();
+        defText.text = "DEF: " + companion.defensePower.ToString();
+        staminaText.text = "Stamina: " + companion.stamina.ToString();
+        spdText.text = "SPD: " + companion.speed.ToString();
+        
+        // Make sure the stats panel is visible
+        companionStatsPanel.SetActive(true);
+    }
+
+
+
+
+    
 
     public Character InstantiateSelectedCompanion(string heroID)
     {

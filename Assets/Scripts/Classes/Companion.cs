@@ -14,6 +14,7 @@ public abstract class Companion : Character
     public int heroStatPoints;
     public int heroSkillPoints;
     public int stamina;
+    public bool isUnlocked;
     
     //public Sprite companionIcon; // Icon associated with the companion
 

@@ -78,7 +78,7 @@ public class MeleeCombo : Skill
             
       
     
-        user.animator.SetBool("ChargeIsOver", true);
+       // user.animator.SetBool("ChargeIsOver", true);
         Debug.Log("waiting on animation to finish");
     
         yield return new WaitUntil(() => user.isAnimationDone == true);
