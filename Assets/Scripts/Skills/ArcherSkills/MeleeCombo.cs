@@ -16,7 +16,7 @@ public class MeleeCombo : Skill
         description = "Melee combo";
         requiresMovement = true;
         energyCost = 0;
-        noZoom = true;
+        noZoom = false;
     }
 
     // Override the default base damage calculation.

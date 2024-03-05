@@ -23,7 +23,7 @@ public class ZoomEffect : MonoBehaviour
         Debug.Log("Zoom Duration: " + zoomDuration);
 
         initialCameraPosition = mainCamera.transform.position; // Capture the original position
-        Vector3 targetCameraPosition = new Vector3(targetPosition.x, targetPosition.y, initialCameraPosition.z);
+        Vector3 targetCameraPosition = new Vector3(targetPosition.x - 1.0f, targetPosition.y, initialCameraPosition.z);
         
         float originalSize = mainCamera.orthographicSize;
         float targetSize = originalSize * zoomFactor;
