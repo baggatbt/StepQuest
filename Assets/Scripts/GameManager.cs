@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
     public GameObject companionStatsPanel;
 
     // References to stat UI Text elements
-    public TextMeshProUGUI atkText, hpText, defText, staminaText, spdText; 
+    public TextMeshProUGUI levelText,atkText, hpText, defText, expText, spdText; 
 
     private int currentStageIndex;
     private bool isUnlocked;
@@ -98,10 +98,11 @@ public class GameManager : MonoBehaviour
     void OnCompanionSelected(Companion companion)
     {
         // Assuming your Companion class has these fields or properties
+        levelText.text = "Lv: " + companion.heroLevel.ToString();
         atkText.text = "ATK: " + companion.attackPower.ToString();
         hpText.text = "HP: " + companion.health.ToString();
         defText.text = "DEF: " + companion.defensePower.ToString();
-        staminaText.text = "Stamina: " + companion.stamina.ToString();
+        expText.text = "EXP: " + companion.heroExp.ToString() + " / " + companion.ExpToNextLevel(companion.heroLevel);
         spdText.text = "SPD: " + companion.speed.ToString();
         
         // Make sure the stats panel is visible
