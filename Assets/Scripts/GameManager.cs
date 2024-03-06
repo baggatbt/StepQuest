@@ -18,12 +18,8 @@ public class GameManager : MonoBehaviour
     public Character companion1; 
     public Character companion2; 
     public Character companion3;
-    public GameObject companionButtonPrefab;
-    public GameObject companionListPanel;
-    public GameObject companionStatsPanel;
+    
 
-    // References to stat UI Text elements
-    public TextMeshProUGUI levelText,atkText, hpText, defText, expText, spdText; 
 
     private int currentStageIndex;
     private bool isUnlocked;
@@ -74,40 +70,13 @@ public class GameManager : MonoBehaviour
     {
          LoadAllCompanionData();
          
+         
+         
     }
 
     
 
-    public void PopulateCompanionList()
-{
-    GameObject companionButtonContainer = GameObject.Find("Companion Button Container"); // Find or reference directly
-
-    foreach (Companion companion in companions)
-    {
-        if (companion.isUnlocked)
-        {
-            GameObject buttonObject = Instantiate(companionButtonPrefab, companionButtonContainer.transform); // Use the container as parent
-            buttonObject.GetComponentInChildren<TextMeshProUGUI>().text = companion.heroID;
-            Button btn = buttonObject.GetComponent<Button>();
-            btn.onClick.AddListener(delegate { OnCompanionSelected(companion); });
-        }
-    }
-}
-
-
-    void OnCompanionSelected(Companion companion)
-    {
-        // Assuming your Companion class has these fields or properties
-        levelText.text = "Lv: " + companion.heroLevel.ToString();
-        atkText.text = "ATK: " + companion.attackPower.ToString();
-        hpText.text = "HP: " + companion.health.ToString();
-        defText.text = "DEF: " + companion.defensePower.ToString();
-        expText.text = "EXP: " + companion.heroExp.ToString() + " / " + companion.ExpToNextLevel(companion.heroLevel);
-        spdText.text = "SPD: " + companion.speed.ToString();
-        
-        // Make sure the stats panel is visible
-        companionStatsPanel.SetActive(true);
-    }
+    
 
 
 

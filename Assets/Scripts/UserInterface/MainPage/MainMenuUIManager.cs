@@ -16,34 +16,20 @@ public class MainMenuUIManager : MonoBehaviour
     public GameObject overworldMapGUI;
     public GameObject knightSkillListView;
     public TextMeshProUGUI stepsText;
+    public GameObject companionButtonPrefab;
+    public GameObject companionListPanel;
+    public GameObject companionStatsPanel;
+    
+    // References to stat UI Text elements
+    public TextMeshProUGUI levelText,atkText, hpText, defText, expText, spdText; 
 
     //KNIGHT 
     public Knight knight;
-    public TextMeshProUGUI knightHPText;
-    public TextMeshProUGUI knightMPText;
-    public TextMeshProUGUI knightAtkText;
-    public TextMeshProUGUI knightDefText;
-    public TextMeshProUGUI knightSpdText;
-    public TextMeshProUGUI knightSPText;
-    public Button knightHPBtn;
-    public Button knightMPBtn;
-    public Button knightATKBtn;
-    public Button knightDEFBtn;
-    public Button knightSPDBtn;
+    
 
     //ARCHER
     public Archer archer;
-    public TextMeshProUGUI archerHPText;
-    public TextMeshProUGUI archerMPText;
-    public TextMeshProUGUI archerAtkText;
-    public TextMeshProUGUI archerDefText;
-    public TextMeshProUGUI archerSpdText;
-    public TextMeshProUGUI archerSPText;
-    public Button archerHPBtn;
-    public Button archerMPBtn;
-    public Button archerATKBtn;
-    public Button archerDEFBtn;
-    public Button archerSPDBtn;
+    
     
   
 
@@ -61,6 +47,36 @@ public class MainMenuUIManager : MonoBehaviour
     {  
        
 
+    }
+    public void PopulateCompanionList()
+{
+    GameObject companionButtonContainer = GameObject.Find("Companion Button Container"); // Find or reference directly
+
+    foreach (Companion companion in GameManager.Instance.companions)
+    {
+        if (companion.isUnlocked)
+        {
+            GameObject buttonObject = Instantiate(companionButtonPrefab, companionButtonContainer.transform); // Use the container as parent
+            buttonObject.GetComponentInChildren<TextMeshProUGUI>().text = companion.heroID;
+            Button btn = buttonObject.GetComponent<Button>();
+            btn.onClick.AddListener(delegate { OnCompanionSelected(companion); });
+        }
+    }
+}
+
+
+    void OnCompanionSelected(Companion companion)
+    {
+        // Assuming your Companion class has these fields or properties
+        levelText.text = "Lv: " + companion.heroLevel.ToString();
+        atkText.text = "ATK: " + companion.attackPower.ToString();
+        hpText.text = "HP: " + companion.health.ToString();
+        defText.text = "DEF: " + companion.defensePower.ToString();
+        expText.text = "EXP: " + companion.heroExp.ToString() + " / " + companion.ExpToNextLevel(companion.heroLevel);
+        spdText.text = "SPD: " + companion.speed.ToString();
+        
+        // Make sure the stats panel is visible
+        companionStatsPanel.SetActive(true);
     }
    
     
@@ -119,7 +135,7 @@ public class MainMenuUIManager : MonoBehaviour
     public void openCharacterInterface()
     {
         characterGUI.SetActive(true);
-        GameManager.Instance.PopulateCompanionList();
+        PopulateCompanionList();
     }
 
     public void closeCharacterInterface()
