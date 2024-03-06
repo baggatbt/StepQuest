@@ -174,6 +174,7 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
 
      public void StartBattle(BattleConfig config)
 {
+    if (playerParty.Count > 0) {
      if (isBattleStarted) return; // Prevent starting the battle multiple times
         battleStartButton.SetActive(false);
         activePlayer = companion1; //Default
@@ -203,6 +204,7 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
     }
     RestoreHealthAndEnergy();
     InitializeTurnOrder();
+    }
 }
 
     public void RestoreHealthAndEnergy()
@@ -211,7 +213,7 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
         companion1.health = companion1.maxHealth;
 
        // companion2.energy = companion2.maxEnergy;
-       // companion2.health = companion2.maxHealth;
+    //companion2.health = companion2.maxHealth;
     }
 
     public void NextBattle()

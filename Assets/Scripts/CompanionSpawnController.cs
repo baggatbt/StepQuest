@@ -1,8 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System;
-
+using System.Linq; // Needed for LINQ queries such as FirstOrDefault
+using System.Collections.Generic; // Needed for List
 public class CompanionSpawnController : MonoBehaviour
 {
     public GameObject companionPrefab;
@@ -18,53 +18,52 @@ public class CompanionSpawnController : MonoBehaviour
     public Slider associatedtempEnergyBarSlider2;
     public BattleManager battleManager;
 
-    public Character[] activeCompanions;
+    public List<Character> activeCompanions = new List<Character>();
+
 
     private void Start()
     {
-        // Initialize the array based on the number of spawn points
-        activeCompanions = new Character[companionSpawnPoints.Length];
+        
     }
 
     public void SetupCompanion(Character companionCharacter)
+{
+    // Removing existing companion of the same type if present
+    var existingCompanion = activeCompanions.FirstOrDefault(c => c.characterIDNumber == companionCharacter.characterIDNumber);
+    if (existingCompanion != null)
     {
-        // Check if a companion of the same type is already active
-        for (int i = 0; i < activeCompanions.Length; i++)
-        {
-            if (activeCompanions[i] != null && activeCompanions[i].characterIDNumber == companionCharacter.characterIDNumber)
-            {
-                RemoveCompanion(activeCompanions[i]);
-                Debug.Log("A companion of the same type is already active and has been removed.");
-                break;
-            }
-        }
-
-        int spawnIndex = FindNextEmptySpot();
-        if (spawnIndex == -1)
-        {
-            Debug.Log("No empty spot available for the companion.");
-            return;
-        }
-
-        Transform spawnPoint = companionSpawnPoints[spawnIndex];
-        companionCharacter.transform.position = spawnPoint.position;
-        companionCharacter.transform.rotation = spawnPoint.rotation;
-   
-
-    // Setup health and energy bars based on spawn index
-    if (spawnIndex == 0)
-    {
-        SetupBars(companionCharacter, associatedHealthBarSlider2, associatedEnergyBarSlider2, associatedHealthText2, associatedEnergyText2);
+        RemoveCompanion(existingCompanion);
     }
-    else if (spawnIndex == 1)
+
+    // Ensure you don't add more companions than spawn points or UI elements
+    if (activeCompanions.Count >= companionSpawnPoints.Length)
+    {
+        Debug.Log("All spawn points are occupied.");
+        return;
+    }
+
+    int spawnIndex = activeCompanions.Count; // Use the count for positioning
+    Transform spawnPoint = companionSpawnPoints[spawnIndex];
+
+    // Setting companion's position
+    companionCharacter.transform.position = spawnPoint.position;
+    companionCharacter.transform.rotation = spawnPoint.rotation;
+
+    // Dynamically assign UI elements based on the current number of active companions
+    if (activeCompanions.Count % 2 == 0)
     {
         SetupBars(companionCharacter, associatedHealthBarSlider, associatedEnergyBarSlider, associatedHealthText, associatedEnergyText);
     }
+    else
+    {
+        SetupBars(companionCharacter, associatedHealthBarSlider2, associatedEnergyBarSlider2, associatedHealthText2, associatedEnergyText2);
+    }
 
-    // Update the active companions array
-    activeCompanions[spawnIndex] = companionCharacter;
+    // Adding to the list
+    activeCompanions.Add(companionCharacter);
     companionCharacter.isSelected = true;
 }
+
 
 
     private void SetupBars(Character character, Slider healthBar, Slider energyBar, TextMeshProUGUI healthText, TextMeshProUGUI energyText)
@@ -82,30 +81,35 @@ public class CompanionSpawnController : MonoBehaviour
         energyText.text = character.energy.ToString();
     }
 
-    private int FindNextEmptySpot()
-    {
-        for (int i = 0; i < activeCompanions.Length; i++)
-        {
-            if (activeCompanions[i] == null)
-            {
-                return i;
-            }
-        }
-        return -1; // No empty spot found
-    }
+    
 
     public void RemoveCompanion(Character companionCharacter)
+{
+    if (activeCompanions.Remove(companionCharacter)) // This now automatically removes the companion
     {
-        for (int i = 0; i < activeCompanions.Length; i++)
+        companionCharacter.isSelected = false;
+        DisableHeroUI(companionCharacter);
+
+        // Remove the companion from the BattleManager's playerParty list
+        if (battleManager.playerParty.Contains(companionCharacter))
         {
-            if (activeCompanions[i] != null && activeCompanions[i].characterIDNumber == companionCharacter.characterIDNumber)
-            {
-                activeCompanions[i].isSelected = false;
-                DisableHeroUI(activeCompanions[i]);
-                Destroy(activeCompanions[i].gameObject);
-                activeCompanions[i] = null;
-                break;
-            }
+            battleManager.playerParty.Remove(companionCharacter);
+        }
+
+        Destroy(companionCharacter.gameObject);
+    }
+}
+
+
+   
+
+    // Update the RemoveCompanionFromGame method to work with the list
+    private void RemoveCompanionFromGame(Companion companion)
+    {
+        var characterToRemove = activeCompanions.FirstOrDefault(c => c.characterIDNumber == companion.characterIDNumber);
+        if (characterToRemove != null)
+        {
+            RemoveCompanion(characterToRemove);
         }
     }
 
@@ -157,6 +161,7 @@ public class CompanionSpawnController : MonoBehaviour
         Debug.Log("Companion is already selected, removing");
         RemoveCompanionFromGame(selectedCompanion);
         selectedCompanion.isSelected = false;
+        selectedCompanionCount --;
     }
     else
     {
@@ -173,18 +178,7 @@ public class CompanionSpawnController : MonoBehaviour
     }
 }
 
-private void RemoveCompanionFromGame(Companion companion)
-{
-    // Find the instantiated character in the game and remove it
-    foreach (var character in activeCompanions)
-    {
-        if (character != null && character.characterIDNumber == companion.characterIDNumber)
-        {
-            RemoveCompanion(character);
-            break;
-        }
-    }
-}
+
 
 
     private void AssignCompanion(Character companion)
