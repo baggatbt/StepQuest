@@ -207,11 +207,13 @@ public class GameManager : MonoBehaviour
     {
         foreach (var companion in companions)
         {
-            if (companion.heroID == heroID)
+            if (companion.heroID == heroID && companion.stamina > 0)
             {
                 companion.stamina -= 1;
                 companion.SaveCharacterData(); // Save updated data
             }
+            
+            
         }
     }
 

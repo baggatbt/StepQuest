@@ -14,6 +14,7 @@ public abstract class Companion : Character
     public int heroStatPoints;
     public int heroSkillPoints;
     public int stamina;
+    public int maxStamina;
     public bool isUnlocked;
     
     //public Sprite companionIcon; // Icon associated with the companion
@@ -39,6 +40,7 @@ public abstract class Companion : Character
         public int heroLevel;
         public int heroExp;
         public int stamina;
+        public int maxStamina;
         
     }
 
@@ -73,6 +75,7 @@ public abstract class Companion : Character
             heroSkillPoints = this.heroSkillPoints,
             heroStatPoints = this.heroStatPoints,
             stamina = this.stamina,
+            maxStamina = this.maxStamina,
             
         };
 
@@ -101,10 +104,12 @@ public abstract class Companion : Character
         this.heroStatPoints = data.heroStatPoints;
         this.heroSkillPoints = data.heroSkillPoints;
         this.stamina = data.stamina;
+        this.maxStamina = data.maxStamina;
     }
     else // Set default values if there is no data
     {
         this.stamina = 10;
+        this.maxStamina = 10;
     }
 }
 

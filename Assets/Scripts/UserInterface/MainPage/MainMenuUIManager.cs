@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -24,24 +25,26 @@ public class MainMenuUIManager : MonoBehaviour
     public TextMeshProUGUI levelText,atkText, hpText, defText, expText, spdText; 
 
     //KNIGHT 
-    public Knight knight;
+    //public Knight knight;
     
 
     //ARCHER
-    public Archer archer;
+    //public Archer archer;
     
     
   
 
     private void Start()
     {
-        knight = GameManager.Instance.knight;
-        archer = GameManager.Instance.archer;
+       // knight = GameManager.Instance.knight;
+       // archer = GameManager.Instance.archer;
+       UpdateTimerDisplay(); // Initial display update
         UpdateUI();
     }
     private void Update()
     {
          if (stepsText != null) stepsText.text =  PlayerData.Instance.inGameSteps.ToString();  
+         UpdateTimerDisplay();
     }
     private void UpdateUI()
     {  
@@ -107,20 +110,47 @@ public class MainMenuUIManager : MonoBehaviour
     panel.SetActive(!panel.activeSelf);
 }
 
+//TIMER MANAGEMENT
+    public TMP_Text timerText; // Assign in the inspector
+        public float timerDuration = 120; // Duration in seconds, adjust as needed
+
+        private string timerId = "upgradeTimer"; // Unique ID for the timer
+
+       
+        
+
+        // Method to start the timer
+        public void StartTimer()
+        {
+            TimerManager.Instance.SetTimer(timerId, timerDuration);
+        }
+
+        // Method to update the timer display
+        void UpdateTimerDisplay()
+        {
+            TimeSpan remainingTime = TimerManager.Instance.GetRemainingTime(timerId);
+            if (remainingTime > TimeSpan.Zero)
+            {
+                timerText.text = string.Format("{0:D2}:{1:D2}", remainingTime.Minutes, remainingTime.Seconds);
+            }
+            else
+            {
+                timerText.text = "00:00";
+            }
+        }
 
 
+    
+    //OLD NEED TO REDO WITH NEW TECHNIQUE 
+        public void openMissionInterface()
+        {
+            missionGUI.SetActive(true);
+        }
 
-   
-
-    public void openMissionInterface()
-    {
-        missionGUI.SetActive(true);
-    }
-
-    public void closeMissionInterface()
-    {
-        missionGUI.SetActive(false);
-    }
+        public void closeMissionInterface()
+        {
+            missionGUI.SetActive(false);
+        }
 
     public void openCompanionInterface()
     {
