@@ -663,7 +663,7 @@ public void EndTurn()
     Vector3 outerCircleInitialScale = outerCircle.transform.localScale; 
     Vector3 zeroScale = new Vector3(0, 0, 0); 
 
-    float speedFactor = 1.25f; // Change this value to adjust speed. Higher means faster.
+    float speedFactor = 1.0f; // Change this value to adjust speed. Higher means faster.
     outerCircle.SetActive(true);
 
 
