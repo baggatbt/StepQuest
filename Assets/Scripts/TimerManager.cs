@@ -7,7 +7,9 @@ public class TimerManager : MonoBehaviour
 {
     public static TimerManager Instance { get; private set; }
 
-    private Dictionary<string, DateTime> timers = new Dictionary<string, DateTime>();
+    public Dictionary<string, DateTime> timers = new Dictionary<string, DateTime>();
+    public delegate void TimerCompleted(string timerId);
+    public event TimerCompleted OnTimerCompleted;
 
     private void Awake()
     {
@@ -22,6 +24,26 @@ public class TimerManager : MonoBehaviour
         }
 
         LoadTimers(); // Load saved timers when the game starts
+    }
+    
+
+    private void Update()
+    {
+        List<string> completedTimers = new List<string>();
+        foreach (var timer in timers)
+        {
+            if (GetRemainingTime(timer.Key) <= TimeSpan.Zero)
+            {
+                completedTimers.Add(timer.Key);
+                Debug.Log($"Timer {timer.Key} has finished.");
+            }
+        }
+
+        foreach (var timerId in completedTimers)
+        {
+            timers.Remove(timerId);
+            OnTimerCompleted?.Invoke(timerId);
+        }
     }
 
     // Start or reset a timer with a given ID and duration in seconds
@@ -81,17 +103,5 @@ public class TimerManager : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        // Example usage in Update for demonstration. Consider optimizing for your needs.
-        foreach (var timer in timers)
-        {
-            if (GetRemainingTime(timer.Key) <= TimeSpan.Zero)
-            {
-                Debug.Log($"Timer {timer.Key} has finished.");
-                // Perform action for timer completion
-                // Consider removing or resetting the timer here if appropriate
-            }
-        }
-    }
+    
 }

@@ -111,18 +111,20 @@ public class MainMenuUIManager : MonoBehaviour
 }
 
 //TIMER MANAGEMENT
-    public TMP_Text timerText; // Assign in the inspector
+        public TMP_Text timerText; // Assign in the inspector
         public float timerDuration = 120; // Duration in seconds, adjust as needed
 
         private string timerId = "upgradeTimer"; // Unique ID for the timer
+        private string knightRecoveryTimerId = "knightRecoveryTimer"; // Unique ID for the knight's recovery timer
+
 
        
         
 
         // Method to start the timer
-        public void StartTimer()
+        public void StartTimer(string timerId, float durationInSeconds)
         {
-            TimerManager.Instance.SetTimer(timerId, timerDuration);
+            TimerManager.Instance.SetTimer(timerId, durationInSeconds);
         }
 
         // Method to update the timer display
@@ -139,8 +141,44 @@ public class MainMenuUIManager : MonoBehaviour
             }
         }
 
+        void OnEnable() {
+            TimerManager.Instance.OnTimerCompleted += HandleTimerCompletion;
+        }
+
+        void OnDisable() {
+            TimerManager.Instance.OnTimerCompleted -= HandleTimerCompletion;
+        }
+
+        private void HandleTimerCompletion(string timerId) {
+            // Check if the completed timer is the one we're interested in
+            if (timerId == "knightRecoveryTimer") { 
+                GameManager.Instance.knight.stamina += 1; // Increase stamina
+                //update UI or do any other necessary actions
+            }
+        }
+
+        // Example method call to start the knight's recovery timer
+        public void StartKnightRecoveryTimer()
+        {
+            float knightRecoveryDuration = 120; // For example, 120 seconds for recovery
+            StartTimer(knightRecoveryTimerId, knightRecoveryDuration);
+        }
+
+        
+
 
     
+
+
+
+
+
+
+
+
+
+
+
     //OLD NEED TO REDO WITH NEW TECHNIQUE 
         public void openMissionInterface()
         {
