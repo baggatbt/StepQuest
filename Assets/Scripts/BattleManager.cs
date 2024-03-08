@@ -354,7 +354,7 @@ public void EndTurn()
         // Move the circles to the targets position
         if (currentTarget != null){
 
-        outerCircle.transform.position = new Vector3(currentTarget.transform.position.x, currentTarget.transform.position.y + 4f, currentTarget.transform.position.z);
+        outerCircle.transform.position = new Vector3(currentTarget.transform.position.x, currentTarget.transform.position.y + 3f, currentTarget.transform.position.z);
         }
 
        // innerCircle.transform.position = currentTarget.transform.position;

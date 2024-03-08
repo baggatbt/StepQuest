@@ -337,11 +337,32 @@ public class Character : MonoBehaviour
 
     public void animationDamageTiming()
 {
+    
     Debug.Log("This is the damage moment");
-    //StartCoroutine(TimeStop(0.1f)); // Adjust the duration for timestop effect
+   // StartCoroutine(TimeStop(0.1f)); // Adjust the duration for timestop effect
     animationDamageTime = true;
-}
 
+}
+/* Dont have a suitable flash material yet, but the idea works
+    public Material originalMaterial; // To store the original material
+    public Material newMaterial; // Material for the "flash" effect
+    public IEnumerator FlashWhiteAndReset() //handles setting and resetting of hero flashing
+    {
+        SwapMaterial();
+        yield return new WaitForSeconds(0.2f); // Delay so it doesnt flash back too early
+        ResetMaterial();
+        
+    }
+    // Method to be called by the animation event to "flash" the hero at correct timing
+    public void SwapMaterial()
+    {
+        GetComponent<SpriteRenderer>().material = newMaterial;
+    }
+     public void ResetMaterial()
+    {
+        GetComponent<SpriteRenderer>().material = originalMaterial;
+    }
+    */
     public EnemyDeathEffect enemyDeathEffect;
    public void CheckForDeath()
 {

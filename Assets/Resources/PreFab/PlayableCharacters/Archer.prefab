@@ -170,6 +170,9 @@ MonoBehaviour:
   cameraShake: {fileID: 0}
   isAnimationDone: 0
   animationDamageTime: 0
+  originalMaterial: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  newMaterial: {fileID: 2100000, guid: 818e127314f46c844a3b31d893dcfe6a, type: 2}
+  enemyDeathEffect: {fileID: 0}
   audioSource: {fileID: 7111989942290979110}
   hitSound: {fileID: 8300000, guid: 6cf83724a179e418e9c0fd0f17384fcc, type: 3}
   criticalHitSound: {fileID: 8300000, guid: 94f827a27b434434d85138f924464fe7, type: 3}
@@ -179,6 +182,7 @@ MonoBehaviour:
   heroStatPoints: 0
   heroSkillPoints: 0
   stamina: 0
+  maxStamina: 0
   isUnlocked: 1
 --- !u!82 &7111989942290979110
 AudioSource:
