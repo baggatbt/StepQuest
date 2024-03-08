@@ -31,6 +31,6 @@ public class RadialMenuLayout : MonoBehaviour
         float angleRad = angle * (Mathf.PI / 180f);
         float x = Mathf.Cos(angleRad) * radius;
         float y = Mathf.Sin(angleRad) * radius;
-        return new Vector3(x, y, 0f);
+        return new Vector3(-x, y, 0f);
     }
 }
