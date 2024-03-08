@@ -873,8 +873,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.023000002, y: 0.009370371}
   m_AnchorMax: {x: 0.98180664, y: 0.20551851}
-  m_AnchoredPosition: {x: -12.793884, y: -9.959961}
-  m_SizeDelta: {x: 707.1, y: 290.85}
+  m_AnchoredPosition: {x: -14, y: 198}
+  m_SizeDelta: {x: 707.1, y: 1031.61}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &97259698
 MonoBehaviour:
@@ -923,21 +923,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 97259694}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
+  m_Script: {fileID: 11500000, guid: 96bd0d083988cb545a5a5ab937e247a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
-  m_ChildAlignment: 4
-  m_StartCorner: 0
-  m_StartAxis: 0
-  m_CellSize: {x: 100, y: 50}
-  m_Spacing: {x: 320, y: 0}
-  m_Constraint: 0
-  m_ConstraintCount: 2
+  radius: 250
 --- !u!1 &130294072
 GameObject:
   m_ObjectHideFlags: 0
@@ -1332,11 +1321,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   battleManager: {fileID: 1020165693}
-  skillButtonPrefab: {fileID: 1619622141431516161, guid: 9f82bb012655df641b2d8b1824140b13, type: 3}
+  skillButtonPrefab: {fileID: 7913000097658310571, guid: 413fc366d1142e045b5342cce8d6ba9c, type: 3}
   skillDescriptionPanel: {fileID: 1256410037}
   skillDescriptionText: {fileID: 647553936}
   skillButtons: []
   activeCompanion: {fileID: 0}
+  radius: 400
   skillSelectionPanel: {fileID: 873669125}
   companionSkillSelectionPanel: {fileID: 97259694}
 --- !u!224 &250696102
@@ -8375,7 +8365,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.011522634, y: 0}
   m_AnchorMax: {x: 0.99341565, y: 0.1807037}
-  m_AnchoredPosition: {x: -152, y: 866.00073}
+  m_AnchoredPosition: {x: -152, y: 866.00116}
   m_SizeDelta: {x: -209.65, y: 16.64}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1325780248
@@ -10111,6 +10101,7 @@ MonoBehaviour:
   skillDescriptionText: {fileID: 0}
   skillButtons: []
   activeCompanion: {fileID: 0}
+  radius: 100
   skillSelectionPanel: {fileID: 0}
   companionSkillSelectionPanel: {fileID: 0}
 --- !u!1 &1609319783
@@ -13336,6 +13327,7 @@ MonoBehaviour:
   skillDescriptionText: {fileID: 0}
   skillButtons: []
   activeCompanion: {fileID: 0}
+  radius: 100
   skillSelectionPanel: {fileID: 0}
   companionSkillSelectionPanel: {fileID: 0}
 --- !u!1 &2011876055

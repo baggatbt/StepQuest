@@ -17,6 +17,8 @@ public class ButtonController : MonoBehaviour
     public List<Button> skillButtons = new List<Button>();
     public Companion activeCompanion;
     private Companion previousActiveCompanion; // For switching the skill panel
+    public float radius = 500f; //Radius of the radial menu circle
+
 
     
 
@@ -92,8 +94,6 @@ private void OnSkillButtonRelease()
  
 public void PopulateSkillPanelWithCompanionSkills()
 {
-    // Get the active companion from the battle manager
-   // Companion activeCompanion = battleManager.activePlayer as Companion;
     if (activeCompanion == null)
     {
         Debug.LogError("Active player is not a Companion.");
@@ -109,44 +109,61 @@ public void PopulateSkillPanelWithCompanionSkills()
     }
     skillButtons.Clear();
 
+    // Calculate angle step based on the number of skills
+    float angleStep = 360f / availableSkills.Count;
+    int skillIndex = 0;
+
     foreach (SkillType skillType in availableSkills)
     {
         GameObject newButtonObj = Instantiate(skillButtonPrefab, companionSkillSelectionPanel.transform);
+        // Position each button radially
+        Vector3 radialPosition = PositionButtonRadially(skillIndex++, availableSkills.Count, radius);
+        newButtonObj.GetComponent<RectTransform>().anchoredPosition = radialPosition;
+
         Button buttonComponent = newButtonObj.GetComponent<Button>();
         if (buttonComponent != null)
         {
             skillButtons.Add(buttonComponent);
-            
-            Skill currentSkill = activeCompanion.GetSkillInstance(skillType);
 
+            Skill currentSkill = activeCompanion.GetSkillInstance(skillType);
             TextMeshProUGUI buttonText = newButtonObj.GetComponentInChildren<TextMeshProUGUI>();
             if (buttonText != null)
             {
                 buttonText.text = currentSkill.skillName;
             }
 
-            Skill buttonSkill = currentSkill;
+            // Setup button actions
+            buttonComponent.onClick.AddListener(() => { SelectAndUseSkill(currentSkill); });
 
-            buttonComponent.onClick.AddListener(() => 
-            {
-                SelectAndUseSkill(buttonSkill);
-            });
-
-            // Add event listeners for pointer down and up
-            EventTrigger eventTrigger = newButtonObj.AddComponent<EventTrigger>();
-
-            var pointerDown = new EventTrigger.Entry();
-            pointerDown.eventID = EventTriggerType.PointerDown;
-            pointerDown.callback.AddListener((data) => { OnSkillButtonHold(buttonSkill); });
-            eventTrigger.triggers.Add(pointerDown);
-
-            var pointerUp = new EventTrigger.Entry();
-            pointerUp.eventID = EventTriggerType.PointerUp;
-            pointerUp.callback.AddListener((data) => { OnSkillButtonRelease(); });
-            eventTrigger.triggers.Add(pointerUp);
+            // Add event listeners for tooltip behavior (existing code)
+            SetupButtonEvents(newButtonObj, currentSkill);
         }
     }
 }
+
+private Vector3 PositionButtonRadially(int skillIndex, int totalSkills, float radius)
+{
+    float angle = (skillIndex * (360f / totalSkills)) * Mathf.Deg2Rad;
+    float x = Mathf.Cos(angle) * radius;
+    float y = Mathf.Sin(angle) * radius;
+    return new Vector3(x, y, 0);
+}
+
+private void SetupButtonEvents(GameObject buttonObj, Skill skill)
+{
+    EventTrigger eventTrigger = buttonObj.AddComponent<EventTrigger>();
+
+    var pointerDown = new EventTrigger.Entry();
+    pointerDown.eventID = EventTriggerType.PointerDown;
+    pointerDown.callback.AddListener((data) => { OnSkillButtonHold(skill); });
+    eventTrigger.triggers.Add(pointerDown);
+
+    var pointerUp = new EventTrigger.Entry();
+    pointerUp.eventID = EventTriggerType.PointerUp;
+    pointerUp.callback.AddListener((data) => { OnSkillButtonRelease(); });
+    eventTrigger.triggers.Add(pointerUp);
+}
+
 
 
 
