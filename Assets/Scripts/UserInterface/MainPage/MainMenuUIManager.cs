@@ -45,6 +45,7 @@ public class MainMenuUIManager : MonoBehaviour
     {
          if (stepsText != null) stepsText.text =  PlayerData.Instance.inGameSteps.ToString();  
          UpdateTimerDisplay();
+         UpdateKnightRecoveryTimerDisplay();
     }
     private void UpdateUI()
     {  
@@ -115,6 +116,7 @@ public class MainMenuUIManager : MonoBehaviour
         public float timerDuration = 120; // Duration in seconds, adjust as needed
 
         private string timerId = "upgradeTimer"; // Unique ID for the timer
+        public TMP_Text knightRecoveryText;
         private string knightRecoveryTimerId = "knightRecoveryTimer"; // Unique ID for the knight's recovery timer
 
 
@@ -160,9 +162,21 @@ public class MainMenuUIManager : MonoBehaviour
         // Example method call to start the knight's recovery timer
         public void StartKnightRecoveryTimer()
         {
-            float knightRecoveryDuration = 120; // For example, 120 seconds for recovery
+            float knightRecoveryDuration = 600; // For example, 120 seconds for recovery
             StartTimer(knightRecoveryTimerId, knightRecoveryDuration);
         }
+
+        void UpdateKnightRecoveryTimerDisplay() 
+        {
+            TimeSpan remainingTime = TimerManager.Instance.GetRemainingTime(knightRecoveryTimerId);
+            if (remainingTime > TimeSpan.Zero) {
+                knightRecoveryText.text = string.Format("{0:D2}:{1:D2}", remainingTime.Minutes, remainingTime.Seconds);
+            } else {
+                knightRecoveryText.text = "00:00";
+                // Additional actions to take when the knight's recovery timer finishes could also be triggered here if needed
+            }
+        }
+
 
         
 
