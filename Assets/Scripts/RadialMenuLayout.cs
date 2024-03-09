@@ -13,10 +13,15 @@ public class RadialMenuLayout : MonoBehaviour
         PositionButtons();
     }
 
+    void Update() //For game mode testing, remoive
+    {
+        PositionButtons();
+    }
+
     void PositionButtons()
     {
         int children = transform.childCount;
-        float angleStep = 360f / children;
+        float angleStep = -180f / children;
         for (int i = 0; i < children; i++)
         {
             GameObject child = transform.GetChild(i).gameObject;
@@ -31,6 +36,6 @@ public class RadialMenuLayout : MonoBehaviour
         float angleRad = angle * (Mathf.PI / 180f);
         float x = Mathf.Cos(angleRad) * radius;
         float y = Mathf.Sin(angleRad) * radius;
-        return new Vector3(-x, y, 0f);
+        return new Vector3(x, y, 0f);
     }
 }
