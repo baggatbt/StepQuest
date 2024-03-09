@@ -362,6 +362,12 @@ public void EndTurn()
             
     }
 
+    public Transform radialMenuPanelCenterPoint;
+    public void MoveRadialMenuToActivePlayer()
+    {
+        radialMenuPanelCenterPoint.transform.position = new Vector3(activePlayer.transform.position.x, activePlayer.transform.position.y +3f, activePlayer.transform.position.z);
+    }
+
 
         public void ExecuteQueuedSkills()
     {
@@ -915,6 +921,7 @@ private void Update()
 {
     
     if (isBattleStarted){
+        MoveRadialMenuToActivePlayer();
     if (!playerParty.Any(character => character.isAttacking) && !enemies.Any(character => character.isAttacking))
     {
     if (Input.GetMouseButtonDown(0))
