@@ -942,6 +942,7 @@ private void Update()
                 // Execute the queued skill here since an enemy is tapped after selecting a skill
                 if ((state == BattleState.PlayerTurn) && isSkillSelected)
                 {
+                    Debug.Log("Its getting into the statement ok");
                     ExecuteQueuedSkills();
                    // turnOrderList.RemoveAll(character => character.health <= 0);
                 }
