@@ -938,11 +938,11 @@ private void Update()
                 MoveCursorToTarget();
                 outerCircle.SetActive(true);
                 activePlayer.attackTarget = currentTarget.transform;
-
+                 Debug.Log("Its getting into the second if statement ok");
                 // Execute the queued skill here since an enemy is tapped after selecting a skill
                 if ((state == BattleState.PlayerTurn) && isSkillSelected)
                 {
-                    Debug.Log("Its getting into the statement ok");
+                    Debug.Log("Its getting into the final statement ok");
                     ExecuteQueuedSkills();
                    // turnOrderList.RemoveAll(character => character.health <= 0);
                 }

@@ -177,6 +177,7 @@ public void SelectAndUseSkill(Skill selectedSkill)
         // The same skill was selected again, so launch the attack
         Debug.Log("Same skill selected, launching attack with skill: " + skill.skillName);
         battleManager.ExecuteQueuedSkills();
+        
     }
     else
     {
@@ -185,11 +186,13 @@ public void SelectAndUseSkill(Skill selectedSkill)
         {
             // If there was another skill in the queue, remove it
             battleManager.skillQueue.Dequeue();
+            battleManager.isSkillSelected = false;
         }
 
         // Queue the new skill
         skill = selectedSkill;
         battleManager.skillQueue.Enqueue(skill);
+        battleManager.isSkillSelected = true;
         Debug.Log("Skill " + skill.skillName + " queued. Current queue size: " + battleManager.skillQueue.Count);
         
         
