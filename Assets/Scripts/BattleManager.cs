@@ -151,6 +151,25 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
 
     
     Debug.Log(activePlayer);
+     for (int i = 0; i < config.maxEnemiesToSpawn; i++)
+    {
+        Debug.Log(config.levelOfEnemies + "config levelOfEnemies");
+        Character spawnedEnemy = enemySpawnController.SpawnEnemiesFromPool(
+            config.poolName,
+            1, // Spawn one enemy
+            enemySpawnPoints[i], // Pass the spawn point
+            healthBars[i], // Pass the health bar slider
+            energyBars[i], // Pass the energy bar slider
+            i, // Pass the index for health text assignment
+            config.levelOfEnemies //For level assignment
+        );
+
+        if (spawnedEnemy != null)
+        {
+            enemies.Add(spawnedEnemy);
+            
+        }
+    }
 }
     public Button nextBattleButton;
     
@@ -183,25 +202,7 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
     endOfBattlePanel.SetActive(false);
     heroSelectionPanel.SetActive(false);
     companionSkillsPanel.SetActive(true);
-    for (int i = 0; i < config.maxEnemiesToSpawn; i++)
-    {
-        Debug.Log(config.levelOfEnemies + "config levelOfEnemies");
-        Character spawnedEnemy = enemySpawnController.SpawnEnemiesFromPool(
-            config.poolName,
-            1, // Spawn one enemy
-            enemySpawnPoints[i], // Pass the spawn point
-            healthBars[i], // Pass the health bar slider
-            energyBars[i], // Pass the energy bar slider
-            i, // Pass the index for health text assignment
-            config.levelOfEnemies //For level assignment
-        );
-
-        if (spawnedEnemy != null)
-        {
-            enemies.Add(spawnedEnemy);
-            
-        }
-    }
+   
     RestoreHealthAndEnergy();
     InitializeTurnOrder();
     }
