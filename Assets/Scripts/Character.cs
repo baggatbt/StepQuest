@@ -412,7 +412,7 @@ private IEnumerator Move(Vector3 targetPosition, float stoppingDistance, float s
     Debug.Log("Completed Move");
 }
 
-public IEnumerator ReturnToPosition(float returnSpeed = 16f)
+public IEnumerator ReturnToPosition(float returnSpeed = 20f)
 {
     Debug.Log($"Returning to original position at: {originalPosition}");
     animator.SetTrigger("MovementAnimationTrigger");
@@ -420,13 +420,13 @@ public IEnumerator ReturnToPosition(float returnSpeed = 16f)
 
     yield return Move(originalPosition, 0.00f, returnSpeed); // Use a small stopping distance and adjustable speed
 
-    transform.position = originalPosition; // Ensure exact original position, consider removing if snapping still occurs
+    transform.position = originalPosition; // Ensure exact original position, remove if snapping still occurs but I think its fixed
     animator.SetTrigger("StopMovementAnimationTrigger");
     this.isMoving = false;
     Debug.Log("Returned to original position");
 }
 
-
+/*
 // Updated to check for an appropriate stopping distance
 private bool HasReachedPosition(Vector3 targetPosition, float stoppingDistance)
 {
@@ -434,7 +434,8 @@ private bool HasReachedPosition(Vector3 targetPosition, float stoppingDistance)
      
     return Vector3.Distance(transform.position, targetPosition) <= stoppingDistance;
 }
-
+*/
+/*
 private bool IsCollidingWithCharacter()
 {
     // Consider using a more specific collision check if necessary
@@ -453,7 +454,7 @@ private bool IsCollidingWithCharacter()
     }
     return false;
 }
-
+*/
 
         public virtual void UpdateStats()
     {   
