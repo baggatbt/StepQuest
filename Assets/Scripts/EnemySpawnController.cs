@@ -77,13 +77,14 @@ public class EnemySpawnController : MonoBehaviour
         lastSpawnedCharacter.healthText = healthTexts[healthTextIndex];
         enemiesSpawned++;  // Increment the spawn count
 
-        lastSpawnedCharacter.healthText.text = lastSpawnedCharacter.health + ""  ;
+        
         Debug.Log(lastSpawnedCharacter + " " + lastSpawnedCharacter.healthText.text);
         associatedHealthBarSlider.gameObject.SetActive(true);
         associatedHealthBarSlider.maxValue = lastSpawnedCharacter.maxHealth;
         associatedHealthBarSlider.value = lastSpawnedCharacter.health;
+        lastSpawnedCharacter.healthText.text = lastSpawnedCharacter.health + ""  ;
 
-        associatedEnergyBarSlider.gameObject.SetActive(true);
+        associatedEnergyBarSlider.gameObject.SetActive(false);
         associatedEnergyBarSlider.maxValue = lastSpawnedCharacter.maxEnergy;
         associatedEnergyBarSlider.value = 0;
 

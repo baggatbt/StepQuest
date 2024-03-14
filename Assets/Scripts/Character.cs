@@ -365,16 +365,20 @@ public class Character : MonoBehaviour
     */
     public EnemyDeathEffect enemyDeathEffect;
    public void CheckForDeath()
-{
-    Debug.Log("Checking for death");
-    if (this.health <= 0)
     {
-        enemyDeathEffect.TriggerExplosion();
-        StartCoroutine(FadeOutSprite());
-        
-      
+        Debug.Log("Checking for death");
+        // Check if the GameObject has the tag "Enemy"
+        if (this.gameObject.tag == "Enemy" && this.health <= 0)
+        {
+            enemyDeathEffect.TriggerExplosion();
+            StartCoroutine(FadeOutSprite());
+            //add any additional logic here for when an enemy dies.
+        }
+        if (this.gameObject.tag == "Companion" && this.health <=0)
+        {
+            //Logic for when a companion dies
+        }
     }
-}
 
 
      public IEnumerator MoveToTarget()
