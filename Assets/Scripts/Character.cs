@@ -393,7 +393,7 @@ public class Character : MonoBehaviour
     checkCollisionsDuringMovement = true;
 
     // Pass the moveSpeed as the third argument to the Move coroutine
-    yield return Move(targetPosition, 3.0f, moveSpeed);
+    yield return Move(targetPosition, 2.0f, moveSpeed);
 
     animator.SetTrigger("StopMovementAnimationTrigger");
     this.isMoving = false;
