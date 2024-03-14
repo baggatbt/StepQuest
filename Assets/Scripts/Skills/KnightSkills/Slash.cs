@@ -37,7 +37,7 @@ public class Slash : Skill
         {
              
 
-             yield return TimingWindow(user, target, battleManager, 0.0f, 0.9f);
+             yield return TimingWindow(user, target, battleManager, 0.0f, 0.5f);
              
 
              HandleTimingResultForPlayerAttack(user, target, result, baseDamage);
