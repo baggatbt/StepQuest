@@ -4040,6 +4040,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 625594134}
+  - component: {fileID: 625594136}
+  - component: {fileID: 625594135}
   m_Layer: 5
   m_Name: PlayerSpawnPoint1
   m_TagString: UI
@@ -4055,18 +4057,56 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 625594133}
   m_LocalRotation: {x: -0, y: -0, z: -3.4082488e-19, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 509}
+  m_LocalPosition: {x: 0, y: 0, z: 509.00003}
   m_LocalScale: {x: 0.1728087, y: 0.29002866, z: 0.322254}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1792707033}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.1005391, y: 0.5287408}
-  m_AnchorMax: {x: 0.2831852, y: 0.5582963}
-  m_AnchoredPosition: {x: 2, y: -6}
-  m_SizeDelta: {x: -10.75, y: 68}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 101, y: -570}
+  m_SizeDelta: {x: 66.94866, y: 96.96437}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &625594135
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 625594133}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &625594136
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 625594133}
+  m_CullTransparentMesh: 1
 --- !u!1 &640964407
 GameObject:
   m_ObjectHideFlags: 0
@@ -5332,6 +5372,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 828832546}
+  - component: {fileID: 828832548}
+  - component: {fileID: 828832547}
   m_Layer: 5
   m_Name: PlayerspawnPoint2
   m_TagString: Untagged
@@ -5347,18 +5389,56 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 828832545}
   m_LocalRotation: {x: -0, y: -0, z: -3.4082488e-19, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 509}
+  m_LocalPosition: {x: 0, y: 0, z: 509.00003}
   m_LocalScale: {x: 0.34175557, y: 0.34175557, z: 0.34175557}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1792707033}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.1005391, y: 0.326}
-  m_AnchorMax: {x: 0.303, y: 0.3563704}
-  m_AnchoredPosition: {x: -6, y: -86.99997}
-  m_SizeDelta: {x: -23, y: 67}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 101, y: -855}
+  m_SizeDelta: {x: 63.127975, y: 96.762985}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &828832547
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 828832545}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &828832548
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 828832545}
+  m_CullTransparentMesh: 1
 --- !u!1 &850020208
 GameObject:
   m_ObjectHideFlags: 0
@@ -8798,7 +8878,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.011522634, y: 0}
   m_AnchorMax: {x: 0.99341565, y: 0.1807037}
-  m_AnchoredPosition: {x: -152, y: 866.0018}
+  m_AnchoredPosition: {x: -152, y: 866.0019}
   m_SizeDelta: {x: -209.65, y: 16.64}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1325780248
