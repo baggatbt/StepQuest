@@ -34,6 +34,7 @@ public class BattleManager : MonoBehaviour
     public HoldReleaseSlider holdReleaseSlider;
     public Slider[] healthBars; //set these in the inspector for enemies
     public Slider[] energyBars;
+    public GameObject[] enemyHealthUI;
     public Skill requestedSkill; // The skill the player chooses next during an ongoing attack.
     public Queue<Skill> skillQueue = new Queue<Skill>();
     public Button[] skillButtons; // An array of buttons for representing skill slots
@@ -153,7 +154,8 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
     Debug.Log(activePlayer);
      for (int i = 0; i < config.maxEnemiesToSpawn; i++)
     {
-        Debug.Log(config.levelOfEnemies + "config levelOfEnemies");
+       
+        
         Character spawnedEnemy = enemySpawnController.SpawnEnemiesFromPool(
             config.poolName,
             1, // Spawn one enemy
@@ -161,11 +163,13 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
             healthBars[i], // Pass the health bar slider
             energyBars[i], // Pass the energy bar slider
             i, // Pass the index for health text assignment
-            config.levelOfEnemies //For level assignment
+            config.levelOfEnemies, //For level assignment
+            enemyHealthUI[i]
         );
-
+        
         if (spawnedEnemy != null)
         {
+           
             enemies.Add(spawnedEnemy);
             
         }
@@ -707,10 +711,12 @@ public void EndTurn()
         }
         ShowTimingResult(result.ToString());
         callback(result);
+        yield return new WaitForSeconds(0.5f); 
     }
     finally
     {
         // Optionally reset circles' scales or disable them here if needed
+        
         outerCircle.SetActive(false);
         innerCircle.SetActive(false);
     }
@@ -739,6 +745,7 @@ private TimingEventResult GetTimingAccuracy(Vector3 innerCircleScale, Vector3 ou
     {
         return TimingEventResult.Miss;
     }
+    
 }
 
 

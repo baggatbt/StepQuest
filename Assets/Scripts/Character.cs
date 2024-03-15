@@ -32,6 +32,7 @@ public class Character : MonoBehaviour
     public Animator animator;
     public TextMeshProUGUI healthText; 
     public TextMeshProUGUI energyText;
+   // public GameObject enemyHealthUI;
     
      
 
@@ -44,6 +45,10 @@ public class Character : MonoBehaviour
     public int attacksBeforeSpecial; 
     public Skill normalSkill; 
     public Skill specialSkill;
+    
+    public GameObject enemyHealthUI;
+
+    
    
     private bool checkCollisionsDuringMovement = true;
 
@@ -186,7 +191,10 @@ public class Character : MonoBehaviour
 
     // Subtract the calculated damage from health
     this.health -= damageDealt;
+    if (this.healthBar != null)
+    {
     this.healthBar.value = health;
+    }
     this.EnemyIsHit(); //If the character taking damage is an enemy, they all share the same trigger
     Debug.Log("Takign damage but im null" + this.healthText);
     // Update the health text
@@ -248,6 +256,7 @@ public class Character : MonoBehaviour
     {
         energyBar.gameObject.SetActive(false);  // Disable the energyBar's GameObject
     }
+        enemyHealthUI.SetActive(false);
 
      yield return new WaitForSeconds(0.5f); //Ensures fade is all done
     }

@@ -8,6 +8,7 @@ public class EnemySpawnController : MonoBehaviour
     public TextMeshProUGUI healthText;
     public TextMeshProUGUI healthText2;
     public TextMeshProUGUI healthText3;
+    public GameObject[] healthUI;
 
     private TextMeshProUGUI[] healthTexts; // Array to store all health texts
 
@@ -36,11 +37,11 @@ public class EnemySpawnController : MonoBehaviour
         healthTexts = new TextMeshProUGUI[] { healthText, healthText2, healthText3 };
     }
 
-    public Character SpawnEnemiesFromPool(string poolName, int numberToSpawn, Transform spawnPoint, Slider associatedHealthBarSlider, Slider associatedEnergyBarSlider, int healthTextIndex, int level)
+    public Character SpawnEnemiesFromPool(string poolName, int numberToSpawn, Transform spawnPoint, Slider associatedHealthBarSlider, Slider associatedEnergyBarSlider, int healthTextIndex, int level, GameObject enemyHealthUI)
 {
     if (!poolDictionary.ContainsKey(poolName))
     {
-        Debug.LogWarning("Pool " + poolName + " doesn't exist!");
+       
         return null;
     }
 
@@ -55,9 +56,12 @@ public class EnemySpawnController : MonoBehaviour
         if (lastSpawnedCharacter == null) continue;
 
         lastSpawnedCharacter.level = level;
-        Debug.Log("Last spawned enemy  " + lastSpawnedCharacter.level);
+        
         // Set health and energy bars
-        lastSpawnedCharacter.healthBar = associatedHealthBarSlider;
+        lastSpawnedCharacter.enemyHealthUI = healthUI[i];
+       
+
+        lastSpawnedCharacter.enemyHealthUI = enemyHealthUI;
         lastSpawnedCharacter.energyBar = associatedEnergyBarSlider;
 
         // Calculate the position 3 units below the spawned character
@@ -69,26 +73,24 @@ public class EnemySpawnController : MonoBehaviour
         }
         Vector3 sliderPositionOffset = new Vector3(spawnedEnemy.transform.position.x, characterBottom - 0.5f, spawnedEnemy.transform.position.z);
 
-        // Move health and energy bar sliders to the calculated position
-        associatedHealthBarSlider.transform.position = sliderPositionOffset;
-        associatedEnergyBarSlider.transform.position = sliderPositionOffset;
-
+       
+        lastSpawnedCharacter.UpdateStats();
         // Update health text and sliders
         lastSpawnedCharacter.healthText = healthTexts[healthTextIndex];
         enemiesSpawned++;  // Increment the spawn count
 
         
-        Debug.Log(lastSpawnedCharacter + " " + lastSpawnedCharacter.healthText.text);
-        associatedHealthBarSlider.gameObject.SetActive(true);
-        associatedHealthBarSlider.maxValue = lastSpawnedCharacter.maxHealth;
-        associatedHealthBarSlider.value = lastSpawnedCharacter.health;
+       
+        lastSpawnedCharacter.enemyHealthUI.gameObject.SetActive(true);
+        
+        
         lastSpawnedCharacter.healthText.text = lastSpawnedCharacter.health + ""  ;
 
         associatedEnergyBarSlider.gameObject.SetActive(false);
         associatedEnergyBarSlider.maxValue = lastSpawnedCharacter.maxEnergy;
         associatedEnergyBarSlider.value = 0;
 
-        lastSpawnedCharacter.UpdateStats();
+        
     }
     enemiesSpawned = 0;
 
