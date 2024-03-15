@@ -111,8 +111,8 @@ public class Character : MonoBehaviour
             healthBar.value = health;
             if (healthText !=null && energyText !=null)
             {
-               this.healthText.text = this.health + "/" + this.maxHealth;
-                energyText.text = this.energy + "/" + this.maxEnergy;
+               this.healthText.text = this.health +"";
+                energyText.text = this.energy +"";
             }
         }
         
