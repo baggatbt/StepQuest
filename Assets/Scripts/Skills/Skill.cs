@@ -92,32 +92,22 @@ public abstract class Skill
         result = timingResult;
         baseDamage = user.attackPower;
     
-    switch (result)
+    if (result == TimingEventResult.Good)
     {
-        case TimingEventResult.Perfect:
-            Debug.Log("Perfect Block!");
-            damageMultiplier = 0.5f;  // Reduce damage by 50%
-          //  user.animator.SetTrigger(trigger);
-            target.TakeDamage((int)(user.attackPower * damageMultiplier),user); // Apply damage multiplier
-           user.GainEnergy(1);
-            target.animator.SetTrigger("BlockTrigger");      
-            AudioManager.instance.PlayBlockSound();
-            break;
-        case TimingEventResult.Good:
             Debug.Log("Good Block!");   
             damageMultiplier = 0.75f;  // Reduce damage by 25%
            // user.animator.SetTrigger(trigger);            
             target.TakeDamage((int)(user.attackPower * damageMultiplier),user); // Apply damage multiplier
-           user.GainEnergy(1);
-            target.animator.SetTrigger("BlockTrigger");
-            AudioManager.instance.PlayBlockSound();     
-            break;
-        case TimingEventResult.Miss:
-          //  user.animator.SetTrigger(trigger);
-            target.TakeDamage(user.attackPower, user); // Full damage as there's no reduction 
             user.GainEnergy(1);
-            target.animator.SetTrigger("IsHurtTrigger");       
-            break;
+            target.animator.SetTrigger("BlockTrigger");
+            AudioManager.instance.PlayBlockSound();       
+    }
+    else 
+    {
+            target.TakeDamage((int)(user.attackPower * damageMultiplier),user); // Apply damage multiplier
+            user.GainEnergy(1);
+            target.animator.SetTrigger("BlockTrigger");
+            AudioManager.instance.PlayBlockSound();      
     }
 }
     
@@ -129,28 +119,20 @@ public abstract class Skill
     result = timingResult;
     baseDamage = user.attackPower;
     
-    switch (result)
+    if (result == TimingEventResult.Good)
     {
-        case TimingEventResult.Perfect:
-            Debug.Log("Perfect Hit!");
-            damageMultiplier = 1.5f;  // Boost damage by 50%
+            Debug.Log("Good Hit!");
+            damageMultiplier = 1.25f;  // Boost damage by 25%
             target.TakeDamage((int)(baseDamage * damageMultiplier), user);
             target.animator.SetTrigger("IsHurtTrigger");
             user.PlayCriticalHitSound(); // Play critical hit sound
-            break;
-        case TimingEventResult.Good:
-            Debug.Log("Good Hit!");
-            damageMultiplier = 1.25f;  // Boost damage by 25%
-            target.animator.SetTrigger("IsHurtTrigger");
+           
+    }
+    else 
+    {
             target.TakeDamage((int)(baseDamage * damageMultiplier), user);
-            user.PlayHitSound(); // Play normal hit sound
-            break;
-        case TimingEventResult.Miss:
-            Debug.Log("Missed!");
             target.animator.SetTrigger("IsHurtTrigger");
-            target.TakeDamage(baseDamage, user); // No damage boost
-            // Optionally play a miss sound or no sound
-            break;
+            user.PlayHitSound(); // Play  hit sound
     }
 }
 
@@ -158,19 +140,15 @@ public abstract class Skill
 public void HandlePlayerRangedAttack(Character user, Projectile projectile, TimingEventResult result)
     {
         float damageMultiplier = 1.0f;
-        switch (result)
+        if (result == TimingEventResult.Good)
         {
-            case TimingEventResult.Perfect:
-                damageMultiplier = 1.5f; // Boost damage by 50%
-                user.PlayCriticalHitSound(); // Play critical hit sound
-                break;
-            case TimingEventResult.Good:
+            
                 damageMultiplier = 1.25f; // Boost damage by 25%
-                user.PlayHitSound();
-                break;
-            case TimingEventResult.Miss:
-                
-                break;
+                user.PlayHitSound();   
+        }
+        else 
+        {
+            user.PlayHitSound();
         }
 
         projectile.damage = (int)(projectile.damage * damageMultiplier);

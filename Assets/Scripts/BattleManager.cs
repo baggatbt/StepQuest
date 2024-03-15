@@ -361,10 +361,10 @@ public void EndTurn()
         // Move the circles to the targets position
         if (currentTarget != null){
 
-        outerCircle.transform.position = new Vector3(currentTarget.transform.position.x, currentTarget.transform.position.y + 1f, currentTarget.transform.position.z);
+        outerCircle.transform.position = new Vector3(currentTarget.transform.position.x, currentTarget.transform.position.y + 3.5f, currentTarget.transform.position.z);
         }
 
-        innerCircle.transform.position = outerCircle.transform.position;
+       // innerCircle.transform.position = outerCircle.transform.position;
         //NEEDS OFFSET TO BE OFF SPRITE
             
     }
@@ -665,8 +665,9 @@ public void EndTurn()
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<TimingEventResult> callback)
 {
     // Enable the timing circles when the event starts
-    outerCircle.SetActive(true);
-    innerCircle.SetActive(true);
+  //  outerCircle.SetActive(true);
+  //  innerCircle.SetActive(true);
+  Debug.Log("Window started");
 
     // Assuming outerCircle does not change scale during this event
     Vector3 targetScale = outerCircle.transform.localScale; // Target scale is the outer circle's scale
@@ -683,6 +684,7 @@ public void EndTurn()
     {
         while (timer < totalWindowDuration)
         {
+            
             float progress = timer / totalWindowDuration;
             // Lerp from initial to target scale based on the progress
             innerCircle.transform.localScale = Vector3.Lerp(initialScale, targetScale, progress);
@@ -700,14 +702,16 @@ public void EndTurn()
         TimingEventResult result;
         if (buttonClicked)
         {
-            // Here you need to decide how to measure timing accuracy
-            // This could be based on the scale of the inner circle relative to the outer circle
-            result = GetTimingAccuracy(innerCircle.transform.localScale, targetScale);
+           
+            
+    result = GetTimingAccuracy(innerCircle.transform.localScale, targetScale, timer, windowStart, windowEnd);
+
+
         }
         else
         {
             Debug.Log("No input detected. Missed!");
-            result = TimingEventResult.Miss;
+            result = TimingEventResult.Late;
         }
         ShowTimingResult(result.ToString());
         callback(result);
@@ -722,31 +726,39 @@ public void EndTurn()
     }
 }
 
-private TimingEventResult GetTimingAccuracy(Vector3 innerCircleScale, Vector3 outerCircleScale)
+private TimingEventResult GetTimingAccuracy(Vector3 innerCircleScale, Vector3 outerCircleScale, float timer, float windowStart, float windowEnd)
 {
-    // This function now compares the inner and outer circle scales to determine accuracy
-    float distance = (innerCircleScale - outerCircleScale).magnitude; // Distance between scales
+    // Calculate the center of the timing window
+    float perfectTiming = (windowEnd + windowStart) / 2;
 
-    // Adjust these thresholds based on your game's design for a 'perfect' or 'good' match
-    float perfectThreshold = 0.05f; // Very close match
-    float goodThreshold = 0.2f; // Reasonably close match
+    // Calculate the timing accuracy based on how close the timer is to the perfectTiming
+    float accuracy = Mathf.Abs(timer - perfectTiming);
 
-    if (distance <= perfectThreshold)
+    // Define the thresholds as a percentage of the total window size
+    float windowSize = windowEnd - windowStart;
+    float perfectThreshold = windowSize * 0.3f; // Define what is considered 'perfect' (30% of the window)
+
+    if (accuracy <= perfectThreshold)
     {
-        StartCoroutine(cameraShake.Shake(0.6f));
-        return TimingEventResult.Perfect;
-    }
-    else if (distance <= goodThreshold)
-    {
-        StartCoroutine(cameraShake.Shake(0.3f));
+        Debug.Log("PERFECT");
+        StartCoroutine(cameraShake.Shake(0.5f));
         return TimingEventResult.Good;
+    }
+    else if (timer < perfectTiming)
+    {
+        Debug.Log("Early");
+        StartCoroutine(cameraShake.Shake(0.25f));
+        return TimingEventResult.Early;
     }
     else
     {
-        return TimingEventResult.Miss;
+        Debug.Log("Late");
+        StartCoroutine(cameraShake.Shake(0.25f));
+        return TimingEventResult.Late;
     }
-    
 }
+
+
 
 
   // Set the sizes: outer starts bigger and shrinks to size (0,0,0)
@@ -759,58 +771,60 @@ private TimingEventResult GetTimingAccuracy(Vector3 innerCircleScale, Vector3 ou
 
 
     public IEnumerator PlayerHoldReleaseTimeEvent(float holdStart, float holdEnd, Action<TimingEventResult> callback)
+{
+    float totalHoldDuration = holdEnd - holdStart;
+    float holdTimer = 0;
+    
+    //colorChanger.StartColorTransition(totalHoldDuration);
+    holdReleaseSlider.ResetSlider(); // Reset the slider at the start of the hold event
+    holdReleaseSlider.gameObject.SetActive(true);
+
+    while (holdTimer < totalHoldDuration)
     {
-        float totalHoldDuration = holdEnd - holdStart;
-        float holdTimer = 0;
-        
-        colorChanger.StartColorTransition(totalHoldDuration);
-
-        holdReleaseSlider.ResetSlider(); // Reset the slider at the start of the hold event
-        holdReleaseSlider.gameObject.SetActive(true);
-
-
-        while (holdTimer < totalHoldDuration)
+        if (Input.GetMouseButton(0)) // Button is currently held down
         {
-            if (Input.GetMouseButton(0)) // Button is currently held down
-            {
-
-                holdTimer += Time.deltaTime;
-
-                // Update the slider value as the hold time increases
-                holdReleaseSlider.UpdateSlider(holdTimer / totalHoldDuration);
-            }
-
-            if (Input.GetMouseButtonUp(0)) // Button was just released
-            {
-                holdReleaseSlider.gameObject.SetActive(false);  
-                break;
-            }
-
-            yield return null;
+            holdTimer += Time.deltaTime;
+            // Update the slider value as the hold time increases
+            holdReleaseSlider.UpdateSlider(holdTimer / totalHoldDuration);
         }
 
-        TimingEventResult result;
-
-        if (holdTimer < totalHoldDuration / 3)
+        if (Input.GetMouseButtonUp(0)) // Button was just released
         {
-            Debug.Log("Button was released too early. Miss!");
-            result = TimingEventResult.Miss;
-        }
-        else if (holdTimer < 2 * totalHoldDuration / 3)
-        {
-            Debug.Log("Button was released early. Good!");
-            result = TimingEventResult.Good;
-        }
-        else
-        {
-            Debug.Log("Button was held for the full duration. Perfect!");
-            result = TimingEventResult.Perfect;
+            holdReleaseSlider.gameObject.SetActive(false);  
+            break;
         }
 
-        ShowTimingResult(result.ToString());
-        callback(result);
-        holdReleaseSlider.ResetSlider(); // Reset the slider at the end of the hold event
+        yield return null;
     }
+
+    TimingEventResult result;
+
+    // Define a threshold for "Perfect" based on total hold duration
+    // if within 10% of the total hold duration
+    float perfectThreshold = totalHoldDuration * 0.1f; // Adjust this value as needed
+
+    if (Mathf.Abs(holdTimer - totalHoldDuration) <= perfectThreshold)
+    {
+        Debug.Log("Perfect!");
+        result = TimingEventResult.Good;
+    }
+    else if (holdTimer < totalHoldDuration)
+    {
+        Debug.Log("Early!");
+        result = TimingEventResult.Early;
+    }
+    else
+    {
+        // If the player holds past the hold duration, it could be considered Late.
+        Debug.Log("Late!");
+        result = TimingEventResult.Late;
+    }
+
+    ShowTimingResult(result.ToString());
+    callback(result);
+    holdReleaseSlider.ResetSlider(); // Reset the slider at the end of the hold event
+}
+
 
 
     public BattleState GetState()
