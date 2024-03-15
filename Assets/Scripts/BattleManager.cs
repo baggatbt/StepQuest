@@ -715,7 +715,7 @@ public void EndTurn()
         }
         ShowTimingResult(result.ToString());
         callback(result);
-        yield return new WaitForSeconds(0.5f); 
+       // yield return new WaitForSeconds(0.5f); 
     }
     finally
     {
