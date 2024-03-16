@@ -22,6 +22,8 @@ public class BattleManager : MonoBehaviour
     public GameObject heroSelectionPanel; // Assign in inspector
     public GameObject battleStartButton;
     public GameObject heroButtonPrefab;   // Assign in inspector
+    public GameObject skillDescriptionPanel;
+    
 
     
     
@@ -950,6 +952,7 @@ private void Update()
                 if ((state == BattleState.PlayerTurn) && isSkillSelected)
                 {
                     Debug.Log("Its getting into the final statement ok");
+                    skillDescriptionPanel.SetActive(false);
                     ExecuteQueuedSkills();
                    // turnOrderList.RemoveAll(character => character.health <= 0);
                 }

@@ -202,6 +202,7 @@ public void SelectAndUseSkill(Skill selectedSkill)
 
         // Queue the new skill
         skill = selectedSkill;
+        skillDescriptionPanel.SetActive(true);
         battleManager.skillQueue.Enqueue(skill);
         battleManager.isSkillSelected = true;
         Debug.Log("Skill " + skill.skillName + " queued. Current queue size: " + battleManager.skillQueue.Count);
