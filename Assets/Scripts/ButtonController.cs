@@ -65,10 +65,10 @@ public class ButtonController : MonoBehaviour
 
 
 
-
+//changed to just display the description
 private IEnumerator ShowSkillDescriptionAfterDelay(Skill skill)
 {
-    yield return new WaitForSeconds(1.0f); // Wait for 1 second
+    yield return new WaitForSeconds(0.0f); // Wait for 1 second
     skillDescriptionText.text = skill.description;
     skillDescriptionPanel.SetActive(true);
 }
@@ -170,7 +170,7 @@ private void SetupButtonEvents(GameObject buttonObj, Skill skill)
 
     var pointerUp = new EventTrigger.Entry();
     pointerUp.eventID = EventTriggerType.PointerUp;
-    pointerUp.callback.AddListener((data) => { OnSkillButtonRelease(); });
+    //pointerUp.callback.AddListener((data) => { OnSkillButtonRelease(); });
     eventTrigger.triggers.Add(pointerUp);
 }
 
@@ -185,6 +185,7 @@ public void SelectAndUseSkill(Skill selectedSkill)
     if (battleManager.skillQueue.Count > 0 && skill == selectedSkill)
     {
         // The same skill was selected again, so launch the attack
+        skillDescriptionPanel.SetActive(false);
         Debug.Log("Same skill selected, launching attack with skill: " + skill.skillName);
         battleManager.ExecuteQueuedSkills();
         

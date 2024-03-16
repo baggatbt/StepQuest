@@ -15,7 +15,7 @@ public class Slash : Skill
         requiresMovement = true; 
         skillExecutionComplete = false;
         numberOfAttacks = 1;
-        iconImage = LoadIconImage("SkillIcons/Icon4");
+        iconImage = LoadIconImage("SkillIcons/attack1");
         
     }
 
