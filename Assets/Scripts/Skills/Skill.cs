@@ -41,13 +41,19 @@ public abstract class Skill
     public int energyGain;
     public int skillLevel;
     public bool noZoom; //Allows zoom to be disabled
-    public int requiredLevel;  // New field
+    public int requiredLevel;  // New field\
+    public Sprite iconImage; // Field to store the icon image associated with the skill
+    
     protected TimingEventResult result; 
 
       // New virtual function for calculating base damage.
     protected virtual int CalculateBaseDamage(Character user)
     {
         return PlayerData.Instance.attackPower;
+    }
+    public Sprite LoadIconImage(string path)
+    {
+        return Resources.Load<Sprite>(path);
     }
 
 

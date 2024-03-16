@@ -134,6 +134,16 @@ public void PopulateSkillPanelWithCompanionSkills()
 
             // Setup button actions
             buttonComponent.onClick.AddListener(() => { SelectAndUseSkill(currentSkill); });
+             // Check if the skill has an icon, and if so, set the button's image to it
+            if (currentSkill.iconImage != null)
+            {
+                Image buttonImage = newButtonObj.GetComponent<Image>(); // Get the Image component of the button
+                if (buttonImage != null)
+                {
+                    buttonImage.sprite = currentSkill.iconImage; // Set the button's sprite to the skill's icon image
+                }
+            }
+
 
             // Add event listeners for tooltip behavior (existing code)
             SetupButtonEvents(newButtonObj, currentSkill);

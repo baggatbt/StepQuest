@@ -205,8 +205,8 @@ public class CompanionSpawnController : MonoBehaviour
 
     private void EnableHeroUI(Character selectedCompanion)
     {
-        selectedCompanion.healthBar.gameObject.SetActive(true);
-        selectedCompanion.energyBar.gameObject.SetActive(true);
+       selectedCompanion.healthBar.gameObject.SetActive(true);
+       selectedCompanion.energyBar.gameObject.SetActive(true);
     }
 
     private void DisableHeroUI(Character selectedCompanion)
