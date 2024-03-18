@@ -56,9 +56,17 @@ public class MainMenuUIManager : MonoBehaviour
 {
     GameObject companionButtonContainer = GameObject.Find("Companion Button Container"); // Find or reference directly
 
+    // Clear existing buttons to avoid duplicates
+    foreach (Transform child in companionButtonContainer.transform)
+    {
+        Destroy(child.gameObject);
+    }
+
+    HashSet<string> addedCompanions = new HashSet<string>(); // To track added companions
+
     foreach (Companion companion in GameManager.Instance.companions)
     {
-        if (companion.isUnlocked)
+        if (companion.isUnlocked && addedCompanions.Add(companion.heroID)) // Checks if heroID is not already added
         {
             GameObject buttonObject = Instantiate(companionButtonPrefab, companionButtonContainer.transform); // Use the container as parent
             buttonObject.GetComponentInChildren<TextMeshProUGUI>().text = companion.heroID;
@@ -67,6 +75,8 @@ public class MainMenuUIManager : MonoBehaviour
         }
     }
 }
+
+
 
 
     void OnCompanionSelected(Companion companion)
