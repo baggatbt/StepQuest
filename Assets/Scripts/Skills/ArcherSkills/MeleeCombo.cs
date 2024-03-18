@@ -12,13 +12,13 @@ public class MeleeCombo : Skill
 
     public MeleeCombo()
     {
-        skillName = "ComboName";
-        description = "A two-part melee attack, tap with good timing for bonus damage";
+        skillName = "Takedown";
+        description = "A two-part melee attack, tap right before each attack lands for bonus damage";
         requiresMovement = true;
         energyCost = 2;
         noZoom = false;
         iconImage = LoadIconImage("SkillIcons/attack1");
-        skillDamageModifier = 0.8f;
+        skillDamageModifier = 0.75f;
     }
 
     // Override the default base damage calculation.

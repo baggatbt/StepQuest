@@ -120,7 +120,7 @@ public abstract class Skill
     float damageMultiplier = 1.0f;
     
     result = timingResult;
-    baseDamage = baseDamage;
+    int skillBaseDamage = baseDamage;
     
     if (result == TimingEventResult.Good)
     {
@@ -143,6 +143,7 @@ public abstract class Skill
 public void HandlePlayerRangedAttack(Character user, Projectile projectile, TimingEventResult result)
     {
         float damageMultiplier = 1.0f;
+        
         if (result == TimingEventResult.Good)
         {
             
