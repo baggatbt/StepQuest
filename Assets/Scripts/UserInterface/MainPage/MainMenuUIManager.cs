@@ -17,6 +17,7 @@ public class MainMenuUIManager : MonoBehaviour
     public GameObject overworldMapGUI;
     public GameObject knightSkillListView;
     public TextMeshProUGUI stepsText;
+    public TextMeshProUGUI goldText;
     public GameObject companionButtonPrefab;
     public GameObject companionListPanel;
     public GameObject companionStatsPanel;
@@ -44,6 +45,7 @@ public class MainMenuUIManager : MonoBehaviour
     private void Update()
     {
          if (stepsText != null) stepsText.text =  PlayerData.Instance.inGameSteps.ToString();  
+         if (goldText != null) goldText.text =  PlayerData.Instance.gold.ToString();  
          UpdateTimerDisplay();
          UpdateKnightRecoveryTimerDisplay();
     }
