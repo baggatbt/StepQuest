@@ -11,22 +11,23 @@ public class ArrowRain : Skill
     public ArrowRain()
     {
         skillName = "Arrow Rain";
-        description = "Rain down arrows";
+        description = "Hold and release with good timing to hit all enemies with a rain of arrows up to 3 times";
         requiresMovement = false;
-        energyCost = 2;
+        energyCost = 4;
         iconImage = LoadIconImage("SkillIcons/attack5");
+        skillDamageModifier = 0.4f; //40%
     }
 
     // Override the default base damage calculation.
     protected override int CalculateBaseDamage(Character user)
     {
-        return (int)(user.attackPower * 1.2);  //Replace 1.2 with skillModifier
+        return (int)(user.attackPower * skillDamageModifier);  
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
 {
     user.isAttacking = true;
-    int baseDamage = CalculateBaseDamage(user) / 3;  // Split total damage into 3 parts
+    int baseDamage = CalculateBaseDamage(user);
     user.animator.SetTrigger("ArrowRainHold");
     // Trigger the player hold release time event without waiting for damage application
     yield return battleManager.PlayerHoldReleaseTimeEvent(0.0f, 1.0f, (result) =>
@@ -47,7 +48,7 @@ public class ArrowRain : Skill
         yield return new WaitForSeconds(0.2f); // Wait for 0.2 seconds between each hit
         HandleAoeAttack(user, battleManager.enemies, result, baseDamage);
     }
-
+    target.CheckForDeath();
     yield return new WaitForSeconds(1.0f); 
     user.isAttacking = false;
 }

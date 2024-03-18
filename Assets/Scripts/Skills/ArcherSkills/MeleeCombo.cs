@@ -13,17 +13,18 @@ public class MeleeCombo : Skill
     public MeleeCombo()
     {
         skillName = "ComboName";
-        description = "Melee combo";
+        description = "A two-part melee attack, tap with good timing for bonus damage";
         requiresMovement = true;
-        energyCost = 0;
+        energyCost = 2;
         noZoom = false;
         iconImage = LoadIconImage("SkillIcons/attack1");
+        skillDamageModifier = 0.8f;
     }
 
     // Override the default base damage calculation.
     protected override int CalculateBaseDamage(Character user)
     {
-        return (int)(user.attackPower * 1.0);  // 100% of the character's attack.
+        return (int)(user.attackPower * skillDamageModifier);  
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)

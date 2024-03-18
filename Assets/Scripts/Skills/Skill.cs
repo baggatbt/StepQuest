@@ -43,6 +43,7 @@ public abstract class Skill
     public bool noZoom; //Allows zoom to be disabled
     public int requiredLevel;  // New field\
     public Sprite iconImage; // Field to store the icon image associated with the skill
+    public float skillDamageModifier;
     
     protected TimingEventResult result; 
 
@@ -63,30 +64,26 @@ public abstract class Skill
 
     public void HandleAoeAttack(Character user, List<Character> enemies, TimingEventResult timingResult, int baseDamage)
 {
-    float damageMultiplier = 1.0f;
+    float damageTimingMultiplier = 1.0f;
     
     result = timingResult;
-    baseDamage = user.attackPower;
+    int skillBaseDamage = baseDamage;
 
     foreach (Character target in enemies)
     {
-        if (result == TimingEventResult.Miss)
+        if (result == TimingEventResult.Good)
         {
              target.animator.SetTrigger("IsHurtTrigger");
+             damageTimingMultiplier = 1.25f;  // Boost damage by 25%                      
+             target.TakeDamage((int)(skillBaseDamage * damageTimingMultiplier),user); // Apply damage boost
              user.PlayCriticalHitSound(); // Play critical hit sound
-        }
-        else if (result == TimingEventResult.Perfect)
-        {
-            damageMultiplier = 1.5f;  // Boost damage by 50%                      
-            target.TakeDamage((int)(baseDamage * damageMultiplier),user); 
-            user.PlayHitSound();
         }
         else 
         {
-            damageMultiplier = 1.25f;  // Boost damage by 25%                      
-            target.TakeDamage((int)(baseDamage * damageMultiplier),user); // Apply damage boost
+                                  
+            target.TakeDamage((int)skillBaseDamage,user); // Apply damage boost
         }
-       // target.CheckForDeath();
+       
     }
 }
 
@@ -123,7 +120,7 @@ public abstract class Skill
     float damageMultiplier = 1.0f;
     
     result = timingResult;
-    baseDamage = user.attackPower;
+    baseDamage = baseDamage;
     
     if (result == TimingEventResult.Good)
     {

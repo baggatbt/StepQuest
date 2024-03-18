@@ -13,16 +13,17 @@ public class ShootArrow : Skill
     public ShootArrow()
     {
         skillName = "Arrow";
-        description = "Shoot an arrow";
+        description = "Hold and release with good timing to fire an arrow";
         requiresMovement = false;
         energyCost = 0;
         iconImage = LoadIconImage("SkillIcons/attack3");
+        skillDamageModifier = 1.0f;
     }
 
     // Override the default base damage calculation.
     protected override int CalculateBaseDamage(Character user)
     {
-        return (int)(user.attackPower * 1.0);  // 100% of the character's attack.
+        return (int)(user.attackPower * skillDamageModifier);  
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
