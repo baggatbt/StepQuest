@@ -17,6 +17,7 @@ public class MeleeCombo : Skill
         requiresMovement = true;
         energyCost = 0;
         noZoom = false;
+        iconImage = LoadIconImage("SkillIcons/attack1");
     }
 
     // Override the default base damage calculation.

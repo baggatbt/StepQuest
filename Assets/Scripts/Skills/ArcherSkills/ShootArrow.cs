@@ -16,6 +16,7 @@ public class ShootArrow : Skill
         description = "Shoot an arrow";
         requiresMovement = false;
         energyCost = 0;
+        iconImage = LoadIconImage("SkillIcons/attack3");
     }
 
     // Override the default base damage calculation.

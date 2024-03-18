@@ -14,6 +14,7 @@ public class ArrowRain : Skill
         description = "Rain down arrows";
         requiresMovement = false;
         energyCost = 2;
+        iconImage = LoadIconImage("SkillIcons/attack5");
     }
 
     // Override the default base damage calculation.
