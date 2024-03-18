@@ -129,7 +129,7 @@ public void PopulateSkillPanelWithCompanionSkills()
             TextMeshProUGUI buttonText = newButtonObj.GetComponentInChildren<TextMeshProUGUI>();
             if (buttonText != null)
             {
-                buttonText.text = currentSkill.skillName;
+               // buttonText.text = currentSkill.skillName;
             }
 
             // Setup button actions
