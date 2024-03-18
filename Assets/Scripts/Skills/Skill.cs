@@ -93,21 +93,21 @@ public abstract class Skill
         float damageMultiplier = 1.0f;
         
         result = timingResult;
-        baseDamage = user.attackPower;
+        int skillBaseDamage = baseDamage;
     
     if (result == TimingEventResult.Good)
     {
             Debug.Log("Good Block!");   
             damageMultiplier = 0.75f;  // Reduce damage by 25%
            // user.animator.SetTrigger(trigger);            
-            target.TakeDamage((int)(user.attackPower * damageMultiplier),user); // Apply damage multiplier
+            target.TakeDamage((int)(skillBaseDamage * damageMultiplier),user); // Apply damage multiplier
             user.GainEnergy(1);
             target.animator.SetTrigger("BlockTrigger");
             AudioManager.instance.PlayBlockSound();       
     }
     else 
     {
-            target.TakeDamage((int)(user.attackPower * damageMultiplier),user); // Apply damage multiplier
+            target.TakeDamage((int)(skillBaseDamage * damageMultiplier),user); // Apply damage multiplier
             user.GainEnergy(1);
             target.animator.SetTrigger("IsHurtTrigger");
             AudioManager.instance.PlayBlockSound();      
