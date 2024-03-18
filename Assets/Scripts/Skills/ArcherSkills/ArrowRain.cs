@@ -15,7 +15,7 @@ public class ArrowRain : Skill
         requiresMovement = false;
         energyCost = 4;
         iconImage = LoadIconImage("SkillIcons/attack5");
-        skillDamageModifier = 0.4f; //40%
+        skillDamageModifier = 0.2f; 
     }
 
     // Override the default base damage calculation.
