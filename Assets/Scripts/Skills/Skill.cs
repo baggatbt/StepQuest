@@ -109,6 +109,7 @@ public abstract class Skill
     {
             target.TakeDamage((int)(skillBaseDamage * damageMultiplier),user); // Apply damage multiplier
             user.GainEnergy(1);
+            user.PlayHitSound();
             target.animator.SetTrigger("IsHurtTrigger");
             AudioManager.instance.PlayBlockSound();      
     }

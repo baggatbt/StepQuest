@@ -35,7 +35,7 @@ public class GoblinAttackSkill : Skill
 
             HandleTimingResultForEnemyAttack(user, target, result, baseDamage);
             Debug.Log("Timing for player attack has been handled waiting for animations");
-
+           // user.PlayHitSound();
             yield return new WaitUntil(() => user.animationDamageTime == true);
             Debug.Log(user.isAnimationDone + "right after the damagetime");
         }

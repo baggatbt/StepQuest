@@ -39,6 +39,7 @@ public class SlimeAttackSkill : Skill
              HandleTimingResultForEnemyAttack(user, target, result, baseDamage);
              Debug.Log("Timing for enemy attack has been handled waiting for animations");
              //Wait until the timing event happens to move on to next attack stage
+          //   user.PlayHitSound();
              yield return new WaitUntil(() => user.animationDamageTime == true);
              
         }
