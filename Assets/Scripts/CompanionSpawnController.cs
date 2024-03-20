@@ -13,6 +13,8 @@ public class CompanionSpawnController : MonoBehaviour
     public TextMeshProUGUI associatedEnergyText;
     public Slider associatedHealthBarSlider2; // Reference to the slider
     public Slider associatedEnergyBarSlider2;
+    public GameObject heroHealthUI1;
+    public GameObject heroHealthUI2;
     public TextMeshProUGUI associatedHealthText2;
     public TextMeshProUGUI associatedEnergyText2;
     public Slider associatedtempEnergyBarSlider2;
@@ -52,11 +54,11 @@ public class CompanionSpawnController : MonoBehaviour
     // Dynamically assign UI elements based on the current number of active companions
     if (activeCompanions.Count % 2 == 0)
     {
-        SetupBars(companionCharacter, associatedHealthBarSlider, associatedEnergyBarSlider, associatedHealthText, associatedEnergyText);
+        SetupBars(companionCharacter, associatedHealthBarSlider, associatedEnergyBarSlider, associatedHealthText, associatedEnergyText,heroHealthUI1);
     }
     else
     {
-        SetupBars(companionCharacter, associatedHealthBarSlider2, associatedEnergyBarSlider2, associatedHealthText2, associatedEnergyText2);
+        SetupBars(companionCharacter, associatedHealthBarSlider2, associatedEnergyBarSlider2, associatedHealthText2, associatedEnergyText2, heroHealthUI2);
     }
 
     // Adding to the list
@@ -66,8 +68,9 @@ public class CompanionSpawnController : MonoBehaviour
 
 
 
-    private void SetupBars(Character character, Slider healthBar, Slider energyBar, TextMeshProUGUI healthText, TextMeshProUGUI energyText)
+    private void SetupBars(Character character, Slider healthBar, Slider energyBar, TextMeshProUGUI healthText, TextMeshProUGUI energyText, GameObject heroHealthUI)
     {
+        heroHealthUI.SetActive(true);
         character.healthText = healthText;
         healthBar.maxValue = character.maxHealth;
         healthBar.value = character.health;
@@ -213,6 +216,7 @@ public class CompanionSpawnController : MonoBehaviour
     {
         selectedCompanion.healthBar.gameObject.SetActive(false);
         selectedCompanion.energyBar.gameObject.SetActive(false);
+        
     }
 
 } 

@@ -184,7 +184,7 @@ public class Character : MonoBehaviour
     Debug.Log("The target has " + effectiveDefense + " defense left after penetration.");
 
     // Calculate total damage using the new formula
-    float totalDamage = damageOfAttacker * (100f / (100f + effectiveDefense));
+    float totalDamage = damageOfAttacker; //* (100f / (100f + effectiveDefense));
     int damageDealt = Mathf.FloorToInt(totalDamage); // Convert to integer, adjust as needed
 
     Debug.Log("Total damage dealt after defense penetration = " + damageDealt);

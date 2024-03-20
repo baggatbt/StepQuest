@@ -8,7 +8,7 @@ public class Slash : Skill
     public Slash()
     {
         skillName = "Slash";
-        description = "A slash that deals " + PlayerData.Instance.attackPower + " damage.";
+        description = "Tap command: Deals 100% ATK as damage.";
         energyCost = 0; 
         energyGain = 1;
         skillLevel = 1; 
@@ -42,7 +42,7 @@ public class Slash : Skill
              
 
              HandleTimingResultForPlayerAttack(user, target, result, baseDamage);
-             AudioManager.instance.PlaySlashSound();
+             
              Debug.Log("Timing for player attack has been handled waiting for animations");
              //Wait until the timing event happens to move on to next attack stage
              yield return new WaitUntil(() => user.animationDamageTime == true);
