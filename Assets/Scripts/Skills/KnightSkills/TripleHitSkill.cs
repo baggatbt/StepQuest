@@ -18,7 +18,7 @@ public class TripleHitSkill : Skill
     // Override the default base damage calculation.
     protected override int CalculateBaseDamage(Character user)
     {
-        return (int)(user.attackPower * 0.8f);  // 80% of the character's attack.
+        return (int)(user.attackPower * 0.4f);  
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)

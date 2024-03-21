@@ -63,6 +63,7 @@ public class Knight : Companion
     public override List<SkillType> AvailableSkills => new List<SkillType>
     {
         SkillType.Slash,
+        SkillType.TripleHit,
         
         
        
@@ -71,7 +72,7 @@ public class Knight : Companion
 
     public override List<SkillType> LockedSkills => new List<SkillType>
     {
-        SkillType.TripleHit,
+        
         SkillType.Taunt,
     };
 

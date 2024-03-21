@@ -363,7 +363,7 @@ public void EndTurn()
         // Move the circles to the targets position
         if (currentTarget != null){
 
-        outerCircle.transform.position = new Vector3(currentTarget.transform.position.x, currentTarget.transform.position.y + 3.5f, currentTarget.transform.position.z);
+        outerCircle.transform.position = new Vector3(currentTarget.transform.position.x, currentTarget.transform.position.y + 4.0f, currentTarget.transform.position.z);
         }
 
        // innerCircle.transform.position = outerCircle.transform.position;
@@ -856,7 +856,8 @@ private TimingEventResult GetTimingAccuracy(Vector3 innerCircleScale, Vector3 ou
             if (i < expSliders.Length && i < expTexts.Length)
             {
                 // Update the slider value and text
-                expSliders[i].value = CalculateSliderValue(companion.heroExp, expToLevel);
+                expSliders[i].maxValue = companion.ExpToNextLevel(companion.heroLevel);
+                expSliders[i].value = companion.heroExp;
                 expTexts[i].text = "Exp to level: " + (expToLevel - companion.heroExp).ToString();
 
                 // Make sure the UI elements for this character are visible
@@ -1052,6 +1053,7 @@ private void ProcessVictory()
     }
     
     endOfBattlePanel.SetActive(true);
+    DisplayExpToLevel(playerParty);
 }
 
 private void ProcessDefeat()
