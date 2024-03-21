@@ -13,6 +13,7 @@ public class TripleHitSkill : Skill
         requiresMovement = true;
         energyCost = 3;
         numberOfAttacksPossible = 3;
+        iconImage = LoadIconImage("SkillIcons/fire2");
     }
 
     // Override the default base damage calculation.
@@ -20,6 +21,7 @@ public class TripleHitSkill : Skill
     {
         return (int)(user.attackPower * 0.4f);  
     }
+    
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
@@ -36,12 +38,13 @@ public class TripleHitSkill : Skill
              
 
              yield return TimingWindow(user, target, battleManager, 0.0f, 0.7f);
-             
+               yield return battleManager.StartCoroutine(battleManager.TimeStop(0.15f));
              
 
              HandleTimingResultForPlayerAttack(user, target, result, baseDamage);
              Debug.Log("Timing for player attack has been handled waiting for animations");
              //Wait until the timing event happens to move on to next attack stage
+             
              yield return new WaitUntil(() => user.animationDamageTime == true);
              
         }

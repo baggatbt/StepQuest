@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Taunt : Skill
 {
- 
+    GameObject barrierPrefab = Resources.Load<GameObject>("PreFab/Skill FX/Barrier");
     public Taunt()
     {
         skillName = "Taunt";
@@ -27,6 +27,8 @@ public class Taunt : Skill
         battleManager.SelectTargetForEnemy();
         user.isAttacking = false;
         user.isAnimationDone = false;
+        user.AddBarrier(barrierPrefab);
+
         yield return new WaitUntil(() => user.isAnimationDone == false);
     }
     

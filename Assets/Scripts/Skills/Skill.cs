@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+
 
 
 public struct AttackStage
@@ -88,32 +90,40 @@ public abstract class Skill
 }
 
 
-    public void HandleTimingResultForEnemyAttack(Character user, Character target,TimingEventResult timingResult, int baseDamage)
-{
+     public void HandleTimingResultForEnemyAttack(Character user, Character target, TimingEventResult timingResult, int baseDamage)
+    {
         float damageMultiplier = 1.0f;
         
         result = timingResult;
-        int skillBaseDamage = baseDamage;
-    
-    if (result == TimingEventResult.Good)
-    {
-            Debug.Log("Good Block!");   
-            damageMultiplier = 0.75f;  // Reduce damage by 25%
-           // user.animator.SetTrigger(trigger);            
-            target.TakeDamage((int)(skillBaseDamage * damageMultiplier),user); // Apply damage multiplier
-            user.GainEnergy(1);
+        
+        
+        
+        // Calculate damage with multiplier and round up
+        double rawDamage = baseDamage * damageMultiplier;
+        int finalDamage = (int)Math.Ceiling(rawDamage);
+
+        // Ensure at least 1 damage is dealt
+        finalDamage = Math.Max(finalDamage, 1);
+
+        target.TakeDamage(finalDamage, user);
+        
+        // Gain energy and set animations based on the result
+        user.GainEnergy(1);
+        
+        if (result == TimingEventResult.Good)
+        {
+            target.didBlock = true;
             target.animator.SetTrigger("BlockTrigger");
-            AudioManager.instance.PlayBlockSound();       
-    }
-    else 
-    {
-            target.TakeDamage((int)(skillBaseDamage * damageMultiplier),user); // Apply damage multiplier
-            user.GainEnergy(1);
+            AudioManager.instance.PlayBlockSound();
+        }
+        else 
+        {
             user.PlayHitSound();
-            target.animator.SetTrigger("IsHurtTrigger");
-            AudioManager.instance.PlayBlockSound();      
+            
+           // AudioManager.instance.PlayBlockSound();
+        }
     }
-}
+
     
 
     public void HandleTimingResultForPlayerAttack(Character user, Character target, TimingEventResult timingResult, int baseDamage)
@@ -125,20 +135,30 @@ public abstract class Skill
     
     if (result == TimingEventResult.Good)
     {
-            Debug.Log("Good Hit!");
-            damageMultiplier = 1.25f;  // Boost damage by 25%
-            target.TakeDamage((int)(baseDamage * damageMultiplier), user);
-            target.animator.SetTrigger("IsHurtTrigger");
-            user.PlayCriticalHitSound(); // Play critical hit sound
-           
+        Debug.Log("Good Hit!");
+        damageMultiplier = 1.25f;  // Boost damage by 25%
     }
-    else 
+    
+    // Calculate damage with multiplier and round up
+    double rawDamage = baseDamage * damageMultiplier;
+    int finalDamage = (int)Math.Ceiling(rawDamage);
+
+    // Ensure at least 1 damage is dealt
+    finalDamage = Math.Max(finalDamage, 1);
+
+    target.TakeDamage(finalDamage, user);
+    target.animator.SetTrigger("IsHurtTrigger");
+
+    if (result == TimingEventResult.Good)
     {
-            target.TakeDamage((int)(baseDamage * damageMultiplier), user);
-            target.animator.SetTrigger("IsHurtTrigger");
-            user.PlayHitSound(); // Play  hit sound
+        user.PlayCriticalHitSound(); // Play critical hit sound
+    }
+    else
+    {
+        user.PlayHitSound(); // Play hit sound
     }
 }
+
 
 
 public void HandlePlayerRangedAttack(Character user, Projectile projectile, TimingEventResult result)

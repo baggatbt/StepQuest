@@ -44,12 +44,12 @@ public class Knight : Companion
         if (this.heroExp >= ExpToNextLevel(this.heroLevel))
         {
             this.heroLevel++;
-            this.attackPower += 2;
-            this.maxHealth += 5;
+            this.attackPower += 1;
+            this.maxHealth += 0;
             this.health = this.maxHealth;
             this.defensePower += 3;
             this.speed += 1;
-            this.maxEnergy += 1;
+            this.maxEnergy += 0;
             this.energy = this.maxEnergy;
             this.heroExp = 0;  
             this.heroStatPoints += 3;
@@ -64,6 +64,7 @@ public class Knight : Companion
     {
         SkillType.Slash,
         SkillType.TripleHit,
+        SkillType.Taunt,
         
         
        
@@ -73,7 +74,7 @@ public class Knight : Companion
     public override List<SkillType> LockedSkills => new List<SkillType>
     {
         
-        SkillType.Taunt,
+        
     };
 
     public override Skill GetSkillInstance(SkillType skillType)

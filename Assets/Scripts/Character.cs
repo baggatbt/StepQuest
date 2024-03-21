@@ -40,6 +40,7 @@ public class Character : MonoBehaviour
     public bool isMoving;
     public bool attackTrigger;
     public bool animationEnded;
+    public bool didBlock;
     public Skill currentSkill; 
     public List<Skill> skills = new List<Skill>();
     public int attacksBeforeSpecial; 
@@ -179,15 +180,22 @@ public class Character : MonoBehaviour
 */
     public void TakeDamage(int damageOfAttacker, Character attacker)
 {
+    if (currentBarrier != null && currentBarrier.IsActive)
+        {
+            currentBarrier.AbsorbDamage();
+            
+            return; // Skip taking damage because the barrier absorbed it
+        }
+        
     // Calculate effective defense after penetration
     int effectiveDefense = Math.Max(0, defensePower - attacker.defensePenetration);
-    Debug.Log("The target has " + effectiveDefense + " defense left after penetration.");
+   // Debug.Log("The target has " + effectiveDefense + " defense left after penetration.");
 
     // Calculate total damage using the new formula
     float totalDamage = damageOfAttacker; //* (100f / (100f + effectiveDefense));
     int damageDealt = Mathf.FloorToInt(totalDamage); // Convert to integer, adjust as needed
 
-    Debug.Log("Total damage dealt after defense penetration = " + damageDealt);
+    Debug.Log("Total damage dealt  = " + damageDealt);
 
     // Subtract the calculated damage from health
     this.health -= damageDealt;
@@ -204,8 +212,11 @@ public class Character : MonoBehaviour
     }
     
     // Check if damage was dealt for additional effects
-    if (damageDealt > 0)
+    if (damageDealt >= 1)
     { 
+        if (!this.didBlock){
+        this.animator.SetTrigger("IsHurtTrigger");
+        }
         // Trigger hit reaction, damage popup, etc.
         GameObject damagePopupPrefab = Resources.Load<GameObject>("PreFab/DamagePopup");
         Transform endOfBattleRewardsTransform = GameObject.Find("EndOfBattleRewardsCanvas").transform;
@@ -332,6 +343,19 @@ public class Character : MonoBehaviour
          isAnimationDone = true;
         
     }
+
+    public Barrier currentBarrier;
+    public void AddBarrier(GameObject barrierPrefab)
+    {
+        if (currentBarrier == null) // Ensure there isn't already a barrier
+        {
+            GameObject barrierObj = Instantiate(barrierPrefab, transform.position, Quaternion.identity, transform);
+            currentBarrier = barrierObj.GetComponent<Barrier>();
+            
+        }
+    }
+
+   
 
     //This will be called on an animation event so characters can call target.TakeDamage() at the exact moment
     public bool animationDamageTime = false;

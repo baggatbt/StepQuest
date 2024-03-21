@@ -44,6 +44,7 @@ public class Goblin : Enemy
         // Goblin-specific updates
        // this.maxHealth = 9 + (this.level * 2);
         this.health = this.maxHealth;
+        this.expReward = 10 + (this.level * 2);
         this.goldReward = 3 + (this.level * 2); // You can keep or modify this if you want specific gold logic for Goblins
         this.attacksBeforeSpecial = 2;
       //  this.attackPower = 6 + (this.level * 2); 
