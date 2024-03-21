@@ -507,7 +507,7 @@ public void EndTurn()
             StartCoroutine(zoomEffect.ZoomOutEffect());
         }
         
-        enemyUIPanel.SetActive(true);
+        EnableAllButtons();
        
         yield return activePlayer.ReturnToPosition();
         }

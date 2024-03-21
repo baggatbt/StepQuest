@@ -21,7 +21,7 @@ public class Knight : Companion
             this.defensePower = 20;
             this.speed = 4;
             this.maxEnergy = 5;
-            this.energy = this.maxEnergy;
+            this.energy = 3;
             this.defensePenetration = 0;
             this.heroID = "Knight";
             this.heroLevel = 1;
@@ -50,7 +50,7 @@ public class Knight : Companion
             this.defensePower += 3;
             this.speed += 1;
             this.maxEnergy += 0;
-            this.energy = this.maxEnergy;
+            this.energy = 3;
             this.heroExp = 0;  
             this.heroStatPoints += 3;
             this.heroSkillPoints += 1;

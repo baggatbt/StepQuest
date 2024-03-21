@@ -52,12 +52,26 @@ public class Slash : Skill
         Debug.Log("waiting on animation to finish");
     
         yield return new WaitUntil(() => user.isAnimationDone == true);
-        //user.GainEnergy(energyGain);
+        user.GainEnergy(EnergyGain());
        // target.CheckForDeath();
         user.animationDamageTime = false;
         user.isAnimationDone = false;
         user.isAttacking = false;
         target.CheckForDeath();
+    }
+
+    private int EnergyGain()
+    {
+        if (result == TimingEventResult.Good)
+        {
+            Debug.Log("2 energy");
+            return 2;
+        }
+        else
+        {
+            Debug.Log("1 energy");
+            return 1;
+        }
     }
 
 
@@ -67,6 +81,7 @@ public class Slash : Skill
         yield return battleManager.StartCoroutine(battleManager.PlayerActiveTimeEvent(windowStart, windowEnd, (timingResult) =>
         {
             result = timingResult;
+            
         }));
          
     }

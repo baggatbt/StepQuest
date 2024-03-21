@@ -133,12 +133,6 @@ public abstract class Skill
     result = timingResult;
     int skillBaseDamage = baseDamage;
     
-    if (result == TimingEventResult.Good)
-    {
-        Debug.Log("Good Hit!");
-        damageMultiplier = 1.25f;  // Boost damage by 25%
-    }
-    
     // Calculate damage with multiplier and round up
     double rawDamage = baseDamage * damageMultiplier;
     int finalDamage = (int)Math.Ceiling(rawDamage);
@@ -147,14 +141,18 @@ public abstract class Skill
     finalDamage = Math.Max(finalDamage, 1);
 
     target.TakeDamage(finalDamage, user);
-    target.animator.SetTrigger("IsHurtTrigger");
+   // target.animator.SetTrigger("IsHurtTrigger");
 
     if (result == TimingEventResult.Good)
     {
+        Debug.Log("Good Hit!");
+        damageMultiplier = 1.25f;  // Boost damage by 25% later replace with TEK stat
         user.PlayCriticalHitSound(); // Play critical hit sound
+        
     }
     else
     {
+        damageMultiplier = 1.0f;  // Base damage
         user.PlayHitSound(); // Play hit sound
     }
 }

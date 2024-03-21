@@ -322,7 +322,12 @@ public class Character : MonoBehaviour
     //For enemy rage bars
     public void GainEnergy(int energyGained)
     {
+        if (this.energy < this.maxEnergy)
+        {
+            Debug.Log("Gaining " + energyGained);
         this.energy = energyGained;
+        }
+
         
     }
 

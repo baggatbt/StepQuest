@@ -199,14 +199,19 @@ public void SelectAndUseSkill(Skill selectedSkill)
             battleManager.skillQueue.Dequeue();
             battleManager.isSkillSelected = false;
         }
-
+        if(selectedSkill.energyCost <= battleManager.activePlayer.energy)
+        {
         // Queue the new skill
         skill = selectedSkill;
         skillDescriptionPanel.SetActive(true);
         battleManager.skillQueue.Enqueue(skill);
         battleManager.isSkillSelected = true;
         Debug.Log("Skill " + skill.skillName + " queued. Current queue size: " + battleManager.skillQueue.Count);
-        
+        }
+        else
+        {
+            Debug.Log("not enough energy to queue");
+        }
         
     }
 }
