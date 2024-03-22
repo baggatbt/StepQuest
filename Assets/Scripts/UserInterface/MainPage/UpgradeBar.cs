@@ -9,7 +9,7 @@ public class UpgradeBar : MonoBehaviour
     public GameObject filledSegmentPrefab; // Assign the FilledUpgradeSegment prefab in the inspector
     public Button upgradeButton; // Assign in the inspector
     public int maxLevel;
-    private int currentLevel;
+    public int currentLevel;
     private GameObject[] segments;
 
     private void Awake()
@@ -28,36 +28,62 @@ public class UpgradeBar : MonoBehaviour
         }
     }
 
-    private void UpgradeStat()
-{
-    if (currentLevel < maxLevel)
+    public void UpgradeStat()
     {
-        // Get the position, rotation, and parent from the current segment to be upgraded
-        Vector3 position = segments[currentLevel].transform.localPosition; // Use localPosition for UI elements
-        Quaternion rotation = segments[currentLevel].transform.localRotation;
-        Transform parent = segments[currentLevel].transform.parent;
-
-        // Destroy the current empty segment
-        Destroy(segments[currentLevel]);
-
-        // Instantiate a new filled segment at the correct position
-        segments[currentLevel] = Instantiate(filledSegmentPrefab, parent);
-        segments[currentLevel].transform.localPosition = position;
-        segments[currentLevel].transform.localRotation = rotation;
-        
-        // Ensure the new segment has the same sibling index so it appears in the correct order in the UI hierarchy
-        segments[currentLevel].transform.SetSiblingIndex(currentLevel);
-
-        // Increment the current level
-        currentLevel++;
-        Debug.Log("Upgraded");
-
-        // Disable the button if max level is reached
-        if (currentLevel >= maxLevel)
+        if (currentLevel < maxLevel)
         {
-            upgradeButton.interactable = false;
+            // Get the position, rotation, and parent from the current segment to be upgraded
+            Vector3 position = segments[currentLevel].transform.localPosition; // Use localPosition for UI elements
+            Quaternion rotation = segments[currentLevel].transform.localRotation;
+            Transform parent = segments[currentLevel].transform.parent;
+
+            // Destroy the current empty segment
+            Destroy(segments[currentLevel]);
+
+            // Instantiate a new filled segment at the correct position
+            segments[currentLevel] = Instantiate(filledSegmentPrefab, parent);
+            segments[currentLevel].transform.localPosition = position;
+            segments[currentLevel].transform.localRotation = rotation;
+            
+            // Ensure the new segment has the same sibling index so it appears in the correct order in the UI hierarchy
+            segments[currentLevel].transform.SetSiblingIndex(currentLevel);
+
+            // Increment the current level
+            currentLevel++;
+            Debug.Log("Upgraded");
+
+            // Reset the button if max level is reached
+            if (currentLevel == maxLevel)
+            {
+                ResetSegments();
+            }
         }
     }
-}
+    private void ResetSegments()
+    {
+        foreach (var segment in segments)
+        {
+            currentLevel -= 1;
+            // Get the position, rotation, and parent from the current segment to be upgraded
+            Vector3 position = segments[currentLevel].transform.localPosition; // Use localPosition for UI elements
+            Quaternion rotation = segments[currentLevel].transform.localRotation;
+            Transform parent = segments[currentLevel].transform.parent;
+
+            // Destroy the current segment
+            Destroy(segments[currentLevel]);
+
+            // Instantiate a new empty segment at the correct position
+            segments[currentLevel] = Instantiate(emptySegmentPrefab, parent);
+            segments[currentLevel].transform.localPosition = position;
+            segments[currentLevel].transform.localRotation = rotation;
+            
+            // Ensure the new segment has the same sibling index so it appears in the correct order in the UI hierarchy
+            segments[currentLevel].transform.SetSiblingIndex(currentLevel);
+
+
+            
+        }
+        currentLevel = 0;
+    }
 
 }

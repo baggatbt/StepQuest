@@ -79,7 +79,9 @@ public class MainMenuUIManager : MonoBehaviour
 }
 
 
-
+    public GameObject atkUpgradeBar;
+    public GameObject vitUpgradeBar;
+    public GameObject spdUpgradeBar;
 
     void OnCompanionSelected(Companion companion)
     {
@@ -87,7 +89,7 @@ public class MainMenuUIManager : MonoBehaviour
         levelText.text = "Lv: " + companion.heroLevel.ToString();
         atkText.text = "ATK: " + companion.attackPower.ToString();
         hpText.text = "HP: " + companion.health.ToString();
-        defText.text = "DEF: " + companion.defensePower.ToString();
+        defText.text = "VIT: " + companion.defensePower.ToString();
         expText.text = "EXP: " + companion.heroExp.ToString() + " / " + companion.ExpToNextLevel(companion.heroLevel);
         spdText.text = "SPD: " + companion.speed.ToString();
         

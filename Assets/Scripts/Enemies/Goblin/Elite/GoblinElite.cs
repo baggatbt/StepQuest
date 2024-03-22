@@ -11,14 +11,14 @@ public class GoblinElite : Enemy
     {
         base.Awake(); // Calls Enemy.Awake(), which now includes the call to UpdateExpAndGoldRewards
         this.level = 1;
-        this.maxHealth = 9;
+        this.maxHealth = 20;
         this.health = this.maxHealth;
-        this.maxEnergy = 1;
+        this.maxEnergy = 3;
         this.speed = 9;
-        this.defensePenetration = 2;
+        this.defensePenetration = 0;
         this.attacksBeforeSpecial = 2;
         this.attackPower = 6;
-        this.defensePower = 5;
+        this.defensePower = 0;
         this.energy = 0;
     }
      protected override void Start()
@@ -47,12 +47,13 @@ public class GoblinElite : Enemy
         base.UpdateStats(); // Ensures that any updates that happen in the base class, including expReward and goldReward updates, are applied
 
         //specific updates
-        this.maxHealth = 30 + (this.level * 2);
-        this.health = this.maxHealth;
+       // this.maxHealth = 30 + (this.level * 2);
+     //   this.health = this.maxHealth;
         this.goldReward = 10 + (this.level * 2); 
+        this.expReward = 20 + (this.level * 3);
         this.attacksBeforeSpecial = 2;
-        this.attackPower = 9 + (this.level * 2); 
-        this.defensePower = 5 + (this.level + 1);
+       // this.attackPower = 9 + (this.level * 2); 
+       // this.defensePower = 5 + (this.level + 1);
         this.energy = 0;
     }
 

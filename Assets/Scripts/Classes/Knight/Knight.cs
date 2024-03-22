@@ -18,7 +18,7 @@ public class Knight : Companion
             this.attackPower = 3;
             this.maxHealth = 10;
             this.health = this.maxHealth;
-            this.defensePower = 20;
+            this.defensePower = 5;
             this.speed = 4;
             this.maxEnergy = 5;
             this.energy = 3;
@@ -44,15 +44,15 @@ public class Knight : Companion
         if (this.heroExp >= ExpToNextLevel(this.heroLevel))
         {
             this.heroLevel++;
-            this.attackPower += 1;
+            this.attackPower += 0;
             this.maxHealth += 0;
             this.health = this.maxHealth;
-            this.defensePower += 3;
-            this.speed += 1;
+            this.defensePower += 0;
+            this.speed += 0;
             this.maxEnergy += 0;
-            this.energy = 3;
+            this.energy = 0;
             this.heroExp = 0;  
-            this.heroStatPoints += 3;
+            this.heroStatPoints += 5;
             this.heroSkillPoints += 1;
         } 
     }

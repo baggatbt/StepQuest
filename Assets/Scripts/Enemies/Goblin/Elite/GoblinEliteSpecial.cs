@@ -12,13 +12,13 @@ public class GoblinEliteSpecial : Skill
         skillName = "Goblin Attack";
         description = "The Goblin attacks the player. The damage can be reduced by timely action.";
         requiresMovement = true;
-        numberOfAttacksPossible = 4;
+        numberOfAttacksPossible = 2;
     }
 
     // Override the default base damage calculation.
     protected override int CalculateBaseDamage(Character user)
     {
-        return (int)(user.attackPower * 0.8f);  // 80% of the character's attack.
+        return (int)(user.attackPower * 0.4f);  // 80% of the character's attack.
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
@@ -28,7 +28,7 @@ public class GoblinEliteSpecial : Skill
 
         int baseDamage = CalculateBaseDamage(user);
 
-        user.animator.SetTrigger("GoblinSpecialAttackTrigger");
+        user.animator.SetTrigger("GoblinAttack1Trigger");
 
         for (int i = 0; i < numberOfAttacksPossible; i++)
         {
