@@ -35,6 +35,8 @@ public class UpgradeBar : MonoBehaviour
 
     public void UpgradeStat()
     {
+        if (GameManager.Instance.currentCompanion.heroStatPoints > 0)
+        {
         if (currentLevel < maxLevel)
         {
             // Get the position, rotation, and parent from the current segment to be upgraded
@@ -55,6 +57,7 @@ public class UpgradeBar : MonoBehaviour
 
             // Increment the current level
             currentLevel++;
+            GameManager.Instance.currentCompanion.heroStatPoints--;
             Debug.Log("Upgraded");
 
             // Reset the button if max level is reached
@@ -62,6 +65,7 @@ public class UpgradeBar : MonoBehaviour
             {
                 ResetSegments();
             }
+        }
         }
     }
     private void ResetSegments()

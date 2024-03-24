@@ -18,8 +18,7 @@ public class GameManager : MonoBehaviour
     public Character companion1; 
     public Character companion2; 
     public Character companion3;
-    
-
+    public Companion currentCompanion; //Used to expose the selected companion 
 
     private int currentStageIndex;
     private bool isUnlocked;
@@ -77,12 +76,6 @@ public class GameManager : MonoBehaviour
     
 
     
-
-
-
-
-    
-
     public Character InstantiateSelectedCompanion(string heroID)
     {
         GameObject companionObject = null;
@@ -91,6 +84,7 @@ public class GameManager : MonoBehaviour
         {
             case "Knight":
                 companionObject = Instantiate(knightPrefab);
+
                 break;
             case "Archer":
                 companionObject = Instantiate(archerPrefab);

@@ -78,13 +78,14 @@ public class MainMenuUIManager : MonoBehaviour
     }
 }
 
-
+    
     public GameObject atkUpgradeBar;
     public GameObject vitUpgradeBar;
     public GameObject spdUpgradeBar;
 
     void OnCompanionSelected(Companion companion)
     {
+        GameManager.Instance.currentCompanion = companion;   
         Debug.Log("Possible memory leak here due to not unsubscribing from the events. Need to check if unity handles that");
         atkUpgradeBar.GetComponent<UpgradeBar>().OnMaxLevelReached += () => IncreaseCompanionStat(companion, "atk");
         vitUpgradeBar.GetComponent<UpgradeBar>().OnMaxLevelReached += () => IncreaseCompanionStat(companion, "vit");
