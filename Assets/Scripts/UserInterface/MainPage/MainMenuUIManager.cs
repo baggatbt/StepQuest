@@ -85,7 +85,12 @@ public class MainMenuUIManager : MonoBehaviour
 
     void OnCompanionSelected(Companion companion)
     {
-        // Assuming your Companion class has these fields or properties
+        Debug.Log("Possible memory leak here due to not unsubscribing from the events. Need to check if unity handles that");
+        atkUpgradeBar.GetComponent<UpgradeBar>().OnMaxLevelReached += () => IncreaseCompanionStat(companion, "atk");
+        vitUpgradeBar.GetComponent<UpgradeBar>().OnMaxLevelReached += () => IncreaseCompanionStat(companion, "vit");
+        spdUpgradeBar.GetComponent<UpgradeBar>().OnMaxLevelReached += () => IncreaseCompanionStat(companion, "spd");
+
+        
         levelText.text = "Lv: " + companion.heroLevel.ToString();
         atkText.text = "ATK: " + companion.attackPower.ToString();
         hpText.text = "HP: " + companion.health.ToString();
@@ -96,6 +101,26 @@ public class MainMenuUIManager : MonoBehaviour
         // Make sure the stats panel is visible
         companionStatsPanel.SetActive(true);
     }
+
+    public void IncreaseCompanionStat(Companion companion, string statType)
+{
+    // Increase the stat based on the type
+    switch (statType)
+    {
+        case "atk":
+            companion.attackPower += 1; // Or any logic for stat increase
+            atkText.text = "ATK: " + companion.attackPower.ToString(); // Update UI
+            break;
+        case "vit":
+            companion.defensePower += 1; // Adjust accordingly
+            defText.text = "VIT: " + companion.defensePower.ToString(); // Update UI
+            break;
+        case "spd":
+            companion.speed += 1; // Adjust accordingly
+            spdText.text = "SPD: " + companion.speed.ToString(); // Update UI
+            break;
+    }
+}
    
     
     public CanvasGroup currentPanel;

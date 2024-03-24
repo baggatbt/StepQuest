@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
+
 
 public class UpgradeBar : MonoBehaviour
 {
@@ -10,10 +12,13 @@ public class UpgradeBar : MonoBehaviour
     public Button upgradeButton; // Assign in the inspector
     public int maxLevel;
     public int currentLevel;
+    public int associatedStat;
     private GameObject[] segments;
+    public event Action OnMaxLevelReached;
 
     private void Awake()
     {
+        maxLevel = 3;
         segments = new GameObject[maxLevel];
         InitializeSegments();
         upgradeButton.onClick.AddListener(UpgradeStat);
@@ -84,6 +89,8 @@ public class UpgradeBar : MonoBehaviour
             
         }
         currentLevel = 0;
+        // Trigger the event to notify subscribers that the max level was reached
+        OnMaxLevelReached?.Invoke();
     }
 
 }
