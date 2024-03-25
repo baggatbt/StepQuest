@@ -83,25 +83,31 @@ public class MainMenuUIManager : MonoBehaviour
     public GameObject vitUpgradeBar;
     public GameObject spdUpgradeBar;
 
-    void OnCompanionSelected(Companion companion)
-    {
-        GameManager.Instance.currentCompanion = companion;   
-        Debug.Log("Possible memory leak here due to not unsubscribing from the events. Need to check if unity handles that");
-        atkUpgradeBar.GetComponent<UpgradeBar>().OnMaxLevelReached += () => IncreaseCompanionStat(companion, "atk");
-        vitUpgradeBar.GetComponent<UpgradeBar>().OnMaxLevelReached += () => IncreaseCompanionStat(companion, "vit");
-        spdUpgradeBar.GetComponent<UpgradeBar>().OnMaxLevelReached += () => IncreaseCompanionStat(companion, "spd");
+   public void OnCompanionSelected(Companion companion)
+{
+    GameManager.Instance.currentCompanion = companion;
 
-        
-        levelText.text = "Lv: " + companion.heroLevel.ToString();
-        atkText.text = "ATK: " + companion.attackPower.ToString();
-        hpText.text = "HP: " + companion.health.ToString();
-        defText.text = "VIT: " + companion.defensePower.ToString();
-        expText.text = "EXP: " + companion.heroExp.ToString() + " / " + companion.ExpToNextLevel(companion.heroLevel);
-        spdText.text = "SPD: " + companion.speed.ToString();
-        
-        // Make sure the stats panel is visible
-        companionStatsPanel.SetActive(true);
-    }
+    // Update upgrade bars based on the selected companion's stat progress
+    atkUpgradeBar.GetComponent<UpgradeBar>().SetInitialProgress(companion.statUpgradeProgress["atk"]);
+    vitUpgradeBar.GetComponent<UpgradeBar>().SetInitialProgress(companion.statUpgradeProgress["vit"]);
+    spdUpgradeBar.GetComponent<UpgradeBar>().SetInitialProgress(companion.statUpgradeProgress["spd"]);
+
+    // Update companion's stats display
+    UpdateCompanionStatsDisplay(companion);
+
+    // Make sure the companion stats panel is visible
+    companionStatsPanel.SetActive(true);
+}
+
+private void UpdateCompanionStatsDisplay(Companion companion)
+{
+    levelText.text = "Lv: " + companion.heroLevel.ToString();
+    atkText.text = "ATK: " + companion.attackPower.ToString();
+    hpText.text = "HP: " + companion.health.ToString();
+    defText.text = "VIT: " + companion.defensePower.ToString();
+    expText.text = "EXP: " + companion.heroExp.ToString() + " / " + companion.ExpToNextLevel(companion.heroLevel);
+    spdText.text = "SPD: " + companion.speed.ToString();
+}
 
     public void IncreaseCompanionStat(Companion companion, string statType)
 {

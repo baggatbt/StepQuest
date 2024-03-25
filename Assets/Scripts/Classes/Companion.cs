@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Linq;
 
 public abstract class Companion : Character
 {
@@ -16,6 +17,15 @@ public abstract class Companion : Character
     public int stamina;
     public int maxStamina;
     public bool isUnlocked;
+    public Dictionary<string, int> statUpgradeProgress = new Dictionary<string, int>
+    {
+        {"atk", 0},
+        {"vit", 0},
+        {"spd", 0}
+    };
+
+
+
     
     //public Sprite companionIcon; // Icon associated with the companion
 

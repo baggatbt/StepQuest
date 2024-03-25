@@ -4,97 +4,90 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 
-
 public class UpgradeBar : MonoBehaviour
 {
-    public GameObject emptySegmentPrefab; // Assign the EmptyUpgradeSegment prefab in the inspector
-    public GameObject filledSegmentPrefab; // Assign the FilledUpgradeSegment prefab in the inspector
-    public Button upgradeButton; // Assign in the inspector
-    public int maxLevel;
-    public int currentLevel;
-    public int associatedStat;
-    private GameObject[] segments;
+    public GameObject emptySegmentPrefab; // Assign in the Inspector
+    public GameObject filledSegmentPrefab; // Assign in the Inspector
+    public Button upgradeButton; // Assign in the Inspector
+    public int maxLevel = 5; // Always set to 5 as per requirements
+    private int currentLevel; // Tracks the current progress
+
+    private GameObject[] segments; // Holds the segments (empty or filled)
+
     public event Action OnMaxLevelReached;
 
     private void Awake()
     {
-        maxLevel = 3;
-        segments = new GameObject[maxLevel];
+        segments = new GameObject[maxLevel]; // Initialize based on maxLevel
         InitializeSegments();
+    }
+
+    private void Start()
+    {
         upgradeButton.onClick.AddListener(UpgradeStat);
     }
 
     private void InitializeSegments()
     {
-        // Instantiate the empty segment prefabs
         for (int i = 0; i < maxLevel; i++)
         {
             segments[i] = Instantiate(emptySegmentPrefab, transform);
         }
     }
 
-    public void UpgradeStat()
+    public void SetInitialProgress(int progress)
     {
-        if (GameManager.Instance.currentCompanion.heroStatPoints > 0)
+        // Resetting currentLevel to 0 to safely re-assign it based on progress
+        currentLevel = 0; 
+        // Ensure progress doesn't exceed maxLevel
+        progress = Mathf.Min(progress, maxLevel);
+        for (int i = 0; i < progress; i++)
         {
-        if (currentLevel < maxLevel)
-        {
-            // Get the position, rotation, and parent from the current segment to be upgraded
-            Vector3 position = segments[currentLevel].transform.localPosition; // Use localPosition for UI elements
-            Quaternion rotation = segments[currentLevel].transform.localRotation;
-            Transform parent = segments[currentLevel].transform.parent;
-
-            // Destroy the current empty segment
-            Destroy(segments[currentLevel]);
-
-            // Instantiate a new filled segment at the correct position
-            segments[currentLevel] = Instantiate(filledSegmentPrefab, parent);
-            segments[currentLevel].transform.localPosition = position;
-            segments[currentLevel].transform.localRotation = rotation;
-            
-            // Ensure the new segment has the same sibling index so it appears in the correct order in the UI hierarchy
-            segments[currentLevel].transform.SetSiblingIndex(currentLevel);
-
-            // Increment the current level
-            currentLevel++;
-            GameManager.Instance.currentCompanion.heroStatPoints--;
-            Debug.Log("Upgraded");
-
-            // Reset the button if max level is reached
-            if (currentLevel == maxLevel)
-            {
-                ResetSegments();
-            }
+            UpgradeSegment(i, true);
         }
+        currentLevel = progress; // Update currentLevel after setting progress
+    }
+
+    private void UpgradeSegment(int index, bool immediate = false)
+    {
+        if (index < maxLevel)
+        {
+            if (!immediate)
+            {
+                Destroy(segments[index]);
+            }
+            segments[index] = Instantiate(filledSegmentPrefab, transform);
+            segments[index].transform.SetSiblingIndex(index);
         }
     }
-    private void ResetSegments()
+
+    public void UpgradeStat()
+    {
+        // Check if currentLevel is about to exceed maxLevel
+        if (GameManager.Instance.currentCompanion.heroStatPoints > 0 && currentLevel < maxLevel)
+        {
+            UpgradeSegment(currentLevel);
+            currentLevel++; // Safely increment currentLevel
+            GameManager.Instance.currentCompanion.heroStatPoints--; // Deduct a stat point
+
+            if (currentLevel == maxLevel)
+            {
+                OnMaxLevelReached?.Invoke();
+            }
+        }
+        else
+        {
+            Debug.Log("No stat points available or max level reached.");
+        }
+    }
+
+    public void ResetSegments()
     {
         foreach (var segment in segments)
         {
-            currentLevel -= 1;
-            // Get the position, rotation, and parent from the current segment to be upgraded
-            Vector3 position = segments[currentLevel].transform.localPosition; // Use localPosition for UI elements
-            Quaternion rotation = segments[currentLevel].transform.localRotation;
-            Transform parent = segments[currentLevel].transform.parent;
-
-            // Destroy the current segment
-            Destroy(segments[currentLevel]);
-
-            // Instantiate a new empty segment at the correct position
-            segments[currentLevel] = Instantiate(emptySegmentPrefab, parent);
-            segments[currentLevel].transform.localPosition = position;
-            segments[currentLevel].transform.localRotation = rotation;
-            
-            // Ensure the new segment has the same sibling index so it appears in the correct order in the UI hierarchy
-            segments[currentLevel].transform.SetSiblingIndex(currentLevel);
-
-
-            
+            Destroy(segment);
         }
         currentLevel = 0;
-        // Trigger the event to notify subscribers that the max level was reached
-        OnMaxLevelReached?.Invoke();
+        InitializeSegments(); // Reinitialize the segments as empty
     }
-
 }
