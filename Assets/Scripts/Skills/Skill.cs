@@ -28,6 +28,7 @@ public enum SkillType
         ShootArrow,
         ArrowRain,
         MeleeCombo,
+        ReflectDamagePassive,
     }
 
 
@@ -43,6 +44,7 @@ public abstract class Skill
     public int energyGain;
     public int skillLevel;
     public bool noZoom; //Allows zoom to be disabled
+     public bool isActiveSkill = true; //Determines whether the skill as active or passive
     public int requiredLevel;  // New field\
     public Sprite iconImage; // Field to store the icon image associated with the skill
     public float skillDamageModifier;
@@ -102,11 +104,12 @@ public abstract class Skill
         double rawDamage = baseDamage * damageMultiplier;
         int finalDamage = (int)Math.Ceiling(rawDamage);
 
+
         // Ensure at least 1 damage is dealt
         finalDamage = Math.Max(finalDamage, 1);
 
         target.TakeDamage(finalDamage, user);
-        
+
         // Gain energy and set animations based on the result
         user.GainEnergy(1);
         
@@ -115,6 +118,11 @@ public abstract class Skill
             target.didBlock = true;
             target.animator.SetTrigger("BlockTrigger");
             AudioManager.instance.PlayBlockSound();
+
+                //Calculate any reflection if necessary
+            int finalReflectedDamage = CalculateReflectDamage(target, finalDamage);
+            user.TakeDamage(finalReflectedDamage, target);
+            
         }
         else 
         {
@@ -123,6 +131,15 @@ public abstract class Skill
            // AudioManager.instance.PlayBlockSound();
         }
     }
+
+    private int CalculateReflectDamage(Character user, int damage)
+{
+    double reflectedDamage = user.damageReflectionPercentage * damage;
+    int finalReflectedDamage = Convert.ToInt32(Math.Round(reflectedDamage));
+    return finalReflectedDamage; // Return the calculated damage to reflect
+}
+
+
 
     
 

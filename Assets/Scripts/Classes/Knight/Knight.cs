@@ -65,6 +65,7 @@ public class Knight : Companion
         SkillType.Slash,
         SkillType.TripleHit,
         SkillType.Taunt,
+        SkillType.ReflectDamagePassive,
         
         
        

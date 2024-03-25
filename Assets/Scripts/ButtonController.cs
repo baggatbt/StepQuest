@@ -109,47 +109,41 @@ public void PopulateSkillPanelWithCompanionSkills()
     }
     skillButtons.Clear();
 
-    // Calculate angle step based on the number of skills
-    float angleStep = 360f / availableSkills.Count;
-    int skillIndex = 0;
-
     foreach (SkillType skillType in availableSkills)
     {
-        GameObject newButtonObj = Instantiate(skillButtonPrefab, companionSkillSelectionPanel.transform);
-        // Position each button radially
-        Vector3 radialPosition = PositionButtonRadially(skillIndex++, availableSkills.Count, radius);
-        newButtonObj.GetComponent<RectTransform>().anchoredPosition = radialPosition;
-
-        Button buttonComponent = newButtonObj.GetComponent<Button>();
-        if (buttonComponent != null)
+        Skill currentSkill = activeCompanion.GetSkillInstance(skillType);
+        
+        // Only create buttons for active skills
+        if (currentSkill.isActiveSkill)
         {
-            skillButtons.Add(buttonComponent);
+            GameObject newButtonObj = Instantiate(skillButtonPrefab, companionSkillSelectionPanel.transform);
+            // Positioning, button text, and other setup...
 
-            Skill currentSkill = activeCompanion.GetSkillInstance(skillType);
-            TextMeshProUGUI buttonText = newButtonObj.GetComponentInChildren<TextMeshProUGUI>();
-            if (buttonText != null)
+            Button buttonComponent = newButtonObj.GetComponent<Button>();
+            if (buttonComponent != null)
             {
-               // buttonText.text = currentSkill.skillName;
-            }
+                skillButtons.Add(buttonComponent);
 
-            // Setup button actions
-            buttonComponent.onClick.AddListener(() => { SelectAndUseSkill(currentSkill); });
-             // Check if the skill has an icon, and if so, set the button's image to it
-            if (currentSkill.iconImage != null)
-            {
-                Image buttonImage = newButtonObj.GetComponent<Image>(); // Get the Image component of the button
-                if (buttonImage != null)
+                // Setup button text, actions, icons, etc., as before
+                // Setup button actions
+                buttonComponent.onClick.AddListener(() => { SelectAndUseSkill(currentSkill); });
+
+                if (currentSkill.iconImage != null)
                 {
-                    buttonImage.sprite = currentSkill.iconImage; // Set the button's sprite to the skill's icon image
+                    Image buttonImage = newButtonObj.GetComponent<Image>();
+                    if (buttonImage != null)
+                    {
+                        buttonImage.sprite = currentSkill.iconImage;
+                    }
                 }
+
+                // Setup tooltip behavior
+                SetupButtonEvents(newButtonObj, currentSkill);
             }
-
-
-            // Add event listeners for tooltip behavior (existing code)
-            SetupButtonEvents(newButtonObj, currentSkill);
         }
     }
 }
+
 
 private Vector3 PositionButtonRadially(int skillIndex, int totalSkills, float radius)
 {

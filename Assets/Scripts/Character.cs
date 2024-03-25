@@ -49,6 +49,9 @@ public class Character : MonoBehaviour
     
     public GameObject enemyHealthUI;
 
+    //Testing various statuses
+    public float damageReflectionPercentage; // Percentage of damage to reflect
+
     
    
     private bool checkCollisionsDuringMovement = true;
