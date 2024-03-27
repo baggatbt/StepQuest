@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 public class MainMenuUIManager : MonoBehaviour
 {
     public GameObject knightSkillPanel;
@@ -77,6 +78,21 @@ public class MainMenuUIManager : MonoBehaviour
         }
     }
 }
+
+     public void GoToNextStage()
+    {
+        
+        if (GameManager.Instance.currentStageIndex >= GameManager.Instance.allStages.Count)
+        {
+            Debug.Log("The game is over, you win");
+        }
+        
+        // Set the current battle configuration to the next stage
+        GameManager.Instance.CurrentBattleConfig = GameManager.Instance.allStages[GameManager.Instance.currentStageIndex];
+
+        // Load the battle scene with the new configuration
+        SceneManager.LoadScene("TestPortraitBattle");
+    }
 
     
     public GameObject atkUpgradeBar;

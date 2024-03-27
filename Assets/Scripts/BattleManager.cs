@@ -1050,12 +1050,12 @@ private void ProcessVictory()
     EndOfBattleRewards(enemies);
     Debug.Log("Battle won");
 
-    Stage completedStage = GameManager.Instance.CurrentBattleConfig.stage;
+   // Stage completedStage = GameManager.Instance.CurrentBattleConfig.stage;
    // GameManager.Instance.UnlockConnectedStages(completedStage);
-    if (completedStage.isFirstCompletion)
+   // if (completedStage.isFirstCompletion)
     {
-        PlayerData.Instance.currentStageIndex++;
-        completedStage.isFirstCompletion = false;
+    //    PlayerData.Instance.currentStageIndex++;
+    //    completedStage.isFirstCompletion = false;
     }
     
     endOfBattlePanel.SetActive(true);

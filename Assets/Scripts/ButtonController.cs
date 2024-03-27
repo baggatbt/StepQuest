@@ -181,7 +181,7 @@ public void SelectAndUseSkill(Skill selectedSkill)
         // The same skill was selected again, so launch the attack
         skillDescriptionPanel.SetActive(false);
         Debug.Log("Same skill selected, launching attack with skill: " + skill.skillName);
-        battleManager.ExecuteQueuedSkills();
+       // battleManager.ExecuteQueuedSkills();
         
     }
     else

@@ -12,7 +12,7 @@ public class BattleConfig //Responsible for passing information to the battle sc
     {
         poolName = "Forest",
         maxEnemiesToSpawn = 0,
-        levelOfEnemies = 30
+        levelOfEnemies = 1
     };
 
     public static BattleConfig ForestEliteConfig = new BattleConfig

@@ -191,7 +191,7 @@ public class Character : MonoBehaviour
         }
         
     // Calculate effective defense after penetration
-    int effectiveDefense = Math.Max(0, defensePower - attacker.defensePenetration);
+   // int effectiveDefense = Math.Max(0, defensePower - attacker.defensePenetration);
    // Debug.Log("The target has " + effectiveDefense + " defense left after penetration.");
 
     // Calculate total damage using the new formula
@@ -217,6 +217,7 @@ public class Character : MonoBehaviour
     // Check if damage was dealt for additional effects
     if (damageDealt >= 1)
     { 
+        Debug.Log("did block from character" + this.didBlock);
         if (!this.didBlock){
         this.animator.SetTrigger("IsHurtTrigger");
         }

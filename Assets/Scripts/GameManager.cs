@@ -138,20 +138,7 @@ public class GameManager : MonoBehaviour
 }
 
 
-    public void GoToNextStage()
-    {
-        
-        if (currentStageIndex >= allStages.Count)
-        {
-            Debug.Log("The game is over, you win");
-        }
-        
-        // Set the current battle configuration to the next stage
-        CurrentBattleConfig = allStages[currentStageIndex];
-
-        // Load the battle scene with the new configuration
-        SceneManager.LoadScene("TestPortraitBattle");
-    }
+   
 
     
     //Testing method for deleting all saved data

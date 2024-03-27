@@ -94,38 +94,41 @@ public abstract class Skill
 
      public void HandleTimingResultForEnemyAttack(Character user, Character target, TimingEventResult timingResult, int baseDamage)
     {
-        float damageMultiplier = 1.0f;
+        float damageTimingMultiplier = 1.0f;
+        int skillBaseDamage = baseDamage;
+        int finalDamage;
         
         result = timingResult;
         
-        
-        
-        // Calculate damage with multiplier and round up
-        double rawDamage = baseDamage * damageMultiplier;
-        int finalDamage = (int)Math.Ceiling(rawDamage);
-
-
-        // Ensure at least 1 damage is dealt
-        finalDamage = Math.Max(finalDamage, 1);
-
-        target.TakeDamage(finalDamage, user);
-
+        //finalDamage = Math.Max(finalDamage, 1);
         // Gain energy and set animations based on the result
         user.GainEnergy(1);
         
         if (result == TimingEventResult.Good)
         {
             target.didBlock = true;
+            damageTimingMultiplier = 0.75f;
+            finalDamage = (int)(skillBaseDamage * damageTimingMultiplier);
+            target.TakeDamage(finalDamage,user);
+             
             target.animator.SetTrigger("BlockTrigger");
             AudioManager.instance.PlayBlockSound();
 
-                //Calculate any reflection if necessary
+            //Calculate any reflection if necessary
             int finalReflectedDamage = CalculateReflectDamage(target, finalDamage);
+            Debug.Log(finalReflectedDamage);
+            if (finalReflectedDamage > 0)
+            {
             user.TakeDamage(finalReflectedDamage, target);
+            }
             
         }
         else 
         {
+            damageTimingMultiplier = 1.0f;
+            finalDamage = skillBaseDamage;
+            Debug.Log("Enemy finalDamage from inside else block = " + finalDamage);
+            target.TakeDamage((int)skillBaseDamage,user); 
             user.PlayHitSound();
             
            // AudioManager.instance.PlayBlockSound();
