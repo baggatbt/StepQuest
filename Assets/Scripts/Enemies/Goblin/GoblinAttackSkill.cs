@@ -31,7 +31,7 @@ public class GoblinAttackSkill : Skill
         for (int i = 0; i < numberOfAttacksPossible; i++)
         {
             
-            yield return TimingWindow(user, target, battleManager, 0.0f, 0.8f);
+            yield return TimingWindow(user, target, battleManager, 0.0f, 0.4f);
 
             HandleTimingResultForEnemyAttack(user, target, result, baseDamage);
             Debug.Log("Timing for player attack has been handled waiting for animations");
