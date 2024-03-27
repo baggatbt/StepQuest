@@ -127,7 +127,7 @@ public abstract class Skill
         {
             damageTimingMultiplier = 1.0f;
             finalDamage = skillBaseDamage;
-            Debug.Log("Enemy finalDamage from inside else block = " + finalDamage);
+            
             target.TakeDamage((int)skillBaseDamage,user); 
             user.PlayHitSound();
             
@@ -148,31 +148,26 @@ public abstract class Skill
 
     public void HandleTimingResultForPlayerAttack(Character user, Character target, TimingEventResult timingResult, int baseDamage)
 {
-    float damageMultiplier = 1.0f;
-    
-    result = timingResult;
-    int skillBaseDamage = baseDamage;
-    
-    // Calculate damage with multiplier and round up
-    double rawDamage = baseDamage * damageMultiplier;
-    int finalDamage = (int)Math.Ceiling(rawDamage);
-
-    // Ensure at least 1 damage is dealt
-    finalDamage = Math.Max(finalDamage, 1);
-
-    target.TakeDamage(finalDamage, user);
-   // target.animator.SetTrigger("IsHurtTrigger");
-
+    float damageTimingMultiplier = 1.0f;
+        int skillBaseDamage = baseDamage;
+        int finalDamage;
+        
+        result = timingResult;
+        
     if (result == TimingEventResult.Good)
     {
         Debug.Log("Good Hit!");
-        damageMultiplier = 1.25f;  // Boost damage by 25% later replace with TEK stat
+        damageTimingMultiplier = 1.25f;  // Boost damage by 25% later replace with 
+        finalDamage = (int)(skillBaseDamage * damageTimingMultiplier);
+        target.TakeDamage(finalDamage,user);
         user.PlayCriticalHitSound(); // Play critical hit sound
         
     }
     else
     {
-        damageMultiplier = 1.0f;  // Base damage
+        damageTimingMultiplier = 1.0f;  // Base damage
+        finalDamage = (skillBaseDamage);
+        target.TakeDamage(finalDamage,user);
         user.PlayHitSound(); // Play hit sound
     }
 }

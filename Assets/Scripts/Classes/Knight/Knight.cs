@@ -15,10 +15,10 @@ public class Knight : Companion
         if (this.heroLevel == 0)
         {
            // this.level = 1;
-            this.attackPower = 3;
-            this.maxHealth = 10;
+            this.attackPower = 10;
+            this.maxHealth = 30;
             this.health = this.maxHealth;
-            this.defensePower = 5;
+            this.defensePower = 0;
             this.speed = 4;
             this.maxEnergy = 5;
             this.energy = 3;
