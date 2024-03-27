@@ -20,9 +20,9 @@ public class GameManager : MonoBehaviour
     public Character companion3;
     public Companion currentCompanion; //Used to expose the selected companion 
 
-    private int currentStageIndex;
+    public int currentStageIndex;
     private bool isUnlocked;
-  //  public List<BattleConfig> allStages; // list is populated with all stages in order
+     public List<BattleConfig> allStages; // list is populated with all stages in order
 
     public List<Companion> companions = new List<Companion>();
 
@@ -137,12 +137,9 @@ public class GameManager : MonoBehaviour
     }
 }
 
-/*
+
     public void GoToNextStage()
     {
-        // Increment the stage index
-        currentStageIndex++;
-        
         
         if (currentStageIndex >= allStages.Count)
         {
@@ -155,7 +152,7 @@ public class GameManager : MonoBehaviour
         // Load the battle scene with the new configuration
         SceneManager.LoadScene("TestPortraitBattle");
     }
-*/
+
     
     //Testing method for deleting all saved data
     public void DeleteEverything()

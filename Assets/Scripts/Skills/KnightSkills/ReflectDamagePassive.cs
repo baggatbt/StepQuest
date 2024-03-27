@@ -13,6 +13,10 @@ public class ReflectDamagePassive : Skill
     
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
+        user.animationDamageTime = false;
+        user.isAnimationDone = false;
+        user.isAttacking = false;
         yield break; // No operation for passive skills
     }
+        
 }

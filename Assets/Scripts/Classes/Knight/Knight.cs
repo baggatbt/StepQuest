@@ -91,6 +91,9 @@ public class Knight : Companion
             
             case SkillType.Taunt:
                 return new Taunt();
+            
+            case SkillType.ReflectDamagePassive:
+                return new ReflectDamagePassive();
 
           
             default:

@@ -1025,6 +1025,7 @@ public void CheckBattleEnd()
         if (allEnemiesDefeated)
         {
             ProcessVictory();
+            GameManager.Instance.currentStageIndex++;
         }
         else if (allAlliesDefeated)
         {
@@ -1050,7 +1051,7 @@ private void ProcessVictory()
     Debug.Log("Battle won");
 
     Stage completedStage = GameManager.Instance.CurrentBattleConfig.stage;
-    GameManager.Instance.UnlockConnectedStages(completedStage);
+   // GameManager.Instance.UnlockConnectedStages(completedStage);
     if (completedStage.isFirstCompletion)
     {
         PlayerData.Instance.currentStageIndex++;
