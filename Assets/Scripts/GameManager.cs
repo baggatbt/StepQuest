@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
     public Character companion2; 
     public Character companion3;
     public Companion currentCompanion; //Used to expose the selected companion 
+    
 
     public int currentStageIndex;
     private bool isUnlocked;

@@ -22,6 +22,7 @@ public class MainMenuUIManager : MonoBehaviour
     public GameObject companionButtonPrefab;
     public GameObject companionListPanel;
     public GameObject companionStatsPanel;
+    public CircleShrinkAndCheck circleShrinkAndCheck;
     
     // References to stat UI Text elements
     public TextMeshProUGUI levelText,atkText, hpText, defText, expText, spdText; 
@@ -78,6 +79,19 @@ public class MainMenuUIManager : MonoBehaviour
         }
     }
 }
+    public void StartCircleShrink()
+    {
+        if (circleShrinkAndCheck != null)
+        {
+            // This would be your trigger to start the shrinking, replacing the spacebar press in the CircleShrinkAndCheck script
+            circleShrinkAndCheck.isShrinking = true;
+        }
+        else
+        {
+            Debug.LogError("CircleShrinkAndCheck script not assigned in GameManager.");
+        }
+    }
+
 
      public void GoToNextStage()
     {
