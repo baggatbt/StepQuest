@@ -4032,7 +4032,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -2, y: 448.28003}
+  m_AnchoredPosition: {x: -2, y: 448.28}
   m_SizeDelta: {x: -40.55, y: -792}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &567007040
@@ -6640,14 +6640,14 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 869060694}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1938450773}
-  m_Father: {fileID: 1503855870}
-  m_RootOrder: 12
+  m_Father: {fileID: 875912470}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -6701,6 +6701,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1765064292}
+  - {fileID: 869060695}
   m_Father: {fileID: 1503855870}
   m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -6717,9 +6718,9 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 875912469}
   m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
+  m_Alpha: 0
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
 --- !u!1 &878390646
 GameObject:
@@ -7323,7 +7324,7 @@ MonoBehaviour:
   attackPower: 0
   defensePower: 0
   inGameSteps: 152
-  stepsSinceStart: 0
+  stepsSinceStart: 100
   maxHealth: 0
   health: 0
   maxEnergy: 0
@@ -7333,6 +7334,7 @@ MonoBehaviour:
   speed: 0
   currentStageIndex: 0
   activeMissions: []
+  stepTokens: 0
   firstTimeLogin: 0
 --- !u!4 &937494370
 Transform:
@@ -11797,7 +11799,6 @@ RectTransform:
   - {fileID: 188042402}
   - {fileID: 453939295}
   - {fileID: 875912470}
-  - {fileID: 869060695}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

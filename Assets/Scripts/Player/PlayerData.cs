@@ -97,11 +97,14 @@ public class PlayerData : MonoBehaviour
             previousSteps = currentSteps;
         }
 
-        
-     //   Debug.Log("Steps in Update: " + inGameSteps);
+        ConvertStepsToTokens();
+     
     }
-
-   
+    public int stepTokens;
+    public void ConvertStepsToTokens()
+    {
+        stepTokens = (inGameSteps / 1000);
+    }
 
     
     public bool firstTimeLogin = true;

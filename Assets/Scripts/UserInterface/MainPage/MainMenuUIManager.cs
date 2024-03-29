@@ -46,7 +46,7 @@ public class MainMenuUIManager : MonoBehaviour
     }
     private void Update()
     {
-         if (stepsText != null) stepsText.text =  PlayerData.Instance.inGameSteps.ToString();  
+         if (stepsText != null) stepsText.text =  PlayerData.Instance.stepTokens.ToString();  
          if (goldText != null) goldText.text =  PlayerData.Instance.gold.ToString();  
          UpdateTimerDisplay();
          UpdateKnightRecoveryTimerDisplay();
