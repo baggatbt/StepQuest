@@ -214,7 +214,7 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
     heroSelectionPanel.SetActive(false);
     companionSkillsPanel.SetActive(true);
    
-    RestoreHealthAndEnergy();
+   // RestoreHealthAndEnergy();
     InitializeTurnOrder();
     }
 }
@@ -912,8 +912,14 @@ private float CalculateSliderValue(int currentExp, int expToNextLevel)
     PlayerData.Instance.gold += totalGold;
     PlayerData.Instance.SavePlayerData();
 
-    // Save all companion data after updating EXP
-    GameManager.Instance.SaveAllCompanionData();
+     foreach (Character character in playerParty)
+    {
+        if (character is Companion companion)
+        {
+            Debug.Log("saving in BM " + character);
+            companion.SaveCharacterData();
+        }
+    }
 
     TextMeshProUGUI expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
     expGainedTextComponent.text = totalExp.ToString();
@@ -1021,6 +1027,7 @@ public void CheckBattleEnd()
     {
         // Deduct stamina from participating companions only once after battle ends
         DeductStaminaFromParticipants();
+
 
         if (allEnemiesDefeated)
         {
