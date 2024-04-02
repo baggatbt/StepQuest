@@ -903,6 +903,7 @@ private float CalculateSliderValue(int currentExp, int expToNextLevel)
     {
         if (character is Companion companion)
         {
+            RestoreHealthAndEnergy();
             // Directly update companion EXP using GameManager
             GameManager.Instance.UpdateCompanionExp(companion.heroID, totalExp);
         }

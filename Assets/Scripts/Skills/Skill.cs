@@ -121,10 +121,12 @@ public abstract class Skill
             {
             user.TakeDamage(finalReflectedDamage, target);
             }
+            target.didBlock = false;
             
         }
         else 
         {
+            target.didBlock = false;
             damageTimingMultiplier = 1.0f;
             finalDamage = skillBaseDamage;
             
