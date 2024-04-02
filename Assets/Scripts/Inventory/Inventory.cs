@@ -11,6 +11,7 @@ public class Inventory : MonoBehaviour
     public Item testItem;
 
     private List<Item> items = new List<Item>();
+    private Dictionary<int, int> materialCounts = new Dictionary<int, int>(); // Track material quantities
     private List<GameObject> itemSlots = new List<GameObject>();
 
     private void Start()
@@ -33,6 +34,18 @@ public class Inventory : MonoBehaviour
         }
 
         items.Add(item);
+        // If the item is a material, update the material count
+        if (item is MaterialItem materialItem)
+        {
+            if (materialCounts.ContainsKey(item.itemID))
+            {
+                materialCounts[item.itemID] += 1; // Assuming each material item represents a single unit
+            }
+            else
+            {
+                materialCounts[item.itemID] = 1;
+            }
+        }
         UpdateInventoryUI();
         return true;
     }
@@ -41,6 +54,15 @@ public class Inventory : MonoBehaviour
     {
         if (items.Remove(item))
         {
+            // If removed item is a material, decrease its count
+            if (item is MaterialItem && materialCounts.ContainsKey(item.itemID))
+            {
+                materialCounts[item.itemID] -= 1;
+                if (materialCounts[item.itemID] <= 0)
+                {
+                    materialCounts.Remove(item.itemID);
+                }
+            }
             UpdateInventoryUI();
         }
     }
@@ -57,6 +79,31 @@ public class Inventory : MonoBehaviour
             if (itemImage != null)
                 itemImage.sprite = items[i].itemIcon;
         }
+    }
+
+    public bool TryCraftItem(CraftableItem itemToCraft)
+    {
+        // Check if the player has all necessary materials in sufficient quantities.
+        foreach (var requirement in itemToCraft.materialRequirements)
+        {
+            if (!materialCounts.ContainsKey(requirement.material.itemID) || materialCounts[requirement.material.itemID] < requirement.quantity)
+            {
+                Debug.Log("Not enough materials to craft " + itemToCraft.itemName);
+                return false;
+            }
+        }
+
+        // Consume the materials.
+        foreach (var requirement in itemToCraft.materialRequirements)
+        {
+            materialCounts[requirement.material.itemID] -= requirement.quantity;
+            // Consider removing the material from items list if its count goes to zero
+        }
+
+        // Optionally, add the crafted item to the player's inventory.
+        Debug.Log("Crafted " + itemToCraft.itemName);
+        AddItem(itemToCraft); // This line adds the crafted item to the inventory
+        return true;
     }
 
     public void AddTestItem()

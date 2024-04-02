@@ -10,6 +10,8 @@ public class Enemy : Character
     public int attackGrowth;
     public int defenseGrowth;
     public int healthGrowth;
+    public MaterialItem[] possibleDrops; // Assign this in the Inspector with your material items.
+    public int dropChancePercentage = 50; // Example drop chance.
 
     // Additional enemy-specific properties and behavior
 
@@ -43,5 +45,20 @@ public class Enemy : Character
     {
         // Example gold reward calculation. 
         return 3 + (level * 2);
+    }
+
+    // Call this method when the enemy is defeated.
+    protected void DropMaterial()
+    {
+        if (Random.Range(0, 100) < dropChancePercentage)
+        {
+            // Select a random material to drop.
+            int dropIndex = Random.Range(0, possibleDrops.Length);
+            MaterialItem droppedMaterial = possibleDrops[dropIndex];
+
+            Debug.Log("Dropped material: " + droppedMaterial.itemName);
+            // Here, you'd add the dropped material to the player's inventory.
+            // InventoryManager.AddToInventory(droppedMaterial);
+        }
     }
 }
