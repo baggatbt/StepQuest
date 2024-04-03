@@ -80,6 +80,7 @@ public class GameManager : MonoBehaviour
       {
         
             itemList.Add(item);
+            inventory.SaveInventory();
     }
         // Optionally, trigger any necessary updates or notifications
     

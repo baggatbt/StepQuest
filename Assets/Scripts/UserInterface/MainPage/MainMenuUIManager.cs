@@ -103,51 +103,34 @@ public void PopulateInventoryList() {
     }
     Debug.Log("[MainMenuUIManager] Cleared existing inventory items.");
 
-    int itemIndex = 0;
     // Loop through the max number of inventory slots
     for (int i = 0; i < GameManager.Instance.maxInventorySlots; i++) {
-        GameObject itemObject = Instantiate(inventoryItemPrefab, inventoryItemContainer.transform); // Use the container as parent
+        GameObject itemSlotObject = Instantiate(inventoryItemPrefab, inventoryItemContainer.transform); // Use the container as parent
+
+        // Assuming the prefab has an Image component for the item icon at a child named 'ItemIcon'
+        Image itemIconImage = itemSlotObject.transform.Find("ItemContainer").GetComponent<Image>(); // Replace 'ItemIcon' with the actual name in your prefab
 
         // Check if there's an item for this slot
         if (i < GameManager.Instance.itemList.Count) {
             Item item = GameManager.Instance.itemList[i];
             Debug.Log($"[MainMenuUIManager] Setting up UI for item: {item.itemName}");
 
-            TextMeshProUGUI itemText = itemObject.GetComponentInChildren<TextMeshProUGUI>();
-            if (itemText != null) {
-                itemText.text = item.itemName;
-                Debug.Log("[MainMenuUIManager] Set item name text.");
-            } else {
-                Debug.LogError("[MainMenuUIManager] TextMeshProUGUI component not found on item prefab.");
-            }
-
-            Image itemIcon = itemObject.GetComponentInChildren<Image>();
-            if (itemIcon != null && item.itemIcon != null) {
-                itemIcon.sprite = item.itemIcon;
+            if (itemIconImage != null && item.itemIcon != null) {
+                itemIconImage.sprite = item.itemIcon;
+                itemIconImage.enabled = true; // Ensure the icon is visible
                 Debug.Log("[MainMenuUIManager] Set item icon.");
             } else {
-                itemIcon.enabled = false; // Disable the icon if there's no item
                 Debug.LogWarning("[MainMenuUIManager] No item icon set or Image component not found.");
+                itemIconImage.enabled = false; // No icon for this item, so disable the image
             }
         } else {
-            // For slots without an item, you might want to clear or disable elements
-            TextMeshProUGUI itemText = itemObject.GetComponentInChildren<TextMeshProUGUI>();
-            if (itemText != null) {
-                itemText.text = ""; // Clear the text
-            }
-            Image itemIcon = itemObject.GetComponentInChildren<Image>();
-            if (itemIcon != null) {
-                itemIcon.enabled = false; // Optionally hide the icon for empty slots
+            // No item for this slot, so we make sure the icon is disabled
+            if (itemIconImage != null) {
+                itemIconImage.enabled = false; // Optionally hide the icon for empty slots
             }
         }
     }
     Debug.Log("[MainMenuUIManager] Finished populating inventory list.");
-}
-
-// Placeholder for OnItemSelected - make sure to implement this according to your game's logic
-void OnItemSelected(Item item) {
-    Debug.Log($"[MainMenuUIManager] Selected item: {item.itemName}");
-    // Implement what should happen when an item is selected
 }
 
 

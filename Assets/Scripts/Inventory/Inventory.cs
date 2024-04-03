@@ -17,7 +17,7 @@ public class Inventory : MonoBehaviour
     private List<GameObject> itemSlots = new List<GameObject>();
 
     private void Awake() {
-        maxInventorySlots = GameManager.Instance.maxInventorySlots;
+   
     }
 
     public void SaveInventory() {
@@ -47,6 +47,7 @@ public class Inventory : MonoBehaviour
             slot.SetActive(true);
             itemSlots.Add(slot);
         }
+         LoadInventory();
     }
 
     // This method needs to be adjusted to interact with GameManager's itemList
@@ -68,7 +69,8 @@ public class Inventory : MonoBehaviour
     }
 
     // Updates the inventory UI to reflect the current items
-    private void UpdateInventoryUI() {
+   // Updates the inventory UI to reflect the current items
+private void UpdateInventoryUI() {
     Debug.Log($"Updating UI with {GameManager.Instance.itemList.Count} items.");
 
     foreach (Transform child in inventoryUI.transform) {
@@ -79,14 +81,17 @@ public class Inventory : MonoBehaviour
         Debug.Log($"Adding item to UI: {item.itemName}");
         GameObject slot = Instantiate(slotPrefab, inventoryUI.transform);
         slot.SetActive(true);
-        Image itemImage = slot.transform.Find("ItemContainer").GetComponentInChildren<Image>();
+        Image itemImage = slot.transform.Find("ItemContainer")?.GetComponent<Image>();  // Use GetComponent<Image>() directly if "ItemContainer" is the direct parent of the Image component
         if (itemImage != null && item.itemIcon != null) {
             itemImage.sprite = item.itemIcon;
+            Debug.Log("Set item icon in ItemContainer.");
         } else {
-            Debug.LogWarning("Missing item icon or incorrect path in prefab.");
+            Debug.LogWarning("Missing item icon or incorrect path in prefab for ItemContainer.");
         }
     }
 }
+
+
 
 
     
