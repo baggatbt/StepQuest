@@ -19,6 +19,9 @@ public class GameManager : MonoBehaviour
     public Character companion2; 
     public Character companion3;
     public Companion currentCompanion; //Used to expose the selected companion 
+    public Inventory inventory;
+    // Centralized item list managed by GameManager
+    public List<Item> itemList = new List<Item>();
     
 
     public int currentStageIndex;
@@ -69,9 +72,29 @@ public class GameManager : MonoBehaviour
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
          LoadAllCompanionData();
-         
-         
-         
+          
+    }
+
+    public int maxInventorySlots = 16; // Maximum number of slots
+     public void AddItem(Item item)
+      {
+        
+            itemList.Add(item);
+    }
+        // Optionally, trigger any necessary updates or notifications
+    
+
+    // Remove item from the list
+    public void RemoveItem(Item item) {
+        if (itemList.Contains(item)) {
+            itemList.Remove(item);
+        }
+        // Optionally, trigger any necessary updates or notifications
+    }
+
+    public Item testItem;
+    public void AddTestItem() {
+        AddItem(testItem);
     }
 
     

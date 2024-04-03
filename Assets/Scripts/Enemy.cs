@@ -50,6 +50,7 @@ public class Enemy : Character
     // Call this method when the enemy is defeated.
     public void DropMaterial()
     {
+       
         if (Random.Range(0, 100) < dropChancePercentage)
         {
             // Select a random material to drop.
@@ -58,7 +59,7 @@ public class Enemy : Character
 
             Debug.Log("Dropped material: " + droppedMaterial.itemName);
             // Here, you'd add the dropped material to the player's inventory.
-            // InventoryManager.AddToInventory(droppedMaterial);
+                 GameManager.Instance.inventory.AddItem(droppedMaterial);
         }
     }
 }

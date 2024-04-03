@@ -5036,11 +5036,14 @@ MonoBehaviour:
   isMoving: 0
   attackTrigger: 0
   animationEnded: 0
+  didBlock: 0
   attacksBeforeSpecial: 0
   enemyHealthUI: {fileID: 0}
+  damageReflectionPercentage: 0
   statusEffectController: {fileID: 0}
   cameraShake: {fileID: 0}
   isAnimationDone: 0
+  currentBarrier: {fileID: 0}
   animationDamageTime: 0
   enemyDeathEffect: {fileID: 0}
   audioSource: {fileID: 783705765471238897}
@@ -5051,6 +5054,9 @@ MonoBehaviour:
   attackGrowth: 0
   defenseGrowth: 0
   healthGrowth: 0
+  possibleDrops:
+  - {fileID: 11400000, guid: e14b1a013771dba45bcd5140e1834510, type: 2}
+  dropChancePercentage: 50
 --- !u!114 &7896838578812409203
 MonoBehaviour:
   m_ObjectHideFlags: 0
