@@ -407,20 +407,24 @@ public class Character : MonoBehaviour
     */
     public EnemyDeathEffect enemyDeathEffect;
    public void CheckForDeath()
+{
+    Debug.Log("Checking for death");
+    if (this.health <= 0)
     {
-        Debug.Log("Checking for death");
-        // Check if the GameObject has the tag "Enemy"
-        if (this.gameObject.tag == "Enemy" && this.health <= 0)
+        // Check if the Character is an Enemy
+        if (this is Enemy enemy)
         {
-            enemyDeathEffect.TriggerExplosion();
-            StartCoroutine(FadeOutSprite());
-            //add any additional logic here for when an enemy dies.
+            enemy.enemyDeathEffect.TriggerExplosion();
+            StartCoroutine(enemy.FadeOutSprite());
+            enemy.DropMaterial(); // Call DropMaterial on the enemy instance
+            // Add any additional logic here for when an enemy dies.
         }
-        if (this.gameObject.tag == "Companion" && this.health <=0)
+        else if (this.gameObject.tag == "Companion")
         {
-            //Logic for when a companion dies
+            // Logic for when a companion dies
         }
     }
+}
 
 
      public IEnumerator MoveToTarget()

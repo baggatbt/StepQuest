@@ -48,7 +48,7 @@ public class Enemy : Character
     }
 
     // Call this method when the enemy is defeated.
-    protected void DropMaterial()
+    public void DropMaterial()
     {
         if (Random.Range(0, 100) < dropChancePercentage)
         {

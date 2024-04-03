@@ -51,4 +51,5 @@ public class Goblin : Enemy
         this.defensePower = 5 + (this.level + 1);
         this.energy = 0;
     }
+   
 }
