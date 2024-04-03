@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.IO;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
@@ -9,10 +10,35 @@ public class Inventory : MonoBehaviour
     public GameObject slotPrefab; // Drag your Slot Prefab here
     public int maxInventorySlots = 16; // Maximum number of slots
     public Item testItem;
+    private string SavePath => $"{Application.persistentDataPath}/inventory.json";
+
 
     private List<Item> items = new List<Item>();
     private Dictionary<int, int> materialCounts = new Dictionary<int, int>(); // Track material quantities
     private List<GameObject> itemSlots = new List<GameObject>();
+
+
+    private void Awake() {
+        LoadInventory();
+    }
+
+    public void SaveInventory() {
+        var json = JsonUtility.ToJson(new ItemContainer { Items = items }, true);
+        File.WriteAllText(SavePath, json);
+        Debug.Log($"Inventory saved to {SavePath}");
+    }
+
+    public void LoadInventory() {
+        if (File.Exists(SavePath)) {
+            var json = File.ReadAllText(SavePath);
+            var itemContainer = JsonUtility.FromJson<ItemContainer>(json);
+            items = itemContainer.Items;
+            UpdateInventoryUI();
+            Debug.Log("Inventory loaded.");
+        } else {
+            Debug.Log("No inventory save found.");
+        }
+    }
 
     private void Start()
     {
@@ -47,6 +73,7 @@ public class Inventory : MonoBehaviour
             }
         }
         UpdateInventoryUI();
+        SaveInventory();
         return true;
     }
 
@@ -64,50 +91,56 @@ public class Inventory : MonoBehaviour
                 }
             }
             UpdateInventoryUI();
+            SaveInventory();
         }
     }
 
-    private void UpdateInventoryUI()
-    {
-        // Then enable and update necessary slots
-        for (int i = 0; i < items.Count; i++)
-        {
-            itemSlots[i].SetActive(true);
-
-            // Find the ItemContainer and then the Image inside it
-            Image itemImage = itemSlots[i].transform.Find("ItemContainer").GetComponentInChildren<Image>();
-            if (itemImage != null)
-                itemImage.sprite = items[i].itemIcon;
-        }
+    private void UpdateInventoryUI() {
+    // First, ensure the correct number of slots are available
+    while (itemSlots.Count < maxInventorySlots) {
+        GameObject slot = Instantiate(slotPrefab, inventoryUI.transform);
+        slot.SetActive(true);
+        itemSlots.Add(slot);
     }
 
-    public bool TryCraftItem(CraftableItem itemToCraft)
-    {
-        // Check if the player has all necessary materials in sufficient quantities.
-        foreach (var requirement in itemToCraft.materialRequirements)
-        {
-            if (!materialCounts.ContainsKey(requirement.material.itemID) || materialCounts[requirement.material.itemID] < requirement.quantity)
-            {
-                Debug.Log("Not enough materials to craft " + itemToCraft.itemName);
-                return false;
-            }
+    // Update slots based on inventory items or clear if no item is assigned
+    for (int i = 0; i < maxInventorySlots; i++) {
+        // Find the ItemContainer and then the Image inside it for each slot
+        Image itemImage = itemSlots[i].transform.Find("ItemContainer").GetComponentInChildren<Image>();
+        if (i < items.Count && itemImage != null) {
+            itemSlots[i].SetActive(true); // Make sure the slot is active
+            itemImage.sprite = items[i].itemIcon; // Update the sprite to the current item's icon
+            itemImage.enabled = true; // Enable the image component to show the icon
+        } else if (itemImage != null) {
+            itemImage.sprite = null; // Clear the sprite for slots without an item
+            itemImage.enabled = false; // Optionally disable the image component if no sprite is assigned
         }
-
-        // Consume the materials.
-        foreach (var requirement in itemToCraft.materialRequirements)
-        {
-            materialCounts[requirement.material.itemID] -= requirement.quantity;
-            // Consider removing the material from items list if its count goes to zero
-        }
-
-        // Optionally, add the crafted item to the player's inventory.
-        Debug.Log("Crafted " + itemToCraft.itemName);
-        AddItem(itemToCraft); // This line adds the crafted item to the inventory
-        return true;
     }
+}
+
 
     public void AddTestItem()
     {
         AddItem(testItem);
+        
+    }
+
+    public void DeleteSavedInventory() {
+    string path = SavePath; // Assuming SavePath is your file path
+
+    // Check if the file exists before attempting to delete
+    if (File.Exists(path)) {
+        File.Delete(path);
+        Debug.Log("Saved inventory data deleted.");
+    } else {
+        Debug.Log("No saved inventory data to delete.");
+    }
+}
+
+
+    [System.Serializable]
+    class ItemContainer 
+    {
+          public List<Item> Items;
     }
 }
