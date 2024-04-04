@@ -17,10 +17,11 @@ public class Inventory : MonoBehaviour
     private List<GameObject> itemSlots = new List<GameObject>();
 
     private void Awake() {
-   
+        
     }
 
     public void SaveInventory() {
+        maxInventorySlots = GameManager.Instance.maxInventorySlots;
         // This method might need rethinking if GameManager is handling items
         var json = JsonUtility.ToJson(new ItemContainer { Items = GameManager.Instance.itemList }, true);
         File.WriteAllText(SavePath, json);
@@ -71,6 +72,7 @@ public class Inventory : MonoBehaviour
     // Updates the inventory UI to reflect the current items
    // Updates the inventory UI to reflect the current items
 private void UpdateInventoryUI() {
+    if (inventoryUI != null){
     Debug.Log($"Updating UI with {GameManager.Instance.itemList.Count} items.");
 
     foreach (Transform child in inventoryUI.transform) {
@@ -88,6 +90,7 @@ private void UpdateInventoryUI() {
         } else {
             Debug.LogWarning("Missing item icon or incorrect path in prefab for ItemContainer.");
         }
+    }
     }
 }
 
