@@ -5,6 +5,7 @@ using UnityEngine;
 public class Slash : Skill
 {
     private int numberOfAttacks;
+    GameObject particleEffectPrefab = Resources.Load<GameObject>("PreFab/Projectiles_Effects/skillAttack2");
     public Slash()
     {
         skillName = "Slash";
@@ -40,6 +41,9 @@ public class Slash : Skill
 
              yield return TimingWindow(user, target, battleManager, 0.0f, 0.6f);
              //yield return battleManager.StartCoroutine(battleManager.TimeStop(0.1f));
+              Vector3 spawnPosition = target.transform.position;
+            Vector3 offsetPosition = new Vector3(spawnPosition.x, spawnPosition.y + 2, spawnPosition.z);
+             GameObject slashEffect = UnityEngine.Object.Instantiate(particleEffectPrefab, offsetPosition, Quaternion.identity);
 
              HandleTimingResultForPlayerAttack(user, target, result, baseDamage);
              
