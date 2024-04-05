@@ -8,12 +8,13 @@ public class Taunt : Skill
     public Taunt()
     {
         skillName = "Taunt";
-        description = "Forces enemies to target this character";
+        description = "Forces enemies to target this character and applies a damage nullifying barrier for one attack";
         energyCost = 2; 
         energyGain = 0;
         skillLevel = 1; 
         requiresMovement = false; 
         skillExecutionComplete = false;
+        iconImage = LoadIconImage("SkillIcons/armor5");
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)

@@ -8,7 +8,7 @@ public class Slash : Skill
     public Slash()
     {
         skillName = "Slash";
-        description = "Tap command: Deals 100% ATK as damage.";
+        description = "Tap at the right time for extra damage";
         energyCost = 0; 
         energyGain = 1;
         skillLevel = 1; 

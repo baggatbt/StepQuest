@@ -5,6 +5,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.Tilemaps;
 public class MainMenuUIManager : MonoBehaviour
 {
     public GameObject knightSkillPanel;
@@ -78,6 +79,22 @@ public class MainMenuUIManager : MonoBehaviour
             btn.onClick.AddListener(delegate { OnCompanionSelected(companion); });
         }
     }
+}
+   
+
+    public CanvasGroup uiCanvasGroup;
+    
+
+public void HideTilemap(TilemapRenderer tilemapRenderer)
+{
+   // uiCanvasGroup.alpha = 0; // Hide UI
+    tilemapRenderer.enabled = false; // Hide Tilemap
+}
+
+public void ShowTilemap(TilemapRenderer tilemapRenderer)
+{
+   // uiCanvasGroup.alpha = 1; // Show UI
+    tilemapRenderer.enabled = true; // Show Tilemap
 }
    
 
