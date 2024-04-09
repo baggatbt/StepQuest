@@ -242,6 +242,7 @@ public void AddItem(Item newItem)
         foreach (var companion in companions)
         {
             companion?.SaveCharacterData();
+            Debug.Log("In game manager saving: " + companion);
         }
     }
 

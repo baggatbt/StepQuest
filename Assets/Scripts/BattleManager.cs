@@ -899,7 +899,7 @@ private float CalculateSliderValue(int currentExp, int expToNextLevel)
     }
 
     Debug.Log($"Running end of battle rewards +{totalExp} EXP +{totalGold} Gold");
-
+/*
     // Update EXP for each companion
     foreach (Character character in playerParty)
     {
@@ -910,7 +910,7 @@ private float CalculateSliderValue(int currentExp, int expToNextLevel)
             GameManager.Instance.UpdateCompanionExp(companion.heroID, totalExp);
         }
     }
-
+*/
     // Update the player's gold and save player data
     PlayerData.Instance.gold += totalGold;
     PlayerData.Instance.SavePlayerData();
@@ -920,6 +920,8 @@ private float CalculateSliderValue(int currentExp, int expToNextLevel)
         if (character is Companion companion)
         {
             Debug.Log("saving in BM " + character);
+            companion.heroExp += totalExp;
+            
             companion.SaveCharacterData();
         }
     }
