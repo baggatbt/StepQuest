@@ -550,9 +550,11 @@ public void EndTurn()
     // Decide whether or not to use the special attack or the normal one
     if (!currentEnemy.isAttacking)
     {
+        /*
         currentEnemy.currentSkill = (currentEnemy.energy >= currentEnemy.maxEnergy) ? 
         currentEnemy.specialSkill : currentEnemy.normalSkill;
-
+        */
+        currentEnemy.currentSkill = currentEnemy.normalSkill;
         
         StartCoroutine(EnemyAttackCoroutine(currentEnemy));
     }

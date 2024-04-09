@@ -19,6 +19,7 @@ public class Item : ScriptableObject
     public Sprite itemIcon;
     public int itemID;
     public string itemDescription;
+    public int quantity = 1; // Default quantity
 }
 
 [CreateAssetMenu(fileName = "New Craftable Item", menuName = "Inventory/Craftable Item")]

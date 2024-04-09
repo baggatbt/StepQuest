@@ -19,7 +19,7 @@ public class TripleHitSkill : Skill
     // Override the default base damage calculation.
     protected override int CalculateBaseDamage(Character user)
     {
-        return (int)(user.attackPower * 0.4f);  
+        return (int)(user.attackPower * 0.5f);  
     }
     
 

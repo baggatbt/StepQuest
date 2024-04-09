@@ -76,14 +76,29 @@ public class GameManager : MonoBehaviour
     }
 
     public int maxInventorySlots = 16; // Maximum number of slots
-     public void AddItem(Item item)
-      {
-        
-            itemList.Add(item);
+public void AddItem(Item newItem)
+{
+    bool itemExists = false;
+    foreach (Item item in itemList) {
+        if (item.itemID == newItem.itemID) {
+            item.quantity++;
+            Debug.Log("item quantity: " + item.quantity);
+            itemExists = true;
             inventory.SaveInventory();
+            break; // Exit the loop after finding and incrementing the item
+        }
     }
-        // Optionally, trigger any necessary updates or notifications
     
+    if (!itemExists) {
+        // If the item doesn't exist, add it to the list with a quantity of 1
+        newItem.quantity = 1;
+        itemList.Add(newItem);
+        inventory.SaveInventory();
+    }
+}
+
+        
+        
 
     // Remove item from the list
     public void RemoveItem(Item item) {

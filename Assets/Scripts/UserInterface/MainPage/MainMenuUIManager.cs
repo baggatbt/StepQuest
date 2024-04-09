@@ -120,35 +120,32 @@ public void PopulateInventoryList() {
     }
     Debug.Log("[MainMenuUIManager] Cleared existing inventory items.");
 
-    // Loop through the max number of inventory slots
-    for (int i = 0; i < GameManager.Instance.maxInventorySlots; i++) {
+    // Loop through all items in the GameManager's inventory list
+    foreach (Item item in GameManager.Instance.itemList) {
         GameObject itemSlotObject = Instantiate(inventoryItemPrefab, inventoryItemContainer.transform); // Use the container as parent
 
         // Assuming the prefab has an Image component for the item icon at a child named 'ItemIcon'
-        Image itemIconImage = itemSlotObject.transform.Find("ItemContainer").GetComponent<Image>(); // Replace 'ItemIcon' with the actual name in your prefab
+        Image itemIconImage = itemSlotObject.transform.Find("ItemContainer").GetComponent<Image>(); // Replace 'ItemImage' with the actual name in your prefab
 
-        // Check if there's an item for this slot
-        if (i < GameManager.Instance.itemList.Count) {
-            Item item = GameManager.Instance.itemList[i];
-            Debug.Log($"[MainMenuUIManager] Setting up UI for item: {item.itemName}");
+        // Assuming the prefab has a Text component for the item count at a child named 'ItemCountText'
+        TextMeshProUGUI itemCountText = itemSlotObject.transform.Find("ItemCountText").GetComponent<TextMeshProUGUI>(); // Correct the path if necessary
 
-            if (itemIconImage != null && item.itemIcon != null) {
-                itemIconImage.sprite = item.itemIcon;
-                itemIconImage.enabled = true; // Ensure the icon is visible
-                Debug.Log("[MainMenuUIManager] Set item icon.");
-            } else {
-                Debug.LogWarning("[MainMenuUIManager] No item icon set or Image component not found.");
-                itemIconImage.enabled = false; // No icon for this item, so disable the image
-            }
+        // Set up the item icon
+        if (itemIconImage != null && item.itemIcon != null) {
+            itemIconImage.sprite = item.itemIcon;
+            itemIconImage.enabled = true; // Ensure the icon is visible
         } else {
-            // No item for this slot, so we make sure the icon is disabled
-            if (itemIconImage != null) {
-                itemIconImage.enabled = false; // Optionally hide the icon for empty slots
-            }
+            itemIconImage.enabled = false; // No icon for this item, so disable the image
+        }
+
+        // Set up the item count text
+        if (itemCountText != null) {
+            itemCountText.text = item.quantity.ToString(); // Display the quantity
         }
     }
     Debug.Log("[MainMenuUIManager] Finished populating inventory list.");
 }
+
 
 
 

@@ -72,25 +72,38 @@ public class Inventory : MonoBehaviour
     // Updates the inventory UI to reflect the current items
    // Updates the inventory UI to reflect the current items
 private void UpdateInventoryUI() {
-    if (inventoryUI != null){
-    Debug.Log($"Updating UI with {GameManager.Instance.itemList.Count} items.");
+    if (inventoryUI != null) {
+        Debug.Log($"Updating UI with {GameManager.Instance.itemList.Count} items.");
 
-    foreach (Transform child in inventoryUI.transform) {
-        Destroy(child.gameObject);
-    }
-
-    foreach (Item item in GameManager.Instance.itemList) {
-        Debug.Log($"Adding item to UI: {item.itemName}");
-        GameObject slot = Instantiate(slotPrefab, inventoryUI.transform);
-        slot.SetActive(true);
-        Image itemImage = slot.transform.Find("ItemContainer")?.GetComponent<Image>();  // Use GetComponent<Image>() directly if "ItemContainer" is the direct parent of the Image component
-        if (itemImage != null && item.itemIcon != null) {
-            itemImage.sprite = item.itemIcon;
-            Debug.Log("Set item icon in ItemContainer.");
-        } else {
-            Debug.LogWarning("Missing item icon or incorrect path in prefab for ItemContainer.");
+        // Clear existing slots to prevent duplication
+        foreach (Transform child in inventoryUI.transform) {
+            Destroy(child.gameObject);
         }
-    }
+
+        // Create or update a slot for each item in the inventory
+        foreach (Item item in GameManager.Instance.itemList) {
+            if (item.quantity > 0) { // Only create slots for items with quantity greater than 0
+                Debug.Log($"Adding item to UI: {item.itemName} with quantity {item.quantity}");
+                GameObject slot = Instantiate(slotPrefab, inventoryUI.transform);
+                slot.SetActive(true);
+                
+                // Find and set the item image
+                Image itemImage = slot.transform.Find("ItemContainer")?.GetComponent<Image>();
+                if (itemImage != null && item.itemIcon != null) {
+                    itemImage.sprite = item.itemIcon;
+                } else {
+                    Debug.LogWarning("Item image component not found or item icon not set.");
+                }
+                
+                // Find and set the item count text
+                Text itemCountText = slot.transform.Find("ItemCountText")?.GetComponent<Text>();
+                if (itemCountText != null) {
+                    itemCountText.text = item.quantity.ToString(); // Display the quantity
+                } else {
+                    Debug.LogWarning("ItemCountText component not found in the slot prefab.");
+                }
+            }
+        }
     }
 }
 

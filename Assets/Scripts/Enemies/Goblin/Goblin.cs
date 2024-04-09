@@ -9,13 +9,13 @@ public class Goblin : Enemy
     {
         base.Awake(); // Calls Enemy.Awake(), which now includes the call to UpdateExpAndGoldRewards
         this.level = 1;
-        this.maxHealth = 21;
+        this.maxHealth = 6;
         this.health = this.maxHealth;
         this.maxEnergy = 1;
         this.speed = 7;
         this.defensePenetration = 0;
         this.attacksBeforeSpecial = 2;
-        this.attackPower = 8;
+        this.attackPower = 4;
         this.defensePower = 5;
         this.energy = 0;
     }

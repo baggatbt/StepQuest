@@ -9,11 +9,11 @@ public class Mushroom : Enemy
     {
         base.Awake(); // Calls Enemy.Awake(), ensuring base class initialization, including exp and gold reward calculations
         this.level = 1;
-        this.maxHealth = 33;
+        this.maxHealth = 11;
         this.health = this.maxHealth;
         this.maxEnergy = 3;
         this.speed = 3;
-        this.attackPower = 9;
+        this.attackPower = 2;
         this.defensePower = 0;
         this.energy = 0;
     }
