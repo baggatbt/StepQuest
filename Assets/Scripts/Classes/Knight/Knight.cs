@@ -66,6 +66,7 @@ public class Knight : Companion
         SkillType.TripleHit,
         SkillType.Taunt,
         SkillType.ReflectDamagePassive,
+        SkillType.SpeedBreak,
         
         
        
@@ -94,6 +95,9 @@ public class Knight : Companion
             
             case SkillType.ReflectDamagePassive:
                 return new ReflectDamagePassive();
+
+            case SkillType.SpeedBreak:
+                return new SpeedBreak();
 
           
             default:

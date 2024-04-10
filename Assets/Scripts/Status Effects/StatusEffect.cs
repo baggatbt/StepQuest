@@ -1,15 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 
 public abstract class StatusEffect
 {
     public string effectName;
+    public Sprite iconImage;
+    
     
 
     public abstract void ApplyEffect(Character target);
     public abstract void RemoveEffect(Character target);
+    public Sprite LoadIconImage(string path)
+    {
+        return Resources.Load<Sprite>(path);
+    }
     
     
 

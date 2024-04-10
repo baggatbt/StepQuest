@@ -29,6 +29,7 @@ public enum SkillType
         ArrowRain,
         MeleeCombo,
         ReflectDamagePassive,
+        SpeedBreak,
     }
 
 

@@ -323,6 +323,7 @@ public void EndTurn()
     Debug.Log("ENDING THE TURN");
     if (turnOrderList.Count == 0)
     {
+        statusEffectController.ProcessEffects();
         InitializeTurnOrder();
         
     }
