@@ -26,7 +26,7 @@ public class MainMenuUIManager : MonoBehaviour
     public CircleShrinkAndCheck circleShrinkAndCheck;
     
     // References to stat UI Text elements
-    public TextMeshProUGUI levelText,atkText, hpText, defText, expText, spdText; 
+    public TextMeshProUGUI levelText,atkText, hpText, spText, expText, spdText; 
 
     //KNIGHT 
     //public Knight knight;
@@ -181,31 +181,54 @@ public void PopulateInventoryList() {
 
     
     public GameObject atkUpgradeBar;
-    public GameObject vitUpgradeBar;
+    public GameObject hpUpgradeBar;
     public GameObject spdUpgradeBar;
+    public GameObject spUpgradeBar;
 
    public void OnCompanionSelected(Companion companion)
 {
     GameManager.Instance.currentCompanion = companion;
 
-    // Update upgrade bars based on the selected companion's stat progress
-    atkUpgradeBar.GetComponent<UpgradeBar>().SetInitialProgress(companion.statUpgradeProgress["atk"]);
-    vitUpgradeBar.GetComponent<UpgradeBar>().SetInitialProgress(companion.statUpgradeProgress["vit"]);
-    spdUpgradeBar.GetComponent<UpgradeBar>().SetInitialProgress(companion.statUpgradeProgress["spd"]);
+    // Setup and subscribe to events for each upgrade bar
+    SetupUpgradeBar(atkUpgradeBar, companion.statUpgradeProgress["atk"], () => IncreaseCompanionStat(companion, "atk"));
+    SetupUpgradeBar(hpUpgradeBar, companion.statUpgradeProgress["hp"], () => IncreaseCompanionStat(companion, "hp"));
+    SetupUpgradeBar(spdUpgradeBar, companion.statUpgradeProgress["spd"], () => IncreaseCompanionStat(companion, "spd"));
+    SetupUpgradeBar(spUpgradeBar, companion.statUpgradeProgress["sp"], () => IncreaseCompanionStat(companion, "sp"));
 
-    // Update companion's stats display
+
+    // Update companion's stats display and make sure the stats panel is visible
     UpdateCompanionStatsDisplay(companion);
-
-    // Make sure the companion stats panel is visible
     companionStatsPanel.SetActive(true);
 }
+
+private void SetupUpgradeBar(GameObject upgradeBarGO, int initialProgress, Action onMaxLevelReached)
+{
+    if (upgradeBarGO == null)
+    {
+        Debug.LogError("Upgrade bar GameObject is null.");
+        return;
+    }
+
+    var upgradeBar = upgradeBarGO.GetComponent<UpgradeBar>();
+    if (upgradeBar == null)
+    {
+        Debug.LogError("UpgradeBar component is not found on the GameObject.");
+        return;
+    }
+
+    upgradeBar.SetInitialProgress(initialProgress);
+    upgradeBar.OnMaxLevelReached -= onMaxLevelReached;
+    upgradeBar.OnMaxLevelReached += onMaxLevelReached;
+}
+
+
 
 private void UpdateCompanionStatsDisplay(Companion companion)
 {
     levelText.text = "Lv: " + companion.heroLevel.ToString();
     atkText.text = "ATK: " + companion.attackPower.ToString();
-    hpText.text = "HP: " + companion.health.ToString();
-    defText.text = "VIT: " + companion.defensePower.ToString();
+    hpText.text = "HP: " + companion.maxHealth.ToString();
+    spText.text = "SP: " + companion.maxEnergy.ToString();
     expText.text = "EXP: " + companion.heroExp.ToString() + " / " + companion.ExpToNextLevel(companion.heroLevel);
     spdText.text = "SPD: " + companion.speed.ToString();
 }
@@ -216,17 +239,26 @@ private void UpdateCompanionStatsDisplay(Companion companion)
     switch (statType)
     {
         case "atk":
-            companion.attackPower += 1; // Or any logic for stat increase
-            atkText.text = "ATK: " + companion.attackPower.ToString(); // Update UI
+            companion.attackPower += companion.atkGrowth;
+            UpdateCompanionStatsDisplay(companion);
+            atkText.text = "ATK: " + companion.attackPower.ToString(); 
             break;
         case "vit":
-            companion.defensePower += 1; // Adjust accordingly
-            defText.text = "VIT: " + companion.defensePower.ToString(); // Update UI
+            companion.maxHealth +=  companion.healthGrowth;
+            UpdateCompanionStatsDisplay(companion);
+            hpText.text = "HP: " + companion.maxHealth.ToString(); 
             break;
         case "spd":
-            companion.speed += 1; // Adjust accordingly
-            spdText.text = "SPD: " + companion.speed.ToString(); // Update UI
+            companion.speed +=  companion.energyGrowth;
+            UpdateCompanionStatsDisplay(companion);
+            spdText.text = "SPD: " + companion.speed.ToString();
             break;
+        case "sp":    
+            companion.maxEnergy +=  companion.energyGrowth;
+            UpdateCompanionStatsDisplay(companion);
+            spText.text = "SP: " + companion.maxEnergy.ToString();
+            break;
+
     }
 }
    

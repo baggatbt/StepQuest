@@ -922,6 +922,7 @@ private float CalculateSliderValue(int currentExp, int expToNextLevel)
         {
             Debug.Log("saving in BM " + character);
             companion.heroExp += totalExp;
+            companion.LevelUp();
             
             companion.SaveCharacterData();
         }

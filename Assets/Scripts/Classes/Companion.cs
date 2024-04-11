@@ -17,11 +17,16 @@ public abstract class Companion : Character
     public int stamina;
     public int maxStamina;
     public bool isUnlocked;
+    public int atkGrowth;
+    public int healthGrowth;
+    public int energyGrowth;
     public Dictionary<string, int> statUpgradeProgress = new Dictionary<string, int>
     {
         {"atk", 0},
-        {"vit", 0},
-        {"spd", 0}
+        {"hp", 0},
+        {"spd", 0},
+        {"sp",0}
+        
     };
 
 
@@ -141,55 +146,25 @@ public abstract class Companion : Character
 
     public int ExpToNextLevel(int heroLevel)
 {
-    if (heroLevel < 20)
+    //TEMP
+     return 30 * heroLevel * heroLevel;
+    /*
+    if (heroLevel < 100)
     {
-        // For levels 1-20, use a quadratic polynomial formula
-        return 100 * heroLevel * heroLevel;
+        // For levels 1-100, use a quadratic polynomial formula
+        return 30 * heroLevel * heroLevel;
     }
+    
     else
     {
         // Beyond level 20, use an exponential model to steeply increase EXP requirements
         return (int)(100 * Math.Pow(1.5, heroLevel - 19) * 400);
     }
+    */
 }
 
 
-/*EXP TO LEVEL, SOFT CAP AT 20
-Level 1: 100 EXP
-Level 2: 400 EXP
-Level 3: 900 EXP
-Level 4: 1600 EXP
-Level 5: 2500 EXP
-Level 6: 3600 EXP
-Level 7: 4900 EXP
-Level 8: 6400 EXP
-Level 9: 8100 EXP
-Level 10: 10000 EXP
-Level 11: 12100 EXP
-Level 12: 14400 EXP
-Level 13: 16900 EXP
-Level 14: 19600 EXP
-Level 15: 22500 EXP
-Level 16: 25600 EXP
-Level 17: 28900 EXP
-Level 18: 32400 EXP
-Level 19: 36100 EXP
-Level 20: 60000 EXP
-Level 21: 90000 EXP
-Level 22: 135000 EXP
-Level 23: 202500 EXP
-Level 24: 303750 EXP
-Level 25: 455625 EXP
-Level 26: 683437 EXP
-Level 27: 1025156 EXP
-Level 28: 1537734 EXP
-Level 29: 2306601 EXP
-Level 30: 3459902 EXP
-*/
-    
 
-    
-    
 }
 
    

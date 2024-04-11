@@ -9,7 +9,7 @@ public class UpgradeBar : MonoBehaviour
     public GameObject emptySegmentPrefab; // Assign in the Inspector
     public GameObject filledSegmentPrefab; // Assign in the Inspector
     public Button upgradeButton; // Assign in the Inspector
-    public int maxLevel = 5; // Always set to 5 as per requirements
+    public int maxLevel; // Always set to 5 as per requirements
     private int currentLevel; // Tracks the current progress
 
     private GameObject[] segments; // Holds the segments (empty or filled)
@@ -18,8 +18,10 @@ public class UpgradeBar : MonoBehaviour
 
     private void Awake()
     {
+        maxLevel = 3;
         segments = new GameObject[maxLevel]; // Initialize based on maxLevel
         InitializeSegments();
+        Debug.Log("max level from upgrade bar:" + maxLevel);
     }
 
     private void Start()
@@ -73,6 +75,7 @@ public class UpgradeBar : MonoBehaviour
             if (currentLevel == maxLevel)
             {
                 OnMaxLevelReached?.Invoke();
+                 ResetSegments(); // Reset segments to empty after reaching max level
             }
         }
         else

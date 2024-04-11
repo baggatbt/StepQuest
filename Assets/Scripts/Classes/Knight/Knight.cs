@@ -7,7 +7,10 @@ public class Knight : Companion
     protected override void Awake()
     {
         base.Awake();
-        
+        atkGrowth = 1;
+        healthGrowth = 3;
+        energyGrowth = 1;
+       
         
         
 
@@ -44,16 +47,10 @@ public class Knight : Companion
         if (this.heroExp >= ExpToNextLevel(this.heroLevel))
         {
             this.heroLevel++;
-            this.attackPower += 0;
-            this.maxHealth += 0;
-            this.health = this.maxHealth;
-            this.defensePower += 0;
-            this.speed += 0;
-            this.maxEnergy += 0;
-            this.energy = 0;
-            this.heroExp = 0;  
+            this.heroExp = 0; // Need to handle overflow exp  
             this.heroStatPoints += 5;
             this.heroSkillPoints += 1;
+            Debug.Log("hero leveled up, now lv : " + this.heroLevel);
         } 
     }
 
