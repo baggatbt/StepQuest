@@ -197,6 +197,7 @@ public void AddItem(Item newItem)
     // After individual deletions, clear all PlayerPrefs
     PlayerPrefs.DeleteAll();
     Debug.Log("All PlayerPrefs deleted");
+    PlayerData.Instance.ResetSteps();
 }
 
 // Method to add a companion to the list
@@ -228,11 +229,18 @@ public void AddItem(Item newItem)
             if (companion.heroID == heroID && companion.stamina > 0)
             {
                 companion.stamina -= 1;
+                RestoreHealthAndEnergyForCompanion(companion);
                 companion.SaveCharacterData(); // Save updated data
             }
             
             
         }
+    }
+
+    private void RestoreHealthAndEnergyForCompanion(Companion companion)
+    {
+                companion.health = companion.maxHealth;
+                companion.energy = companion.maxEnergy;
     }
 
 

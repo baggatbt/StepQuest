@@ -12,14 +12,18 @@ public class PlayerData : MonoBehaviour
         get { return _instance; }
     }
 
+     // Declare fields for player attributes
     public int level;
     public int exp;
     public int gold;
     public int attackPower;
     public int defensePower;
     public int inGameSteps;
-    public int stepsSinceStart; //Steps since the game was started once
-   // public int dailySteps; //Tracker for the 10k steps a day that will reset NOT IMPLEMENTED
+    public int stepsSinceStart; // Initial steps when the game was first loaded
+    private int previousSteps; // Declare previousSteps to store the last known step count
+    public int currentSteps;
+    public int stepsAtCloseOfApp;
+    // public int dailySteps; // Future implementation for daily step tracking
     public int maxHealth;
     public int health;
     public int maxEnergy;
@@ -28,12 +32,14 @@ public class PlayerData : MonoBehaviour
     public string heroID;
     public int speed;
     public int currentStageIndex;
-    
+
     public Dictionary<string, int> skillLevels;
     public Dictionary<string, int> skillExp;
     public List<Quest> activeMissions = new List<Quest>();
 
     private StepCounterController stepCounterController;
+    
+
     
 
     private void Awake()
@@ -76,30 +82,41 @@ public class PlayerData : MonoBehaviour
    
     
 
-    private void Start()
+   private void Start()
+{
+    LoadPlayerData(); // Ensure all player data is loaded
+
+    if (firstTimeLogin)
     {
-       
-        LoadStepsData();
-       
-        int stepsSinceStart = stepCounterController.GetStepsSinceStart();
-        inGameSteps += stepsSinceStart;
-        Debug.Log("Steps after adding stepsSinceStart: " + inGameSteps);
+        stepsSinceStart = stepCounterController.GetSteps(); // Get current step count from sensor
+        PlayerPrefs.SetInt("StepsSinceStart", stepsSinceStart);
+        firstTimeLogin = false;
+        PlayerPrefs.SetInt("FirstLogin", 0);
+        PlayerPrefs.Save();
+        Debug.Log("First time setup: Initial steps recorded: " + stepsSinceStart);
+    }
+    else
+    {
+        stepsSinceStart = PlayerPrefs.GetInt("StepsSinceStart", 0); // Load stepsSinceStart from PlayerPrefs
     }
 
-    private int previousSteps = 0;
+    previousSteps = stepsSinceStart; // Initialize previousSteps to stepsSinceStart on every start
+    int currentSteps = stepCounterController.GetSteps();
+    inGameSteps = Math.Max(0, currentSteps - stepsSinceStart); // Ensure that inGameSteps doesn't go negative
+    Debug.Log($"Game restarted: stepsSinceStart: {stepsSinceStart}, currentSteps: {currentSteps}, inGameSteps: {inGameSteps}");
+}
 
-    private void Update()
+private void Update()
+{
+    int currentSteps = stepCounterController.GetSteps();
+    if (currentSteps >= previousSteps)
     {
-        int currentSteps = stepCounterController.GetSteps();
-        if(currentSteps >= previousSteps)
-        {
-            inGameSteps += currentSteps - previousSteps;
-            previousSteps = currentSteps;
-        }
-
-        ConvertStepsToTokens();
-     
+        int stepsToAdd = currentSteps - previousSteps;
+        inGameSteps += stepsToAdd; // Increment in-game steps by new steps detected since last update
+        previousSteps = currentSteps;
+        Debug.Log($"Update: Current steps: {currentSteps}, Previous steps: {previousSteps}, Steps to add: {stepsToAdd}, Total in-game steps: {inGameSteps}");
     }
+}
     public int stepTokens;
     public void ConvertStepsToTokens()
     {
@@ -119,6 +136,19 @@ public class PlayerData : MonoBehaviour
     Debug.Log("Data saved");
 }
 
+    public void ResetSteps()
+{
+    // Reset only the in-game steps counter
+    inGameSteps = 0;
+
+    // No need to touch stepsSinceStart since it's a historical record from first load
+
+    // Save the reset state to PlayerPrefs to ensure persistence across sessions
+    SaveStepsData();
+
+    Debug.Log("In-game steps have been reset to 0.");
+}
+
 
     public void LoadPlayerData()
 {
@@ -133,44 +163,52 @@ public class PlayerData : MonoBehaviour
 }
 
 
-    private void OnApplicationPause(bool pauseStatus)
-{
-    if (pauseStatus)
+     private void OnApplicationPause(bool pauseStatus)
     {
+        if (pauseStatus)
+        {
+            stepsAtCloseOfApp = inGameSteps;
+            stepCounterController.SaveLastKnownSteps();
+            SavePlayerData();
+            SaveStepsData();
+        }
+        else
+        {
+            LoadStepsData();
+            AdjustStepsPostPause();
+        }
+    }
+
+    private void OnApplicationQuit()
+    {
+        SavePlayerData();
+        stepCounterController.SaveLastKnownSteps();
         SaveStepsData();
     }
-    else
-    {
-        LoadStepsData();
-    }
-}
 
-private void SaveStepsData()
+    private void AdjustStepsPostPause()
+    {
+        int lastKnownSteps = stepCounterController.GetInitialStepsOnResume();
+        int currentSteps = stepCounterController.GetSteps();
+        if (currentSteps > lastKnownSteps)
+        {
+            inGameSteps += currentSteps - lastKnownSteps;
+        }
+        Debug.Log("Adjusted Steps after resume: " + inGameSteps);
+    }
+
+public void SaveStepsData()
 {
-    // Save the total steps from the plugin when the app is paused or closed
-    PlayerPrefs.SetInt("TotalStepsWhenClosed", stepCounterController.GetSteps());
+    PlayerPrefs.SetInt("InGameSteps", inGameSteps);
     PlayerPrefs.Save();
-    Debug.Log("Saved total steps when closed: " + stepCounterController.GetSteps());
+    Debug.Log("Saved total steps: " + inGameSteps);
 }
 
 private void LoadStepsData()
 {
-    int totalStepsWhenClosed = PlayerPrefs.GetInt("TotalStepsWhenClosed", stepCounterController.GetSteps());
-    int totalStepsNow = stepCounterController.GetSteps();
-
-    // Calculate the steps taken after the game was started
-    inGameSteps = totalStepsNow - totalStepsWhenClosed;
-
+    inGameSteps = PlayerPrefs.GetInt("InGameSteps", 0); // Load in-game steps
     Debug.Log("Loaded Steps: " + inGameSteps);
 }
-
-
-
-private void OnApplicationQuit()
-{
-    SaveStepsData();
-}
-
 
 
 
