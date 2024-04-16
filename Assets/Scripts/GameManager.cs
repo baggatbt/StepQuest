@@ -231,19 +231,28 @@ public void AddItem(Item newItem)
                 companion.stamina -= 1;
                 RestoreHealthAndEnergyForCompanion(companion);
                 companion.SaveCharacterData(); // Save updated data
-            }
-            
-            
+            }      
         }
     }
 
-    private void RestoreHealthAndEnergyForCompanion(Companion companion)
+    public void RestoreHealthAndEnergyForCompanion(Companion companion)
     {
                 companion.health = companion.maxHealth;
                 companion.energy = companion.maxEnergy;
     }
+    private void RecoverCompanion()
+    {
+        currentCompanion.health = currentCompanion.maxHealth;
+        currentCompanion.energy = currentCompanion.maxEnergy;
+    }
 
-
+    public void RecoverForSteps()
+    {
+       if (PlayerData.Instance.UseSteps(100))
+       {
+        RecoverCompanion();
+       }
+    }
     // Call this method to save the data of all companions
     public void SaveAllCompanionData()
     {

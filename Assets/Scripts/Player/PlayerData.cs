@@ -114,7 +114,7 @@ private void Update()
         int stepsToAdd = currentSteps - previousSteps;
         inGameSteps += stepsToAdd; // Increment in-game steps by new steps detected since last update
         previousSteps = currentSteps;
-        Debug.Log($"Update: Current steps: {currentSteps}, Previous steps: {previousSteps}, Steps to add: {stepsToAdd}, Total in-game steps: {inGameSteps}");
+     //   Debug.Log($"Update: Current steps: {currentSteps}, Previous steps: {previousSteps}, Steps to add: {stepsToAdd}, Total in-game steps: {inGameSteps}");
     }
 }
     public int stepTokens;
@@ -210,6 +210,19 @@ private void LoadStepsData()
     Debug.Log("Loaded Steps: " + inGameSteps);
 }
 
+
+    
+    public bool UseSteps(int amountToUse)
+    {
+        if (inGameSteps >= amountToUse)
+        {
+         inGameSteps -= amountToUse;
+         Debug.Log("Spent steps: " + amountToUse);
+         return true;
+        }
+        else
+        return false;
+    }
 
 
 
