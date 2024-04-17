@@ -40,6 +40,8 @@ public class GameManager : MonoBehaviour
     public float probabilityCompanion2;// Default probability for companion2 to be attacked
     public float probabilityCompanion3;
 
+    public int accountLevel;
+
     private void Awake()
     {
         
@@ -55,7 +57,7 @@ public class GameManager : MonoBehaviour
             probabilityCompanion2 = 1f;
             probabilityCompanion3 = 1f;
             
-            
+           
             Debug.Log(PlayerData.Instance.firstTimeLogin);
            if (PlayerData.Instance.firstTimeLogin)
         {

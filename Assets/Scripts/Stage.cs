@@ -21,7 +21,7 @@ public class Stage : MonoBehaviour
          stageButton.onClick.AddListener(OnStageButtonClicked);
         // Initialize the unlocked state based on GameManager's data
         isUnlocked = GameManager.Instance.UnlockedStageNames.Contains(this.stageID);
-        UpdateButtonColor();
+       // UpdateButtonColor();
         
     }
 

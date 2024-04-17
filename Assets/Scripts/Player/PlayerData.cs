@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 
-//HANDLES STORING/RETRIEVING OF ALL PLAYER RELATED DATA
+// HANDLES STORING/RETRIEVING OF ALL PLAYER RELATED DATA
 public class PlayerData : MonoBehaviour
 {
     private static PlayerData _instance;
@@ -12,7 +12,7 @@ public class PlayerData : MonoBehaviour
         get { return _instance; }
     }
 
-     // Declare fields for player attributes
+    // Declare fields for player attributes
     public int level;
     public int exp;
     public int gold;
@@ -23,7 +23,7 @@ public class PlayerData : MonoBehaviour
     private int previousSteps; // Declare previousSteps to store the last known step count
     public int currentSteps;
     public int stepsAtCloseOfApp;
-    // public int dailySteps; // Future implementation for daily step tracking
+    public int dailySteps; // Future implementation for daily step tracking
     public int maxHealth;
     public int health;
     public int maxEnergy;
@@ -38,40 +38,32 @@ public class PlayerData : MonoBehaviour
     public List<Quest> activeMissions = new List<Quest>();
 
     private StepCounterController stepCounterController;
-    
-
-    
 
     private void Awake()
-{
-    
-   //For testing, wipes saved data 
-  // PlayerPrefs.DeleteAll();
-
-    Debug.Log("PlayerData Awake is running");
-    if (_instance == null)
     {
-        _instance = this;
-        DontDestroyOnLoad(gameObject);
-
-        // Ensure default value for first login
-        if (!PlayerPrefs.HasKey("FirstLogin"))
+        Debug.Log("PlayerData Awake is running");
+        if (_instance == null)
         {
-            firstTimeLogin = true;
+            _instance = this;
+            DontDestroyOnLoad(gameObject);
+
+            if (!PlayerPrefs.HasKey("FirstLogin"))
+            {
+                firstTimeLogin = true;
+            }
+
+            LoadPlayerData();
+            LoadStepsData(); // Ensure step data is also loaded here
+            Debug.Log($"First time login after LoadPlayerData: {firstTimeLogin}");
         }
-        
-        LoadPlayerData();
-        Debug.Log($"First time login after LoadPlayerData: {firstTimeLogin}");
-    }
-    else
-    {
-        Destroy(gameObject);
-    }
+        else
+        {
+            Destroy(gameObject);
+        }
 
         skillLevels = new Dictionary<string, int>();
         skillExp = new Dictionary<string, int>();
 
-       
         stepCounterController = FindObjectOfType<StepCounterController>();
         if (stepCounterController == null)
         {
@@ -79,152 +71,133 @@ public class PlayerData : MonoBehaviour
         }
     }
 
-   
-    
-
-   private void Start()
-{
-    LoadPlayerData(); // Ensure all player data is loaded
-
-    if (firstTimeLogin)
+    private void Start()
     {
-        stepsSinceStart = stepCounterController.GetSteps(); // Get current step count from sensor
+        LoadPlayerData(); // Ensure all player data is loaded
+
+        if (firstTimeLogin)
+        {
+            HandleFirstLogin();
+        }
+        else
+        {
+            stepsSinceStart = PlayerPrefs.GetInt("StepsSinceStart", 0); // Load stepsSinceStart from PlayerPrefs
+            previousSteps = PlayerPrefs.GetInt("PreviousSteps", 0); // Fetch last known steps
+            currentSteps = stepCounterController.GetSteps(); // Fetch current steps
+            inGameSteps = PlayerPrefs.GetInt("InGameSteps");
+            Debug.Log($"Game restarted: stepsSinceStart: {stepsSinceStart}, currentSteps: {currentSteps}, inGameSteps: {inGameSteps}");
+        }
+    }
+
+    private void HandleFirstLogin()
+    {
+        stepsSinceStart = stepCounterController.GetStepsSinceStart(); // Get current step count from sensor
         PlayerPrefs.SetInt("StepsSinceStart", stepsSinceStart);
         firstTimeLogin = false;
         PlayerPrefs.SetInt("FirstLogin", 0);
         PlayerPrefs.Save();
         Debug.Log("First time setup: Initial steps recorded: " + stepsSinceStart);
     }
-    else
+
+    private void Update()
     {
-        stepsSinceStart = PlayerPrefs.GetInt("StepsSinceStart", 0); // Load stepsSinceStart from PlayerPrefs
+        currentSteps = stepCounterController.GetSteps();
+        Debug.Log($"Current steps from controller: {currentSteps}, Previously recorded steps: {previousSteps}");
+
+        if (currentSteps != previousSteps)
+        {
+            if (currentSteps > previousSteps)
+            {
+                int stepsToAdd = currentSteps - previousSteps;
+                inGameSteps += stepsToAdd;
+                Debug.Log($"Update: Steps added: {stepsToAdd}, New total in-game steps: {inGameSteps}");
+                previousSteps = currentSteps; // Update previousSteps to the latest value
+            }
+            else
+            {
+                Debug.Log("Error: Current steps less than previous steps - check for reset or rollover");
+            }
+        }
+        else
+        {
+            Debug.Log("No change in step count detected.");
+        }
     }
 
-    previousSteps = stepsSinceStart; // Initialize previousSteps to stepsSinceStart on every start
-    int currentSteps = stepCounterController.GetSteps();
-    inGameSteps = Math.Max(0, currentSteps - stepsSinceStart); // Ensure that inGameSteps doesn't go negative
-    Debug.Log($"Game restarted: stepsSinceStart: {stepsSinceStart}, currentSteps: {currentSteps}, inGameSteps: {inGameSteps}");
-}
-
-private void Update()
-{
-    int currentSteps = stepCounterController.GetSteps();
-    if (currentSteps >= previousSteps)
-    {
-        int stepsToAdd = currentSteps - previousSteps;
-        inGameSteps += stepsToAdd; // Increment in-game steps by new steps detected since last update
-        previousSteps = currentSteps;
-     //   Debug.Log($"Update: Current steps: {currentSteps}, Previous steps: {previousSteps}, Steps to add: {stepsToAdd}, Total in-game steps: {inGameSteps}");
-    }
-}
     public int stepTokens;
     public void ConvertStepsToTokens()
     {
         stepTokens = (inGameSteps / 1000);
     }
 
-    
     public bool firstTimeLogin = true;
     public void SavePlayerData()
-{
-    PlayerPrefs.SetInt("PlayerLevel", level);
-    PlayerPrefs.SetInt("PlayerGold", gold);
-    PlayerPrefs.SetInt("CurrentStageIndex", currentStageIndex);
-    PlayerPrefs.SetInt("FirstLogin", firstTimeLogin ? 1 : 0); // Convert bool to int
-    
-    PlayerPrefs.Save();
-    Debug.Log("Data saved");
-}
+    {
+        PlayerPrefs.SetInt("PlayerLevel", level);
+        PlayerPrefs.SetInt("PlayerGold", gold);
+        PlayerPrefs.SetInt("CurrentStageIndex", currentStageIndex);
+        PlayerPrefs.SetInt("FirstLogin", firstTimeLogin ? 1 : 0);
+        PlayerPrefs.Save();
+        Debug.Log("Data saved");
+    }
 
     public void ResetSteps()
-{
-    // Reset only the in-game steps counter
-    inGameSteps = 0;
-
-    // No need to touch stepsSinceStart since it's a historical record from first load
-
-    // Save the reset state to PlayerPrefs to ensure persistence across sessions
-    SaveStepsData();
-
-    Debug.Log("In-game steps have been reset to 0.");
-}
-
+    {
+        inGameSteps = 0;
+        SaveStepsData();
+        Debug.Log("In-game steps have been reset to 0.");
+    }
 
     public void LoadPlayerData()
-{
-    if (PlayerPrefs.HasKey("PlayerLevel"))
     {
-        level = PlayerPrefs.GetInt("PlayerLevel");
-        gold = PlayerPrefs.GetInt("PlayerGold");
-        currentStageIndex = PlayerPrefs.GetInt("CurrentStageIndex");
-        // Convert int back to bool
-        firstTimeLogin = PlayerPrefs.GetInt("FirstLogin", 1) == 1; // Default to true if not set
+        level = PlayerPrefs.GetInt("PlayerLevel", 1);
+        gold = PlayerPrefs.GetInt("PlayerGold", 0);
+        currentStageIndex = PlayerPrefs.GetInt("CurrentStageIndex", 0);
+        firstTimeLogin = PlayerPrefs.GetInt("FirstLogin", 1) == 1;
     }
-}
 
-
-     private void OnApplicationPause(bool pauseStatus)
+    private void OnApplicationPause(bool pauseStatus)
     {
         if (pauseStatus)
         {
-            stepsAtCloseOfApp = inGameSteps;
-            stepCounterController.SaveLastKnownSteps();
             SavePlayerData();
             SaveStepsData();
         }
         else
         {
             LoadStepsData();
-            AdjustStepsPostPause();
         }
     }
 
     private void OnApplicationQuit()
     {
         SavePlayerData();
-        stepCounterController.SaveLastKnownSteps();
         SaveStepsData();
     }
 
-    private void AdjustStepsPostPause()
+    public void SaveStepsData()
     {
-        int lastKnownSteps = stepCounterController.GetInitialStepsOnResume();
-        int currentSteps = stepCounterController.GetSteps();
-        if (currentSteps > lastKnownSteps)
-        {
-            inGameSteps += currentSteps - lastKnownSteps;
-        }
-        Debug.Log("Adjusted Steps after resume: " + inGameSteps);
+        PlayerPrefs.SetInt("InGameSteps", inGameSteps);
+        PlayerPrefs.SetInt("PreviousSteps", previousSteps);
+        PlayerPrefs.Save();
+        Debug.Log("Saved steps data: InGameSteps and PreviousSteps");
     }
 
-public void SaveStepsData()
-{
-    PlayerPrefs.SetInt("InGameSteps", inGameSteps);
-    PlayerPrefs.Save();
-    Debug.Log("Saved total steps: " + inGameSteps);
-}
+    public void LoadStepsData()
+    {
+        inGameSteps = PlayerPrefs.GetInt("InGameSteps", 0);
+        previousSteps = PlayerPrefs.GetInt("PreviousSteps", 0);
+        Debug.Log("Loaded steps data: InGameSteps and PreviousSteps");
+    }
 
-private void LoadStepsData()
-{
-    inGameSteps = PlayerPrefs.GetInt("InGameSteps", 0); // Load in-game steps
-    Debug.Log("Loaded Steps: " + inGameSteps);
-}
-
-
-    
     public bool UseSteps(int amountToUse)
     {
         if (inGameSteps >= amountToUse)
         {
-         inGameSteps -= amountToUse;
-         Debug.Log("Spent steps: " + amountToUse);
-         return true;
+            inGameSteps -= amountToUse;
+            Debug.Log("Spent steps: " + amountToUse);
+            return true;
         }
-        else
         return false;
     }
-
-
-
-  
 }
