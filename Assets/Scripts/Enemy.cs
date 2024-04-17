@@ -13,8 +13,6 @@ public class Enemy : Character
     public MaterialItem[] possibleDrops; // Assign this in the Inspector with your material items.
     public int dropChancePercentage = 50; // Example drop chance.
 
-    // Additional enemy-specific properties and behavior
-
     protected override void Awake()
     {
         base.Awake();
@@ -23,43 +21,38 @@ public class Enemy : Character
 
     protected virtual void UpdateExpAndGoldRewards()
     {
-        this.expReward = CalculateExpReward(this.level);
-        this.goldReward = CalculateGoldReward(this.level);
+        expReward = CalculateExpReward(level);
+        goldReward = CalculateGoldReward(level);
     }
 
     protected int CalculateExpReward(int level)
     {
         if (level < 20)
         {
-            // For levels 1-20, use a quadratic polynomial formula
-            return 100 * level * level;
+            return 100 * level * level; // For levels 1-20, use a quadratic polynomial formula
         }
         else
         {
-            // Beyond level 20, use an exponential model to steeply increase EXP requirements
-            return (int)(100 * Mathf.Pow(1.5f, level - 19) * 400); // 400 is 20^2, the base EXP at level 20
+            return (int)(100 * Mathf.Pow(1.5f, level - 19) * 400); // Beyond level 20, exponential model
         }
     }
 
     protected int CalculateGoldReward(int level)
     {
-        // Example gold reward calculation. 
-        return 3 + (level * 2);
+        return 3 + (level * 2); // Example gold reward calculation. 
     }
 
     // Call this method when the enemy is defeated.
     public void DropMaterial()
     {
-       
         if (Random.Range(0, 100) < dropChancePercentage)
         {
-            // Select a random material to drop.
             int dropIndex = Random.Range(0, possibleDrops.Length);
             MaterialItem droppedMaterial = possibleDrops[dropIndex];
 
             Debug.Log("Dropped material: " + droppedMaterial.itemName);
-            // Here, you'd add the dropped material to the player's inventory.
-                 GameManager.Instance.inventory.AddItem(droppedMaterial);
+            // Add the dropped material to the player's inventory via GameManager
+            GameManager.Instance.AddItem(droppedMaterial);
         }
     }
 }

@@ -195,10 +195,31 @@ public void PopulateInventoryList() {
     SetupUpgradeBar(spdUpgradeBar, companion.statUpgradeProgress["spd"], () => IncreaseCompanionStat(companion, "spd"));
     SetupUpgradeBar(spUpgradeBar, companion.statUpgradeProgress["sp"], () => IncreaseCompanionStat(companion, "sp"));
 
-
     // Update companion's stats display and make sure the stats panel is visible
     UpdateCompanionStatsDisplay(companion);
     companionStatsPanel.SetActive(true);
+
+    // Find and configure the HealButton
+    GameObject healButton = GameObject.Find("HealButton");
+    if (healButton != null)
+    {
+        Button btn = healButton.GetComponent<Button>();
+        if (btn != null)
+        {
+            // Remove all listeners to avoid stacking if the button is reused
+            btn.onClick.RemoveAllListeners();
+            // Add a listener to call RecoverForSteps when clicked
+            btn.onClick.AddListener(GameManager.Instance.RecoverForSteps);
+        }
+        else
+        {
+            Debug.LogError("HealButton does not have a Button component attached.");
+        }
+    }
+    else
+    {
+        Debug.LogError("HealButton GameObject not found in the scene.");
+    }
 }
 
 private void SetupUpgradeBar(GameObject upgradeBarGO, int initialProgress, Action onMaxLevelReached)

@@ -102,7 +102,7 @@ public class PlayerData : MonoBehaviour
     private void Update()
     {
         currentSteps = stepCounterController.GetSteps();
-        Debug.Log($"Current steps from controller: {currentSteps}, Previously recorded steps: {previousSteps}");
+     //   Debug.Log($"Current steps from controller: {currentSteps}, Previously recorded steps: {previousSteps}");
 
         if (currentSteps != previousSteps)
         {
@@ -110,17 +110,17 @@ public class PlayerData : MonoBehaviour
             {
                 int stepsToAdd = currentSteps - previousSteps;
                 inGameSteps += stepsToAdd;
-                Debug.Log($"Update: Steps added: {stepsToAdd}, New total in-game steps: {inGameSteps}");
+               // Debug.Log($"Update: Steps added: {stepsToAdd}, New total in-game steps: {inGameSteps}");
                 previousSteps = currentSteps; // Update previousSteps to the latest value
             }
             else
             {
-                Debug.Log("Error: Current steps less than previous steps - check for reset or rollover");
+              //  Debug.Log("Error: Current steps less than previous steps - check for reset or rollover");
             }
         }
         else
         {
-            Debug.Log("No change in step count detected.");
+          //  Debug.Log("No change in step count detected.");
         }
     }
 

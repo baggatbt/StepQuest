@@ -22,6 +22,8 @@ public class GameManager : MonoBehaviour
     public Inventory inventory;
     // Centralized item list managed by GameManager
     public List<Item> itemList = new List<Item>();
+    public int maxInventorySlots = 16;
+    
     
 
     public int currentStageIndex;
@@ -51,6 +53,8 @@ public class GameManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
             SceneManager.sceneLoaded += OnSceneLoaded;
             currentStageIndex = PlayerData.Instance.currentStageIndex; //Gets the current stage from PlayerData
+            maxInventorySlots = 16;
+            Debug.Log("Initial item list count: " + itemList.Count);
 
             //Each companion has equal chance to be selected for attack, need to change so it uses the class's variable threat
             probabilityCompanion1 = 1f;
@@ -77,41 +81,78 @@ public class GameManager : MonoBehaviour
           
     }
 
-    public int maxInventorySlots = 16; // Maximum number of slots
-public void AddItem(Item newItem)
-{
-    bool itemExists = false;
-    foreach (Item item in itemList) {
-        if (item.itemID == newItem.itemID) {
+  
+ public void AddItem(Item newItem)
+    {
+        if (itemList.Count >= maxInventorySlots)
+        {
+            Debug.Log("Inventory is full!");
+            return;
+        }
+
+        var item = itemList.Find(i => i.itemID == newItem.itemID);
+        if (item != null)
+        {
             item.quantity++;
-            Debug.Log("item quantity: " + item.quantity);
-            itemExists = true;
-            inventory.SaveInventory();
-            break; // Exit the loop after finding and incrementing the item
+        }
+        else
+        {
+            newItem.quantity = 1;
+            itemList.Add(newItem);
+        }
+        SaveInventory();
+        inventory.UpdateInventoryUI();
+    }
+
+    public void RemoveItem(Item item)
+    {
+        Item foundItem = itemList.Find(i => i.itemID == item.itemID);
+        if (foundItem != null && foundItem.quantity > 1)
+        {
+            foundItem.quantity--;
+        }
+        else
+        {
+            itemList.Remove(foundItem);
+        }
+        SaveInventory();
+        inventory.UpdateInventoryUI();
+    }
+
+    public void SaveInventory()
+    {
+        string json = JsonUtility.ToJson(new ItemContainer { Items = itemList }, true);
+        System.IO.File.WriteAllText($"{Application.persistentDataPath}/inventory.json", json);
+        Debug.Log("Inventory saved.");
+    }
+
+    public void LoadInventory()
+    {
+        string filePath = $"{Application.persistentDataPath}/inventory.json";
+        if (System.IO.File.Exists(filePath))
+        {
+            string json = System.IO.File.ReadAllText(filePath);
+            var itemContainer = JsonUtility.FromJson<ItemContainer>(json);
+            itemList = itemContainer.Items;
+            inventory.UpdateInventoryUI();
+            Debug.Log("Inventory loaded.");
+        }
+        else
+        {
+            Debug.Log("No inventory save found.");
         }
     }
-    
-    if (!itemExists) {
-        // If the item doesn't exist, add it to the list with a quantity of 1
-        newItem.quantity = 1;
-        itemList.Add(newItem);
-        inventory.SaveInventory();
-    }
-}
 
-        
-        
-
-    // Remove item from the list
-    public void RemoveItem(Item item) {
-        if (itemList.Contains(item)) {
-            itemList.Remove(item);
-        }
-        // Optionally, trigger any necessary updates or notifications
+    [System.Serializable]
+    class ItemContainer
+    {
+        public List<Item> Items;
     }
+
 
     public Item testItem;
-    public void AddTestItem() {
+    public void AddTestItem()
+    {
         AddItem(testItem);
     }
 
@@ -162,22 +203,49 @@ public void AddItem(Item newItem)
     public void UnlockConnectedStages(Stage completedStage)
 {
     Debug.Log($"Unlocking stages connected to: {completedStage.stageID}");
+    bool hasUnlockedAny = false; // Track if any new stages were unlocked
 
     foreach (Stage connectedStage in completedStage.connectedStages)
     {
-        Debug.Log($"Checking connected stage: {connectedStage.stageID}");
-
         if (!UnlockedStageNames.Contains(connectedStage.stageID))
         {
             Debug.Log($"Unlocking connected stage: {connectedStage.stageID}");
             UnlockedStageNames.Add(connectedStage.stageID);
+            hasUnlockedAny = true; // Indicate that a new stage has been unlocked
         }
         else
         {
             Debug.Log($"Stage already unlocked: {connectedStage.stageID}");
         }
     }
+
+    // If any new stages were unlocked, save the updated list
+    if (hasUnlockedAny)
+    {
+        SaveUnlockedStages();
+    }
 }
+
+private void SaveUnlockedStages()
+{
+    // Convert HashSet to a List to serialize
+    List<string> unlockedStagesList = new List<string>(UnlockedStageNames);
+
+    // Convert the list to a JSON string
+    string json = JsonUtility.ToJson(new StageList { Stages = unlockedStagesList });
+
+    // Save the JSON string to PlayerPrefs
+    PlayerPrefs.SetString("UnlockedStages", json);
+    PlayerPrefs.Save();
+    Debug.Log("Unlocked stages saved.");
+}
+
+[System.Serializable]
+private class StageList
+{
+    public List<string> Stages;
+}
+
 
 
    
@@ -201,6 +269,22 @@ public void AddItem(Item newItem)
     Debug.Log("All PlayerPrefs deleted");
     PlayerData.Instance.ResetSteps();
 }
+
+public void DeleteSavedInventory()
+    {
+        string filePath = $"{Application.persistentDataPath}/inventory.json";
+        if (System.IO.File.Exists(filePath))
+        {
+            System.IO.File.Delete(filePath);
+            itemList.Clear();
+            inventory.UpdateInventoryUI();
+            Debug.Log("Saved inventory data deleted.");
+        }
+        else
+        {
+            Debug.Log("No saved inventory data to delete.");
+        }
+    }
 
 // Method to add a companion to the list
    public void RegisterCompanion(Companion companion)
@@ -246,6 +330,8 @@ public void AddItem(Item newItem)
     {
         currentCompanion.health = currentCompanion.maxHealth;
         currentCompanion.energy = currentCompanion.maxEnergy;
+        Debug.Log("Current Companion " + currentCompanion);
+        currentCompanion.SaveCharacterData();
     }
 
     public void RecoverForSteps()

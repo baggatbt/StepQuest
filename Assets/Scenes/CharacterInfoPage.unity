@@ -1415,8 +1415,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inventoryUI: {fileID: 2009918416}
   slotPrefab: {fileID: 7376581010048672609, guid: 57ccb21085c27454aa5a7a89f65d064d, type: 3}
-  maxInventorySlots: 18
-  testItem: {fileID: 11400000, guid: 12a9ba489cc5c5d4e8b0cc4d0ac36d49, type: 2}
 --- !u!225 &163357875
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -9306,6 +9304,7 @@ MonoBehaviour:
   currentCompanion: {fileID: 0}
   inventory: {fileID: 163357874}
   itemList: []
+  maxInventorySlots: 16
   currentStageIndex: 0
   allStages:
   - poolName: Forest
@@ -9328,7 +9327,6 @@ MonoBehaviour:
   probabilityCompanion2: 50
   probabilityCompanion3: 50
   accountLevel: 0
-  maxInventorySlots: 16
   testItem: {fileID: 11400000, guid: 12a9ba489cc5c5d4e8b0cc4d0ac36d49, type: 2}
 --- !u!4 &728042707
 Transform:
@@ -17379,19 +17377,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1661800543}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 728042706}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: RecoverForSteps
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1661800543
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18336,8 +18322,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 163357874}
-        m_TargetAssemblyTypeName: Inventory, Assembly-CSharp
+      - m_Target: {fileID: 728042706}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
         m_MethodName: DeleteSavedInventory
         m_Mode: 1
         m_Arguments:

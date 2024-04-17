@@ -1064,8 +1064,8 @@ private void ProcessVictory()
     EndOfBattleRewards(enemies);
     Debug.Log("Battle won");
 
-   // Stage completedStage = GameManager.Instance.CurrentBattleConfig.stage;
-   // GameManager.Instance.UnlockConnectedStages(completedStage);
+      Stage completedStage = GameManager.Instance.CurrentBattleConfig.stage;
+      GameManager.Instance.UnlockConnectedStages(completedStage);
    // if (completedStage.isFirstCompletion)
     {
     //    PlayerData.Instance.currentStageIndex++;
