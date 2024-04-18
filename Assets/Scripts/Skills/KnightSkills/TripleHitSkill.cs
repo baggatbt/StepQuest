@@ -9,7 +9,7 @@ public class TripleHitSkill : Skill
     public TripleHitSkill()
     {
         skillName = "Triple Slash";
-        description = "Slash three times";
+        description = "Tap before each hit for extra damage";
         requiresMovement = true;
         energyCost = 3;
         numberOfAttacksPossible = 3;
@@ -19,7 +19,7 @@ public class TripleHitSkill : Skill
     // Override the default base damage calculation.
     protected override int CalculateBaseDamage(Character user)
     {
-        return (int)(user.attackPower * 0.7f);  
+        return (int)Math.Ceiling(user.attackPower * 0.7f); //Rounds up to next integer of any fraction
     }
     
 
