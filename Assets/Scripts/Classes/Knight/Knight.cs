@@ -47,11 +47,26 @@ public class Knight : Companion
         if (this.heroExp >= ExpToNextLevel(this.heroLevel))
         {
             this.heroLevel++;
-            this.heroExp = 0; // Need to handle overflow exp  
+            this.heroExp = 0; // Handle overflow exp
             this.heroStatPoints += 5;
             this.heroSkillPoints += 1;
-            Debug.Log("hero leveled up, now lv : " + this.heroLevel);
-        } 
+            
+            // Stat increases by level
+            if (this.heroLevel % 2 == 0) this.attackPower += 1; // Every 2 levels increase attack power
+            if (this.heroLevel % 3 == 0) this.maxHealth += 3; // Every 3 levels increase health by 3
+            else this.maxHealth += 2; // Other levels increase health by 2
+            if (this.heroLevel == 5 || this.heroLevel == 10) this.maxEnergy += 1; // Levels 5 and 10 increase energy
+            
+
+            //TO IMPLEMENT LATER
+            //As the levels go higher, the growth rates will rise to match.
+            //Example: past 20, it will be 2 attack power ever 2 levels
+            
+            this.health = this.maxHealth; // Refresh health to new max
+            this.energy = this.maxEnergy; // Refresh energy to new max
+            
+            Debug.Log("Hero leveled up, now level: " + this.heroLevel);
+        }
     }
 
     
