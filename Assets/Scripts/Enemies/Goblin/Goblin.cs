@@ -16,7 +16,7 @@ public class Goblin : Enemy
         this.defensePenetration = 0;
         this.attacksBeforeSpecial = 2;
         this.attackPower = 4;
-        this.defensePower = 5;
+        this.defensePower = 0;
         this.energy = 0;
     }
 
@@ -48,7 +48,7 @@ public class Goblin : Enemy
         this.goldReward = 3 + (this.level * 2); // You can keep or modify this if you want specific gold logic for Goblins
         this.attacksBeforeSpecial = 2;
       //  this.attackPower = 6 + (this.level * 2); 
-        this.defensePower = 5 + (this.level + 1);
+      // this.defensePower = 5 + (this.level + 1);
         this.energy = 0;
     }
    

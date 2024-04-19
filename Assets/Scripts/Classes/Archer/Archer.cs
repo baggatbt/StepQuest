@@ -16,7 +16,7 @@ public class Archer : Companion
             this.attackPower = 8;
             this.maxHealth = 14;
             this.health = this.maxHealth;
-            this.defensePower = 12;
+            this.defensePower = 0;
             this.speed = 10;
             this.maxEnergy = 6;
             this.energy = this.maxEnergy;

@@ -191,17 +191,17 @@ public class Character : MonoBehaviour
         }
         
     // Calculate effective defense after penetration
-   // int effectiveDefense = Math.Max(0, defensePower - attacker.defensePenetration);
+      int effectiveDefense = Math.Max(0, defensePower - attacker.defensePenetration);
    // Debug.Log("The target has " + effectiveDefense + " defense left after penetration.");
 
-    // Calculate total damage using the new formula
-    float totalDamage = damageOfAttacker; //* (100f / (100f + effectiveDefense));
-    int damageDealt = Mathf.FloorToInt(totalDamage); // Convert to integer, adjust as needed
+    // Calculate total damage after flat defense reduction
+    int totalDamageAfterDefense = damageOfAttacker - effectiveDefense;
+    
 
-    Debug.Log("Total damage dealt  = " + damageDealt);
+    Debug.Log("Total damage dealt  = " + totalDamageAfterDefense);
 
     // Subtract the calculated damage from health
-    this.health -= damageDealt;
+    this.health -= totalDamageAfterDefense;
     if (this.healthBar != null)
     {
     this.healthBar.value = health;
@@ -215,7 +215,7 @@ public class Character : MonoBehaviour
     }
     
     // Check if damage was dealt for additional effects
-    if (damageDealt >= 1)
+    if (totalDamageAfterDefense >= 1)
     { 
         Debug.Log("did block from character" + this.didBlock);
         if (!this.didBlock){
@@ -228,7 +228,7 @@ public class Character : MonoBehaviour
         {
             GameObject damagePopupInstance = Instantiate(damagePopupPrefab, transform.position, Quaternion.identity, endOfBattleRewardsTransform);
             DamagePopup damagePopupScript = damagePopupInstance.GetComponent<DamagePopup>();
-            damagePopupScript.Setup(damageDealt);
+            damagePopupScript.Setup(totalDamageAfterDefense);
         }
         else
         {

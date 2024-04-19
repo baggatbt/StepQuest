@@ -45,7 +45,7 @@ public class Mushroom : Enemy
         this.expReward = 10 + (this.level * 2);
         this.goldReward = 4 + (this.level * 3); // You can keep or modify this if you want specific gold logic for Mushrooms
      //   this.attackPower = 8 + (this.level + 1); // Adjusted to match the original pattern
-        this.defensePower = 15 + (this.level + 3); // Adjusted to match the original pattern
+       // this.defensePower = 15 + (this.level + 3); // Adjusted to match the original pattern
         this.energy = 0;
     }
 }

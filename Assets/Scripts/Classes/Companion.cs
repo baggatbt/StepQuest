@@ -146,6 +146,7 @@ public abstract class Companion : Character
 
     public int ExpToNextLevel(int heroLevel)
 {
+    Debug.Log("EXP to level : " + (30 * heroLevel * heroLevel));
     //TEMP
      return 30 * heroLevel * heroLevel;
     /*
