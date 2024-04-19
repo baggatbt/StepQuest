@@ -47,31 +47,31 @@ public class Knight : Companion
         switch (this.heroLevel)
         {
             case 2:
-                this.maxHealth += 1; // +1 hp at level 2
+                this.maxHealth += 2; 
                 break;
             case 3:
-                this.attackPower += 1; // +1 dmg at level 3
+                this.attackPower += 1; 
                 break;
             case 4:
-                this.defensePower += 1; // +1 def at level 4
+                this.maxHealth += 3; 
                 break;
             case 5:
-                this.attackPower += 1; // +1 dmg at level 5
+                this.attackPower += 1; 
                 break;
             case 6:
-                this.maxHealth += 1; // +1 hp at level 6
+                this.maxEnergy += 1; 
                 break;
             case 7:
-                this.defensePower += 1; // +1 def at level 7
+                this.maxHealth += 3; 
                 break;
             case 8:
-                this.attackPower += 1; // +1 dmg at level 8
+                this.attackPower += 1; 
                 break;
             case 9:
-                this.maxEnergy += 1; // +1 energy at level 9
+                this.defensePower += 1; 
                 break;
             case 10:
-                this.speed += 1; // +1 speed at level 10
+                this.maxHealth += 4; 
                 break;
             default:
                 break; //TODO: extend this later when I have concrete balance plans

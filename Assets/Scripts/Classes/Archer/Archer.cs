@@ -37,32 +37,57 @@ public class Archer : Companion
 
     
 
-   public override void LevelUp()
+    public override void LevelUp()
+{
+    if (this.heroExp >= ExpToNextLevel(this.heroLevel))
     {
-        if (this.heroExp >= ExpToNextLevel(this.heroLevel))
-        {
-            this.heroLevel++;
-            this.heroExp = 0; // Handle overflow exp
-            this.heroStatPoints += 5;
-            this.heroSkillPoints += 1;
-            
-            // Stat increases by level
-            if (this.heroLevel % 2 == 0) this.attackPower += 1; // Every 2 levels increase attack power
-            if (this.heroLevel % 3 == 0) this.maxHealth += 3; // Every 3 levels increase health by 3
-            else this.maxHealth += 2; // Other levels increase health by 2
-            if (this.heroLevel == 5 || this.heroLevel == 10) this.maxEnergy += 1; // Levels 5 and 10 increase energy
-            
+        this.heroExp -= ExpToNextLevel(this.heroLevel); // Handles exp past the required amount
+        this.heroLevel++;
+        
 
-            //TO IMPLEMENT LATER
-            //As the levels go higher, the growth rates will rise to match.
-            //Example: past 20, it will be 2 attack power ever 2 levels
-            
-            this.health = this.maxHealth; // Refresh health to new max
-            this.energy = this.maxEnergy; // Refresh energy to new max
-            
-            Debug.Log("Hero leveled up, now level: " + this.heroLevel);
+        switch (this.heroLevel)
+        {
+            case 2:
+                this.attackPower += 1; 
+                break;
+            case 3:
+                this.maxHealth += 2; 
+                break;
+            case 4:
+                this.attackPower += 3; 
+                break;
+            case 5:
+                this.attackPower += 1; 
+                break;
+            case 6:
+                this.maxEnergy += 2; 
+                break;
+            case 7:
+                this.maxHealth += 3; 
+                break;
+            case 8:
+                this.speed += 1;
+                break;
+            case 9:
+                this.attackPower += 2; 
+                break;
+            case 10:
+                this.maxHealth += 2; 
+                break;
+            default:
+                break; //TODO: extend this later when I have concrete balance plans
         }
+
+        // Update current health and energy to new max values
+        this.health = this.maxHealth;
+        this.energy = this.maxEnergy;
+
+        this.heroStatPoints += 1; // Every 3 levels will allow player to upgrade one stat of their choice +1
+        this.heroSkillPoints += 1; //TODO: Implement skill unlocking
+
+        Debug.Log("Hero leveled up to level " + this.heroLevel + ", stat upgraded.");
     }
+}
 
     
     
