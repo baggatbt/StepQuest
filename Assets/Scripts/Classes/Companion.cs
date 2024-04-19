@@ -164,6 +164,12 @@ public abstract class Companion : Character
     */
 }
 
+    public void RecoverHealth(int amount)
+    {
+        health += amount;
+        health = Mathf.Clamp(health, 0, maxHealth); // Ensure health doesn't exceed maxHealth
+    }
+
 
 
 }

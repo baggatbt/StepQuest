@@ -39,13 +39,24 @@ public class Consumable : Item
     
     public void Consume(Companion companion)
     {
-        // Apply the consumable's effect, e.g., recovering health.
-        // companion.RecoverHealth(healthRecoveryAmount);
-        
-        // Optionally, handle the removal of the consumable from the inventory here.
+        // Check if the consumable is indeed a health potion
+        if (itemType == ItemType.Consumable)
+        {
+            // Apply the consumable's effect, e.g., recovering health.
+            companion.RecoverHealth(healthRecoveryAmount);
+            
+            // Optionally, reduce the quantity of the consumable in the inventory
+            // This logic may belong elsewhere, such as in an InventoryManager class
+            quantity--;
+        }
+
+        // If quantity falls below 1, it could be removed from the inventory.
+        if (quantity < 1)
+        {
+            // InventoryManager.Remove(this);
+        }
     }
 }
-
 
 
 [System.Serializable]
