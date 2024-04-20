@@ -24,7 +24,9 @@ public class MainMenuUIManager : MonoBehaviour
     public GameObject companionListPanel;
     public GameObject companionStatsPanel;
     public CircleShrinkAndCheck circleShrinkAndCheck;
-    
+    public GameObject consumablesPanel;  // Assign in inspector
+    public Transform consumableListContent;  // Assign the content transform of your scroll view in the consumables panel
+
     // References to stat UI Text elements
     public TextMeshProUGUI levelText,atkText, hpText, spText, expText, spdText; 
 
@@ -56,6 +58,53 @@ public class MainMenuUIManager : MonoBehaviour
     {  
        
 
+    }
+
+    public void ToggleConsumablesPanel()
+    {
+        bool isActive = consumablesPanel.activeSelf;
+        consumablesPanel.SetActive(!isActive);
+        if (!isActive)
+            PopulateConsumablesList();  // Populate list when the panel is opened
+    }
+
+    void PopulateConsumablesList()
+    {
+        // Clear existing entries
+        foreach (Transform child in consumableListContent)
+        {
+            Destroy(child.gameObject);
+        }
+
+        // Populate the list with consumable items
+        foreach (Item item in GameManager.Instance.itemList)
+        {
+            if (item.itemType == ItemType.Consumable)  // Check if it's a consumable
+            {
+                GameObject itemGO = Instantiate(inventoryItemPrefab, consumableListContent);
+                itemGO.GetComponentInChildren<Image>().sprite = item.itemIcon;  // Assuming prefab structure
+                itemGO.GetComponentInChildren<TextMeshProUGUI>().text = $"{item.itemName} x{item.quantity}";
+
+                Button useButton = itemGO.GetComponentInChildren<Button>(); // Assuming a Button exists in the prefab
+                useButton.gameObject.SetActive(true);
+                useButton.onClick.RemoveAllListeners();
+                useButton.onClick.AddListener(() => UseItem(item));
+            }
+        }
+    }
+
+    void UseItem(Item item)
+    {
+        // Assuming the consumable reduces quantity and might have other effects
+        Debug.Log("Using item: " + item.itemName);
+        ConsumableItem consumableItem = item as ConsumableItem;
+        if (consumableItem != null)
+        {
+            consumableItem.Consume(GameManager.Instance.currentCompanion); // Just an example usage
+            // Update UI or handle the item quantity decrease
+            PopulateConsumablesList(); // Refresh list after using an item
+            UpdateCompanionStatsDisplay(GameManager.Instance.currentCompanion);
+        }
     }
     public void PopulateCompanionList()
 {
@@ -248,7 +297,7 @@ private void UpdateCompanionStatsDisplay(Companion companion)
 {
     levelText.text = "Lv: " + companion.heroLevel.ToString();
     atkText.text = "ATK: " + companion.attackPower.ToString();
-    hpText.text = "HP: " + companion.maxHealth.ToString();
+    hpText.text = "HP: " + companion.health + " / " + companion.maxHealth.ToString();
     spText.text = "SP: " + companion.maxEnergy.ToString();
     expText.text = "EXP: " + companion.heroExp.ToString() + " / " + companion.ExpToNextLevel(companion.heroLevel);
     spdText.text = "SPD: " + companion.speed.ToString();
