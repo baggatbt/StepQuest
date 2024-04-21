@@ -397,6 +397,7 @@ private void UpdateCompanionStatsDisplay(Companion companion)
    public void TogglePanel(GameObject panel)
 {
     panel.SetActive(!panel.activeSelf);
+    companionStatsPanel.SetActive(false);
 }
 
 //TIMER MANAGEMENT
@@ -505,8 +506,10 @@ private void UpdateCompanionStatsDisplay(Companion companion)
     public void openCharacterInterface()
     {
         characterGUI.SetActive(true);
+
         PopulateCompanionList();
     }
+    
 
     public void openInventory()
     {
