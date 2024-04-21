@@ -164,10 +164,14 @@ MonoBehaviour:
   isMoving: 0
   attackTrigger: 0
   animationEnded: 0
+  didBlock: 0
   attacksBeforeSpecial: 0
+  enemyHealthUI: {fileID: 0}
+  damageReflectionPercentage: 0
   statusEffectController: {fileID: 0}
   cameraShake: {fileID: 0}
   isAnimationDone: 0
+  currentBarrier: {fileID: 0}
   animationDamageTime: 0
   enemyDeathEffect: {fileID: 0}
   audioSource: {fileID: 1772341838862574825}
@@ -176,10 +180,15 @@ MonoBehaviour:
   heroID: 
   heroLevel: 0
   heroExp: 0
+  heroIcon: {fileID: 21300004, guid: 3a501bb3dcbdce54ba4b1f1dd4924979, type: 3}
   heroStatPoints: 0
   heroSkillPoints: 1
   stamina: 0
+  maxStamina: 0
   isUnlocked: 1
+  atkGrowth: 0
+  healthGrowth: 0
+  energyGrowth: 0
 --- !u!82 &1772341838862574825
 AudioSource:
   m_ObjectHideFlags: 0

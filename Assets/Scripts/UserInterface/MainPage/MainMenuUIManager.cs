@@ -106,7 +106,7 @@ public class MainMenuUIManager : MonoBehaviour
             UpdateCompanionStatsDisplay(GameManager.Instance.currentCompanion);
         }
     }
-    public void PopulateCompanionList()
+   public void PopulateCompanionList()
 {
     GameObject companionButtonContainer = GameObject.Find("Companion Button Container"); // Find or reference directly
 
@@ -123,12 +123,22 @@ public class MainMenuUIManager : MonoBehaviour
         if (companion.isUnlocked && addedCompanions.Add(companion.heroID)) // Checks if heroID is not already added
         {
             GameObject buttonObject = Instantiate(companionButtonPrefab, companionButtonContainer.transform); // Use the container as parent
-            buttonObject.GetComponentInChildren<TextMeshProUGUI>().text = companion.heroID;
+            Image buttonImage = buttonObject.GetComponent<Image>();
+            if (buttonImage != null && companion.heroIcon != null)
+            {
+                buttonImage.sprite = companion.heroIcon; // Set the hero's icon
+            }
+            else
+            {
+                Debug.LogError("Missing Image component on the button or heroIcon not set.");
+            }
+
             Button btn = buttonObject.GetComponent<Button>();
             btn.onClick.AddListener(delegate { OnCompanionSelected(companion); });
         }
     }
 }
+
    
 
     public CanvasGroup uiCanvasGroup;
