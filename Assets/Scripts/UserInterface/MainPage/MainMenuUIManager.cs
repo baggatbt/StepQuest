@@ -122,22 +122,28 @@ public class MainMenuUIManager : MonoBehaviour
     {
         if (companion.isUnlocked && addedCompanions.Add(companion.heroID)) // Checks if heroID is not already added
         {
-            GameObject buttonObject = Instantiate(companionButtonPrefab, companionButtonContainer.transform); // Use the container as parent
-            Image buttonImage = buttonObject.GetComponent<Image>();
-            if (buttonImage != null && companion.heroIcon != null)
+            // Instantiate the button within the container
+            GameObject buttonObject = Instantiate(companionButtonPrefab, companionButtonContainer.transform);
+
+            // Find the Image component on the instantiated button, assuming the Image component is a direct child of the prefab
+            Image heroIconImage = buttonObject.GetComponentInChildren<Image>();
+
+            if (heroIconImage != null && companion.heroIcon != null)
             {
-                buttonImage.sprite = companion.heroIcon; // Set the hero's icon
+                heroIconImage.sprite = companion.heroIcon; // Set the hero's icon
             }
             else
             {
                 Debug.LogError("Missing Image component on the button or heroIcon not set.");
             }
 
+            // Setup button to select the companion when clicked
             Button btn = buttonObject.GetComponent<Button>();
             btn.onClick.AddListener(delegate { OnCompanionSelected(companion); });
         }
     }
 }
+
 
    
 
