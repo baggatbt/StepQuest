@@ -125,16 +125,23 @@ public class MainMenuUIManager : MonoBehaviour
             // Instantiate the button within the container
             GameObject buttonObject = Instantiate(companionButtonPrefab, companionButtonContainer.transform);
 
-            // Find the Image component on the instantiated button, assuming the Image component is a direct child of the prefab
-            Image heroIconImage = buttonObject.GetComponentInChildren<Image>();
-
-            if (heroIconImage != null && companion.heroIcon != null)
+            // Find the HeroIcon Image component which is a child of the HeroIconBorder, which in turn is a child of the button object
+            Transform heroIconBorderTransform = buttonObject.transform.Find("HeroIconBorder");
+            if (heroIconBorderTransform != null)
             {
-                heroIconImage.sprite = companion.heroIcon; // Set the hero's icon
+                Image heroIconImage = heroIconBorderTransform.Find("HeroIcon")?.GetComponent<Image>();
+                if (heroIconImage != null && companion.heroIcon != null)
+                {
+                    heroIconImage.sprite = companion.heroIcon; // Set the hero's icon
+                }
+                else
+                {
+                    Debug.LogError("Missing Image component on HeroIcon or heroIcon not set.");
+                }
             }
             else
             {
-                Debug.LogError("Missing Image component on the button or heroIcon not set.");
+                Debug.LogError("HeroIconBorder not found within the button prefab.");
             }
 
             // Setup button to select the companion when clicked
@@ -143,6 +150,7 @@ public class MainMenuUIManager : MonoBehaviour
         }
     }
 }
+
 
 
    
