@@ -129,17 +129,19 @@ public class MainMenuUIManager : MonoBehaviour
             Image heroIconImage = buttonObject.transform.Find("HeroIconBorder/HeroIcon")?.GetComponent<Image>();
             Slider healthBarSlider = buttonObject.transform.Find("HealthBar").GetComponent<Slider>();
             Slider expBarSlider = buttonObject.transform.Find("ExpBar").GetComponent<Slider>();
-            TextMeshProUGUI healthBarText = buttonObject.transform.Find("HPLabel").GetComponent<TextMeshProUGUI>(); // Corrected Component type
-            TextMeshProUGUI xpBarText = buttonObject.transform.Find("ExpLabel").GetComponent<TextMeshProUGUI>(); // Corrected Component type
+            Text healthBarText = buttonObject.transform.Find("HealthBar/HealthText").GetComponent<Text>(); 
+            Text xpBarText = buttonObject.transform.Find("ExpBar/ExpText").GetComponent<Text>(); 
 
             // Set the hero's icon
             if (heroIconImage != null && companion.heroIcon != null)
             {
                 heroIconImage.sprite = companion.heroIcon;
             }
-
+             
             healthBarSlider.maxValue = companion.maxHealth;
             healthBarSlider.value = companion.health; 
+
+            expBarSlider.maxValue = companion.ExpToNextLevel(companion.heroLevel);
             expBarSlider.value = companion.heroExp;
 
             // Set the text for health and experience
