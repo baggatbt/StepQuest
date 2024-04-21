@@ -106,7 +106,7 @@ public class MainMenuUIManager : MonoBehaviour
             UpdateCompanionStatsDisplay(GameManager.Instance.currentCompanion);
         }
     }
-   public void PopulateCompanionList()
+  public void PopulateCompanionList()
 {
     GameObject companionButtonContainer = GameObject.Find("Companion Button Container"); // Find or reference directly
 
@@ -125,23 +125,36 @@ public class MainMenuUIManager : MonoBehaviour
             // Instantiate the button within the container
             GameObject buttonObject = Instantiate(companionButtonPrefab, companionButtonContainer.transform);
 
-            // Find the HeroIcon Image component which is a child of the HeroIconBorder, which in turn is a child of the button object
-            Transform heroIconBorderTransform = buttonObject.transform.Find("HeroIconBorder");
-            if (heroIconBorderTransform != null)
+            // Find components
+            Image heroIconImage = buttonObject.transform.Find("HeroIconBorder/HeroIcon")?.GetComponent<Image>();
+            Slider healthBarSlider = buttonObject.transform.Find("HealthBar").GetComponent<Slider>();
+            Slider expBarSlider = buttonObject.transform.Find("ExpBar").GetComponent<Slider>();
+            TextMeshProUGUI healthBarText = buttonObject.transform.Find("HPLabel").GetComponent<TextMeshProUGUI>(); // Corrected Component type
+            TextMeshProUGUI xpBarText = buttonObject.transform.Find("ExpLabel").GetComponent<TextMeshProUGUI>(); // Corrected Component type
+
+            // Set the hero's icon
+            if (heroIconImage != null && companion.heroIcon != null)
             {
-                Image heroIconImage = heroIconBorderTransform.Find("HeroIcon")?.GetComponent<Image>();
-                if (heroIconImage != null && companion.heroIcon != null)
-                {
-                    heroIconImage.sprite = companion.heroIcon; // Set the hero's icon
-                }
-                else
-                {
-                    Debug.LogError("Missing Image component on HeroIcon or heroIcon not set.");
-                }
+                heroIconImage.sprite = companion.heroIcon;
+            }
+
+            healthBarSlider.maxValue = companion.maxHealth;
+            healthBarSlider.value = companion.health; 
+            expBarSlider.value = companion.heroExp;
+
+            // Set the text for health and experience
+            if (healthBarText != null)
+            {
+                healthBarText.text = $"{companion.health} / {companion.maxHealth}";
+            }
+
+            if (xpBarText != null)
+            {
+                xpBarText.text = $"{companion.heroExp} / {companion.ExpToNextLevel(companion.heroLevel)}";
             }
             else
             {
-                Debug.LogError("HeroIconBorder not found within the button prefab.");
+                Debug.LogError("One or more components were not found on the button prefab.");
             }
 
             // Setup button to select the companion when clicked
