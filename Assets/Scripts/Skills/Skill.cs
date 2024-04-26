@@ -152,28 +152,32 @@ public abstract class Skill
     public void HandleTimingResultForPlayerAttack(Character user, Character target, TimingEventResult timingResult, int baseDamage)
 {
     float damageTimingMultiplier = 1.0f;
-        int skillBaseDamage = baseDamage;
-        int finalDamage;
-        
-        result = timingResult;
-        
+    float skillBaseDamage = baseDamage; // Use float for baseDamage to allow for fractional multipliers
+    int finalDamage;
+    
+    result = timingResult;
+    
     if (result == TimingEventResult.Good)
     {
         Debug.Log("Good Hit!");
-        damageTimingMultiplier = 1.25f;  // Boost damage by 25% later replace with 
-        finalDamage = (int)(skillBaseDamage * damageTimingMultiplier);
-        target.TakeDamage(finalDamage,user);
-        user.PlayCriticalHitSound(); // Play critical hit sound
+        damageTimingMultiplier = 1.25f;  // Boost damage by 25%
         
+        // Calculate final damage and round up
+        finalDamage = Mathf.CeilToInt(skillBaseDamage * damageTimingMultiplier);
+        
+        target.TakeDamage(finalDamage, user);
+        user.GainEnergy(1); // Bonus energy for a good hit
+        user.PlayCriticalHitSound(); // Play critical hit sound
     }
     else
     {
         damageTimingMultiplier = 1.0f;  // Base damage
-        finalDamage = (skillBaseDamage);
-        target.TakeDamage(finalDamage,user);
+        finalDamage = baseDamage; // No need to round since no multiplier
+        target.TakeDamage(finalDamage, user);
         user.PlayHitSound(); // Play hit sound
     }
 }
+
 
 
 
@@ -192,7 +196,7 @@ public void HandlePlayerRangedAttack(Character user, Projectile projectile, Timi
             user.PlayHitSound();
         }
 
-        projectile.damage = (int)(projectile.damage * damageMultiplier);
+        projectile.damage = Mathf.CeilToInt(projectile.damage * damageMultiplier);
     }
 
 

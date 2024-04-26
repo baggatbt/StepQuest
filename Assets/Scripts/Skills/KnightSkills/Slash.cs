@@ -56,27 +56,15 @@ public class Slash : Skill
         Debug.Log("waiting on animation to finish");
     
         yield return new WaitUntil(() => user.isAnimationDone == true);
-        user.GainEnergy(EnergyGain());
        // target.CheckForDeath();
+        user.GainEnergy(energyGain);
         user.animationDamageTime = false;
         user.isAnimationDone = false;
         user.isAttacking = false;
         target.CheckForDeath();
     }
 
-    private int EnergyGain()
-    {
-        if (result == TimingEventResult.Good)
-        {
-            Debug.Log("2 energy");
-            return 2;
-        }
-        else
-        {
-            Debug.Log("1 energy");
-            return 1;
-        }
-    }
+    
 
 
     private IEnumerator TimingWindow(Character user, Character target, BattleManager battleManager, float windowStart, float windowEnd)

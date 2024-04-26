@@ -11,12 +11,12 @@ public class Slime : Enemy
     {
         base.Awake();
         this.level = 1;
-        this.maxHealth = 12;
+        this.maxHealth = 9;
         this.health = this.maxHealth;
         this.maxEnergy = 3;
         this.speed = 3;
-        this.defensePower = 12;
-        this.attackPower = 4;
+        this.defensePower = 1;
+        this.attackPower = 2;
         this.attacksBeforeSpecial = 2;
         
     }
@@ -48,11 +48,12 @@ public class Slime : Enemy
         public override void UpdateStats()
     {
         base.UpdateStats();
-        this.maxHealth = 9 + (this.level * 4);
+      //  this.maxHealth = 9 + (this.level * 4);
         this.health = maxHealth;
         this.goldReward = 3 + (this.level * 2);
-        this.attackPower = 6 + (this.level + 1);
-        this.defensePower = 5 + (this.level + 1);
+        this.expReward = 5 + (this.level * 3);
+       // this.attackPower = 6 + (this.level + 1);
+       // this.defensePower = 5 + (this.level + 1);
         this.energy = 0;
     }
 }

@@ -39,7 +39,7 @@ public class TripleHitSkill : Skill
              
 
              yield return TimingWindow(user, target, battleManager, 0.0f, 0.7f);
-              // yield return battleManager.StartCoroutine(battleManager.TimeStop(0.15f));
+               yield return battleManager.StartCoroutine(battleManager.TimeStop(0.1f));
              
 
              HandleTimingResultForPlayerAttack(user, target, result, baseDamage);

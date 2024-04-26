@@ -324,16 +324,29 @@ public class Character : MonoBehaviour
     Debug.Log("Not passing any");
 }
     //For enemy rage bars
-    public void GainEnergy(int energyGained)
+   public void GainEnergy(int energyGained)
+{
+    if (this.energy < this.maxEnergy)
     {
-        if (this.energy < this.maxEnergy)
+        Debug.Log("Gaining " + energyGained + " energy");
+        this.energy += energyGained; // Corrected to add energyGained to the current energy
+        if (this.energy > this.maxEnergy) // Ensuring that energy does not exceed maxEnergy
         {
-            Debug.Log("Gaining " + energyGained);
-        this.energy = energyGained;
+            this.energy = this.maxEnergy;
         }
-
-        
+        Debug.Log(this.energy.ToString() + " total energy now");
     }
+    if (energyBar != null)
+    {
+        energyBar.value = this.energy;
+    }
+
+    if (energyText != null)
+    {
+        energyText.text = this.energy.ToString();
+    }
+}
+
 
     public void Gainhealth(int healthGained)
     {

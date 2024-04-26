@@ -171,7 +171,17 @@ public abstract class Companion : Character
         health = Mathf.Clamp(health, 0, maxHealth); // Ensure health doesn't exceed maxHealth
     }
 
-
+    public void RecoverEnergy(int amount)
+    {
+        if ((energy + amount) >= maxEnergy)
+        {
+            energy = maxEnergy;
+        }
+        else
+        {
+            energy += amount;
+        }
+    }
 
 }
 
