@@ -126,7 +126,7 @@ public class MainMenuUIManager : MonoBehaviour
             GameObject buttonObject = Instantiate(companionButtonPrefab, companionButtonContainer.transform);
 
             // Find components
-            Image heroIconImage = buttonObject.transform.Find("HeroIconBorder/HeroIcon")?.GetComponent<Image>();
+            Image heroIconImage = buttonObject.transform.Find("Background/HeroIconBorder/HeroIcon")?.GetComponent<Image>();
             Slider healthBarSlider = buttonObject.transform.Find("HealthBar").GetComponent<Slider>();
             Slider expBarSlider = buttonObject.transform.Find("ExpBar").GetComponent<Slider>();
             Text healthBarText = buttonObject.transform.Find("HealthBar/HealthText").GetComponent<Text>(); 
