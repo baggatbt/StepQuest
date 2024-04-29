@@ -193,7 +193,7 @@ public GameObject inventoryItemPrefab; // Assign this prefab in the Inspector
 
 public void PopulateInventoryList() {
     Debug.Log("[MainMenuUIManager] Starting to populate inventory list...");
-
+    
     GameObject inventoryItemContainer = GameObject.Find("Inventory Item Container");
     if (inventoryItemContainer == null) {
         Debug.LogError("[MainMenuUIManager] Inventory Item Container not found.");
@@ -204,37 +204,52 @@ public void PopulateInventoryList() {
 
     // Clear existing items to avoid duplicates
     foreach (Transform child in inventoryItemContainer.transform) {
+        Debug.Log("[MainMenuUIManager] Destroying child: " + child.gameObject.name);
         Destroy(child.gameObject);
     }
     Debug.Log("[MainMenuUIManager] Cleared existing inventory items.");
 
     // Loop through all items in the GameManager's inventory list
     foreach (Item item in GameManager.Instance.itemList) {
+        Debug.Log("[MainMenuUIManager] Creating inventory item slot for: " + item.itemName);
         GameObject itemSlotObject = Instantiate(inventoryItemPrefab, inventoryItemContainer.transform); // Use the container as parent
 
-        // Assuming the prefab has an Image component for the item icon at a child named 'ItemIcon'
-        Image itemIconImage = itemSlotObject.transform.Find("ItemContainer").GetComponent<Image>(); // Replace 'ItemImage' with the actual name in your prefab
+        if (itemSlotObject == null) {
+            Debug.LogError("[MainMenuUIManager] Failed to instantiate inventory item slot prefab.");
+            continue;
+        }
 
-        // Assuming the prefab has a Text component for the item count at a child named 'ItemCountText'
-        TextMeshProUGUI itemCountText = itemSlotObject.transform.Find("ItemCountText").GetComponent<TextMeshProUGUI>(); // Correct the path if necessary
+        // Attempt to find and set the item icon
+        Image itemIconImage = itemSlotObject.transform.Find("ItemContainer").GetComponent<Image>();
+        if (itemIconImage == null) {
+            Debug.LogError("[MainMenuUIManager] Failed to find Image component on ItemContainer.");
+            continue;
+        }
 
         // Set up the item icon
-        if (itemIconImage != null && item.itemIcon != null) {
+        if (item.itemIcon != null) {
             itemIconImage.sprite = item.itemIcon;
-            itemIconImage.enabled = true; // Ensure the icon is visible
+            itemIconImage.enabled = true;
+            Debug.Log("[MainMenuUIManager] Set item icon for: " + item.itemName);
         } else {
             itemIconImage.enabled = false; // No icon for this item, so disable the image
+            Debug.Log("[MainMenuUIManager] No icon found for item: " + item.itemName + "; disabling image component.");
+        }
+
+        // Attempt to find and set the item count text
+        TextMeshProUGUI itemCountText = itemSlotObject.transform.Find("ItemCountText").GetComponent<TextMeshProUGUI>();
+        if (itemCountText == null) {
+            Debug.LogError("[MainMenuUIManager] Failed to find TextMeshProUGUI component on ItemCountText.");
+            continue;
         }
 
         // Set up the item count text
-        if (itemCountText != null) {
-            itemCountText.text = item.quantity.ToString(); // Display the quantity
-        }
+        itemCountText.text = item.quantity.ToString();
+        Debug.Log("[MainMenuUIManager] Set item quantity for: " + item.itemName);
+
     }
     Debug.Log("[MainMenuUIManager] Finished populating inventory list.");
 }
-
-
 
 
 
@@ -514,6 +529,7 @@ private void UpdateCompanionStatsDisplay(Companion companion)
     public void openInventory()
     {
         PopulateInventoryList();
+        
     }
 
     public void closeCharacterInterface()

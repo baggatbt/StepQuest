@@ -73,22 +73,57 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
          Application.targetFrameRate = 60;  // Set target frame rate to 60 FPS.
+         LoadAllItems(); //Gets assets ready, move to a class eventually for loading all resources.
+         
     }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        GameObject inventoryPanel = GameObject.Find("Inventory Panel");  // Adjust the name as per your hierarchy
+         inventory.UpdateInventoryUI();
          LoadAllCompanionData();
           
     }
 
+    public void LoadAllItems()
+{
+    // Assuming all item prefabs are stored under a Resources/Items directory
+    Item[] items = Resources.LoadAll<Item>("Items");
+    itemList = new List<Item>(items);
+
+    if (itemList == null || itemList.Count == 0)
+    {
+        Debug.LogError("Failed to load items or no items available.");
+        return;
+    }
+
+    foreach (Item item in itemList)
+    {
+        Debug.Log("Loaded item: " + item.itemName);
+    }
+}
+
+
   
  public void AddItem(Item newItem)
     {
+        Debug.Log("[GameManager] Adding item to inventory: " + (newItem != null ? newItem.itemName : "null"));
+
+    if (newItem == null) {
+        Debug.LogError("Attempted to add a null item to the inventory.");
+        return;
+    }
+
+    if (itemList == null) {
+        Debug.LogError("Item list is null.");
+        itemList = new List<Item>();  // Initialize if null
+    }
         if (itemList.Count >= maxInventorySlots)
         {
             Debug.Log("Inventory is full!");
             return;
         }
+        Debug.Log("[GameManager] Adding item to inventory: " + (newItem != null ? newItem.itemName : "null"));
 
         var item = itemList.Find(i => i.itemID == newItem.itemID);
         if (item != null)
@@ -100,6 +135,8 @@ public class GameManager : MonoBehaviour
             newItem.quantity = 1;
             itemList.Add(newItem);
         }
+        Debug.Log("[GameManager] Adding item to inventory: " + (newItem != null ? newItem.itemName : "null"));
+
         SaveInventory();
         inventory.UpdateInventoryUI();
     }
@@ -127,21 +164,39 @@ public class GameManager : MonoBehaviour
     }
 
     public void LoadInventory()
+{
+    string filePath = $"{Application.persistentDataPath}/inventory.json";
+    Debug.Log("[GameManager] Trying to load inventory from: " + filePath);
+
+    if (!System.IO.File.Exists(filePath))
     {
-        string filePath = $"{Application.persistentDataPath}/inventory.json";
-        if (System.IO.File.Exists(filePath))
+        Debug.LogError("[GameManager] No inventory save file found at: " + filePath);
+        return;
+    }
+
+    try
+    {
+        string json = System.IO.File.ReadAllText(filePath);
+        ItemContainer itemContainer = JsonUtility.FromJson<ItemContainer>(json);
+        
+        if (itemContainer == null || itemContainer.Items == null)
         {
-            string json = System.IO.File.ReadAllText(filePath);
-            var itemContainer = JsonUtility.FromJson<ItemContainer>(json);
-            itemList = itemContainer.Items;
-            inventory.UpdateInventoryUI();
-            Debug.Log("Inventory loaded.");
+            Debug.LogError("[GameManager] Failed to parse inventory data.");
         }
         else
         {
-            Debug.Log("No inventory save found.");
+            itemList = itemContainer.Items;
+            inventory.UpdateInventoryUI();
+            Debug.Log("[GameManager] Inventory loaded successfully.");
         }
     }
+    catch (System.Exception ex)
+    {
+        Debug.LogError("[GameManager] Error loading inventory: " + ex.Message);
+    }
+}
+
+
 
     [System.Serializable]
     class ItemContainer
@@ -267,6 +322,7 @@ private class StageList
     // After individual deletions, clear all PlayerPrefs
     PlayerPrefs.DeleteAll();
     Debug.Log("All PlayerPrefs deleted");
+    DeleteSavedInventory();
     PlayerData.Instance.ResetSteps();
 }
 

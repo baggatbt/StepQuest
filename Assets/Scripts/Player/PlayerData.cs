@@ -125,6 +125,7 @@ public class PlayerData : MonoBehaviour
         int newSteps = currentSteps + stepsOffset - stepsSinceStart;
         if (newSteps != inGameSteps)
         {
+            Debug.Log("New steps comapred to In game steps" + newSteps + inGameSteps);
             inGameSteps = newSteps;
             SavePlayerData();
         }
@@ -154,6 +155,7 @@ public class PlayerData : MonoBehaviour
         PlayerPrefs.SetInt("PlayerGold", gold);
         PlayerPrefs.SetInt("CurrentStageIndex", currentStageIndex);
         PlayerPrefs.SetInt("InGameSteps", inGameSteps);
+        Debug.Log("Saving inGameSteps = " + inGameSteps);
         PlayerPrefs.SetInt("PreviousSteps", previousSteps);
         PlayerPrefs.SetInt("StepsOffset", stepsOffset);
         PlayerPrefs.Save();
@@ -165,6 +167,7 @@ public class PlayerData : MonoBehaviour
         gold = PlayerPrefs.GetInt("PlayerGold", 0);
         currentStageIndex = PlayerPrefs.GetInt("CurrentStageIndex", 0);
         inGameSteps = PlayerPrefs.GetInt("InGameSteps", 0);
+        Debug.Log("Loading InGameSteps = " + inGameSteps);
         previousSteps = PlayerPrefs.GetInt("PreviousSteps", 0);
         stepsOffset = PlayerPrefs.GetInt("StepsOffset", 0);
         firstTimeLogin = PlayerPrefs.GetInt("FirstLogin", 0) == 1;
