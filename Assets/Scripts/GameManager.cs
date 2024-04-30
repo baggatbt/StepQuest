@@ -20,8 +20,12 @@ public class GameManager : MonoBehaviour
     public Character companion3;
     public Companion currentCompanion; //Used to expose the selected companion 
     public Inventory inventory;
+
     // Centralized item list managed by GameManager
-    public List<Item> itemList = new List<Item>();
+    [SerializeField]
+    private List<Item> allItemsMasterList = new List<Item>(); //All items in game
+
+    public List<Item> itemList = new List<Item>(); //Items player has
     public int maxInventorySlots = 16;
     
     
@@ -73,8 +77,7 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
          Application.targetFrameRate = 60;  // Set target frame rate to 60 FPS.
-         LoadAllItems(); //Gets assets ready, move to a class eventually for loading all resources.
-         
+        LoadInventory();   
     }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -84,6 +87,8 @@ public class GameManager : MonoBehaviour
          LoadAllCompanionData();
           
     }
+
+    
 
     public void LoadAllItems()
 {
@@ -141,6 +146,17 @@ public class GameManager : MonoBehaviour
         inventory.UpdateInventoryUI();
     }
 
+    public Item FindItemInMasterList(int id)
+{
+    foreach (Item item in allItemsMasterList)
+    {
+        if (item.itemID == id)
+            return item;
+    }
+    Debug.LogWarning("Item with ID " + id + " not found in master list.");
+    return null;
+}
+
     public void RemoveItem(Item item)
     {
         Item foundItem = itemList.Find(i => i.itemID == item.itemID);
@@ -166,35 +182,38 @@ public class GameManager : MonoBehaviour
     public void LoadInventory()
 {
     string filePath = $"{Application.persistentDataPath}/inventory.json";
-    Debug.Log("[GameManager] Trying to load inventory from: " + filePath);
-
-    if (!System.IO.File.Exists(filePath))
-    {
-        Debug.LogError("[GameManager] No inventory save file found at: " + filePath);
-        return;
-    }
-
-    try
+    if (System.IO.File.Exists(filePath))
     {
         string json = System.IO.File.ReadAllText(filePath);
         ItemContainer itemContainer = JsonUtility.FromJson<ItemContainer>(json);
-        
-        if (itemContainer == null || itemContainer.Items == null)
+        if (itemContainer != null && itemContainer.Items != null)
         {
-            Debug.LogError("[GameManager] Failed to parse inventory data.");
+            itemList.Clear(); // Clear the current inventory list
+            foreach (var itemData in itemContainer.Items)
+            {
+                // Use FindItemInMasterList to match itemData with the actual item object
+                Item item = FindItemInMasterList(itemData.itemID); // Ensure itemData has itemID
+                if (item != null)
+                {
+                    item.quantity = itemData.quantity; // Set the quantity from the saved data
+                    itemList.Add(item); // Add to the player's inventory
+                }
+            }
+            inventory.UpdateInventoryUI(); // Update UI to reflect the loaded inventory
         }
         else
         {
-            itemList = itemContainer.Items;
-            inventory.UpdateInventoryUI();
-            Debug.Log("[GameManager] Inventory loaded successfully.");
+            Debug.LogError("Failed to parse inventory data.");
         }
     }
-    catch (System.Exception ex)
+    else
     {
-        Debug.LogError("[GameManager] Error loading inventory: " + ex.Message);
+        Debug.LogError("No inventory save file found at: " + filePath);
     }
 }
+
+
+
 
 
 
