@@ -293,15 +293,64 @@ public void PopulateInventoryList() {
     GameManager.Instance.currentCompanion = companion;
 
     // Setup and subscribe to events for each upgrade bar
+    /*
     SetupUpgradeBar(atkUpgradeBar, companion.statUpgradeProgress["atk"], () => IncreaseCompanionStat(companion, "atk"));
     SetupUpgradeBar(hpUpgradeBar, companion.statUpgradeProgress["hp"], () => IncreaseCompanionStat(companion, "hp"));
     SetupUpgradeBar(spdUpgradeBar, companion.statUpgradeProgress["spd"], () => IncreaseCompanionStat(companion, "spd"));
     SetupUpgradeBar(spUpgradeBar, companion.statUpgradeProgress["sp"], () => IncreaseCompanionStat(companion, "sp"));
-
+    */
     // Update companion's stats display and make sure the stats panel is visible
     UpdateCompanionStatsDisplay(companion);
     companionStatsPanel.SetActive(true);
 
+    // Find the GameObject with the name "HeroImage"
+    GameObject heroImageObject = GameObject.Find("HeroImage");
+
+    // Ensure the heroImageObject is not null and has an Image component
+    if (heroImageObject != null)
+    {
+        // Get the Image component attached to the heroImageObject
+        Image heroImage = heroImageObject.GetComponent<Image>();
+
+        // Ensure the heroImage is not null
+        if (heroImage != null)
+        {
+            // Set the sprite of the Image component to the companion's heroIcon
+            heroImage.sprite = companion.heroIcon;
+        }
+        else
+        {
+            Debug.LogError("HeroImage GameObject does not have an Image component attached.");
+        }
+    }
+    else
+    {
+        Debug.LogError("HeroImage GameObject not found in the scene.");
+    }
+
+
+
+    // Ensure the heroImageObject is not null and has an Image component
+    if (heroImageObject != null)
+    {
+        // Get the Image component attached to the heroImageObject
+        Image heroImage = heroImageObject.GetComponent<Image>();
+
+        // Ensure the heroImage is not null
+        if (heroImage != null)
+        {
+            // Set the sprite of the Image component to the companion's heroIcon
+            heroImage.sprite = companion.heroIcon;
+        }
+        else
+        {
+            Debug.LogError("HeroImage GameObject does not have an Image component attached.");
+        }
+    }
+    else
+    {
+        Debug.LogError("HeroImage GameObject not found in the scene.");
+    }
     // Find and configure the HealButton
     GameObject healButton = GameObject.Find("HealButton");
     if (healButton != null)
