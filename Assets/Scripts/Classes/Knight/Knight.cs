@@ -96,8 +96,7 @@ public class Knight : Companion
         SkillType.Slash,
         SkillType.TripleHit,
         SkillType.Taunt,
-        SkillType.ReflectDamagePassive,
-        SkillType.SpeedBreak,
+        
         
         
        
@@ -106,7 +105,8 @@ public class Knight : Companion
 
     public override List<SkillType> LockedSkills => new List<SkillType>
     {
-        
+        SkillType.ReflectDamagePassive,
+        SkillType.SpeedBreak,
         
     };
 

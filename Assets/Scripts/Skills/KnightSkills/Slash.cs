@@ -50,7 +50,7 @@ public class Slash : Skill
              Debug.Log("Timing for player attack has been handled waiting for animations");
              //Wait until the timing event happens to move on to next attack stage
              yield return new WaitUntil(() => user.animationDamageTime == true);
-             yield return battleManager.StartCoroutine(battleManager.TimeStop(0.5f));
+             yield return battleManager.StartCoroutine(battleManager.TimeStop(0.5f, .15f));
              
         }
         Debug.Log("waiting on animation to finish");
