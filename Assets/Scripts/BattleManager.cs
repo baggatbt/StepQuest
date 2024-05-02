@@ -196,7 +196,7 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
     */
     public IEnumerator TimeStop(float duration)
 {
-    Time.timeScale = .25f; // slow the game time
+    Time.timeScale = .1f; // slow the game time
     yield return new WaitForSecondsRealtime(duration); // Waits in real time
     Time.timeScale = 1f; // Resumes the game time
 }

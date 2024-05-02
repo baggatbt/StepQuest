@@ -44,13 +44,13 @@ public class Slash : Skill
              // Vector3 spawnPosition = target.transform.position;
            // Vector3 offsetPosition = new Vector3(spawnPosition.x, spawnPosition.y + 2, spawnPosition.z);
             // GameObject slashEffect = UnityEngine.Object.Instantiate(particleEffectPrefab, offsetPosition, Quaternion.identity);
-
+             
              HandleTimingResultForPlayerAttack(user, target, result, baseDamage);
              
              Debug.Log("Timing for player attack has been handled waiting for animations");
              //Wait until the timing event happens to move on to next attack stage
              yield return new WaitUntil(() => user.animationDamageTime == true);
-             
+             yield return battleManager.StartCoroutine(battleManager.TimeStop(0.5f));
              
         }
         Debug.Log("waiting on animation to finish");
