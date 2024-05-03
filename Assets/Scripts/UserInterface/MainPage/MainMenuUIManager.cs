@@ -166,6 +166,12 @@ public class MainMenuUIManager : MonoBehaviour
     }
 }
 
+            public SkillPanelController skillPanelController;
+            public void OpenSkillPanel()
+            {
+                skillPanelController.gameObject.SetActive(true); 
+                skillPanelController.SkillPanelOpen(GameManager.Instance.currentCompanion);
+            }
 
 
    

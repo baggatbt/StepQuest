@@ -114,20 +114,20 @@ public class PlayerData : MonoBehaviour
     {
             newSensorTotal = stepCounterController.GetSteps();
         int differenceBetweenSensorCounts = newSensorTotal - currentSensorTotal;
-        Debug.Log("Difference between sensor counts = " + differenceBetweenSensorCounts);
+        //Debug.Log("Difference between sensor counts = " + differenceBetweenSensorCounts);
 
         if (differenceBetweenSensorCounts > 0)
         {
             //Add the steps to game, then reset the totalCount for next reboot
             inGameSteps += differenceBetweenSensorCounts;
             currentSensorTotal = newSensorTotal;
-            Debug.Log("updating old total, currentSensorTotal = " + currentSensorTotal);
+            //Debug.Log("updating old total, currentSensorTotal = " + currentSensorTotal);
      
         }
         else
         {
             currentSensorTotal = newSensorTotal;
-            Debug.Log("No new steps to load from sensor, updating old total, currentSensorTotal = " + currentSensorTotal);
+           // Debug.Log("No new steps to load from sensor, updating old total, currentSensorTotal = " + currentSensorTotal);
         }
         
 

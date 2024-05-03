@@ -66,6 +66,13 @@ public class Wizard : Companion
         // ... skills
     };
 
+    public override List<SkillType> AllSkills => new List<SkillType>
+    {
+        SkillType.WizardBasicAttack,
+        SkillType.FirePillar,
+        // ... other skills ...
+    };
+
     public override Skill GetSkillInstance(SkillType skillType)
     {
         switch(skillType)

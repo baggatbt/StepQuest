@@ -99,13 +99,19 @@ public class Archer : Companion
         SkillType.MeleeCombo,
         
         
-       
-        
     };
 
     public override List<SkillType> LockedSkills => new List<SkillType>
     {
         // ... skills
+    };
+    public override List<SkillType> AllSkills => new List<SkillType>
+    {
+        SkillType.ShootArrow,
+        SkillType.ArrowRain,
+        SkillType.MeleeCombo,
+        
+        
     };
 
     public override Skill GetSkillInstance(SkillType skillType)

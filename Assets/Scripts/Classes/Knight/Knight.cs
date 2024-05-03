@@ -110,6 +110,16 @@ public class Knight : Companion
         
     };
 
+    public override List<SkillType> AllSkills => new List<SkillType>
+    {
+        SkillType.Slash,
+        SkillType.TripleHit,
+        SkillType.Taunt,
+        SkillType.ReflectDamagePassive,
+        SkillType.SpeedBreak,
+        
+    };
+
     public override Skill GetSkillInstance(SkillType skillType)
     {
         switch(skillType)
