@@ -7,7 +7,8 @@ public class Knight : Companion
     protected override void Awake()
     {
         base.Awake();
-        
+        // Load the skill tree prefab from the Resources folder
+    
         // Initialize with default values if no data is loaded
         if (this.heroLevel == 0)
         {

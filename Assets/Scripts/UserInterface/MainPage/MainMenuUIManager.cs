@@ -168,10 +168,40 @@ public class MainMenuUIManager : MonoBehaviour
 
             public SkillPanelController skillPanelController;
             public void OpenSkillPanel()
+    {   
+        
+        string companionName = GameManager.Instance.currentCompanion.heroID;
+
+        // Concatenate the companion name with "SkillTreePanel"
+        string panelName = companionName + "SkillTreePanel";
+        GameObject skillTreePanelObject = GameObject.Find(panelName);
+        Debug.Log(GameManager.Instance.currentCompanion);
+
+        // Check if the GameObject is found
+        if (skillTreePanelObject != null)
+        {
+            // Get the CanvasGroup component
+            CanvasGroup canvasGroup = skillTreePanelObject.GetComponent<CanvasGroup>();
+
+            // Check if the CanvasGroup component exists
+            if (canvasGroup != null)
             {
-                skillPanelController.gameObject.SetActive(true); 
-                skillPanelController.SkillPanelOpen(GameManager.Instance.currentCompanion);
+                // Show the panel by setting its alpha and interactable properties
+                canvasGroup.alpha = 1;
+                canvasGroup.interactable = true;
+                canvasGroup.blocksRaycasts = true;
             }
+            else
+            {
+                Debug.LogError("CanvasGroup component not found on the skill tree panel GameObject.");
+            }
+        }
+        else
+        {
+            Debug.LogError("Skill tree panel GameObject not found.");
+        }
+    }
+
 
 
    

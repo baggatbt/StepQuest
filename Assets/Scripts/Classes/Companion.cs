@@ -13,6 +13,7 @@ public abstract class Companion : Character
     public string heroID; // Name of the class/character 
     public int heroLevel; // Level of the hero
     public int heroExp;   // Experience of the hero
+    public GameObject skillTreePanel; 
     public Sprite heroIcon;
     public int heroStatPoints;
     public int heroSkillPoints;
