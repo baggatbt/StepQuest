@@ -845,6 +845,7 @@ private TimingEventResult GetTimingAccuracy(Vector3 innerCircleScale, Vector3 ou
     public Companion companion;
     public Slider[] expSliders; // Ensure this array size matches the max party size in the Inspector
     public TextMeshProUGUI[] expTexts; // Match this array size with expSliders
+    public TextMeshProUGUI[] heroIDTexts;
 
 
     private void DisplayExpToLevel(List<Character> playerParty)
@@ -852,6 +853,7 @@ private TimingEventResult GetTimingAccuracy(Vector3 innerCircleScale, Vector3 ou
     // Hide all UI elements initially
     foreach (var slider in expSliders) slider.gameObject.SetActive(false);
     foreach (var text in expTexts) text.gameObject.SetActive(false);
+    foreach (var text in heroIDTexts) text.gameObject.SetActive(false);
 
     for (int i = 0; i < playerParty.Count; i++)
     {
@@ -867,10 +869,12 @@ private TimingEventResult GetTimingAccuracy(Vector3 innerCircleScale, Vector3 ou
                 expSliders[i].maxValue = companion.ExpToNextLevel(companion.heroLevel);
                 expSliders[i].value = companion.heroExp;
                 expTexts[i].text = "Exp to level: " + (expToLevel - companion.heroExp).ToString();
+                heroIDTexts[i].text = companion.heroID;
 
                 // Make sure the UI elements for this character are visible
                 expSliders[i].gameObject.SetActive(true);
                 expTexts[i].gameObject.SetActive(true);
+                heroIDTexts[i].gameObject.SetActive(true);
             }
             Debug.Log(expTexts[i].text);
         }
