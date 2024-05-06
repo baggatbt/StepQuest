@@ -181,6 +181,10 @@ public class Character : MonoBehaviour
     }
 
 */
+
+
+    
+
     public void TakeDamage(int damageOfAttacker, Character attacker)
 {
     if (currentBarrier != null && currentBarrier.IsActive)
@@ -222,6 +226,7 @@ public class Character : MonoBehaviour
         this.animator.SetTrigger("IsHurtTrigger");
         }
         // Trigger hit reaction, damage popup, etc.
+        
         GameObject damagePopupPrefab = Resources.Load<GameObject>("PreFab/DamagePopup");
         Transform endOfBattleRewardsTransform = GameObject.Find("EndOfBattleRewardsCanvas").transform;
         if(damagePopupPrefab != null)

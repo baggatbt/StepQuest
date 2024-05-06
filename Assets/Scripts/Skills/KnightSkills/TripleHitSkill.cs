@@ -39,7 +39,7 @@ public class TripleHitSkill : Skill
              
 
              yield return TimingWindow(user, target, battleManager, 0.0f, 0.7f);
-               //yield return battleManager.StartCoroutine(battleManager.TimeStop(0.1f));
+              
              
 
              HandleTimingResultForPlayerAttack(user, target, result, baseDamage);
@@ -47,9 +47,10 @@ public class TripleHitSkill : Skill
              //Wait until the timing event happens to move on to next attack stage
              
              yield return new WaitUntil(() => user.animationDamageTime == true);
+              
              if (i == 3)
              {
-                yield return battleManager.StartCoroutine(battleManager.TimeStop(0.15f, .2f));
+               yield return battleManager.StartCoroutine(battleManager.TimeStop(0.4f, .1f));
              }
             
              
