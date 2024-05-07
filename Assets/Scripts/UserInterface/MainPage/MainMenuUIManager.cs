@@ -483,6 +483,7 @@ private void UpdateCompanionStatsDisplay(Companion companion)
     
     public CanvasGroup currentPanel;
     public CanvasGroup ForestMapCanvasGroup;
+    
 
    public void SwitchPanel(CanvasGroup newPanel)
     {
