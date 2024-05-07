@@ -20,6 +20,8 @@ public class MainMenuUIManager : MonoBehaviour
     public GameObject knightSkillListView;
     public TextMeshProUGUI stepsText;
     public TextMeshProUGUI goldText;
+    public TextMeshProUGUI silverText;
+    public TextMeshProUGUI copperText;
     public GameObject companionButtonPrefab;
     public GameObject companionListPanel;
     public GameObject companionStatsPanel;
@@ -51,6 +53,8 @@ public class MainMenuUIManager : MonoBehaviour
     {
          if (stepsText != null) stepsText.text =  PlayerData.Instance.inGameSteps.ToString();  
          if (goldText != null) goldText.text =  PlayerData.Instance.gold.ToString();  
+         if (silverText != null) silverText.text =  PlayerData.Instance.silver.ToString();  
+         if (copperText != null) copperText.text =  PlayerData.Instance.copper.ToString();  
          UpdateTimerDisplay();
          UpdateKnightRecoveryTimerDisplay();
     }
