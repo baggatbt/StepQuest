@@ -12,12 +12,14 @@ public class UnlockSkillButton : MonoBehaviour
     // Method to be called when the button is clicked
     public void OnButtonClick()
     {
+        Debug.Log("clicked button");
         // Check if the companion reference is set
         if (companion != null && GameManager.Instance.currentCompanion.heroSkillPoints >= 1)
         {
             // Call the UnlockSkill method of the companion
             companion.UnlockSkill(skillType);
             GameManager.Instance.currentCompanion.heroSkillPoints -= 1;
+            Debug.Log("unlocked: " + skillType);
         }
         else
         {
