@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+//Add this to the skill button, then set the onclick function to call the parameters set on the button
 public class UnlockSkillButton : MonoBehaviour
 {
     // Reference to the companion whose skill will be unlocked
