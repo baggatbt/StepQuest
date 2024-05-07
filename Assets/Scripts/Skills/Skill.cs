@@ -49,6 +49,7 @@ public abstract class Skill
     public int requiredLevel;  // New field\
     public Sprite iconImage; // Field to store the icon image associated with the skill
     public float skillDamageModifier;
+    public int skillPointCost;
     
     protected TimingEventResult result; 
 

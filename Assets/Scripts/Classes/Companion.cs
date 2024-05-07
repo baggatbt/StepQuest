@@ -75,6 +75,26 @@ public abstract class Companion : Character
 
     //abstract LevelUp method
     public abstract void LevelUp();
+
+    public void UnlockSkill(SkillType skillType)
+    {
+        // Check if the skill exists in the LockedSkills list
+        if (LockedSkills.Contains(skillType))
+        {
+            // Remove the skill from LockedSkills
+            LockedSkills.Remove(skillType);
+
+            // Add the skill to AvailableSkills
+            AvailableSkills.Add(skillType);
+
+            Debug.Log(skillType.ToString() + " unlocked."); // Log that the skill is unlocked
+        }
+        else
+        {
+            Debug.LogError(skillType.ToString() + " is not in the LockedSkills list."); // Log an error if the skill is not found in LockedSkills
+        }
+    }
+
     
     public void SaveCharacterData()
     {

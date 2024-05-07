@@ -167,40 +167,48 @@ public class MainMenuUIManager : MonoBehaviour
 }
 
             public SkillPanelController skillPanelController;
-            public void OpenSkillPanel()
-    {   
-        
-        string companionName = GameManager.Instance.currentCompanion.heroID;
 
-        // Concatenate the companion name with "SkillTreePanel"
-        string panelName = companionName + "SkillTreePanel";
-        GameObject skillTreePanelObject = GameObject.Find(panelName);
-        Debug.Log(GameManager.Instance.currentCompanion);
+public void OpenSkillPanel()
+{   
+    string companionName = GameManager.Instance.currentCompanion.heroID;
 
-        // Check if the GameObject is found
-        if (skillTreePanelObject != null)
+    // Concatenate the companion name with "SkillTreePanel"
+    string panelName = companionName + "SkillTreePanel";
+    GameObject skillTreePanelObject = GameObject.Find(panelName);
+    GameObject skillTreeSkillPointTextObject = GameObject.Find("SkillPointText");
+    Debug.Log(GameManager.Instance.currentCompanion);
+
+    // Check if the GameObjects are found
+    if (skillTreePanelObject != null && skillTreeSkillPointTextObject != null)
+    {
+        // Get the CanvasGroup component of the skill tree panel GameObject
+        CanvasGroup canvasGroup = skillTreePanelObject.GetComponent<CanvasGroup>();
+
+        // Get the Text component of the skill point text GameObject
+        TextMeshProUGUI skillPointText = skillTreeSkillPointTextObject.GetComponent<TextMeshProUGUI>();
+
+        // Check if the CanvasGroup and Text components exist
+        if (canvasGroup != null && skillPointText != null)
         {
-            // Get the CanvasGroup component
-            CanvasGroup canvasGroup = skillTreePanelObject.GetComponent<CanvasGroup>();
+            // Show the panel by setting its alpha and interactable properties
+            canvasGroup.alpha = 1;
+            canvasGroup.interactable = true;
+            canvasGroup.blocksRaycasts = true;
 
-            // Check if the CanvasGroup component exists
-            if (canvasGroup != null)
-            {
-                // Show the panel by setting its alpha and interactable properties
-                canvasGroup.alpha = 1;
-                canvasGroup.interactable = true;
-                canvasGroup.blocksRaycasts = true;
-            }
-            else
-            {
-                Debug.LogError("CanvasGroup component not found on the skill tree panel GameObject.");
-            }
+            // Update the text of the skill point text
+            skillPointText.text = "SP: " + GameManager.Instance.currentCompanion.heroSkillPoints.ToString();
         }
         else
         {
-            Debug.LogError("Skill tree panel GameObject not found.");
+            Debug.LogError("CanvasGroup or Text component not found on the corresponding GameObject.");
         }
     }
+    else
+    {
+        Debug.LogError("Skill tree panel or skill point text GameObject not found.");
+    }
+}
+
 
 
 
@@ -318,11 +326,8 @@ public void PopulateInventoryList() {
         SceneManager.LoadScene("TestPortraitBattle");
     }
 
-    
-    public GameObject atkUpgradeBar;
-    public GameObject hpUpgradeBar;
-    public GameObject spdUpgradeBar;
-    public GameObject spUpgradeBar;
+
+   
 
    public void OnCompanionSelected(Companion companion)
 {
@@ -643,10 +648,13 @@ private void UpdateCompanionStatsDisplay(Companion companion)
         forestTownPanel.SetActive(false);
     }
 
+    public TextMeshProUGUI knightSkillPointText;
+
     public void openKnightSkillTree()
     {
         
         knightSkillListView.SetActive(true);
+        knightSkillPointText.text = GameManager.Instance.currentCompanion.heroSkillPoints.ToString();
     }
 
     

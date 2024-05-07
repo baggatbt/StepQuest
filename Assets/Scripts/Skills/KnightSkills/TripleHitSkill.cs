@@ -14,6 +14,7 @@ public class TripleHitSkill : Skill
         requiresMovement = true;
         energyCost = 3;
         numberOfAttacksPossible = 3;
+        skillPointCost = 1;
         iconImage = LoadIconImage("SkillIcons/fire2");
     }
 
