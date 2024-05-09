@@ -510,6 +510,36 @@ private void UpdateCompanionStatsDisplay(Companion companion)
     companionStatsPanel.SetActive(false);
 }
 
+    public void ToggleCanvasGroup(GameObject canvasGroupObject)
+{
+    // Check if the canvas group object exists
+    if (canvasGroupObject != null)
+    {
+        // Get the CanvasGroup component
+        CanvasGroup canvasGroup = canvasGroupObject.GetComponent<CanvasGroup>();
+
+        // If the CanvasGroup component exists
+        if (canvasGroup != null)
+        {
+            // Toggle visibility by toggling the alpha value
+            canvasGroup.alpha = canvasGroup.alpha > 0 ? 0 : 1;
+
+            // Toggle interactability and raycast blocking based on visibility
+            canvasGroup.interactable = canvasGroup.alpha > 0;
+            canvasGroup.blocksRaycasts = canvasGroup.alpha > 0;
+        }
+        else
+        {
+            Debug.LogError("CanvasGroup component not found on the GameObject: " + canvasGroupObject.name);
+        }
+    }
+    else
+    {
+        Debug.LogError("CanvasGroup GameObject is null.");
+    }
+}
+
+
 //TIMER MANAGEMENT
         public TMP_Text timerText; // Assign in the inspector
         public float timerDuration = 120; // Duration in seconds, adjust as needed
