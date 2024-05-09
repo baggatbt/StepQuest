@@ -336,6 +336,7 @@ public void PopulateInventoryList() {
    public void OnCompanionSelected(Companion companion)
 {
     GameManager.Instance.currentCompanion = companion;
+   //GameManager.Instance.knight.InitializeSkillsBasedOnLevel();
 
     // Setup and subscribe to events for each upgrade bar
     /*

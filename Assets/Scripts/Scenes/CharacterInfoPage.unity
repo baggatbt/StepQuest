@@ -3265,7 +3265,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &169587560
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4228,15 +4228,14 @@ MonoBehaviour:
   stageButton: {fileID: 189726015}
   stageBattleConfig:
     poolName: Forest
-    maxEnemiesToSpawn: 2
+    maxEnemiesToSpawn: 1
     levelOfEnemies: 1
     stage: {fileID: 189726016}
   battleSceneName: TestPortraitBattle
   isUnlocked: 1
   isFirstCompletion: 0
   stageID: 0
-  connectedStages:
-  - {fileID: 0}
+  connectedStages: []
 --- !u!1 &192894865
 GameObject:
   m_ObjectHideFlags: 0
@@ -22507,8 +22506,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -6, y: -1043.6001}
-  m_SizeDelta: {x: -1501.8, y: -5984}
+  m_AnchoredPosition: {x: -6, y: -931.2998}
+  m_SizeDelta: {x: -1501.8, y: -6075.3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &950908078
 MonoBehaviour:
@@ -23114,11 +23113,11 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1274183892}
         m_TargetAssemblyTypeName: MainMenuUIManager, Assembly-CSharp
-        m_MethodName: SwitchPanel
+        m_MethodName: TogglePanel
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 1400189893}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.CanvasGroup, UnityEngine
+          m_ObjectArgument: {fileID: 779841268}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -23666,7 +23665,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2255148490054618754, guid: d69c1ea3d2e9050499de5bfbf9e856e5, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3349296499348391448, guid: d69c1ea3d2e9050499de5bfbf9e856e5, type: 3}
       propertyPath: m_Pivot.x
@@ -37338,7 +37337,7 @@ MonoBehaviour:
   m_StartCorner: 0
   m_StartAxis: 0
   m_CellSize: {x: 125, y: 125}
-  m_Spacing: {x: 65, y: 45}
+  m_Spacing: {x: 65, y: 50}
   m_Constraint: 0
   m_ConstraintCount: 2
 --- !u!114 &2009918418

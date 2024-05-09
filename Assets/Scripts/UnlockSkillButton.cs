@@ -26,5 +26,7 @@ public class UnlockSkillButton : MonoBehaviour
         {
             Debug.LogError("Companion reference is not set.");
         }
+        
     }
+    
 }

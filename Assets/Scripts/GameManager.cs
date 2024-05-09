@@ -208,7 +208,7 @@ public class GameManager : MonoBehaviour
     }
     else
     {
-        Debug.LogError("No inventory save file found at: " + filePath);
+        Debug.Log("No inventory save file found at: " + filePath);
     }
 }
 
@@ -281,11 +281,13 @@ public class GameManager : MonoBehaviour
 
     foreach (Stage connectedStage in completedStage.connectedStages)
     {
+        if (connectedStage.stageID != null){
         if (!UnlockedStageNames.Contains(connectedStage.stageID))
         {
             Debug.Log($"Unlocking connected stage: {connectedStage.stageID}");
             UnlockedStageNames.Add(connectedStage.stageID);
             hasUnlockedAny = true; // Indicate that a new stage has been unlocked
+        }
         }
         else
         {
@@ -456,6 +458,9 @@ public void DeleteSavedInventory()
             SaveAllCompanionData();
         }
     }
+
+    
+
 
     
    

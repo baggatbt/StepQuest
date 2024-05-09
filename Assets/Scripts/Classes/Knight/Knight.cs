@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Knight : Companion
 {
+    private List<SkillType> availableSkills = new List<SkillType>();
     protected override void Awake()
     {
         base.Awake();
@@ -31,9 +32,33 @@ public class Knight : Companion
         }
         else
         {
-        LoadCharacterData(); // Load saved data
+         LoadCharacterData(); // Load saved data
         }
+
+        
     }
+
+
+    public void InitializeSkillsBasedOnLevel()
+    {
+        // Always add default skills
+        availableSkills.Add(SkillType.Slash);
+
+        // Conditional addition based on level
+        if (this.heroLevel >= 2)
+        {
+            availableSkills.Add(SkillType.TripleHit);
+        }
+        if (this.heroLevel >= 5)
+        {
+            availableSkills.Add(SkillType.Taunt);
+        }
+        // Add more skills based on additional conditions
+        Debug.Log("Initializing skills, hero level = " + this.heroLevel);
+    }
+
+
+    
 
     
 
@@ -95,11 +120,7 @@ public class Knight : Companion
     public override List<SkillType> AvailableSkills => new List<SkillType>
     {
         SkillType.Slash,
-        SkillType.TripleHit,
-        SkillType.Taunt,
-        
-        
-        
+
        
         
     };
