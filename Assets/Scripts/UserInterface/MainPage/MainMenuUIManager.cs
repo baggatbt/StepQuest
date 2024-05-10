@@ -420,61 +420,80 @@ public void PopulateInventoryList() {
     }
     UpdateSkillButtonImages(companion);
 }
+    public GameObject skillInfoPanel;
+    public void OnSkillButtonClick(Skill skill)
+{
+    Debug.Log("Button clicked for skill: " + skill.skillName);
+
+    // Ensure the skillInfoPanel is active so the text update can be seen
+    if (!skillInfoPanel.activeInHierarchy)
+        skillInfoPanel.SetActive(true);
+
+    // Find the TextMeshProUGUI component that should display the skill name
+    TextMeshProUGUI skillNameText = skillInfoPanel.transform.Find("SkillNameText").GetComponent<TextMeshProUGUI>();
+    if (skillNameText != null)
+    {
+        // Set the skill name text
+        skillNameText.text = skill.skillName;
+    }
+    else
+    {
+        Debug.LogError("SkillNameText component not found or is not a TextMeshProUGUI");
+    }
+}
+
 
 public void UpdateSkillButtonImages(Companion companion)
 {
-    GameObject skillOneButton = GameObject.Find("SkillOneButton");
-    if (skillOneButton != null)
+    // Update and set up the first skill button
+    SetupSkillButton("SkillOneButton", companion.MainSkills[0], companion);
+
+    
+    SetupSkillButton("SkillTwoButton", companion.MainSkills[1], companion);
+
+    
+    SetupSkillButton("SkillThreeButton", companion.MainSkills[2], companion);
+
+
+    SetupSkillButton("SkillFourButton", companion.MainSkills[3], companion);
+}
+
+private void SetupSkillButton(string buttonName, SkillType skillType, Companion companion)
+{
+    GameObject skillButtonObj = GameObject.Find(buttonName);
+    if (skillButtonObj != null)
     {
-        // Get the Image component attached to the heroImageObject
-        Image skillImage = skillOneButton.GetComponent<Image>();
+        Image skillImage = skillButtonObj.GetComponent<Image>();
+        Button skillButton = skillButtonObj.GetComponent<Button>();
 
-        // Ensure the heroImage is not null
-        if (skillImage != null)
+        if (skillImage != null && skillButton != null)
         {
-            // Get the first main skill as a SkillType
-        SkillType firstSkillType = companion.MainSkills[0];
-
-        // Retrieve the Skill instance using the firstSkillType
-        Skill firstSkill = companion.GetSkillInstance(firstSkillType);
-        skillImage.sprite = firstSkill.iconImage;
+            Skill skill = companion.GetSkillInstance(skillType);
+            if (skill != null)
+            {
+                skillImage.sprite = skill.iconImage;
+                skillButton.onClick.RemoveAllListeners(); // Remove existing listeners to prevent multiple assignments
+                skillButton.onClick.AddListener(() => OnSkillButtonClick(skill));
+            }
+            else
+            {
+                Debug.LogError("Skill instance is null for " + skillType);
+            }
+        }
+        else
+        {
+            if (skillImage == null) Debug.LogError(buttonName + " does not have an Image component.");
+            if (skillButton == null) Debug.LogError(buttonName + " does not have a Button component.");
         }
     }
-    GameObject skillTwoButton = GameObject.Find("SkillTwoButton");
-    if (skillTwoButton != null)
+    else
     {
-        // Get the Image component attached to the heroImageObject
-        Image skillImage = skillTwoButton.GetComponent<Image>();
-
-        // Ensure the heroImage is not null
-        if (skillImage != null)
-        {
-            // Get the first main skill as a SkillType
-        SkillType secondSkillType = companion.MainSkills[1];
-
-        // Retrieve the Skill instance using the firstSkillType
-        Skill secondSkill = companion.GetSkillInstance(secondSkillType);
-        skillImage.sprite = secondSkill.iconImage;
-        }
-    }
-    GameObject skillThreeButton = GameObject.Find("SkillThreeButton");
-    if (skillThreeButton != null)
-    {
-        // Get the Image component attached to the heroImageObject
-        Image skillImage = skillThreeButton.GetComponent<Image>();
-
-        // Ensure the heroImage is not null
-        if (skillImage != null)
-        {
-            // Get the first main skill as a SkillType
-        SkillType secondSkillType = companion.MainSkills[2];
-
-        // Retrieve the Skill instance using the firstSkillType
-        Skill secondSkill = companion.GetSkillInstance(secondSkillType);
-        skillImage.sprite = secondSkill.iconImage;
-        }
+        Debug.LogError(buttonName + " GameObject not found.");
     }
 }
+
+
+
 
 private void SetupUpgradeBar(GameObject upgradeBarGO, int initialProgress, Action onMaxLevelReached)
 {
