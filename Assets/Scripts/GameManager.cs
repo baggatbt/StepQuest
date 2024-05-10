@@ -247,7 +247,7 @@ public class GameManager : MonoBehaviour
                 companionObject = Instantiate(archerPrefab);
                 break;
             case "Wizard":
-                companionObject = Instantiate(wizardPrefab);
+               // companionObject = Instantiate(wizardPrefab);
                 break;
             // Add cases for other companions
         }
