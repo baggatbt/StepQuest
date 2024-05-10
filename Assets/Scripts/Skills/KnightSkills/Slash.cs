@@ -16,7 +16,7 @@ public class Slash : Skill
         requiresMovement = true; 
         skillExecutionComplete = false;
         numberOfAttacks = 1;
-        iconImage = LoadIconImage("SkillIcons/weapon1");
+        iconImage = LoadIconImage("Sprites/SkillIcons/Knight/Knight_Icon_Slash");
         
     }
 
@@ -50,7 +50,7 @@ public class Slash : Skill
              Debug.Log("Timing for player attack has been handled waiting for animations");
              //Wait until the timing event happens to move on to next attack stage
              yield return new WaitUntil(() => user.animationDamageTime == true);
-             yield return battleManager.StartCoroutine(battleManager.TimeStop(0.4f, 0.1f));  
+            // yield return battleManager.StartCoroutine(battleManager.TimeStop(0.4f, 0.1f));  
 
              
         }

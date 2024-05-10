@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Knight : Companion
 {
-    private List<SkillType> availableSkills = new List<SkillType>();
+    
+    
     protected override void Awake()
     {
         base.Awake();
@@ -33,28 +34,20 @@ public class Knight : Companion
         else
         {
          LoadCharacterData(); // Load saved data
+         
         }
 
-        
+        InitializeSkillsBasedOnLevel();
     }
 
 
-    public void InitializeSkillsBasedOnLevel()
+  public override void InitializeSkillsBasedOnLevel()
     {
-        // Always add default skills
+        availableSkills.Clear(); // Directly manipulate the protected field
         availableSkills.Add(SkillType.Slash);
-
-        // Conditional addition based on level
-        if (this.heroLevel >= 2)
-        {
-            availableSkills.Add(SkillType.TripleHit);
-        }
-        if (this.heroLevel >= 5)
-        {
-            availableSkills.Add(SkillType.Taunt);
-        }
-        // Add more skills based on additional conditions
-        Debug.Log("Initializing skills, hero level = " + this.heroLevel);
+        if (this.heroLevel >= 2) availableSkills.Add(SkillType.TripleHit);
+        if (this.heroLevel >= 5) availableSkills.Add(SkillType.Taunt);
+        Debug.Log($"Total Available skills: {availableSkills.Count}");
     }
 
 
@@ -117,13 +110,10 @@ public class Knight : Companion
     
     
 
-    public override List<SkillType> AvailableSkills => new List<SkillType>
+    public override List<SkillType> AvailableSkills
     {
-        SkillType.Slash,
-
-       
-        
-    };
+        get { return availableSkills; }
+    }
 
     public override List<SkillType> LockedSkills => new List<SkillType>
     {
@@ -137,10 +127,23 @@ public class Knight : Companion
         SkillType.Slash,
         SkillType.TripleHit,
         SkillType.Taunt,
-        SkillType.ReflectDamagePassive,
         SkillType.SpeedBreak,
+        //Future upgrades can just be a brand new skill, like if the player upgrades slash, switch it to Slash2() etc
         
     };
+
+    private List<SkillType> mainSkills = new List<SkillType>()
+    {
+        SkillType.Slash,
+        SkillType.TripleHit,
+        SkillType.Taunt,
+        SkillType.SpeedBreak
+    };
+
+    public override List<SkillType> MainSkills
+    {
+        get { return mainSkills; }
+    }
 
     public override Skill GetSkillInstance(SkillType skillType)
     {

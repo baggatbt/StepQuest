@@ -5,11 +5,17 @@ using System;
 using System.Linq;
 
 public abstract class Companion : Character
-{
-    public abstract List<SkillType> AvailableSkills { get; }
-    public abstract List<SkillType> LockedSkills { get; }
+{   
+    [SerializeField]
+    protected List<SkillType> availableSkills = new List<SkillType>();
+    protected List<SkillType> lockedSkills = new List<SkillType>();
+
+    public virtual List<SkillType> AvailableSkills => availableSkills;
+    public virtual List<SkillType> LockedSkills => lockedSkills;
     public abstract List<SkillType> AllSkills { get; }
+    public abstract List<SkillType> MainSkills { get; }
     public abstract Skill GetSkillInstance(SkillType skillType);
+
     public string heroID; // Name of the class/character 
     public int heroLevel; // Level of the hero
     public int heroExp;   // Experience of the hero
@@ -75,6 +81,8 @@ public abstract class Companion : Character
 
     //abstract LevelUp method
     public abstract void LevelUp();
+
+    public abstract void InitializeSkillsBasedOnLevel();
 
     public void UnlockSkill(SkillType skillType)
     {

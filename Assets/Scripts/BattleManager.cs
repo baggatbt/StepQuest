@@ -265,6 +265,7 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
 {
     turnOrderList.Clear();
     
+    
     if (companion1 != null) turnOrderList.Add(companion1);
     if (companion2 != null) turnOrderList.Add(companion2);
 

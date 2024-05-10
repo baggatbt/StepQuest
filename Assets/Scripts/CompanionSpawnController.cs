@@ -171,11 +171,14 @@ public class CompanionSpawnController : MonoBehaviour
         // If not selected, add the companion
         Debug.Log("Companion wasn't selected, adding");
         Character instantiatedCompanion = GameManager.Instance.InstantiateSelectedCompanion(selectedCompanion.heroID);
+        Companion companion = instantiatedCompanion as Companion;
         if (instantiatedCompanion != null)
         {
+            companion.InitializeSkillsBasedOnLevel();
             SetupSelectedCompanion(instantiatedCompanion);
             AssignCompanion(instantiatedCompanion);
             EnableHeroUI(instantiatedCompanion);
+            selectedCompanion.InitializeSkillsBasedOnLevel();
             selectedCompanion.isSelected = true;
         }
     }

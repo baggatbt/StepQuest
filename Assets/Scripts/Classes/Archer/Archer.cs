@@ -89,6 +89,11 @@ public class Archer : Companion
     }
 }
 
+    public override void InitializeSkillsBasedOnLevel()
+    {
+
+    }
+
     
     
 
@@ -113,6 +118,19 @@ public class Archer : Companion
         
         
     };
+
+    private List<SkillType> mainSkills = new List<SkillType>()
+    {
+        SkillType.Slash,
+        SkillType.TripleHit,
+        SkillType.Taunt,
+        SkillType.SpeedBreak
+    };
+
+    public override List<SkillType> MainSkills
+    {
+        get { return mainSkills; }
+    }
 
     public override Skill GetSkillInstance(SkillType skillType)
     {

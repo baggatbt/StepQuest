@@ -14,7 +14,7 @@ public class Taunt : Skill
         skillLevel = 1; 
         requiresMovement = false; 
         skillExecutionComplete = false;
-        iconImage = LoadIconImage("SkillIcons/armor5");
+        iconImage = LoadIconImage("Sprites/SkillIcons/Knight/Knight_Icon_Taunt");
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)

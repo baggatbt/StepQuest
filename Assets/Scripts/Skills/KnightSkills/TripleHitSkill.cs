@@ -15,7 +15,7 @@ public class TripleHitSkill : Skill
         energyCost = 3;
         numberOfAttacksPossible = 3;
         skillPointCost = 1;
-        iconImage = LoadIconImage("SkillIcons/fire2");
+        iconImage = LoadIconImage("Sprites/SkillIcons/Knight/Knight_Icon_TripleSlash");
     }
 
     // Override the default base damage calculation.

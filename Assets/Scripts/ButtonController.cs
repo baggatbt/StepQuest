@@ -31,6 +31,7 @@ public class ButtonController : MonoBehaviour
     void Start()
     {
        activeCompanion = battleManager.activePlayer as Companion;
+       
     }
 
    void Update()
@@ -100,49 +101,46 @@ public void PopulateSkillPanelWithCompanionSkills()
         return;
     }
 
-    List<SkillType> availableSkills = activeCompanion.AvailableSkills;
-
-    // Clear existing skill buttons
+    // Clear existing buttons
     foreach (Transform child in companionSkillSelectionPanel.transform)
-    {
         Destroy(child.gameObject);
-    }
+    
     skillButtons.Clear();
+    Debug.Log($"Populating skills for {activeCompanion.heroID}. Number of available skills: {activeCompanion.AvailableSkills.Count}");
 
-    foreach (SkillType skillType in availableSkills)
+    foreach (SkillType skillType in activeCompanion.AvailableSkills)  // Changed to property access
     {
         Skill currentSkill = activeCompanion.GetSkillInstance(skillType);
-        
-        // Only create buttons for active skills
+        if (currentSkill == null)
+        {
+            Debug.LogError("Skill instance is null for " + skillType);
+            continue;
+        }
+
+        Debug.Log($"Skill loaded: {currentSkill.skillName}, Active: {currentSkill.isActiveSkill}");
+
         if (currentSkill.isActiveSkill)
         {
             GameObject newButtonObj = Instantiate(skillButtonPrefab, companionSkillSelectionPanel.transform);
-            // Positioning, button text, and other setup...
-
             Button buttonComponent = newButtonObj.GetComponent<Button>();
             if (buttonComponent != null)
             {
+                buttonComponent.onClick.AddListener(() => SelectAndUseSkill(currentSkill));
                 skillButtons.Add(buttonComponent);
 
-                // Setup button text, actions, icons, etc., as before
-                // Setup button actions
-                buttonComponent.onClick.AddListener(() => { SelectAndUseSkill(currentSkill); });
-
-                if (currentSkill.iconImage != null)
+                if (currentSkill.iconImage)
                 {
                     Image buttonImage = newButtonObj.GetComponent<Image>();
-                    if (buttonImage != null)
-                    {
-                        buttonImage.sprite = currentSkill.iconImage;
-                    }
+                    buttonImage.sprite = currentSkill.iconImage;
                 }
-
-                // Setup tooltip behavior
-                SetupButtonEvents(newButtonObj, currentSkill);
+                Debug.Log("Button created for " + currentSkill.skillName);
             }
         }
     }
 }
+
+
+
 
 
 private Vector3 PositionButtonRadially(int skillIndex, int totalSkills, float radius)

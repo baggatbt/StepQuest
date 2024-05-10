@@ -54,6 +54,12 @@ public class Wizard : Companion
     }
     
 
+
+    public override void InitializeSkillsBasedOnLevel()
+    {
+        
+    }
+
     public override List<SkillType> AvailableSkills => new List<SkillType>
     {
         SkillType.WizardBasicAttack,
@@ -72,6 +78,19 @@ public class Wizard : Companion
         SkillType.FirePillar,
         // ... other skills ...
     };
+
+    private List<SkillType> mainSkills = new List<SkillType>()
+    {
+        SkillType.Slash,
+        SkillType.TripleHit,
+        SkillType.Taunt,
+        SkillType.SpeedBreak
+    };
+
+    public override List<SkillType> MainSkills
+    {
+        get { return mainSkills; }
+    }
 
     public override Skill GetSkillInstance(SkillType skillType)
     {
