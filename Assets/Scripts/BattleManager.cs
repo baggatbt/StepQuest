@@ -724,8 +724,9 @@ public void EndTurn()
             Debug.Log("No input detected. Missed!");
             result = TimingEventResult.Late;
         }
-        ShowTimingResult(result.ToString());
+        
         callback(result);
+        ShowTimingResult(result.ToString());
        // yield return new WaitForSeconds(0.5f); 
     }
     finally
@@ -734,6 +735,7 @@ public void EndTurn()
         
         outerCircle.SetActive(false);
         innerCircle.SetActive(false);
+        
     }
 }
 

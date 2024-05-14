@@ -6,6 +6,7 @@ using TMPro;
 using System;
 
 
+
 public class Character : MonoBehaviour 
 {
     public int level;
@@ -399,7 +400,7 @@ public class Character : MonoBehaviour
 {
     
     Debug.Log("This is the damage moment");
-   // StartCoroutine(TimeStop(0.1f)); // Adjust the duration for timestop effect
+   
     animationDamageTime = true;
 
 }
