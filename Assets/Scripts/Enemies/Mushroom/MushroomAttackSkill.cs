@@ -31,7 +31,7 @@ public class MushroomAttackSkill : Skill
         for (int i = 0; i < numberOfAttacksPossible; i++)
         {
             
-            yield return TimingWindow(user, target, battleManager, 0.2f, 0.7f);
+            yield return TimingWindow(user, target, battleManager, 0.0f, 0.7f);
 
             HandleTimingResultForEnemyAttack(user, target, result, baseDamage);
             Debug.Log("Timing for player attack has been handled waiting for animations");
