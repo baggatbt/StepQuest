@@ -385,6 +385,7 @@ public void DeleteSavedInventory()
         }
     }
 
+    /*
     public void UpdateCompanionStamina(string heroID)
     {
         foreach (var companion in companions)
@@ -392,11 +393,13 @@ public void DeleteSavedInventory()
             if (companion.heroID == heroID && companion.stamina > 0)
             {
                 companion.stamina -= 1;
+                Debug.Log("Companion stamina: " + companion.stamina);
                 RestoreHealthAndEnergyForCompanion(companion);
                 companion.SaveCharacterData(); // Save updated data
             }      
         }
     }
+    */
 
     public void RestoreHealthAndEnergyForCompanion(Companion companion)
     {
@@ -407,13 +410,14 @@ public void DeleteSavedInventory()
     {
         currentCompanion.health = currentCompanion.maxHealth;
         currentCompanion.energy = currentCompanion.maxEnergy;
+        currentCompanion.stamina = currentCompanion.maxStamina;
         Debug.Log("Current Companion " + currentCompanion);
         currentCompanion.SaveCharacterData();
     }
 
-    public void RecoverForSteps()
+    public void RecoverAllForSteps()
     {
-       if (PlayerData.Instance.UseSteps(100))
+       if (PlayerData.Instance.UseSteps(1000))
        {
         RecoverCompanion();
        }

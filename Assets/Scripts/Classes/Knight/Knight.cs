@@ -29,7 +29,7 @@ public class Knight : Companion
             this.heroSkillPoints = 0;
             this.heroStatPoints = 0;
             this.characterIDNumber = "1";
-            this.stamina = 10;
+            this.stamina = 5;
         }
         else
         {

@@ -73,8 +73,9 @@ public class Character : MonoBehaviour
        // this.hasNotGone = true;
     }
 
-    /*
-    void Update(){
+    
+    public void Update()
+    {
             
         if (this.healthBar != null)
         {
@@ -104,7 +105,7 @@ public class Character : MonoBehaviour
         
 
     }
-    */
+    
 
     protected virtual void Start()
     {

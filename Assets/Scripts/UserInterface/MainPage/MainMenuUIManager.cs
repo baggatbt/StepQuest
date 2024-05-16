@@ -407,7 +407,7 @@ public void PopulateInventoryList() {
             // Remove all listeners to avoid stacking if the button is reused
             btn.onClick.RemoveAllListeners();
             // Add a listener to call RecoverForSteps when clicked
-            btn.onClick.AddListener(GameManager.Instance.RecoverForSteps);
+            btn.onClick.AddListener(GameManager.Instance.RecoverAllForSteps);
         }
         else
         {

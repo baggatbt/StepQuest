@@ -206,6 +206,7 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
 {
     if (playerParty.Count > 0) {
      if (isBattleStarted) return; // Prevent starting the battle multiple times
+        DeductStaminaFromParticipants();
         battleStartButton.SetActive(false);
         activePlayer = companion1; //Default
         isBattleStarted = true;
@@ -886,69 +887,14 @@ private TimingEventResult GetTimingAccuracy(Vector3 innerCircleScale, Vector3 ou
 
 private float CalculateSliderValue(int currentExp, int expToNextLevel)
 {
-    // Example calculation, adjust according to your EXP system
-    // This assumes 'expToNextLevel' is the total EXP needed to level up from the current level
+    
+    // 'expToNextLevel' is the total EXP needed to level up from the current level
     // and 'currentExp' is the current EXP amount towards that goal.
     return (float)currentExp / expToNextLevel;
 }
 
 
-
-    public void EndOfBattleRewards(List<Character> enemies)
-{
-    int totalExp = 0;
-    int totalGold = 0;
-
-    // Calculate total EXP and gold from defeated enemies
-    foreach (Enemy enemy in enemies)
-    {
-        totalExp += enemy.expReward;
-        totalGold += enemy.goldReward;
-    }
-
-    Debug.Log($"Running end of battle rewards +{totalExp} EXP +{totalGold} Gold");
-/*
-    // Update EXP for each companion
-    foreach (Character character in playerParty)
-    {
-        if (character is Companion companion)
-        {
-            RestoreHealthAndEnergy();
-            // Directly update companion EXP using GameManager
-            GameManager.Instance.UpdateCompanionExp(companion.heroID, totalExp);
-        }
-    }
-*/
-    // Update the player's gold and save player data
-    PlayerData.Instance.gold += totalGold;
-    PlayerData.Instance.SavePlayerData();
-
-     foreach (Character character in playerParty)
-    {
-        if (character is Companion companion)
-        {
-            Debug.Log("saving in BM " + character);
-            companion.heroExp += totalExp;
-            companion.LevelUp();
-            
-            companion.SaveCharacterData();
-        }
-    }
-
-    TextMeshProUGUI expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
-    expGainedTextComponent.text = totalExp.ToString();
-
-    TextMeshProUGUI goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
-    goldGainedTextComponent.text = totalGold.ToString();
-
-    // Optionally, display EXP to next level for each companion
-    DisplayExpToLevel(playerParty);
-}
-
-
-
-
-    public bool isSkillSelected = false;  // New variable
+public bool isSkillSelected = false;  
 
 
 
@@ -1039,10 +985,7 @@ public void CheckBattleEnd()
     // Check if the battle has ended
     if (allEnemiesDefeated || allAlliesDefeated)
     {
-        // Deduct stamina from participating companions only once after battle ends
-        DeductStaminaFromParticipants();
-
-
+    
         if (allEnemiesDefeated)
         {
             ProcessVictory();
@@ -1059,12 +1002,71 @@ private void DeductStaminaFromParticipants()
 {
     foreach (Character character in playerParty)
     {
-        if (character is Companion companion)
+        Companion companion = (Companion)character;  // Explicitly casting Character to Companion
+        //If they had stamina, fully recover resources
+        if (companion.stamina > 0)
         {
-            GameManager.Instance.UpdateCompanionStamina(companion.heroID);
+        companion.stamina -= 1;
+        companion.health = companion.maxHealth;
+        companion.energy = companion.maxEnergy;
         }
+        companion.SaveCharacterData();
     }
 }
+
+public void EndOfBattleRewards(List<Character> enemies)
+{
+    int totalExp = 0;
+    int totalGold = 0;
+
+    // Calculate total EXP and gold from defeated enemies
+    foreach (Enemy enemy in enemies)
+    {
+        totalExp += enemy.expReward;
+        totalGold += enemy.goldReward;
+    }
+
+    Debug.Log($"Running end of battle rewards +{totalExp} EXP +{totalGold} Gold");
+/*
+    // Update EXP for each companion
+    foreach (Character character in playerParty)
+    {
+        if (character is Companion companion)
+        {
+            RestoreHealthAndEnergy();
+            // Directly update companion EXP using GameManager
+            GameManager.Instance.UpdateCompanionExp(companion.heroID, totalExp);
+        }
+    }
+*/
+    // Update the player's gold and save player data
+    PlayerData.Instance.gold += totalGold;
+    PlayerData.Instance.SavePlayerData();
+
+     foreach (Character character in playerParty)
+    {
+        if (character is Companion companion)
+        {
+            Debug.Log("saving in BM " + character);
+            companion.heroExp += totalExp;
+            companion.LevelUp();
+            
+            companion.SaveCharacterData();
+        }
+        
+        DeductStaminaFromParticipants();
+    }
+
+    TextMeshProUGUI expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
+    expGainedTextComponent.text = totalExp.ToString();
+
+    TextMeshProUGUI goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
+    goldGainedTextComponent.text = totalGold.ToString();
+
+    // Optionally, display EXP to next level for each companion
+    DisplayExpToLevel(playerParty);
+}
+
 
 private void ProcessVictory()
 {

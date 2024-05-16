@@ -124,7 +124,7 @@ public abstract class Companion : Character
             maxStamina = this.maxStamina,
             
         };
-        Debug.Log("saved" + health);
+        Debug.Log("saved stamina" + stamina);
         string jsonData = JsonUtility.ToJson(data);
         PlayerPrefs.SetString("CharacterData_" + heroID, jsonData);
         PlayerPrefs.Save();
