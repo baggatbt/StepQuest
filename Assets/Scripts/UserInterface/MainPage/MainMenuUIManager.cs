@@ -133,8 +133,10 @@ public class MainMenuUIManager : MonoBehaviour
             Image heroIconImage = buttonObject.transform.Find("Background/HeroIconBorder/HeroIcon")?.GetComponent<Image>();
             Slider healthBarSlider = buttonObject.transform.Find("HealthBar").GetComponent<Slider>();
             Slider expBarSlider = buttonObject.transform.Find("ExpBar").GetComponent<Slider>();
+            Slider staBarSlider = buttonObject.transform.Find("StaminaBar").GetComponent<Slider>();
             Text healthBarText = buttonObject.transform.Find("HealthBar/HealthText").GetComponent<Text>(); 
             Text xpBarText = buttonObject.transform.Find("ExpBar/ExpText").GetComponent<Text>(); 
+            Text staBarText = buttonObject.transform.Find("StaminaBar/StaText").GetComponent<Text>(); 
 
             // Set the hero's icon
             if (heroIconImage != null && companion.heroIcon != null)
@@ -148,6 +150,9 @@ public class MainMenuUIManager : MonoBehaviour
             expBarSlider.maxValue = companion.ExpToNextLevel(companion.heroLevel);
             expBarSlider.value = companion.heroExp;
 
+            staBarSlider.maxValue = companion.maxStamina;
+            staBarSlider.value = companion.stamina;
+
             // Set the text for health and experience
             if (healthBarText != null)
             {
@@ -157,6 +162,11 @@ public class MainMenuUIManager : MonoBehaviour
             if (xpBarText != null)
             {
                 xpBarText.text = $"{companion.heroExp} / {companion.ExpToNextLevel(companion.heroLevel)}";
+            }
+
+            if (staBarText != null)
+            {
+                staBarText.text = $"{companion.stamina} / {companion.maxStamina}";
             }
             else
             {
@@ -386,7 +396,7 @@ public void PopulateInventoryList() {
         if (heroImage != null)
         {
             // Set the sprite of the Image component to the companion's heroIcon
-            heroImage.sprite = companion.heroIcon;
+            heroImage.sprite = companion.fullHeroImage;
         }
         else
         {
@@ -431,10 +441,16 @@ public void PopulateInventoryList() {
 
     // Find the TextMeshProUGUI component that should display the skill name
     TextMeshProUGUI skillNameText = skillInfoPanel.transform.Find("SkillNameText").GetComponent<TextMeshProUGUI>();
+    TextMeshProUGUI skillDescriptionText = skillInfoPanel.transform.Find("DescriptionText").GetComponent<TextMeshProUGUI>();
     if (skillNameText != null)
     {
         // Set the skill name text
         skillNameText.text = skill.skillName;
+    }
+    if (skillDescriptionText != null)
+    {
+        // Set the skill name text
+        skillDescriptionText.text = skill.description;
     }
     else
     {

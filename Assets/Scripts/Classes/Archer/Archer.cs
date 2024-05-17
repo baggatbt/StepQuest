@@ -97,34 +97,30 @@ public class Archer : Companion
     
     
 
-    public override List<SkillType> AvailableSkills => new List<SkillType>
+    public override List<SkillType> AvailableSkills
     {
-        SkillType.ShootArrow,
-        SkillType.ArrowRain,
-        SkillType.MeleeCombo,
-        
-        
-    };
+        get { return availableSkills; }
+    }
 
     public override List<SkillType> LockedSkills => new List<SkillType>
     {
-        // ... skills
+        SkillType.ArrowRain,
+        SkillType.MeleeCombo,
     };
     public override List<SkillType> AllSkills => new List<SkillType>
     {
         SkillType.ShootArrow,
-        SkillType.ArrowRain,
-        SkillType.MeleeCombo,
+        
         
         
     };
 
     private List<SkillType> mainSkills = new List<SkillType>()
     {
-        SkillType.Slash,
-        SkillType.TripleHit,
-        SkillType.Taunt,
-        SkillType.SpeedBreak
+       SkillType.ShootArrow,
+       SkillType.ArrowRain,
+       SkillType.MeleeCombo,
+       SkillType.ShootArrow, //Temp add until 4th skill made
     };
 
     public override List<SkillType> MainSkills

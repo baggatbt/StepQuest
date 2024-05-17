@@ -21,6 +21,7 @@ public abstract class Companion : Character
     public int heroExp;   // Experience of the hero
     public GameObject skillTreePanel; 
     public Sprite heroIcon;
+    public Sprite fullHeroImage;
     public int heroStatPoints;
     public int heroSkillPoints;
     public int stamina;
