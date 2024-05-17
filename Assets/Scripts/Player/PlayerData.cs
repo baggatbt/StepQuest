@@ -182,6 +182,7 @@ public class PlayerData : MonoBehaviour
         {
             inGameSteps -= amountToUse;
             Debug.Log("Spent steps: " + amountToUse);
+            SavePlayerData();
             return true;
         }
         return false;

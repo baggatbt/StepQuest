@@ -55,7 +55,9 @@ public class BattleManager : MonoBehaviour
     {
         PlayerTurn,
 
-        EnemyTurn
+        EnemyTurn,
+
+        BattleLost
     }
 
 
@@ -106,6 +108,9 @@ public class BattleManager : MonoBehaviour
                     break;
                 case BattleState.EnemyTurn:
                     Debug.Log("Enemy Turn Started!");
+                    break;
+                case BattleState.BattleLost:
+                    Debug.Log("Battle lost");
                     break;
             }
         }
@@ -264,6 +269,8 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
     public List<Character> turnOrderList = new List<Character>();
     public void InitializeTurnOrder()
 {
+    if (battleLost != true)
+    {
     turnOrderList.Clear();
     
     
@@ -279,13 +286,19 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
 
     turnOrderList = turnOrderList.OrderByDescending(character => character.speed).ToList();
     StartTurn();
+    }
+    else 
+    {
+        Debug.Log("the battle is over");
+    }
 }
 
 
     public void StartTurn()
 {
     
-
+    if (battleLost != true)
+    {
     // Now check if there are characters left to take a turn
     if (turnOrderList.Count > 0)
     {
@@ -297,6 +310,7 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
     {
         // If no characters are left, re-initialize the turn order
         InitializeTurnOrder();
+    }
     }
 }
 
@@ -326,13 +340,17 @@ public void EndTurn()
     if (turnOrderList.Count == 0)
     {
         statusEffectController.ProcessEffects();
+
+       
         InitializeTurnOrder();
+        
         
     }
     else
     {
         StartTurn(); // Proceed to the next character's turn
     }
+    
 }
 
 
@@ -551,7 +569,7 @@ public void EndTurn()
     }
 
     // Decide whether or not to use the special attack or the normal one
-    if (!currentEnemy.isAttacking)
+    if (!currentEnemy.isAttacking && battleLost != true)
     {
         /*
         currentEnemy.currentSkill = (currentEnemy.energy >= currentEnemy.maxEnergy) ? 
@@ -582,8 +600,9 @@ public void EndTurn()
 
     if (potentialTargets.Count == 0)
     {
-        Debug.LogError("No valid targets available.");
+        Debug.Log("No valid targets available.");
         return null;
+        
     }
 
     // Use weighted random selection to choose a target
@@ -1084,10 +1103,12 @@ private void ProcessVictory()
     endOfBattlePanel.SetActive(true);
     DisplayExpToLevel(playerParty);
 }
-
+public bool battleLost = false;
 private void ProcessDefeat()
 {
     Debug.Log("Battle lost");
+    StopAllCoroutines();
+    battleLost = true;
     endOfBattleLossPanel.SetActive(true);
 }
 

@@ -278,7 +278,10 @@ public class Character : MonoBehaviour
     {
         energyBar.gameObject.SetActive(false);  // Disable the energyBar's GameObject
     }
+    if (this is Enemy enemy)
+    {
         enemyHealthUI.SetActive(false);
+    }
 
      yield return new WaitForSeconds(0.5f); //Ensures fade is all done
     }
@@ -441,7 +444,7 @@ public class Character : MonoBehaviour
         }
         else if (this.gameObject.tag == "Companion")
         {
-            // Logic for when a companion dies
+            StartCoroutine(this.FadeOutSprite());
         }
     }
 }

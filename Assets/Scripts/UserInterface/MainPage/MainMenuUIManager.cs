@@ -224,6 +224,21 @@ public void OpenSkillPanel()
 }
 
 
+public GameObject restRecoverStaminaPanel;
+public TextMeshProUGUI stepsToPayText;
+public void openRestPanel()
+{
+    restRecoverStaminaPanel.SetActive(true);
+
+    int stepsToPay = GameManager.Instance.CalculateStepCostForResting();
+
+    stepsToPayText.text = ("Cost: " + stepsToPay.ToString() + " steps");  
+}
+
+public void RecoverStaminaUsingSteps()
+{
+    GameManager.Instance.RecoverAllForSteps();
+}
 
 
    
@@ -407,27 +422,9 @@ public void PopulateInventoryList() {
     {
         Debug.LogError("HeroImage GameObject not found in the scene.");
     }
-    // Find and configure the HealButton
-    GameObject healButton = GameObject.Find("HealButton");
-    if (healButton != null)
-    {
-        Button btn = healButton.GetComponent<Button>();
-        if (btn != null)
-        {
-            // Remove all listeners to avoid stacking if the button is reused
-            btn.onClick.RemoveAllListeners();
-            // Add a listener to call RecoverForSteps when clicked
-            btn.onClick.AddListener(GameManager.Instance.RecoverAllForSteps);
-        }
-        else
-        {
-            Debug.LogError("HealButton does not have a Button component attached.");
-        }
-    }
-    else
-    {
-        Debug.LogError("HealButton GameObject not found in the scene.");
-    }
+    
+    
+    
     UpdateSkillButtonImages(companion);
 }
     public GameObject skillInfoPanel;

@@ -417,11 +417,26 @@ public void DeleteSavedInventory()
 
     public void RecoverAllForSteps()
     {
-       if (PlayerData.Instance.UseSteps(1000))
+       int stepsToUse = CalculateStepCostForResting();
+       
+       if (PlayerData.Instance.UseSteps(stepsToUse))
        {
         RecoverCompanion();
        }
+       else
+       {
+        Debug.Log("not enough steps");
+       }
     }
+
+    public int CalculateStepCostForResting() //Later include modifiers for upgraded player buildings
+    {
+       int staminaToRecover = (currentCompanion.maxStamina - currentCompanion.stamina);
+       int calculatedStepCost = (staminaToRecover * 200); //1000 steps for full recovery
+
+       return calculatedStepCost;
+    }
+
     // Call this method to save the data of all companions
     public void SaveAllCompanionData()
     {
@@ -431,6 +446,7 @@ public void DeleteSavedInventory()
             Debug.Log("In game manager saving: " + companion);
         }
     }
+
 
 
     private void LoadAllCompanionData()
