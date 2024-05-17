@@ -278,10 +278,9 @@ public class Character : MonoBehaviour
     {
         energyBar.gameObject.SetActive(false);  // Disable the energyBar's GameObject
     }
-    if (this is Enemy enemy)
-    {
-        enemyHealthUI.SetActive(false);
-    }
+    
+        enemyHealthUI.SetActive(false); //Will also work for heroes
+    
 
      yield return new WaitForSeconds(0.5f); //Ensures fade is all done
     }

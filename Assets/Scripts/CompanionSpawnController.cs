@@ -76,12 +76,15 @@ public class CompanionSpawnController : MonoBehaviour
         healthBar.value = character.health;
         character.healthBar = healthBar;
         healthText.text = character.health.ToString();
+        
 
         character.energyText = energyText;
         energyBar.maxValue = character.maxEnergy;
         energyBar.value = character.energy;
         character.energyBar = energyBar;
         energyText.text = character.energy.ToString();
+
+        character.enemyHealthUI = heroHealthUI;
     }
 
     

@@ -1031,6 +1031,9 @@ private void DeductStaminaFromParticipants()
         }
         companion.SaveCharacterData();
     }
+
+        Debug.Log("No stamina");
+    
 }
 
 public void EndOfBattleRewards(List<Character> enemies)
@@ -1106,10 +1109,20 @@ private void ProcessVictory()
 public bool battleLost = false;
 private void ProcessDefeat()
 {
+   foreach (Character character in playerParty)
+    {
+        if (character is Companion companion)
+        {
+        
+            companion.SaveCharacterData();
+        }   
+        
+    }
     Debug.Log("Battle lost");
     StopAllCoroutines();
     battleLost = true;
     endOfBattleLossPanel.SetActive(true);
+    
 }
 
 
