@@ -1,66 +1,61 @@
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
-
+using TMPro;
 public class Inventory : MonoBehaviour
 {
     [Header("Inventory UI")]
-    public GameObject inventoryUI; // Drag your InventoryUI GameObject here
-    public GameObject slotPrefab; // Drag your Slot Prefab here
-    public int maxInventorySlots = 16; // Maximum number of slots
-    public Item testItem;
-
-    private List<Item> items = new List<Item>();
-    private List<GameObject> itemSlots = new List<GameObject>();
+    public GameObject inventoryUI;
+    public GameObject slotPrefab;
 
     private void Start()
     {
-        // Initialize empty slots
-        for (int i = 0; i < maxInventorySlots; i++)
-        {
-            GameObject slot = Instantiate(slotPrefab, inventoryUI.transform);
-            slot.SetActive(true);
-            itemSlots.Add(slot);
-        }
+        GameManager.Instance.LoadInventory(); // Load the inventory at start
     }
 
-    public bool AddItem(Item item)
+    public void UpdateInventoryUI()
+{
+    if (inventoryUI == null) return;
+
+    foreach (Transform child in inventoryUI.transform)
     {
-        if (items.Count >= maxInventorySlots)
+        Destroy(child.gameObject);
+    }
+
+    foreach (Item item in GameManager.Instance.itemList)
+    {
+        GameObject slot = Instantiate(slotPrefab, inventoryUI.transform);
+        slot.SetActive(true);
+
+        // Assuming 'ItemContainer' is where you want to set the image for the item
+        Image itemImage = slot.transform.Find("ItemContainer")?.GetComponent<Image>();
+        if (itemImage != null)
         {
-            Debug.Log("Inventory is full!");
-            return false;
+            itemImage.sprite = item.itemIcon;
+            if (item.itemIcon == null)
+            {
+                Debug.LogError("Item sprite is null for item: " + item.itemName);
+            }
+        }
+        else
+        {
+            Debug.LogError("Image component not found for ItemContainer.");
         }
 
-        items.Add(item);
-        UpdateInventoryUI();
-        return true;
-    }
-
-    public void RemoveItem(Item item)
-    {
-        if (items.Remove(item))
+        // Use TextMeshProUGUI instead of Text
+        TextMeshProUGUI itemCountText = slot.transform.Find("ItemCountText")?.GetComponent<TextMeshProUGUI>();
+        if (itemCountText != null)
         {
-            UpdateInventoryUI();
+            itemCountText.text = item.quantity.ToString();
         }
-    }
-
-    private void UpdateInventoryUI()
-    {
-        // Then enable and update necessary slots
-        for (int i = 0; i < items.Count; i++)
+        else
         {
-            itemSlots[i].SetActive(true);
-
-            // Find the ItemContainer and then the Image inside it
-            Image itemImage = itemSlots[i].transform.Find("ItemContainer").GetComponentInChildren<Image>();
-            if (itemImage != null)
-                itemImage.sprite = items[i].itemIcon;
+            Debug.LogError("ItemCountText component not found for slot prefab.");
         }
-    }
 
-    public void AddTestItem()
-    {
-        AddItem(testItem);
+        Debug.Log($"Updated UI with item: {item.itemName}, Quantity: {item.quantity}");
     }
+}
+
+
+
 }

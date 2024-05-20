@@ -2,62 +2,95 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class UpgradeBar : MonoBehaviour
 {
-    public GameObject emptySegmentPrefab; // Assign the EmptyUpgradeSegment prefab in the inspector
-    public GameObject filledSegmentPrefab; // Assign the FilledUpgradeSegment prefab in the inspector
-    public Button upgradeButton; // Assign in the inspector
-    public int maxLevel;
-    private int currentLevel;
-    private GameObject[] segments;
+    public GameObject emptySegmentPrefab; // Assign in the Inspector
+    public GameObject filledSegmentPrefab; // Assign in the Inspector
+    public Button upgradeButton; // Assign in the Inspector
+    public int maxLevel; // Always set to 5 as per requirements
+    private int currentLevel; // Tracks the current progress
+
+    private GameObject[] segments; // Holds the segments (empty or filled)
+
+    public event Action OnMaxLevelReached;
 
     private void Awake()
     {
-        segments = new GameObject[maxLevel];
+        maxLevel = 3;
+        segments = new GameObject[maxLevel]; // Initialize based on maxLevel
         InitializeSegments();
+        Debug.Log("max level from upgrade bar:" + maxLevel);
+    }
+
+    private void Start()
+    {
         upgradeButton.onClick.AddListener(UpgradeStat);
     }
 
     private void InitializeSegments()
     {
-        // Instantiate the empty segment prefabs
         for (int i = 0; i < maxLevel; i++)
         {
             segments[i] = Instantiate(emptySegmentPrefab, transform);
         }
     }
 
-    private void UpgradeStat()
-{
-    if (currentLevel < maxLevel)
+    public void SetInitialProgress(int progress)
     {
-        // Get the position, rotation, and parent from the current segment to be upgraded
-        Vector3 position = segments[currentLevel].transform.localPosition; // Use localPosition for UI elements
-        Quaternion rotation = segments[currentLevel].transform.localRotation;
-        Transform parent = segments[currentLevel].transform.parent;
-
-        // Destroy the current empty segment
-        Destroy(segments[currentLevel]);
-
-        // Instantiate a new filled segment at the correct position
-        segments[currentLevel] = Instantiate(filledSegmentPrefab, parent);
-        segments[currentLevel].transform.localPosition = position;
-        segments[currentLevel].transform.localRotation = rotation;
-        
-        // Ensure the new segment has the same sibling index so it appears in the correct order in the UI hierarchy
-        segments[currentLevel].transform.SetSiblingIndex(currentLevel);
-
-        // Increment the current level
-        currentLevel++;
-        Debug.Log("Upgraded");
-
-        // Disable the button if max level is reached
-        if (currentLevel >= maxLevel)
+        // Resetting currentLevel to 0 to safely re-assign it based on progress
+        currentLevel = 0; 
+        // Ensure progress doesn't exceed maxLevel
+        progress = Mathf.Min(progress, maxLevel);
+        for (int i = 0; i < progress; i++)
         {
-            upgradeButton.interactable = false;
+            UpgradeSegment(i, true);
+        }
+        currentLevel = progress; // Update currentLevel after setting progress
+    }
+
+    private void UpgradeSegment(int index, bool immediate = false)
+    {
+        if (index < maxLevel)
+        {
+            if (!immediate)
+            {
+                Destroy(segments[index]);
+            }
+            segments[index] = Instantiate(filledSegmentPrefab, transform);
+            segments[index].transform.SetSiblingIndex(index);
         }
     }
-}
 
+    public void UpgradeStat()
+    {
+        // Check if currentLevel is about to exceed maxLevel
+        if (GameManager.Instance.currentCompanion.heroStatPoints > 0 && currentLevel < maxLevel)
+        {
+            UpgradeSegment(currentLevel);
+            currentLevel++; // Safely increment currentLevel
+            GameManager.Instance.currentCompanion.heroStatPoints--; // Deduct a stat point
+
+            if (currentLevel == maxLevel)
+            {
+                OnMaxLevelReached?.Invoke();
+                 ResetSegments(); // Reset segments to empty after reaching max level
+            }
+        }
+        else
+        {
+            Debug.Log("No stat points available or max level reached.");
+        }
+    }
+
+    public void ResetSegments()
+    {
+        foreach (var segment in segments)
+        {
+            Destroy(segment);
+        }
+        currentLevel = 0;
+        InitializeSegments(); // Reinitialize the segments as empty
+    }
 }

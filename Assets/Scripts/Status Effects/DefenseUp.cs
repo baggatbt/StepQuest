@@ -16,6 +16,7 @@ public class DefenseUp : StatusEffect
     {
         defenseModifier = (target.defensePower / 2); //Half their defense
         target.defensePower += defenseModifier;
+        
     }
 
     public override void RemoveEffect(Character target)

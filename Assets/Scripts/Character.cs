@@ -1,4 +1,4 @@
-using System.Collections;
+ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,11 +6,14 @@ using TMPro;
 using System;
 
 
+
 public class Character : MonoBehaviour 
 {
     public int level;
     public int health;
     public int maxHealth;
+    public string characterIDNumber;
+    public bool isSelected;
     
     public int energy;
     public int maxEnergy;
@@ -30,6 +33,7 @@ public class Character : MonoBehaviour
     public Animator animator;
     public TextMeshProUGUI healthText; 
     public TextMeshProUGUI energyText;
+   // public GameObject enemyHealthUI;
     
      
 
@@ -37,12 +41,20 @@ public class Character : MonoBehaviour
     public bool isMoving;
     public bool attackTrigger;
     public bool animationEnded;
+    public bool didBlock;
     public Skill currentSkill; 
     public List<Skill> skills = new List<Skill>();
     public int attacksBeforeSpecial; 
     public Skill normalSkill; 
     public Skill specialSkill;
+    
+    public GameObject enemyHealthUI;
 
+    //Testing various statuses
+    public float damageReflectionPercentage; // Percentage of damage to reflect
+
+    
+   
     private bool checkCollisionsDuringMovement = true;
 
     //STATUS EFFECTS
@@ -52,14 +64,19 @@ public class Character : MonoBehaviour
 
     protected virtual void Awake()
     {
+        isSelected = false;
         animator = GetComponent<Animator>();
-        originalPosition = transform.position;
         statusEffectController = GetComponent<StatusEffectController>();
+        enemyDeathEffect = GetComponent<EnemyDeathEffect>();
+        originalPosition = transform.position;
+        Debug.Log("OP at Awake() " + originalPosition);
        // this.hasNotGone = true;
     }
 
-    void Update(){
-        
+    
+    public void Update()
+    {
+            
         if (this.healthBar != null)
         {
             
@@ -67,8 +84,8 @@ public class Character : MonoBehaviour
             this.healthBar.value = health;
             if (this.healthText != null )
             {
-                Debug.Log(this.healthText.text + " was not null");
-                this.healthText.text =  this.health + " / " + maxHealth;
+                
+                this.healthText.text =  this.health + "";
                 
             }
         }
@@ -79,7 +96,7 @@ public class Character : MonoBehaviour
             if (this.energyText != null)
             {
                 
-                this.energyText.text = this.energy +  " / " + this.maxEnergy;
+                this.energyText.text = this.energy + "";
                 this.energyBar.value = this.energy;
                 
                 
@@ -88,6 +105,7 @@ public class Character : MonoBehaviour
         
 
     }
+    
 
     protected virtual void Start()
     {
@@ -99,8 +117,8 @@ public class Character : MonoBehaviour
             healthBar.value = health;
             if (healthText !=null && energyText !=null)
             {
-               this.healthText.text = this.health + " / " + this.maxHealth;
-                energyText.text = this.energy  + " / " + maxEnergy;
+               this.healthText.text = this.health +"";
+                energyText.text = this.energy +"";
             }
         }
         
@@ -110,6 +128,8 @@ public class Character : MonoBehaviour
             energyBar.maxValue = maxEnergy;
             energyBar.value = energy;
         }
+
+        
         
     }
 
@@ -163,40 +183,59 @@ public class Character : MonoBehaviour
     }
 
 */
+
+
+    
+
     public void TakeDamage(int damageOfAttacker, Character attacker)
 {
+    if (currentBarrier != null && currentBarrier.IsActive)
+        {
+            currentBarrier.AbsorbDamage();
+            
+            return; // Skip taking damage because the barrier absorbed it
+        }
+        
     // Calculate effective defense after penetration
-    int effectiveDefense = Math.Max(0, defensePower - attacker.defensePenetration);
-    Debug.Log("The target has " + effectiveDefense + " defense left after penetration.");
+      int effectiveDefense = Math.Max(0, defensePower - attacker.defensePenetration);
+   // Debug.Log("The target has " + effectiveDefense + " defense left after penetration.");
 
-    // Calculate total damage using the new formula
-    float totalDamage = damageOfAttacker * (100f / (100f + effectiveDefense));
-    int damageDealt = Mathf.FloorToInt(totalDamage); // Convert to integer, adjust as needed
+    // Calculate total damage after flat defense reduction
+    int totalDamageAfterDefense = damageOfAttacker - effectiveDefense;
+    
 
-    Debug.Log("Total damage dealt after defense penetration = " + damageDealt);
+    Debug.Log("Total damage dealt  = " + totalDamageAfterDefense);
 
     // Subtract the calculated damage from health
-    health -= damageDealt;
-    healthBar.value = health;
-
+    this.health -= totalDamageAfterDefense;
+    if (this.healthBar != null)
+    {
+    this.healthBar.value = health;
+    }
+    this.EnemyIsHit(); //If the character taking damage is an enemy, they all share the same trigger
+    Debug.Log("Takign damage but im null" + this.healthText);
     // Update the health text
     if (this.healthText != null)
     {
-        this.healthText.text = this.health + " / " + this.maxHealth;
+        this.healthText.text = this.health + "";
     }
     
     // Check if damage was dealt for additional effects
-    if (damageDealt > 0)
+    if (totalDamageAfterDefense >= 1)
     { 
+        Debug.Log("did block from character" + this.didBlock);
+        if (!this.didBlock){
+        this.animator.SetTrigger("IsHurtTrigger");
+        }
         // Trigger hit reaction, damage popup, etc.
+        
         GameObject damagePopupPrefab = Resources.Load<GameObject>("PreFab/DamagePopup");
         Transform endOfBattleRewardsTransform = GameObject.Find("EndOfBattleRewardsCanvas").transform;
-
         if(damagePopupPrefab != null)
         {
             GameObject damagePopupInstance = Instantiate(damagePopupPrefab, transform.position, Quaternion.identity, endOfBattleRewardsTransform);
             DamagePopup damagePopupScript = damagePopupInstance.GetComponent<DamagePopup>();
-            damagePopupScript.Setup(damageDealt);
+            damagePopupScript.Setup(totalDamageAfterDefense);
         }
         else
         {
@@ -204,6 +243,7 @@ public class Character : MonoBehaviour
         }
     }
     Debug.Log("isAttacking = " + attacker.isAttacking);
+    
    
 }
 
@@ -228,23 +268,40 @@ public class Character : MonoBehaviour
 
     sr.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0);
     this.gameObject.SetActive(false);  // deactivate the GameObject after fade
-   // yield return new WaitForSeconds(0.5f); //Ensures fade is all done
-}
+
+    if (healthBar != null)
+    {
+    healthBar.gameObject.SetActive(false);  // Disable the healthBar's GameObject
+    }
+
+    if (energyBar != null)
+    {
+        energyBar.gameObject.SetActive(false);  // Disable the energyBar's GameObject
+    }
+    
+        enemyHealthUI.SetActive(false); //Will also work for heroes
+    
+
+     yield return new WaitForSeconds(0.5f); //Ensures fade is all done
+    }
 
    // private int remainingCost = 0;
     public void SpendEnergy(int energySpent)
+{
+    this.energy -= energySpent;
+    
+    // Check if energyBar and energyText are not null before accessing their properties
+    if (energyBar != null)
     {
-  
-        this.energy -= energySpent;
-        
-        
         energyBar.value = this.energy;
-        if (energyBar != null)
-        {
-            energyBar.value = this.energy;
-            energyText.text = this.energy + " / " + this.maxEnergy;
-        }
-}   
+    }
+
+    if (energyText != null)
+    {
+        energyText.text = this.energy.ToString();
+    }
+}
+
 
 
     public void GainTeamEnergy(int energyGained)
@@ -271,16 +328,34 @@ public class Character : MonoBehaviour
     }
     if (energyText != null) //Had to separate this because monster energies do not use text.
     {
-        energyText.text = "MP: " + this.energy + " / " + maxEnergy;
+        energyText.text =  this.energy + "";
     }
     Debug.Log("Not passing any");
 }
     //For enemy rage bars
-    public void GainEnergy(int energyGained)
+   public void GainEnergy(int energyGained)
+{
+    if (this.energy < this.maxEnergy)
     {
-        this.energy = energyGained;
-        
+        Debug.Log("Gaining " + energyGained + " energy");
+        this.energy += energyGained; // Corrected to add energyGained to the current energy
+        if (this.energy > this.maxEnergy) // Ensuring that energy does not exceed maxEnergy
+        {
+            this.energy = this.maxEnergy;
+        }
+        Debug.Log(this.energy.ToString() + " total energy now");
     }
+    if (energyBar != null)
+    {
+        energyBar.value = this.energy;
+    }
+
+    if (energyText != null)
+    {
+        energyText.text = this.energy.ToString();
+    }
+}
+
 
     public void Gainhealth(int healthGained)
     {
@@ -288,7 +363,7 @@ public class Character : MonoBehaviour
     }
 
    
-    public void IsHit() => animator.SetTrigger("IsHurtTrigger");
+    public void EnemyIsHit() => animator.SetTrigger("EnemyIsHurtTrigger");
     
     public bool isAnimationDone = false;
 
@@ -300,24 +375,76 @@ public class Character : MonoBehaviour
         
     }
 
+    public Barrier currentBarrier;
+    public void AddBarrier(GameObject barrierPrefab)
+    {
+        if (currentBarrier == null) // Ensure there isn't already a barrier
+        {
+            GameObject barrierObj = Instantiate(barrierPrefab, transform.position, Quaternion.identity, transform);
+            currentBarrier = barrierObj.GetComponent<Barrier>();
+            
+        }
+    }
+
+   
+
     //This will be called on an animation event so characters can call target.TakeDamage() at the exact moment
     public bool animationDamageTime = false;
 
-    public void animationDamageTiming()
-    {
-        Debug.Log("This is the damage moment");
-        //animator.SetTrigger("TimingFlashTrigger");
-        animationDamageTime = true;;
-    
-    }
+    private IEnumerator TimeStop(float duration)
+{
+    Time.timeScale = 0f; // Stops the game time
+    yield return new WaitForSecondsRealtime(duration); // Waits in real time
+    Time.timeScale = 1f; // Resumes the game time
+}
 
+
+    public void animationDamageTiming()
+{
+    
+    Debug.Log("This is the damage moment");
+   
+    animationDamageTime = true;
+
+}
+/* Dont have a suitable flash material yet, but the idea works
+    public Material originalMaterial; // To store the original material
+    public Material newMaterial; // Material for the "flash" effect
+    public IEnumerator FlashWhiteAndReset() //handles setting and resetting of hero flashing
+    {
+        SwapMaterial();
+        yield return new WaitForSeconds(0.2f); // Delay so it doesnt flash back too early
+        ResetMaterial();
+        
+    }
+    // Method to be called by the animation event to "flash" the hero at correct timing
+    public void SwapMaterial()
+    {
+        GetComponent<SpriteRenderer>().material = newMaterial;
+    }
+     public void ResetMaterial()
+    {
+        GetComponent<SpriteRenderer>().material = originalMaterial;
+    }
+    */
+    public EnemyDeathEffect enemyDeathEffect;
    public void CheckForDeath()
 {
     Debug.Log("Checking for death");
     if (this.health <= 0)
     {
-        StartCoroutine(FadeOutSprite());
-       // Destroy(gameObject); // Destroy the GameObject
+        // Check if the Character is an Enemy
+        if (this is Enemy enemy)
+        {
+            enemy.enemyDeathEffect.TriggerExplosion();
+            StartCoroutine(enemy.FadeOutSprite());
+            enemy.DropMaterial(); // Call DropMaterial on the enemy instance
+            // Add any additional logic here for when an enemy dies.
+        }
+        else if (this.gameObject.tag == "Companion")
+        {
+            StartCoroutine(this.FadeOutSprite());
+        }
     }
 }
 
@@ -327,56 +454,56 @@ public class Character : MonoBehaviour
     animator.SetTrigger("MovementAnimationTrigger");
     this.isMoving = true;
 
-    Vector3 targetPosition = attackTarget.position;
+    // Define a speed for moving to the target. 
+    float moveSpeed = 17f; 
+
+    Vector3 targetPosition = new Vector3(attackTarget.position.x, attackTarget.position.y, attackTarget.position.z);
     checkCollisionsDuringMovement = true;
 
-    // Start moving towards the target
-    yield return Move(targetPosition, stoppingDistance: 0.0f); // Set a small stopping distance
+    // Pass the moveSpeed as the third argument to the Move coroutine
+    yield return Move(targetPosition, 3.0f, moveSpeed);
 
-    // Stop the movement animation when the target position is reached or a collision occurs
     animator.SetTrigger("StopMovementAnimationTrigger");
     this.isMoving = false;
 }
 
-public IEnumerator ReturnToPosition()
+
+
+private IEnumerator Move(Vector3 targetPosition, float stoppingDistance, float speed)
 {
+    Debug.Log($"Starting Move towards {targetPosition}");
+    while (Vector3.Distance(transform.position, targetPosition) > stoppingDistance)
+    {
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
+        yield return null; // Wait for the next frame
+    }
+    Debug.Log("Completed Move");
+}
+
+public IEnumerator ReturnToPosition(float returnSpeed = 20f)
+{
+    Debug.Log($"Returning to original position at: {originalPosition}");
     animator.SetTrigger("MovementAnimationTrigger");
     this.isMoving = true;
 
-    // Move back to the original position
-    yield return Move(originalPosition, stoppingDistance: 0.0f); // Exact position, so stopping distance is 0
+    yield return Move(originalPosition, 0.00f, returnSpeed); // Use a small stopping distance and adjustable speed
 
-    // This line will ensure the character is exactly at the original position
-    transform.position = originalPosition;
-
+    transform.position = originalPosition; // Ensure exact original position, remove if snapping still occurs but I think its fixed
     animator.SetTrigger("StopMovementAnimationTrigger");
     this.isMoving = false;
+    Debug.Log("Returned to original position");
 }
 
-private IEnumerator Move(Vector3 targetPosition, float stoppingDistance)
-{
-    while (!HasReachedPosition(targetPosition, stoppingDistance))
-    {
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, 17.5f * Time.deltaTime);
-
-        if (checkCollisionsDuringMovement && IsCollidingWithCharacter())
-        {
-            animator.SetTrigger("StopMovementAnimationTrigger");
-            yield break; // Stop the coroutine if a collision is detected
-        }
-
-        // Use WaitForFixedUpdate for physics-based movement
-        yield return new WaitForFixedUpdate();
-    }
-}
-
+/*
 // Updated to check for an appropriate stopping distance
 private bool HasReachedPosition(Vector3 targetPosition, float stoppingDistance)
 {
     // Adjusted to use magnitude instead of sqrMagnitude for more accurate comparison
+     
     return Vector3.Distance(transform.position, targetPosition) <= stoppingDistance;
 }
-
+*/
+/*
 private bool IsCollidingWithCharacter()
 {
     // Consider using a more specific collision check if necessary
@@ -395,5 +522,30 @@ private bool IsCollidingWithCharacter()
     }
     return false;
 }
+*/
+
+        public virtual void UpdateStats()
+    {   
+        //Each enemy implements its own growth
+    }
+
+    public AudioSource audioSource; // Attach this in the inspector
+    public AudioClip hitSound; // Assign this in the inspector
+    public AudioClip criticalHitSound; // Assign this in the inspector
+
+    public void PlayHitSound()
+    {
+        audioSource.clip = hitSound;
+        audioSource.Play();
+        Debug.Log("hit sound");
+    }
+
+    public void PlayCriticalHitSound()
+    {
+        audioSource.clip = criticalHitSound;
+        audioSource.Play();
+        Debug.Log("crit sound");
+    }
+    
 
 }

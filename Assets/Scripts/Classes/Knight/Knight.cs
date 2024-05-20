@@ -4,71 +4,146 @@ using UnityEngine;
 
 public class Knight : Companion
 {
+    
+    
     protected override void Awake()
     {
         base.Awake();
-        GameManager.Instance.RegisterCompanion(this);
-        Debug.Log("Companion registered");
-        
-
+        // Load the skill tree prefab from the Resources folder
+    
         // Initialize with default values if no data is loaded
-        if (this.level == 0)
+        if (this.heroLevel == 0)
         {
-            this.level = 1;
-            this.attackPower = 7;
-            this.maxHealth = 20;
+           // this.level = 1; phasing out, replace with heroLevel
+            this.attackPower = 5;
+            this.maxHealth = 12;
             this.health = this.maxHealth;
-            this.defensePower = 20;
+            this.defensePower = 1;
             this.speed = 4;
-            this.maxEnergy = 10;
-            this.energy = this.maxEnergy;
+            this.maxEnergy = 5;
+            this.energy = maxEnergy;
             this.defensePenetration = 0;
             this.heroID = "Knight";
             this.heroLevel = 1;
             this.heroExp = 0;
             this.heroSkillPoints = 0;
             this.heroStatPoints = 0;
+            this.characterIDNumber = "1";
+            this.stamina = 5;
         }
-        LoadCharacterData(); // Load saved data
+        else
+        {
+         LoadCharacterData(); // Load saved data
+         
+        }
+
+        InitializeSkillsBasedOnLevel();
     }
+
+
+  public override void InitializeSkillsBasedOnLevel()
+    {
+        availableSkills.Clear(); // Directly manipulate the protected field
+        availableSkills.Add(SkillType.Slash);
+        if (this.heroLevel >= 2) availableSkills.Add(SkillType.TripleHit);
+        if (this.heroLevel >= 5) availableSkills.Add(SkillType.Taunt);
+        Debug.Log($"Total Available skills: {availableSkills.Count}");
+    }
+
+
+    
 
     
 
     public override void LevelUp()
+{
+    if (this.heroExp >= ExpToNextLevel(this.heroLevel))
     {
-        if (this.heroExp >= ExpToNextLevel(this.heroLevel))
+        this.heroExp -= ExpToNextLevel(this.heroLevel); // Handles exp past the required amount
+        this.heroLevel++;
+        
+
+        switch (this.heroLevel)
         {
-            this.heroLevel++;
-            this.attackPower += 2;
-            this.maxHealth += 5;
-            this.health = this.maxHealth;
-            this.defensePower += 3;
-            this.speed += 1;
-            this.maxEnergy += 1;
-            this.energy = this.maxEnergy;
-            this.heroExp = 0;  
-            this.heroStatPoints += 3;
-            this.heroSkillPoints += 1;
-        } 
+            case 2:
+                this.maxHealth += 2; 
+                break;
+            case 3:
+                this.attackPower += 1; 
+                break;
+            case 4:
+                this.maxHealth += 3; 
+                break;
+            case 5:
+                this.attackPower += 1; 
+                break;
+            case 6:
+                this.maxEnergy += 1; 
+                break;
+            case 7:
+                this.maxHealth += 3; 
+                break;
+            case 8:
+                this.attackPower += 1; 
+                break;
+            case 9:
+                this.defensePower += 1; 
+                break;
+            case 10:
+                this.maxHealth += 4; 
+                break;
+            default:
+                break; //TODO: extend this later when I have concrete balance plans
+        }
+
+        // Update current health and energy to new max values
+        this.health = this.maxHealth;
+        this.energy = this.maxEnergy;
+
+        this.heroStatPoints += 1; // Every 3 levels will allow player to upgrade one stat of their choice +1
+        this.heroSkillPoints += 1; //TODO: Implement skill unlocking
+
+        Debug.Log("Hero leveled up to level " + this.heroLevel + ", stat upgraded.");
+    }
+}
+
+    
+    
+
+    public override List<SkillType> AvailableSkills
+    {
+        get { return availableSkills; }
     }
 
-    
-    
+    public override List<SkillType> LockedSkills => new List<SkillType>
+    {
+        SkillType.ReflectDamagePassive,
+        SkillType.SpeedBreak,
+        
+    };
 
-    public override List<SkillType> AvailableSkills => new List<SkillType>
+    public override List<SkillType> AllSkills => new List<SkillType>
     {
         SkillType.Slash,
         SkillType.TripleHit,
         SkillType.Taunt,
-        
-       
+        SkillType.SpeedBreak,
+        //Future upgrades can just be a brand new skill, like if the player upgrades slash, switch it to Slash2() etc
         
     };
 
-    public override List<SkillType> LockedSkills => new List<SkillType>
+    private List<SkillType> mainSkills = new List<SkillType>()
     {
-        // ... skills
+        SkillType.Slash,
+        SkillType.TripleHit,
+        SkillType.Taunt,
+        SkillType.SpeedBreak
     };
+
+    public override List<SkillType> MainSkills
+    {
+        get { return mainSkills; }
+    }
 
     public override Skill GetSkillInstance(SkillType skillType)
     {
@@ -83,6 +158,12 @@ public class Knight : Companion
             
             case SkillType.Taunt:
                 return new Taunt();
+            
+            case SkillType.ReflectDamagePassive:
+                return new ReflectDamagePassive();
+
+            case SkillType.SpeedBreak:
+                return new SpeedBreak();
 
           
             default:

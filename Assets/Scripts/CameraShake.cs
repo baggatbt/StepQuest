@@ -9,9 +9,9 @@ using TMPro;
 public class CameraShake : MonoBehaviour
 {
     public float shakeDuration = 0.15f;
-    public float shakeMagnitude = 0.1f;
+   // public float shakeMagnitude = 0.1f;
 
-    public IEnumerator Shake()
+    public IEnumerator Shake(float shakeMagnitude)
     {
         Vector3 originalPos = transform.position;
         float elapsed = 0.0f;

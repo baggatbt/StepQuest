@@ -7,13 +7,14 @@ public class Wizard : Companion
     protected override void Awake()
     {
         base.Awake();
-        GameManager.Instance.RegisterCompanion(this);
-        LoadCharacterData(); // Load saved data
+        
+        
+        
 
         // Initialize with default values if no data is loaded
         if (this.health <= 0)
         {
-            this.level = 1;
+           // this.level = 1;
             this.attackPower = 9;
             this.maxHealth = 12;
             this.health = this.maxHealth;
@@ -27,6 +28,9 @@ public class Wizard : Companion
             this.heroExp = 0;
             this.heroSkillPoints = 0;
             this.heroStatPoints = 0;
+            this.characterIDNumber = "3";
+             this.stamina = 10;
+        
         }  
     }
 
@@ -45,9 +49,16 @@ public class Wizard : Companion
             this.heroExp = 0;  
             this.heroStatPoints += 3;
             this.heroSkillPoints += 1;
+            
         } 
     }
     
+
+
+    public override void InitializeSkillsBasedOnLevel()
+    {
+        
+    }
 
     public override List<SkillType> AvailableSkills => new List<SkillType>
     {
@@ -60,6 +71,26 @@ public class Wizard : Companion
     {
         // ... skills
     };
+
+    public override List<SkillType> AllSkills => new List<SkillType>
+    {
+        SkillType.WizardBasicAttack,
+        SkillType.FirePillar,
+        // ... other skills ...
+    };
+
+    private List<SkillType> mainSkills = new List<SkillType>()
+    {
+        SkillType.Slash,
+        SkillType.TripleHit,
+        SkillType.Taunt,
+        SkillType.SpeedBreak
+    };
+
+    public override List<SkillType> MainSkills
+    {
+        get { return mainSkills; }
+    }
 
     public override Skill GetSkillInstance(SkillType skillType)
     {

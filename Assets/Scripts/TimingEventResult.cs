@@ -8,7 +8,9 @@ public enum TimingEventResult
 {
     Perfect,
     Good,
-    Miss
+    Miss,
+    Early,
+    Late
 }
 
 

@@ -16,7 +16,7 @@ public class GoblinAttackSkill : Skill
     // Override the default base damage calculation.
     protected override int CalculateBaseDamage(Character user)
     {
-        return (int)(user.attackPower * 0.6f);  // 60% of the character's attack.
+        return (int)(user.attackPower * 1.0f); 
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
@@ -31,12 +31,13 @@ public class GoblinAttackSkill : Skill
         for (int i = 0; i < numberOfAttacksPossible; i++)
         {
             
-            yield return TimingWindow(user, target, battleManager, 0.0f, 0.8f);
+            yield return TimingWindow(user, target, battleManager, 0.10f, 0.6f);
 
             HandleTimingResultForEnemyAttack(user, target, result, baseDamage);
             Debug.Log("Timing for player attack has been handled waiting for animations");
-
+           // user.PlayHitSound();
             yield return new WaitUntil(() => user.animationDamageTime == true);
+             yield return battleManager.StartCoroutine(battleManager.TimeStop(0.60f, .9f));
             Debug.Log(user.isAnimationDone + "right after the damagetime");
         }
 

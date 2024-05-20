@@ -11,11 +11,14 @@ public class ButtonController : MonoBehaviour
     
     public BattleManager battleManager;
     public GameObject skillButtonPrefab;
-    public Companion companion2;
-    public Companion companion1;
+
     public GameObject skillDescriptionPanel; // UI Panel to show the skill description
     public TextMeshProUGUI skillDescriptionText; // Text component to show the description
     public List<Button> skillButtons = new List<Button>();
+    public Companion activeCompanion;
+    private Companion previousActiveCompanion; // For switching the skill panel
+    public float radius = 500f; //Radius of the radial menu circle
+
 
     
 
@@ -27,27 +30,34 @@ public class ButtonController : MonoBehaviour
 
     void Start()
     {
-       PopulateSkillPanelWithPlayerSkills();
-       PopulateSkillPanelWithCompanionSkills();
+       activeCompanion = battleManager.activePlayer as Companion;
+       
     }
 
-    void Update()
+   void Update()
+{
+    if (battleManager.isBattleStarted)
     {
-        if (battleManager.activePlayer == battleManager.companion1)
+        // Check if the active player has changed
+        Companion currentActiveCompanion = battleManager.activePlayer as Companion;
+        if (currentActiveCompanion != null && currentActiveCompanion != previousActiveCompanion)
         {
-            Debug.Log("ButtonController: Active player com1");
-            companionSkillSelectionPanel.SetActive(false);
-            skillSelectionPanel.SetActive(true);
+            previousActiveCompanion = currentActiveCompanion;
+            UpdateUI();
         }
 
-        if (battleManager.activePlayer == battleManager.companion2)
-        {
-            Debug.Log("ButtonController: Active player com2");
-            companionSkillSelectionPanel.SetActive(true);
-            skillSelectionPanel.SetActive(false);
-        }
-
+        // UI panel activation/deactivation
+        bool isCompanionActive = battleManager.activePlayer is Companion;
+        companionSkillSelectionPanel.SetActive(isCompanionActive);
+        skillSelectionPanel.SetActive(!isCompanionActive);
     }
+}
+
+   private void UpdateUI()
+{
+    activeCompanion = previousActiveCompanion;
+    PopulateSkillPanelWithCompanionSkills();
+}
     
     private UnityEngine.Events.UnityAction GetSkillAction(Skill currentSkill)
 {
@@ -55,53 +65,11 @@ public class ButtonController : MonoBehaviour
 }
 
 
-public void PopulateSkillPanelWithPlayerSkills()
-{
-    List<SkillType> availableSkills = companion1.AvailableSkills;
 
-    foreach (SkillType skillType in availableSkills)
-    {
-        GameObject newButtonObj = Instantiate(skillButtonPrefab, skillSelectionPanel.transform);
-        Button buttonComponent = newButtonObj.GetComponent<Button>();
-        if (buttonComponent != null)
-        {
-            skillButtons.Add(buttonComponent);
-            
-            Skill currentSkill = companion1.GetSkillInstance(skillType);
-
-            TextMeshProUGUI buttonText = newButtonObj.GetComponentInChildren<TextMeshProUGUI>();
-            if (buttonText != null)
-            {
-                buttonText.text = currentSkill.skillName;
-            }
-
-            Skill buttonSkill = currentSkill;
-
-            buttonComponent.onClick.AddListener(() => 
-            {
-                SelectAndUseSkill(buttonSkill);
-            });
-
-            // Add event listeners for pointer down and up
-            EventTrigger eventTrigger = newButtonObj.AddComponent<EventTrigger>();
-
-            var pointerDown = new EventTrigger.Entry();
-            pointerDown.eventID = EventTriggerType.PointerDown;
-            pointerDown.callback.AddListener((data) => { OnSkillButtonHold(buttonSkill); });
-            eventTrigger.triggers.Add(pointerDown);
-
-            var pointerUp = new EventTrigger.Entry();
-            pointerUp.eventID = EventTriggerType.PointerUp;
-            pointerUp.callback.AddListener((data) => { OnSkillButtonRelease(); });
-            eventTrigger.triggers.Add(pointerUp);
-        }
-    }
-}
-
-
+//changed to just display the description
 private IEnumerator ShowSkillDescriptionAfterDelay(Skill skill)
 {
-    yield return new WaitForSeconds(1.0f); // Wait for 1 second
+    yield return new WaitForSeconds(0.0f); // Wait for 1 second
     skillDescriptionText.text = skill.description;
     skillDescriptionPanel.SetActive(true);
 }
@@ -124,46 +92,49 @@ private void OnSkillButtonRelease()
     skillDescriptionPanel.SetActive(false);
 }
 
-
+ 
 public void PopulateSkillPanelWithCompanionSkills()
 {
-    List<SkillType> availableSkills = companion2.AvailableSkills;
-
-    foreach (SkillType skillType in availableSkills)
+    if (activeCompanion == null)
     {
-        GameObject newButtonObj = Instantiate(skillButtonPrefab, companionSkillSelectionPanel.transform);
-        Button buttonComponent = newButtonObj.GetComponent<Button>();
-        if (buttonComponent != null)
+        Debug.LogError("Active player is not a Companion.");
+        return;
+    }
+
+    // Clear existing buttons
+    foreach (Transform child in companionSkillSelectionPanel.transform)
+        Destroy(child.gameObject);
+    
+    skillButtons.Clear();
+    Debug.Log($"Populating skills for {activeCompanion.heroID}. Number of available skills: {activeCompanion.AvailableSkills.Count}");
+
+    foreach (SkillType skillType in activeCompanion.AvailableSkills)  // Changed to property access
+    {
+        Skill currentSkill = activeCompanion.GetSkillInstance(skillType);
+        if (currentSkill == null)
         {
-            skillButtons.Add(buttonComponent);
-            
-            Skill currentSkill = companion2.GetSkillInstance(skillType);
+            Debug.LogError("Skill instance is null for " + skillType);
+            continue;
+        }
 
-            TextMeshProUGUI buttonText = newButtonObj.GetComponentInChildren<TextMeshProUGUI>();
-            if (buttonText != null)
+        Debug.Log($"Skill loaded: {currentSkill.skillName}, Active: {currentSkill.isActiveSkill}");
+
+        if (currentSkill.isActiveSkill)
+        {
+            GameObject newButtonObj = Instantiate(skillButtonPrefab, companionSkillSelectionPanel.transform);
+            Button buttonComponent = newButtonObj.GetComponent<Button>();
+            if (buttonComponent != null)
             {
-                buttonText.text = currentSkill.skillName;
+                buttonComponent.onClick.AddListener(() => SelectAndUseSkill(currentSkill));
+                skillButtons.Add(buttonComponent);
+
+                if (currentSkill.iconImage)
+                {
+                    Image buttonImage = newButtonObj.GetComponent<Image>();
+                    buttonImage.sprite = currentSkill.iconImage;
+                }
+                Debug.Log("Button created for " + currentSkill.skillName);
             }
-
-            Skill buttonSkill = currentSkill;
-
-            buttonComponent.onClick.AddListener(() => 
-            {
-                SelectAndUseSkill(buttonSkill);
-            });
-
-            // Add event listeners for pointer down and up
-            EventTrigger eventTrigger = newButtonObj.AddComponent<EventTrigger>();
-
-            var pointerDown = new EventTrigger.Entry();
-            pointerDown.eventID = EventTriggerType.PointerDown;
-            pointerDown.callback.AddListener((data) => { OnSkillButtonHold(buttonSkill); });
-            eventTrigger.triggers.Add(pointerDown);
-
-            var pointerUp = new EventTrigger.Entry();
-            pointerUp.eventID = EventTriggerType.PointerUp;
-            pointerUp.callback.AddListener((data) => { OnSkillButtonRelease(); });
-            eventTrigger.triggers.Add(pointerUp);
         }
     }
 }
@@ -171,23 +142,70 @@ public void PopulateSkillPanelWithCompanionSkills()
 
 
 
+
+private Vector3 PositionButtonRadially(int skillIndex, int totalSkills, float radius)
+{
+    float angle = (skillIndex * (360f / totalSkills)) * Mathf.Deg2Rad;
+    float x = Mathf.Cos(angle) * radius;
+    float y = Mathf.Sin(angle) * radius;
+    return new Vector3(x, y, 0);
+}
+
+private void SetupButtonEvents(GameObject buttonObj, Skill skill)
+{
+    EventTrigger eventTrigger = buttonObj.AddComponent<EventTrigger>();
+
+    var pointerDown = new EventTrigger.Entry();
+    pointerDown.eventID = EventTriggerType.PointerDown;
+    pointerDown.callback.AddListener((data) => { OnSkillButtonHold(skill); });
+    eventTrigger.triggers.Add(pointerDown);
+
+    var pointerUp = new EventTrigger.Entry();
+    pointerUp.eventID = EventTriggerType.PointerUp;
+    //pointerUp.callback.AddListener((data) => { OnSkillButtonRelease(); });
+    eventTrigger.triggers.Add(pointerUp);
+}
+
+
+
+
+
+
 public void SelectAndUseSkill(Skill selectedSkill)
 {
-    if (battleManager.skillQueue.Count == 0)
+    // Check if the selected skill is the same as the one already in the queue
+    if (battleManager.skillQueue.Count > 0 && skill == selectedSkill)
     {
-        //No skill has been selected yet
-         skill = selectedSkill;
-         battleManager.skillQueue.Enqueue(skill);
-         OnButtonClick();
+        // The same skill was selected again, so launch the attack
+        skillDescriptionPanel.SetActive(false);
+        Debug.Log("Same skill selected, launching attack with skill: " + skill.skillName);
+       // battleManager.ExecuteQueuedSkills();
+        
     }
     else
-    { //Replacing the old skill
-    battleManager.skillQueue.Dequeue();
-    skill = selectedSkill;
-    battleManager.skillQueue.Enqueue(skill);
-    OnButtonClick();
+    {
+        // No skill has been selected yet or a different skill is selected
+        if (battleManager.skillQueue.Count > 0)
+        {
+            // If there was another skill in the queue, remove it
+            battleManager.skillQueue.Dequeue();
+            battleManager.isSkillSelected = false;
+        }
+        if(selectedSkill.energyCost <= battleManager.activePlayer.energy)
+        {
+        // Queue the new skill
+        skill = selectedSkill;
+        skillDescriptionPanel.SetActive(true);
+        battleManager.skillQueue.Enqueue(skill);
+        battleManager.isSkillSelected = true;
+        Debug.Log("Skill " + skill.skillName + " queued. Current queue size: " + battleManager.skillQueue.Count);
+        }
+        else
+        {
+            Debug.Log("not enough energy to queue");
+        }
+        
     }
-    
 }
 
         
@@ -232,22 +250,9 @@ public void SelectAndUseSkill(Skill selectedSkill)
 
 
 
-    public void AttackButtonClick()
-{
-    // Set the skill
-    if (skill != null)
-    {
-        OnButtonClick();
-    }
-    else
-    {
-        //Default skill to use if nothing selected, eventually needs to be assigned based on player job.
-        skill = new Slash();
-        Debug.Log("Using Slash.");
-        OnButtonClick();
-    }
+   
 
-}
+
 
 
     public void OpenSkillPanel()

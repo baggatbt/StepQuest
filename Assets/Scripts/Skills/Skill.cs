@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+
 
 
 public struct AttackStage
@@ -24,6 +26,10 @@ public enum SkillType
         FirePillar,
         Taunt,
         ShootArrow,
+        ArrowRain,
+        MeleeCombo,
+        ReflectDamagePassive,
+        SpeedBreak,
     }
 
 
@@ -38,7 +44,13 @@ public abstract class Skill
     public int energyCost;
     public int energyGain;
     public int skillLevel;
-    public int requiredLevel;  // New field
+    public bool noZoom; //Allows zoom to be disabled
+     public bool isActiveSkill = true; //Determines whether the skill as active or passive
+    public int requiredLevel;  // New field\
+    public Sprite iconImage; // Field to store the icon image associated with the skill
+    public float skillDamageModifier;
+    public int skillPointCost;
+    
     protected TimingEventResult result; 
 
       // New virtual function for calculating base damage.
@@ -46,6 +58,12 @@ public abstract class Skill
     {
         return PlayerData.Instance.attackPower;
     }
+    public Sprite LoadIconImage(string path)
+    {
+        return Resources.Load<Sprite>(path);
+    }
+
+    
 
 
     
@@ -54,111 +72,137 @@ public abstract class Skill
 
     public void HandleAoeAttack(Character user, List<Character> enemies, TimingEventResult timingResult, int baseDamage)
 {
-    float damageMultiplier = 1.0f;
+    float damageTimingMultiplier = 1.0f;
     
     result = timingResult;
-    baseDamage = user.attackPower;
+    int skillBaseDamage = baseDamage;
 
     foreach (Character target in enemies)
     {
-        if (result == TimingEventResult.Miss)
+        if (result == TimingEventResult.Good)
         {
              target.animator.SetTrigger("IsHurtTrigger");
-             AudioManager.instance.PlaySlashSound();
-        }
-        else if (result == TimingEventResult.Perfect)
-        {
-            damageMultiplier = 1.5f;  // Boost damage by 50%                      
-            target.TakeDamage((int)(baseDamage * damageMultiplier),user); // Apply damage boost
+             damageTimingMultiplier = 1.25f;  // Boost damage by 25%                      
+             target.TakeDamage((int)(skillBaseDamage * damageTimingMultiplier),user); // Apply damage boost
+             user.PlayCriticalHitSound(); // Play critical hit sound
         }
         else 
         {
-            damageMultiplier = 1.25f;  // Boost damage by 25%                      
-            target.TakeDamage((int)(baseDamage * damageMultiplier),user); // Apply damage boost
+                                  
+            target.TakeDamage((int)skillBaseDamage,user); // Apply damage boost
         }
-        target.CheckForDeath();
+       
     }
 }
 
 
-    public void HandleTimingResultForEnemyAttack(Character user, Character target,TimingEventResult timingResult, int baseDamage)
-{
-        float damageMultiplier = 1.0f;
+
+
+     public void HandleTimingResultForEnemyAttack(Character user, Character target, TimingEventResult timingResult, int baseDamage)
+    {
+        float damageTimingMultiplier = 1.0f;
+        int skillBaseDamage = baseDamage;
+        int finalDamage;
         
         result = timingResult;
-        baseDamage = user.attackPower;
-    
-    switch (result)
-    {
-        case TimingEventResult.Perfect:
-            Debug.Log("Perfect Block!");
-            damageMultiplier = 0.5f;  // Reduce damage by 50%
-          //  user.animator.SetTrigger(trigger);
-            target.TakeDamage((int)(user.attackPower * damageMultiplier),user); // Apply damage multiplier
-           user.GainEnergy(1);
-            target.animator.SetTrigger("BlockTrigger");      
-            AudioManager.instance.PlayBlockSound();
-            break;
-        case TimingEventResult.Good:
-            Debug.Log("Good Block!");   
-            damageMultiplier = 0.75f;  // Reduce damage by 25%
-           // user.animator.SetTrigger(trigger);            
-            target.TakeDamage((int)(user.attackPower * damageMultiplier),user); // Apply damage multiplier
-           user.GainEnergy(1);
+        
+        //finalDamage = Math.Max(finalDamage, 1);
+        // Gain energy and set animations based on the result
+        user.GainEnergy(1);
+        
+        if (result == TimingEventResult.Good)
+        {
+            target.didBlock = true;
+            damageTimingMultiplier = 0.75f;
+            finalDamage = (int)(skillBaseDamage * damageTimingMultiplier);
+            target.TakeDamage(finalDamage,user);
+             
             target.animator.SetTrigger("BlockTrigger");
-            AudioManager.instance.PlayBlockSound();     
-            break;
-        case TimingEventResult.Miss:
-          //  user.animator.SetTrigger(trigger);
-            target.TakeDamage(user.attackPower, user); // Full damage as there's no reduction 
-            user.GainEnergy(1);
-            target.animator.SetTrigger("IsHurtTrigger");       
-            break;
+            AudioManager.instance.PlayBlockSound();
+
+            //Calculate any reflection if necessary
+            int finalReflectedDamage = CalculateReflectDamage(target, finalDamage);
+            Debug.Log(finalReflectedDamage);
+            if (finalReflectedDamage > 0)
+            {
+            user.TakeDamage(finalReflectedDamage, target);
+            }
+            target.didBlock = false;
+            
+        }
+        else 
+        {
+            target.didBlock = false;
+            damageTimingMultiplier = 1.0f;
+            finalDamage = skillBaseDamage;
+            
+            target.TakeDamage((int)skillBaseDamage,user); 
+            user.PlayHitSound();
+            
+           // AudioManager.instance.PlayBlockSound();
+        }
     }
+
+    private int CalculateReflectDamage(Character user, int damage)
+{
+    double reflectedDamage = user.damageReflectionPercentage * damage;
+    int finalReflectedDamage = Convert.ToInt32(Math.Round(reflectedDamage));
+    return finalReflectedDamage; // Return the calculated damage to reflect
 }
+
+
+
     
 
     public void HandleTimingResultForPlayerAttack(Character user, Character target, TimingEventResult timingResult, int baseDamage)
+{
+    float damageTimingMultiplier = 1.0f;
+    float skillBaseDamage = baseDamage; // Use float for baseDamage to allow for fractional multipliers
+    int finalDamage;
+    
+    result = timingResult;
+    
+    if (result == TimingEventResult.Good)
+    {
+        Debug.Log("Good Hit!");
+        damageTimingMultiplier = 1.25f;  // Boost damage by 25%
+        
+        // Calculate final damage and round up
+        finalDamage = Mathf.CeilToInt(skillBaseDamage * damageTimingMultiplier);
+        
+        target.TakeDamage(finalDamage, user);
+        user.GainEnergy(1); // Bonus energy for a good hit
+        user.PlayCriticalHitSound(); // Play critical hit sound
+    }
+    else
+    {
+        damageTimingMultiplier = 1.0f;  // Base damage
+        finalDamage = baseDamage; // No need to round since no multiplier
+        target.TakeDamage(finalDamage, user);
+        user.PlayHitSound(); // Play hit sound
+    }
+}
+
+
+
+
+public void HandlePlayerRangedAttack(Character user, Projectile projectile, TimingEventResult result)
     {
         float damageMultiplier = 1.0f;
         
-        result = timingResult;
-        baseDamage = user.attackPower;
-        
-    switch (result)
-    {
-        case TimingEventResult.Perfect:
-            Debug.Log("Perfect Hit!");
-            damageMultiplier = 1.5f;  // Boost damage by 50%
-           // user.animator.SetTrigger(trigger);
-            target.TakeDamage((int)(baseDamage * damageMultiplier),user); // Apply damage boost
-           //target.EnemyTakeDamage((int)(baseDamage * damageMultiplier),user, target.enemyDamageReductionModifier);
-            target.animator.SetTrigger("IsHurtTrigger");
-            AudioManager.instance.PlayCriticalSlashSound();
-            //user.GainEnergy(energyGain); //Perfect hits give +1 energy
-            break;
-        case TimingEventResult.Good:
-            Debug.Log("Good Hit!");   
-            damageMultiplier = 1.25f;  // Boost damage by 25%
-           // user.animator.SetTrigger(trigger);         
-            target.animator.SetTrigger("IsHurtTrigger");   
-            Debug.Log("Damage before boost: " + ((int)(baseDamage), user) );
-            //target.EnemyTakeDamage((int)(baseDamage * damageMultiplier),user, target.enemyDamageReductionModifier);
-            target.TakeDamage((int)(baseDamage * damageMultiplier), user); // Apply damage boost
-            Debug.Log("Damage after boost: " + ((int)(baseDamage * damageMultiplier), user) );
-           // user.GainEnergy(energyGain);
-            break;
-        case TimingEventResult.Miss:
-            Debug.Log("Missed!");
-           // user.animator.SetTrigger(trigger); 
-            target.animator.SetTrigger("IsHurtTrigger");
-            // target.EnemyTakeDamage((int)(baseDamage * damageMultiplier),user, target.enemyDamageReductionModifier);
-            target.TakeDamage(baseDamage, user); // No damage boost
-            AudioManager.instance.PlaySlashSound();
-            Debug.Log("BaseDamage going into TakeDamage = " + baseDamage);
-            break;
+        if (result == TimingEventResult.Good)
+        {
+            
+                damageMultiplier = 1.25f; // Boost damage by 25%
+                user.PlayHitSound();   
+        }
+        else 
+        {
+            user.PlayHitSound();
+        }
+
+        projectile.damage = Mathf.CeilToInt(projectile.damage * damageMultiplier);
     }
-}
 
 
 

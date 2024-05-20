@@ -2,24 +2,54 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Linq;
 
 public abstract class Companion : Character
-{
-    public abstract List<SkillType> AvailableSkills { get; }
-    public abstract List<SkillType> LockedSkills { get; }
+{   
+    [SerializeField]
+    protected List<SkillType> availableSkills = new List<SkillType>();
+    protected List<SkillType> lockedSkills = new List<SkillType>();
+
+    public virtual List<SkillType> AvailableSkills => availableSkills;
+    public virtual List<SkillType> LockedSkills => lockedSkills;
+    public abstract List<SkillType> AllSkills { get; }
+    public abstract List<SkillType> MainSkills { get; }
     public abstract Skill GetSkillInstance(SkillType skillType);
+
     public string heroID; // Name of the class/character 
     public int heroLevel; // Level of the hero
     public int heroExp;   // Experience of the hero
+    public GameObject skillTreePanel; 
+    public Sprite heroIcon;
+    public Sprite fullHeroImage;
     public int heroStatPoints;
     public int heroSkillPoints;
+    public int stamina;
+    public int maxStamina;
+    public bool isUnlocked;
+    public int atkGrowth;
+    public int healthGrowth;
+    public int energyGrowth;
+    public Dictionary<string, int> statUpgradeProgress = new Dictionary<string, int>
+    {
+        {"atk", 0},
+        {"hp", 0},
+        {"spd", 0},
+        {"sp",0}
+        
+    };
+
+
+
     
+    //public Sprite companionIcon; // Icon associated with the companion
+
     
     
     [Serializable]
     public struct SerializableCharacterData
     {
-        public int level;
+      //  public int level;
         public int health;
         public int maxHealth;
         public int energy;
@@ -34,17 +64,52 @@ public abstract class Companion : Character
         public int heroStatPoints;
         public int heroLevel;
         public int heroExp;
+        public int stamina;
+        public int maxStamina;
+        
     }
+
+    public int expToLevel
+{
+    get
+    {
+        
+        return ExpToNextLevel(heroLevel);
+    }
+}
+
 
 
     //abstract LevelUp method
     public abstract void LevelUp();
+
+    public abstract void InitializeSkillsBasedOnLevel();
+
+    public void UnlockSkill(SkillType skillType)
+    {
+        // Check if the skill exists in the LockedSkills list
+        if (LockedSkills.Contains(skillType))
+        {
+            // Remove the skill from LockedSkills
+            LockedSkills.Remove(skillType);
+
+            // Add the skill to AvailableSkills
+            AvailableSkills.Add(skillType);
+
+            Debug.Log(skillType.ToString() + " unlocked."); // Log that the skill is unlocked
+        }
+        else
+        {
+            Debug.LogError(skillType.ToString() + " is not in the LockedSkills list."); // Log an error if the skill is not found in LockedSkills
+        }
+    }
+
     
     public void SaveCharacterData()
     {
         SerializableCharacterData data = new SerializableCharacterData
         {
-            level = this.level,
+            //level = this.level,
             health = this.health,
             maxHealth = this.maxHealth,
             maxEnergy = this.maxEnergy,
@@ -56,9 +121,11 @@ public abstract class Companion : Character
             heroExp = this.heroExp,
             heroSkillPoints = this.heroSkillPoints,
             heroStatPoints = this.heroStatPoints,
+            stamina = this.stamina,
+            maxStamina = this.maxStamina,
             
         };
-
+        Debug.Log("saved stamina" + stamina);
         string jsonData = JsonUtility.ToJson(data);
         PlayerPrefs.SetString("CharacterData_" + heroID, jsonData);
         PlayerPrefs.Save();
@@ -71,7 +138,7 @@ public abstract class Companion : Character
     {
         SerializableCharacterData data = JsonUtility.FromJson<SerializableCharacterData>(jsonData);
 
-        this.level = data.level;
+       // this.level = data.level;
         this.health = data.health;
         this.maxHealth = data.maxHealth;
         this.maxEnergy = data.maxEnergy; 
@@ -83,10 +150,13 @@ public abstract class Companion : Character
         this.heroExp = data.heroExp;
         this.heroStatPoints = data.heroStatPoints;
         this.heroSkillPoints = data.heroSkillPoints;
+        this.stamina = data.stamina;
+        this.maxStamina = data.maxStamina;
     }
     else // Set default values if there is no data
     {
-        
+        this.stamina = 10;
+        this.maxStamina = 10;
     }
 }
 
@@ -108,15 +178,42 @@ public abstract class Companion : Character
 
     public int ExpToNextLevel(int heroLevel)
 {
-    // Parameters for levels 1-90
-    int baseExp = 100; // Base experience for the first level
-    int incrementPerLevel = 100; // Additional experience required for each subsequent level
-    int expRequiredToLevel = baseExp + (incrementPerLevel * heroLevel);
-    return expRequiredToLevel;
+    Debug.Log("EXP to level : " + (30 * heroLevel * heroLevel));
+    //TEMP
+     return 30 * heroLevel * heroLevel;
+    /*
+    if (heroLevel < 100)
+    {
+        // For levels 1-100, use a quadratic polynomial formula
+        return 30 * heroLevel * heroLevel;
+    }
+    
+    else
+    {
+        // Beyond level 20, use an exponential model to steeply increase EXP requirements
+        return (int)(100 * Math.Pow(1.5, heroLevel - 19) * 400);
+    }
+    */
 }
 
-    
-    
+    public void RecoverHealth(int amount)
+    {
+        health += amount;
+        health = Mathf.Clamp(health, 0, maxHealth); // Ensure health doesn't exceed maxHealth
+    }
+
+    public void RecoverEnergy(int amount)
+    {
+        if ((energy + amount) >= maxEnergy)
+        {
+            energy = maxEnergy;
+        }
+        else
+        {
+            energy += amount;
+        }
+    }
+
 }
 
    

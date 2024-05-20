@@ -19,18 +19,24 @@ public class BattleManager : MonoBehaviour
     public List<Character> enemies = new List<Character>();
     public List<Character> playerParty = new List<Character>();
     public GameObject activePlayerIndicator;
+    public GameObject heroSelectionPanel; // Assign in inspector
+    public GameObject battleStartButton;
+    public GameObject heroButtonPrefab;   // Assign in inspector
+    public GameObject skillDescriptionPanel;
+    
 
     
     
     
     
-    public GameObject knightPrefab;
+
     private BattleState state;
     public int enemyAttackCount = 0;
     public GameObject currentTarget;
     public HoldReleaseSlider holdReleaseSlider;
     public Slider[] healthBars; //set these in the inspector for enemies
     public Slider[] energyBars;
+    public GameObject[] enemyHealthUI;
     public Skill requestedSkill; // The skill the player chooses next during an ongoing attack.
     public Queue<Skill> skillQueue = new Queue<Skill>();
     public Button[] skillButtons; // An array of buttons for representing skill slots
@@ -49,7 +55,9 @@ public class BattleManager : MonoBehaviour
     {
         PlayerTurn,
 
-        EnemyTurn
+        EnemyTurn,
+
+        BattleLost
     }
 
 
@@ -62,6 +70,9 @@ public class BattleManager : MonoBehaviour
     public GameObject endOfBattleLossPanel;
 
     public EnemySpawnController enemySpawnController;
+     public CompanionSpawnController companionSpawnController; // Assign in inspector
+
+
 
     private Vector3 outerCircleInitialScale;
     private Vector3 innerCircleInitialScale;
@@ -74,6 +85,7 @@ public class BattleManager : MonoBehaviour
 
 
     public Transform[] enemySpawnPoints; // enemySpawnPoint1, enemySpawnPoint2....
+    
 
 
     //public PlayerSpawnController playerSpawnController;
@@ -97,6 +109,9 @@ public class BattleManager : MonoBehaviour
                 case BattleState.EnemyTurn:
                     Debug.Log("Enemy Turn Started!");
                     break;
+                case BattleState.BattleLost:
+                    Debug.Log("Battle lost");
+                    break;
             }
         }
     }
@@ -106,14 +121,12 @@ public class BattleManager : MonoBehaviour
 
     private void Awake()
     {
-        companion1 = GameManager.Instance.companion1;
-        companion2 = GameManager.Instance.companion2;
-        activePlayer = companion1;
+        companionSpawnController.CreateHeroSelectionUI();
     }
+    public bool isBattleStarted = false;
    private void Start()
 {
     
-    activePlayer = companion1;
     Debug.Log("Active player from Player1 in start method"  + activePlayer);
     outerCircleInitialScale = outerCircle.transform.localScale;
     innerCircleInitialScale = innerCircle.transform.localScale;
@@ -131,7 +144,7 @@ public class BattleManager : MonoBehaviour
         BattleConfig config = GameManager.Instance.CurrentBattleConfig;
         if (config != null)
         {
-            StartBattle(config);
+         //   StartBattle(config);
         }
         else
         {
@@ -139,9 +152,35 @@ public class BattleManager : MonoBehaviour
         }
     
 
+    Debug.Log("Hero Selection Panel: " + heroSelectionPanel);
+Debug.Log("Hero Button Prefab: " + heroButtonPrefab);
+Debug.Log("GameManager Instance: " + GameManager.Instance);
+Debug.Log("Companions: " + GameManager.Instance.companions);
 
-
+    
     Debug.Log(activePlayer);
+     for (int i = 0; i < config.maxEnemiesToSpawn; i++)
+    {
+       
+        
+        Character spawnedEnemy = enemySpawnController.SpawnEnemiesFromPool(
+            config.poolName,
+            1, // Spawn one enemy
+            enemySpawnPoints[i], // Pass the spawn point
+            healthBars[i], // Pass the health bar slider
+            energyBars[i], // Pass the energy bar slider
+            i, // Pass the index for health text assignment
+            config.levelOfEnemies, //For level assignment
+            enemyHealthUI[i]
+        );
+        
+        if (spawnedEnemy != null)
+        {
+           
+            enemies.Add(spawnedEnemy);
+            
+        }
+    }
 }
     public Button nextBattleButton;
     
@@ -160,30 +199,30 @@ public class BattleManager : MonoBehaviour
         }
     }
     */
-   
+    public IEnumerator TimeStop(float duration , float timeScale)
+{
+    Time.timeScale = timeScale; // slow the game time
+    yield return new WaitForSecondsRealtime(duration); // Waits in real time
+    Time.timeScale = 1f; // Resumes the game time
+}
     
 
      public void StartBattle(BattleConfig config)
 {
+    if (playerParty.Count > 0) {
+     if (isBattleStarted) return; // Prevent starting the battle multiple times
+        DeductStaminaFromParticipants();
+        battleStartButton.SetActive(false);
+        activePlayer = companion1; //Default
+        isBattleStarted = true;
+        // Existing logic to start the battle
     endOfBattlePanel.SetActive(false);
-    for (int i = 0; i < config.maxEnemiesToSpawn; i++)
-    {
-        Character spawnedEnemy = enemySpawnController.SpawnEnemiesFromPool(
-            config.poolName,
-            1, // Spawn one enemy
-            enemySpawnPoints[i], // Pass the spawn point
-            healthBars[i], // Pass the health bar slider
-            energyBars[i], // Pass the energy bar slider
-            i // Pass the index for health text assignment
-        );
-
-        if (spawnedEnemy != null)
-        {
-            enemies.Add(spawnedEnemy);
-        }
-    }
-    RestoreHealthAndEnergy();
+    heroSelectionPanel.SetActive(false);
+   // companionSkillsPanel.SetActive(true);
+   
+   // RestoreHealthAndEnergy();
     InitializeTurnOrder();
+    }
 }
 
     public void RestoreHealthAndEnergy()
@@ -191,8 +230,8 @@ public class BattleManager : MonoBehaviour
         companion1.energy = companion1.maxEnergy;
         companion1.health = companion1.maxHealth;
 
-        companion2.energy = companion2.maxEnergy;
-        companion2.health = companion2.maxHealth;
+       // companion2.energy = companion2.maxEnergy;
+    //companion2.health = companion2.maxHealth;
     }
 
     public void NextBattle()
@@ -210,26 +249,34 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    
+
 
    
 
 
     private void ChangeState(BattleState newState)
     {
+         
+        CheckBattleEnd();
+        turnOrderList.RemoveAll(character => character.health <= 0);
         State = newState;
         if (State == BattleState.PlayerTurn)
         {
-
             
-            EnableAllButtons();
+            StartCoroutine(EnableAllButtons());
+
         }
     }
 
     public List<Character> turnOrderList = new List<Character>();
     public void InitializeTurnOrder()
 {
+    if (battleLost != true)
+    {
     turnOrderList.Clear();
-
+    
+    
     if (companion1 != null) turnOrderList.Add(companion1);
     if (companion2 != null) turnOrderList.Add(companion2);
 
@@ -237,47 +284,42 @@ public class BattleManager : MonoBehaviour
     {
         turnOrderList.Add(enemy);
         enemy.attackTarget = SelectTargetForEnemy(); // Assign a target to each enemy
+        
     }
 
     turnOrderList = turnOrderList.OrderByDescending(character => character.speed).ToList();
     StartTurn();
+    }
+    else 
+    {
+        Debug.Log("the battle is over");
+    }
 }
 
 
     public void StartTurn()
 {
+    
+    if (battleLost != true)
+    {
+    // Now check if there are characters left to take a turn
     if (turnOrderList.Count > 0)
     {
+        turnOrderList.RemoveAll(character => character.health <= 0);
         var nextCharacter = turnOrderList[0];
-        if (nextCharacter.health <= 0) // Check to make sure the character is dead and needs to be removed.
-        {
-            turnOrderList.Remove(nextCharacter);
-            
-            // Check if there are still characters left in the list before executing the next turn
-            if (turnOrderList.Count > 0)
-            {
-                ExecuteTurn(turnOrderList[0]);
-            }
-            else
-            {
-                // If no characters are left, re-initialize the turn order
-                InitializeTurnOrder();
-            }
-        }
-        else
-        {
-            ExecuteTurn(nextCharacter);
-        }
+        ExecuteTurn(nextCharacter);
     }
     else
-        {
-            InitializeTurnOrder();
-        }
-
+    {
+        // If no characters are left, re-initialize the turn order
+        InitializeTurnOrder();
+    }
+    }
 }
 
 private void ExecuteTurn(Character character)
 {
+   
     if (character == companion1 || character == companion2)
     {
         activePlayer = character;
@@ -285,6 +327,7 @@ private void ExecuteTurn(Character character)
     }
     else // Assuming the character is an enemy
     {
+       
         ChangeState(BattleState.EnemyTurn);
         EnemyAttack(character); // Pass the current enemy character
     }
@@ -295,57 +338,81 @@ public void EndTurn()
 {
     
     turnOrderList.RemoveAt(0); // Remove the character from the list after their turn
+    turnOrderList.RemoveAll(character => character.health <= 0);
     Debug.Log("ENDING THE TURN");
     if (turnOrderList.Count == 0)
     {
+        statusEffectController.ProcessEffects();
+
+       
         InitializeTurnOrder();
+        
         
     }
     else
     {
         StartTurn(); // Proceed to the next character's turn
     }
+    
 }
 
-// This method should be called when the player has finished their turn
 
 
 
-
+    private void DisableSkillSelection()
+    {
+        companionSkillsPanel.SetActive(false);
+        SkillsPanel.SetActive(false);
+    }
     
 
     public void DisableAllButtons()
     {
-        /*
-        foreach (Button btn in skillButtons)
-        {
-            btn.interactable = false;
-        }
-        launchAttacksButton.interactable = false;
-        */
-      //  enemyUIPanel.SetActive(false);
+        companionSkillsPanel.SetActive(false);
+        SkillsPanel.SetActive(false);
+        enemyUIPanel.SetActive(false);
+        heroUIPanels.SetActive(false);
     }
+
    public GameObject enemyUIPanel;
-    public void EnableAllButtons()
+   public GameObject heroUIPanels;
+   public GameObject companionSkillsPanel;
+   public GameObject SkillsPanel;
+
+    public IEnumerator EnableAllButtons()
+{
+    // Wait for half a second before executing the rest of the function
+    yield return new WaitForSeconds(0.25f);
+
+    // Check if the current state allows enabling buttons
+    if (state == BattleState.PlayerTurn)
     {
-       /* foreach (Button btn in skillButtons)
-        {
-            btn.interactable = true;
-        }
-        launchAttacksButton.interactable = true;
-        */
-        //enemyUIPanel.SetActive(true);
+        companionSkillsPanel.SetActive(true);
     }
+
+    SkillsPanel.SetActive(true);
+    enemyUIPanel.SetActive(true);
+    heroUIPanels.SetActive(true);
+}
+
 
     public void MoveCursorToTarget()
      {
         // Move the circles to the targets position
-        outerCircle.transform.position = new Vector3(currentTarget.transform.position.x, currentTarget.transform.position.y + 4f, currentTarget.transform.position.z);
+        if (currentTarget != null){
 
+        outerCircle.transform.position = new Vector3(currentTarget.transform.position.x, currentTarget.transform.position.y + 4.0f, currentTarget.transform.position.z);
+        }
 
-       // innerCircle.transform.position = currentTarget.transform.position;
+       // innerCircle.transform.position = outerCircle.transform.position;
         //NEEDS OFFSET TO BE OFF SPRITE
             
+    }
+
+    public Transform radialMenuPanelCenterPoint;
+    public void MoveRadialMenuToActivePlayer()
+    {
+        radialMenuPanelCenterPoint.transform.position = new Vector3(activePlayer.transform.position.x, activePlayer.transform.position.y +3f, activePlayer.transform.position.z);
     }
 
 
@@ -389,10 +456,10 @@ public void EndTurn()
         skillsExecuted = 0;
         //Make them unable to take a second turn.
         
-        
-
-        yield return new WaitUntil(() => activePlayer.isMoving == false);
+        turnOrderList.RemoveAll(character => character.health <= 0);
         EndTurn();
+        yield return new WaitUntil(() => activePlayer.isMoving == false);
+        
 
         
       
@@ -431,21 +498,29 @@ public void EndTurn()
     public IEnumerator PlayerMoveAndAttackCoroutine()
     {
         // Start zoom effect
+        if (!activePlayer.currentSkill.noZoom)
+        {
             StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position));
+        }
+            enemyUIPanel.SetActive(false);
+            
         // Only move if the player is not already at the target
         if (activePlayer.transform.position != currentTarget.transform.position)
         {
+            activePlayer.originalPosition = activePlayer.transform.position;
+            Debug.Log("OP set to " + activePlayer.originalPosition);
             yield return activePlayer.MoveToTarget();
             
             
         }
-
+//ARROW DOESNT USE MOVE AND ATTACK INVESTIGATE THERE
         yield return StartCoroutine(PlayerAttackCoroutine(null));
     }
 
 
     public IEnumerator PlayerAttackCoroutine(System.Action successCallback)
     {
+        
         Character targetEnemy = currentTarget.GetComponent<Character>();
         yield return new WaitUntil(() => targetEnemy.isAttacking == false);
 
@@ -454,18 +529,27 @@ public void EndTurn()
             
             yield return activePlayer.currentSkill.Execute(activePlayer, targetEnemy, this);
             
-            
-
-            
-
-            CheckBattleEnd();
+           // CheckBattleEnd();
         }
         if (activePlayer.currentSkill.requiresMovement == true)
         {
         // Move player back to their original position after all skills executed.
-        StartCoroutine(zoomEffect.ZoomOutEffect());
+
+        if (!activePlayer.currentSkill.noZoom)
+        {
+            StartCoroutine(zoomEffect.ZoomOutEffect());
+        }
+        
+        StartCoroutine(EnableAllButtons());
+
+       
         yield return activePlayer.ReturnToPosition();
         }
+        if(activePlayer.currentSkill.requiresMovement == false)
+        {
+            yield return new WaitForSeconds(0.5f); //Ensures fade is all done
+        }
+        
     }
 
     private Queue<Character> enemyTurnQueue = new Queue<Character>();
@@ -498,11 +582,13 @@ public void EndTurn()
     }
 
     // Decide whether or not to use the special attack or the normal one
-    if (!currentEnemy.isAttacking)
+    if (!currentEnemy.isAttacking && battleLost != true)
     {
+        /*
         currentEnemy.currentSkill = (currentEnemy.energy >= currentEnemy.maxEnergy) ? 
         currentEnemy.specialSkill : currentEnemy.normalSkill;
-
+        */
+        currentEnemy.currentSkill = currentEnemy.normalSkill;
         
         StartCoroutine(EnemyAttackCoroutine(currentEnemy));
     }
@@ -527,8 +613,9 @@ public void EndTurn()
 
     if (potentialTargets.Count == 0)
     {
-        Debug.LogError("No valid targets available.");
+        Debug.Log("No valid targets available.");
         return null;
+        
     }
 
     // Use weighted random selection to choose a target
@@ -539,41 +626,46 @@ public void EndTurn()
     
 
     public IEnumerator EnemyAttackCoroutine(Character currentEnemy)
+{
+    yield return new WaitUntil(() => activePlayer.isAttacking == false);
+    yield return new WaitForSeconds(1.0f); //Ensures player animation is all done
+
+    // Select the target for the enemy and assign it
+    Transform enemyTargetTransform = SelectTargetForEnemy();
+    currentEnemy.attackTarget = enemyTargetTransform;
+    currentTarget = enemyTargetTransform.gameObject; // Update currentTarget to the selected target
+
+    if (currentEnemy.currentSkill != null)
     {
-        yield return new WaitUntil(() => activePlayer.isAttacking == false);
-        yield return new WaitForSeconds(1.0f); //Ensures player animation is all done
-        
-
-        if (currentEnemy.currentSkill != null)
+        if (currentEnemy.currentSkill.requiresMovement)
         {
-            if (currentEnemy.currentSkill.requiresMovement)
-            {
-                yield return currentEnemy.MoveToTarget();
-            }
-
-            
-            Character targetCharacter = currentEnemy.attackTarget.GetComponent<Character>();
-            yield return currentEnemy.currentSkill.Execute(currentEnemy, targetCharacter, this);
-
-
-           
-            if (currentEnemy.currentSkill.requiresMovement)
-            {
-                yield return currentEnemy.ReturnToPosition();
-            }
-           // Debug.Log("Enemy reurning to position");
-        }
-        else
-        {
-            Debug.Log("Standard Attack Performed - This should not happen");
-            
+            StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position));
+            enemyUIPanel.SetActive(false);
+            DisableAllButtons();
+            yield return currentEnemy.MoveToTarget();
         }
 
-        
-          
-        EndTurn();
-        CheckBattleEnd();
+        Character targetCharacter = enemyTargetTransform.GetComponent<Character>();
+
+        yield return currentEnemy.currentSkill.Execute(currentEnemy, targetCharacter, this);
+
+        if (currentEnemy.currentSkill.requiresMovement)
+        {
+            StartCoroutine(zoomEffect.ZoomOutEffect());
+            yield return currentEnemy.ReturnToPosition();
+            StartCoroutine(EnableAllButtons());
+
+        }
     }
+    else
+    {
+        Debug.Log("Standard Attack Performed - This should not happen");
+    }
+
+    EndTurn();
+   // CheckBattleEnd();
+}
+
     
     
    
@@ -586,9 +678,9 @@ public void EndTurn()
     if (currentTarget == null)
     {
         Debug.LogError("No current target set for timing result popup.");
-        return;
+      
     }
-
+    
     // Position the popup above the current target
     Vector3 targetPosition = currentTarget.transform.position;
     float yOffset = 3.0f; // Adjust this value as needed for the correct height
@@ -618,35 +710,33 @@ public void EndTurn()
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<TimingEventResult> callback)
 {
     // Enable the timing circles when the event starts
-   // outerCircle.SetActive(true);
-    //innerCircle.SetActive(true);
+  //  outerCircle.SetActive(true);
+  //  innerCircle.SetActive(true);
+  Debug.Log("Window started");
+
+    // Assuming outerCircle does not change scale during this event
+    Vector3 targetScale = outerCircle.transform.localScale; // Target scale is the outer circle's scale
+    Vector3 initialScale = new Vector3(0, 0, 0); // Inner circle starts from zero scale
+    innerCircle.transform.localScale = initialScale; // Apply initial scale
+
     float totalWindowDuration = windowEnd - windowStart;
-   // colorChanger.StartColorTransition(totalWindowDuration);
     float timer = 0;
     bool buttonClicked = false;
 
-    // Set the sizes: outer starts bigger and shrinks to size (0,0,0)
-    Vector3 outerCircleInitialScale = outerCircle.transform.localScale; // Let's assume this is the size at start.
-    Vector3 zeroScale = new Vector3(0, 0, 0); 
-
-    float speedFactor = 1.25f; // Change this value to adjust speed. Higher means faster.
-    outerCircle.SetActive(true);
-
+    float speedFactor = 1.0f; // Adjust speed if needed. Higher values make the scaling faster
 
     try
     {
         while (timer < totalWindowDuration)
         {
             
-   
             float progress = timer / totalWindowDuration;
-            outerCircle.transform.localScale = Vector3.Lerp(outerCircleInitialScale, zeroScale, progress);
+            // Lerp from initial to target scale based on the progress
+            innerCircle.transform.localScale = Vector3.Lerp(initialScale, targetScale, progress);
 
             if (Input.GetMouseButtonDown(0))
             {
                 buttonClicked = true;
-               
-
                 break;
             }
 
@@ -657,118 +747,131 @@ public void EndTurn()
         TimingEventResult result;
         if (buttonClicked)
         {
-            if (timer >= windowStart)
-            {
-                result = GetTimingAccuracy(outerCircle.transform.localScale);
-                
-            }
-            else
-            {
-                Debug.Log("Timing Missed!");
-                result = TimingEventResult.Miss;
-                
-            }
+           
+            
+    result = GetTimingAccuracy(innerCircle.transform.localScale, targetScale, timer, windowStart, windowEnd);
+
+
         }
         else
         {
-          
             Debug.Log("No input detected. Missed!");
-            result = TimingEventResult.Miss;
-            
+            result = TimingEventResult.Late;
         }
-        ShowTimingResult(result.ToString());
+        
         callback(result);
+        ShowTimingResult(result.ToString());
+       // yield return new WaitForSeconds(0.5f); 
     }
     finally
     {
-        // Reset the scale of the outer circle, ensuring it always happens even if the coroutine is interrupted
-        outerCircle.transform.localScale = outerCircleInitialScale;
+        // Optionally reset circles' scales or disable them here if needed
+        
+        outerCircle.SetActive(false);
+        innerCircle.SetActive(false);
+        
     }
-    // Disable the timing circles when the event ends
-    outerCircle.SetActive(false);
-    innerCircle.SetActive(false);
 }
 
-
-
-
-    
-    private TimingEventResult GetTimingAccuracy(Vector3 outerCircleScale)
+private TimingEventResult GetTimingAccuracy(Vector3 innerCircleScale, Vector3 outerCircleScale, float timer, float windowStart, float windowEnd)
 {
-    // Thresholds based on the size of the outer circle
-    float perfectThreshold = 0.1f; // This means the circle is very small, almost disappeared
-    float goodThreshold = 0.5f; // This means the circle is half its original size
+    // Calculate the center of the timing window
+    float perfectTiming = (windowEnd + windowStart) / 2;
 
-    if (outerCircleScale.x <= perfectThreshold) 
+    // Calculate the timing accuracy based on how close the timer is to the perfectTiming
+    float accuracy = Mathf.Abs(timer - perfectTiming);
+
+    // Define the thresholds as a percentage of the total window size
+    float windowSize = windowEnd - windowStart;
+    float perfectThreshold = windowSize * 0.3f; // Define what is considered 'perfect' (30% of the window)
+
+    if (accuracy <= perfectThreshold)
     {
-        StartCoroutine(cameraShake.Shake());
-        return TimingEventResult.Perfect;
-    }
-    else if (outerCircleScale.x <= goodThreshold)
-    {
-        StartCoroutine(cameraShake.Shake());
+        Debug.Log("PERFECT");
+        StartCoroutine(cameraShake.Shake(0.5f));
         return TimingEventResult.Good;
+    }
+    else if (timer < perfectTiming)
+    {
+        Debug.Log("Early");
+        StartCoroutine(cameraShake.Shake(0.25f));
+        return TimingEventResult.Early;
     }
     else
     {
-        return TimingEventResult.Miss;
+        Debug.Log("Late");
+        StartCoroutine(cameraShake.Shake(0.25f));
+        return TimingEventResult.Late;
     }
 }
 
 
+
+
+  // Set the sizes: outer starts bigger and shrinks to size (0,0,0)
+    
+    Vector3 zeroScale = new Vector3(0, 0, 0); 
+
+    
+	
+
+
+
     public IEnumerator PlayerHoldReleaseTimeEvent(float holdStart, float holdEnd, Action<TimingEventResult> callback)
+{
+    float totalHoldDuration = holdEnd - holdStart;
+    float holdTimer = 0;
+    
+    //colorChanger.StartColorTransition(totalHoldDuration);
+    holdReleaseSlider.ResetSlider(); // Reset the slider at the start of the hold event
+    holdReleaseSlider.gameObject.SetActive(true);
+
+    while (holdTimer < totalHoldDuration)
     {
-        float totalHoldDuration = holdEnd - holdStart;
-        float holdTimer = 0;
-        
-        colorChanger.StartColorTransition(totalHoldDuration);
-
-        holdReleaseSlider.ResetSlider(); // Reset the slider at the start of the hold event
-        holdReleaseSlider.gameObject.SetActive(true);
-
-        
-        while (holdTimer < totalHoldDuration)
+        if (Input.GetMouseButton(0)) // Button is currently held down
         {
-            if (Input.GetMouseButton(0)) // Button is currently held down
-            {
-                
-                holdTimer += Time.deltaTime;
-
-                // Update the slider value as the hold time increases
-                holdReleaseSlider.UpdateSlider(holdTimer / totalHoldDuration);
-            }
-
-            if (Input.GetMouseButtonUp(0)) // Button was just released
-            {
-                holdReleaseSlider.gameObject.SetActive(false);  
-                break;
-            }
-              
-            yield return null;
+            holdTimer += Time.deltaTime;
+            // Update the slider value as the hold time increases
+            holdReleaseSlider.UpdateSlider(holdTimer / totalHoldDuration);
         }
 
-        TimingEventResult result;
-
-        if (holdTimer < totalHoldDuration / 3)
+        if (Input.GetMouseButtonUp(0)) // Button was just released
         {
-            Debug.Log("Button was released too early. Miss!");
-            result = TimingEventResult.Miss;
-        }
-        else if (holdTimer < 2 * totalHoldDuration / 3)
-        {
-            Debug.Log("Button was released early. Good!");
-            result = TimingEventResult.Good;
-        }
-        else
-        {
-            Debug.Log("Button was held for the full duration. Perfect!");
-            result = TimingEventResult.Perfect;
+            holdReleaseSlider.gameObject.SetActive(false);  
+            break;
         }
 
-        ShowTimingResult(result.ToString());
-        callback(result);
-        holdReleaseSlider.ResetSlider(); // Reset the slider at the end of the hold event
+        yield return null;
     }
+
+    TimingEventResult result;
+
+    // Define a threshold for "Perfect" based on total hold duration
+    // if within 10% of the total hold duration
+    float perfectThreshold = totalHoldDuration * 0.1f; // Adjust this value as needed
+
+    if (Mathf.Abs(holdTimer - totalHoldDuration) <= perfectThreshold)
+    {
+        Debug.Log("Perfect!");
+        result = TimingEventResult.Good;
+    }
+    else if (holdTimer < totalHoldDuration)
+    {
+        Debug.Log("Early!");
+        result = TimingEventResult.Early;
+    }
+    else
+    {
+        // If the player holds past the hold duration, it could be considered Late.
+        Debug.Log("Late!");
+        result = TimingEventResult.Late;
+    }
+
+    ShowTimingResult(result.ToString());
+    callback(result);
+    holdReleaseSlider.ResetSlider(); // Reset the slider at the end of the hold event
+}
+
 
 
     public BattleState GetState()
@@ -776,47 +879,71 @@ public void EndTurn()
         return state;
     }
 
-    public void EndOfBattleRewards(List<Character> enemies)
+    public Companion companion;
+    public Slider[] expSliders; // Ensure this array size matches the max party size in the Inspector
+    public TextMeshProUGUI[] expTexts; // Match this array size with expSliders
+    public TextMeshProUGUI[] heroIDTexts;
+
+
+    private void DisplayExpToLevel(List<Character> playerParty)
 {
-    int totalExp = 0;
-    int totalGold = 0;
+    // Hide all UI elements initially
+    foreach (var slider in expSliders) slider.gameObject.SetActive(false);
+    foreach (var text in expTexts) text.gameObject.SetActive(false);
+    foreach (var text in heroIDTexts) text.gameObject.SetActive(false);
 
-    foreach (Enemy enemy in enemies)
+    for (int i = 0; i < playerParty.Count; i++)
     {
-        totalExp += enemy.expReward;
-        totalGold += enemy.goldReward;
+        if (playerParty[i] is Companion companion)
+        {
+            // Calculate EXP to next level
+            int expToLevel = companion.ExpToNextLevel(companion.heroLevel);
+
+            // Ensure we don't exceed the UI elements array bounds
+            if (i < expSliders.Length && i < expTexts.Length)
+            {
+                // Update the slider value and text
+                expSliders[i].maxValue = companion.ExpToNextLevel(companion.heroLevel);
+                expSliders[i].value = companion.heroExp;
+                expTexts[i].text = "Exp to level: " + (expToLevel - companion.heroExp).ToString();
+                heroIDTexts[i].text = companion.heroID;
+
+                // Make sure the UI elements for this character are visible
+                expSliders[i].gameObject.SetActive(true);
+                expTexts[i].gameObject.SetActive(true);
+                heroIDTexts[i].gameObject.SetActive(true);
+            }
+            Debug.Log(expTexts[i].text);
+        }
     }
+}
 
-    GameManager.Instance.GainExp(totalExp);
-    PlayerData.Instance.gold += totalGold;
-    PlayerData.Instance.SavePlayerData();
-    GameManager.Instance.SaveAllCompanionData();
+private float CalculateSliderValue(int currentExp, int expToNextLevel)
+{
     
-
-
-    TextMeshProUGUI expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
-    expGainedTextComponent.text = totalExp.ToString();
-
-    TextMeshProUGUI goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
-    goldGainedTextComponent.text = totalGold.ToString();
-
+    // 'expToNextLevel' is the total EXP needed to level up from the current level
+    // and 'currentExp' is the current EXP amount towards that goal.
+    return (float)currentExp / expToNextLevel;
 }
 
 
+public bool isSkillSelected = false;  
 
-    public bool isSkillSelected = false;  // New variable
 
 
 private void Update()
 {
-    if (!companion1.isAttacking && !companion2.isAttacking)
+    
+    if (isBattleStarted){
+        MoveRadialMenuToActivePlayer();
+    if (!playerParty.Any(character => character.isAttacking) && !enemies.Any(character => character.isAttacking))
     {
     if (Input.GetMouseButtonDown(0))
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
 
-        if (hit.collider != null && (!companion1.isAttacking && !companion2.isAttacking))
+        if (hit.collider != null && !playerParty.Any(character => character.isAttacking))
         {
             // If the hit object is an enemy
             if (hit.collider.CompareTag("Enemy")) // && isSkillSelected)
@@ -825,11 +952,14 @@ private void Update()
                 MoveCursorToTarget();
                 outerCircle.SetActive(true);
                 activePlayer.attackTarget = currentTarget.transform;
-
+                 Debug.Log("Its getting into the second if statement ok");
                 // Execute the queued skill here since an enemy is tapped after selecting a skill
                 if ((state == BattleState.PlayerTurn) && isSkillSelected)
                 {
+                    Debug.Log("Its getting into the final statement ok");
+                    skillDescriptionPanel.SetActive(false);
                     ExecuteQueuedSkills();
+                   // turnOrderList.RemoveAll(character => character.health <= 0);
                 }
                 isSkillSelected = false;  // Reset the flag
             }
@@ -850,8 +980,12 @@ private void Update()
         }
     }
     }
+    }
     //ChangeColorAfterTurnTaken();
 }
+
+    
+
 
 //NOT BEING USED;Would need to implement for enemies and allies, maybe later due to changing battle
     public void ChangeColorAfterTurnTaken()
@@ -878,31 +1012,133 @@ private void Update()
 }
 public void CheckBattleEnd()
 {
-    bool allEnemiesDefeated = true;
-    bool allAlliesDefeated = companion1.health <= 0 && companion2.health <= 0;
+    bool allEnemiesDefeated = enemies.All(enemy => enemy.health <= 0);
+    bool allAlliesDefeated = playerParty.All(hero => hero.health <= 0);
 
-    foreach (var enemy in enemies)
+    // Check if the battle has ended
+    if (allEnemiesDefeated || allAlliesDefeated)
     {
-        if (enemy.health > 0)
+    
+        if (allEnemiesDefeated)
         {
-            allEnemiesDefeated = false;
-            break;
+            ProcessVictory();
+            GameManager.Instance.currentStageIndex++;
+        }
+        else if (allAlliesDefeated)
+        {
+            ProcessDefeat();
         }
     }
-    
-    if (allEnemiesDefeated)
-    {
-        EndOfBattleRewards(enemies);
-        Debug.Log("Is this running");
-        Stage completedStage = GameManager.Instance.CurrentBattleConfig.stage;
-        GameManager.Instance.UnlockConnectedStages(completedStage);
-        endOfBattlePanel.SetActive(true);
-    }
-    else if (allAlliesDefeated)
-    {
-        endOfBattleLossPanel.SetActive(true);
-    }
 }
+
+private void DeductStaminaFromParticipants()
+{
+    foreach (Character character in playerParty)
+    {
+        Companion companion = (Companion)character;  // Explicitly casting Character to Companion
+        //If they had stamina, fully recover resources
+        if (companion.stamina > 0)
+        {
+        companion.stamina -= 1;
+        companion.health = companion.maxHealth;
+        companion.energy = companion.maxEnergy;
+        }
+        companion.SaveCharacterData();
+    }
+
+        Debug.Log("No stamina");
+    
+}
+
+public void EndOfBattleRewards(List<Character> enemies)
+{
+    int totalExp = 0;
+    int totalGold = 0;
+
+    // Calculate total EXP and gold from defeated enemies
+    foreach (Enemy enemy in enemies)
+    {
+        totalExp += enemy.expReward;
+        totalGold += enemy.goldReward;
+    }
+
+    Debug.Log($"Running end of battle rewards +{totalExp} EXP +{totalGold} Gold");
+/*
+    // Update EXP for each companion
+    foreach (Character character in playerParty)
+    {
+        if (character is Companion companion)
+        {
+            RestoreHealthAndEnergy();
+            // Directly update companion EXP using GameManager
+            GameManager.Instance.UpdateCompanionExp(companion.heroID, totalExp);
+        }
+    }
+*/
+    // Update the player's gold and save player data
+    PlayerData.Instance.gold += totalGold;
+    PlayerData.Instance.SavePlayerData();
+
+     foreach (Character character in playerParty)
+    {
+        if (character is Companion companion)
+        {
+            Debug.Log("saving in BM " + character);
+            companion.heroExp += totalExp;
+            companion.LevelUp();
+            
+            companion.SaveCharacterData();
+        }
+        
+       // DeductStaminaFromParticipants();  Moved to StartBattle() for testing
+    }
+
+    TextMeshProUGUI expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
+    expGainedTextComponent.text = totalExp.ToString();
+
+    TextMeshProUGUI goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
+    goldGainedTextComponent.text = totalGold.ToString();
+
+    // Optionally, display EXP to next level for each companion
+    DisplayExpToLevel(playerParty);
+}
+
+
+private void ProcessVictory()
+{
+    EndOfBattleRewards(enemies);
+    Debug.Log("Battle won");
+
+      Stage completedStage = GameManager.Instance.CurrentBattleConfig.stage;
+      GameManager.Instance.UnlockConnectedStages(completedStage);
+   // if (completedStage.isFirstCompletion)
+    {
+    //    PlayerData.Instance.currentStageIndex++;
+    //    completedStage.isFirstCompletion = false;
+    }
+    
+    endOfBattlePanel.SetActive(true);
+    DisplayExpToLevel(playerParty);
+}
+public bool battleLost = false;
+private void ProcessDefeat()
+{
+   foreach (Character character in playerParty)
+    {
+        if (character is Companion companion)
+        {
+        
+            companion.SaveCharacterData();
+        }   
+        
+    }
+    Debug.Log("Battle lost");
+    StopAllCoroutines();
+    battleLost = true;
+    endOfBattleLossPanel.SetActive(true);
+    
+}
+
 
 
 

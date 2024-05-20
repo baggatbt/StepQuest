@@ -18,7 +18,7 @@ public class MushroomSpecialAttackSkill : Skill
     // Override the default base damage calculation.
     protected override int CalculateBaseDamage(Character user)
     {
-        return (int)(user.attackPower * 1.3f);  
+        return (int)(user.attackPower * 1.5f);  
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)

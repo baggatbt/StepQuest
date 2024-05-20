@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using System;
 
 public class TripleHitSkill : Skill
 {
@@ -9,17 +10,20 @@ public class TripleHitSkill : Skill
     public TripleHitSkill()
     {
         skillName = "Triple Slash";
-        description = "Slash three times";
+        description = "Tap before each hit for extra damage";
         requiresMovement = true;
         energyCost = 3;
         numberOfAttacksPossible = 3;
+        skillPointCost = 1;
+        iconImage = LoadIconImage("Sprites/SkillIcons/Knight/Knight_Icon_TripleSlash");
     }
 
     // Override the default base damage calculation.
     protected override int CalculateBaseDamage(Character user)
     {
-        return (int)(user.attackPower * 0.8f);  // 80% of the character's attack.
+        return (int)Math.Ceiling(user.attackPower * 0.7f); //Rounds up to next integer of any fraction
     }
+    
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
@@ -36,13 +40,20 @@ public class TripleHitSkill : Skill
              
 
              yield return TimingWindow(user, target, battleManager, 0.0f, 0.7f);
-             
+              
              
 
              HandleTimingResultForPlayerAttack(user, target, result, baseDamage);
              Debug.Log("Timing for player attack has been handled waiting for animations");
              //Wait until the timing event happens to move on to next attack stage
+             
              yield return new WaitUntil(() => user.animationDamageTime == true);
+              
+             if (i == 3)
+             {
+               yield return battleManager.StartCoroutine(battleManager.TimeStop(0.4f, .1f));
+             }
+            
              
         }
         Debug.Log("waiting on animation to finish");

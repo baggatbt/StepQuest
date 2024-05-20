@@ -10,7 +10,7 @@ public class Stage : MonoBehaviour
 {
     public Button stageButton;
     public BattleConfig stageBattleConfig;
-    public string battleSceneName = "BattleScene"; 
+    public string battleSceneName = "TestPortraitBattle"; 
     public bool isUnlocked;
     public bool isFirstCompletion;
     public string stageID; // Unique identifier for the stage
@@ -21,7 +21,7 @@ public class Stage : MonoBehaviour
          stageButton.onClick.AddListener(OnStageButtonClicked);
         // Initialize the unlocked state based on GameManager's data
         isUnlocked = GameManager.Instance.UnlockedStageNames.Contains(this.stageID);
-        UpdateButtonColor();
+       // UpdateButtonColor();
         
     }
 
@@ -29,6 +29,7 @@ public class Stage : MonoBehaviour
     public void UpdateButtonColor()
 {
     // Check if the stageButton is not null before accessing it
+    /*
     if (stageButton != null)
     {
         if (isUnlocked)
@@ -40,6 +41,7 @@ public class Stage : MonoBehaviour
             stageButton.GetComponent<Image>().color = Color.red;
         }
     }
+    */
 }
 
 

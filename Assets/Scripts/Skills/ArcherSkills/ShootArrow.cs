@@ -13,23 +13,26 @@ public class ShootArrow : Skill
     public ShootArrow()
     {
         skillName = "Arrow";
-        description = "Shoot an arrow";
+        description = "Hold and release with good timing to fire an arrow";
         requiresMovement = false;
         energyCost = 0;
+        iconImage = LoadIconImage("SkillIcons/attack3");
+        skillDamageModifier = 1.0f;
     }
 
     // Override the default base damage calculation.
     protected override int CalculateBaseDamage(Character user)
     {
-        return (int)(user.attackPower * 1.0);  // 100% of the character's attack.
+        return (int)(user.attackPower * skillDamageModifier);  
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
 {
     user.isAttacking = true;
-    user.animator.SetTrigger("Attack1Trigger");
     Projectile projectileScript = null;  
     int baseDamage = CalculateBaseDamage(user);
+    user.animator.SetBool("isHoldOver", false);
+    user.animator.SetTrigger("IsHolding");
     
 
     // Find the ArrowSpawnLocation in the user's hierarchy
@@ -42,6 +45,7 @@ public class ShootArrow : Skill
 
     yield return battleManager.PlayerHoldReleaseTimeEvent(0.0f, 1.0f, (result) =>
     {
+        user.animator.SetBool("isHoldOver", true);
         // Use the position and rotation of the ArrowSpawnLocation
         Vector3 spawnPosition = arrowSpawnTransform.position;
         Vector2 direction = (target.transform.position - spawnPosition).normalized;
@@ -54,14 +58,20 @@ public class ShootArrow : Skill
         if (projectileScript != null)
         {
             projectileScript.damage = baseDamage;
-            projectileScript.speed = 50.0f;
+            projectileScript.speed = 40.0f;
             projectileScript.Spawner = user;  // Set the spawner
         }
-
-        HandleTimingResultForPlayerAttack(user, target, result, baseDamage);
+    
+          // Modify the projectile's damage based on the timing result
+           projectileScript.Target = target;  // Set the target of the projectile
+           
+            HandlePlayerRangedAttack(user, projectileScript, result);
+            
+            
+            
       
     });
-   
+        
         Debug.Log("waiting on animation to finish");
     
         yield return new WaitUntil(() => user.isAnimationDone == true);
@@ -69,7 +79,8 @@ public class ShootArrow : Skill
         user.animationDamageTime = false;
         user.isAnimationDone = false;
         user.isAttacking = false;
-        target.CheckForDeath();
+        
+     
     
 }
 }

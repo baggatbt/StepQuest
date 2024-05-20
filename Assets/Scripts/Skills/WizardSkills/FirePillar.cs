@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class FirePillar : Skill
 {
-    GameObject firePillarPreFab = Resources.Load<GameObject>("PreFab/ParticleEffects/FirePillarPrefab");
+    GameObject firePillarPreFab = Resources.Load<GameObject>("PreFab/Projectiles_Effects/FirePillarPrefab");
 
 
     public FirePillar()
@@ -47,7 +47,7 @@ public class FirePillar : Skill
     
     
         user.isAttacking = false;
-        target.CheckForDeath();
+       
         
     }
 }

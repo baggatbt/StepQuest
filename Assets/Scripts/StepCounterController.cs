@@ -37,7 +37,21 @@ public class StepCounterController : MonoBehaviour
         }
     }
 
-    private void OnApplicationPause(bool pauseStatus)
+     public void SaveLastKnownSteps()
+    {
+        int currentTotalSteps = GetSteps();
+        PlayerPrefs.SetInt("LastKnownSteps", currentTotalSteps);
+        PlayerPrefs.Save();
+        Debug.Log("Last known steps saved: " + currentTotalSteps);
+    }
+
+    public int GetInitialStepsOnResume()
+    {
+        return PlayerPrefs.GetInt("LastKnownSteps", 0);
+    }
+
+
+    public void OnApplicationPause(bool pauseStatus)
     {
         if (Application.platform == RuntimePlatform.Android)
         {
@@ -62,12 +76,12 @@ public class StepCounterController : MonoBehaviour
         stepCounterPluginInstance.CallStatic("stopCounting");
     }
 
-    public int GetStepsSinceStart()
+    public int GetStepsSinceStart() //Used tp get the steps off of the device on the games first launch so that any pre existing steps wont be counted in game
     {
         return CallStaticMethodOnPlugin<int>("getStepsSinceStart");
     }
 
-    public int GetSteps()
+    public int GetSteps() //gets current steps from the device
     {
         return CallStaticMethodOnPlugin<int>("getSteps");
     }
@@ -80,4 +94,5 @@ public class StepCounterController : MonoBehaviour
         }
         return default(T);
     }
+
 }
