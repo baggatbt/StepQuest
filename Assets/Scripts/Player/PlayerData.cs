@@ -48,9 +48,16 @@ public class PlayerData : MonoBehaviour
         {
             _instance = this;
             DontDestroyOnLoad(gameObject);
+           //REMOVE AFTER TESTING
+          //  PlayerPrefs.DeleteAll();  // Clears all keys and values from PlayerPrefs
+          //  PlayerPrefs.Save();       // Make sure changes are saved immediately
 
             InitializeStepCounter();
-            UpdateSteps(); //Compares the phones sensor from the last time it ran to now, adds steps if its greater
+            if (!firstTimeLogin)
+            {
+                 UpdateSteps(); //Compares the phones sensor from the last time it ran to now, adds steps if its greater
+            }
+            
             LoadPlayerData();
             Debug.Log("PlayerData Awake complete");
         }

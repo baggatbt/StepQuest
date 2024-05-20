@@ -265,6 +265,7 @@ public GameObject inventoryItemPrefab; // Assign this prefab in the Inspector
 
 
 public void PopulateInventoryList() {
+    
     Debug.Log("[MainMenuUIManager] Starting to populate inventory list...");
     
     GameObject inventoryItemContainer = GameObject.Find("Inventory Item Container");

@@ -77,16 +77,55 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
          Application.targetFrameRate = 60;  // Set target frame rate to 60 FPS.
-        LoadInventory();   
+         
+    }
+
+    private void Start()
+    {
+        LoadInventory();  
     }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        GameObject inventoryPanel = GameObject.Find("Inventory Panel");  // Adjust the name as per your hierarchy
-         inventory.UpdateInventoryUI();
-         LoadAllCompanionData();
-          
+        ReassignInventoryComponent();
+        LoadAllCompanionData();
     }
+
+    private void ReassignInventoryComponent()
+{
+    GameObject inventoryPanel = GameObject.Find("Inventory Panel");
+    if (inventoryPanel != null)
+    {
+        inventory = inventoryPanel.GetComponent<Inventory>();
+        if (inventory != null)
+        {
+            Debug.Log("Inventory component reassigned successfully.");
+            inventory.UpdateInventoryUI();  // Optionally update UI here if it's safe to do so
+        }
+        else
+        {
+            Debug.LogError("Failed to find Inventory component on the Inventory Panel.");
+        }
+    }
+    else
+    {
+        Debug.Log("Inventory Panel not found in the scene. This may be expected in some scenes.");
+    }
+}
+
+
+void OnEnable()
+    {
+        Debug.Log("SceneManagement is enabled and registering to sceneLoaded event.");
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    void OnDisable()
+    {
+        Debug.Log("SceneManagement is disabled and unregistering from sceneLoaded event.");
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
 
     
 
@@ -181,6 +220,15 @@ public class GameManager : MonoBehaviour
 
     public void LoadInventory()
 {
+    GameObject inventoryPanel = GameObject.Find("Inventory Panel"); // Adjust the name as per your hierarchy
+    if (inventoryPanel != null && inventory != null)
+    {
+        inventory.UpdateInventoryUI();
+    }
+    else
+    {
+        Debug.LogError("InventoryPanel or inventory is null.");
+    }
     string filePath = $"{Application.persistentDataPath}/inventory.json";
     if (System.IO.File.Exists(filePath))
     {
@@ -336,6 +384,7 @@ private class StageList
         if (companion != null)
         {
             companion.DeleteCharacterData();
+            companion.SaveCharacterData();
             Debug.Log("Deleted data for " + companion.name);
         }
     }
@@ -345,6 +394,7 @@ private class StageList
     Debug.Log("All PlayerPrefs deleted");
     DeleteSavedInventory();
     PlayerData.Instance.ResetSteps();
+    PlayerData.Instance.SavePlayerData();
 }
 
 public void DeleteSavedInventory()
@@ -418,7 +468,7 @@ public void DeleteSavedInventory()
     public void RecoverAllForSteps()
     {
        int stepsToUse = CalculateStepCostForResting();
-       
+
        if (PlayerData.Instance.UseSteps(stepsToUse))
        {
         RecoverCompanion();
@@ -468,7 +518,7 @@ public void DeleteSavedInventory()
     
     private void OnApplicationQuit()
     {
-      // SaveAllCompanionData();
+       SaveAllCompanionData();
     }
 
     private void OnApplicationPause(bool pause)

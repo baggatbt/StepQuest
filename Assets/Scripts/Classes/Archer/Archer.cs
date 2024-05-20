@@ -91,7 +91,11 @@ public class Archer : Companion
 
     public override void InitializeSkillsBasedOnLevel()
     {
-
+         availableSkills.Clear(); // Directly manipulate the protected field
+        availableSkills.Add(SkillType.ShootArrow);
+        if (this.heroLevel >= 2) availableSkills.Add(SkillType.MeleeCombo);
+        if (this.heroLevel >= 5) availableSkills.Add(SkillType.ArrowRain);
+        Debug.Log($"Total Available skills: {availableSkills.Count}");
     }
 
     

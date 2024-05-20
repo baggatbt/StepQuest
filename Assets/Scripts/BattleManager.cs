@@ -218,7 +218,7 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
         // Existing logic to start the battle
     endOfBattlePanel.SetActive(false);
     heroSelectionPanel.SetActive(false);
-    companionSkillsPanel.SetActive(true);
+   // companionSkillsPanel.SetActive(true);
    
    // RestoreHealthAndEnergy();
     InitializeTurnOrder();
@@ -257,12 +257,15 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
 
     private void ChangeState(BattleState newState)
     {
+         
         CheckBattleEnd();
         turnOrderList.RemoveAll(character => character.health <= 0);
         State = newState;
         if (State == BattleState.PlayerTurn)
         {
-            EnableAllButtons();
+            
+            StartCoroutine(EnableAllButtons());
+
         }
     }
 
@@ -356,7 +359,11 @@ public void EndTurn()
 
 
 
-
+    private void DisableSkillSelection()
+    {
+        companionSkillsPanel.SetActive(false);
+        SkillsPanel.SetActive(false);
+    }
     
 
     public void DisableAllButtons()
@@ -372,17 +379,22 @@ public void EndTurn()
    public GameObject companionSkillsPanel;
    public GameObject SkillsPanel;
 
-    public void EnableAllButtons()
+    public IEnumerator EnableAllButtons()
+{
+    // Wait for half a second before executing the rest of the function
+    yield return new WaitForSeconds(0.25f);
+
+    // Check if the current state allows enabling buttons
+    if (state == BattleState.PlayerTurn)
     {
-        if (state == BattleState.PlayerTurn)
-        {
         companionSkillsPanel.SetActive(true);
-        }
-        SkillsPanel.SetActive(true);
-        enemyUIPanel.SetActive(true);
-        heroUIPanels.SetActive(true);
-        
     }
+
+    SkillsPanel.SetActive(true);
+    enemyUIPanel.SetActive(true);
+    heroUIPanels.SetActive(true);
+}
+
 
     public void MoveCursorToTarget()
      {
@@ -528,7 +540,8 @@ public void EndTurn()
             StartCoroutine(zoomEffect.ZoomOutEffect());
         }
         
-        EnableAllButtons();
+        StartCoroutine(EnableAllButtons());
+
        
         yield return activePlayer.ReturnToPosition();
         }
@@ -640,7 +653,8 @@ public void EndTurn()
         {
             StartCoroutine(zoomEffect.ZoomOutEffect());
             yield return currentEnemy.ReturnToPosition();
-            EnableAllButtons();
+            StartCoroutine(EnableAllButtons());
+
         }
     }
     else
@@ -1076,7 +1090,7 @@ public void EndOfBattleRewards(List<Character> enemies)
             companion.SaveCharacterData();
         }
         
-        DeductStaminaFromParticipants();
+       // DeductStaminaFromParticipants();  Moved to StartBattle() for testing
     }
 
     TextMeshProUGUI expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
