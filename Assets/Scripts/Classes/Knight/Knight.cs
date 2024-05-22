@@ -68,6 +68,7 @@ public class Knight : Companion
         {
             case 2:
                 this.maxHealth += 2; 
+                Debug.Log("Your max health went up by 2!");
                 break;
             case 3:
                 this.attackPower += 1; 
