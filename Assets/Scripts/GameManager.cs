@@ -435,7 +435,7 @@ public void DeleteSavedInventory()
         }
     }
 
-    /*
+    
     public void UpdateCompanionStamina(string heroID)
     {
         foreach (var companion in companions)
@@ -449,7 +449,7 @@ public void DeleteSavedInventory()
             }      
         }
     }
-    */
+    
 
     public void RestoreHealthAndEnergyForCompanion(Companion companion)
     {

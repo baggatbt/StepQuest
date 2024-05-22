@@ -55,9 +55,7 @@ public class BattleManager : MonoBehaviour
     {
         PlayerTurn,
 
-        EnemyTurn,
-
-        BattleLost
+        EnemyTurn
     }
 
 
@@ -108,9 +106,6 @@ public class BattleManager : MonoBehaviour
                     break;
                 case BattleState.EnemyTurn:
                     Debug.Log("Enemy Turn Started!");
-                    break;
-                case BattleState.BattleLost:
-                    Debug.Log("Battle lost");
                     break;
             }
         }
@@ -211,14 +206,13 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
 {
     if (playerParty.Count > 0) {
      if (isBattleStarted) return; // Prevent starting the battle multiple times
-        DeductStaminaFromParticipants();
         battleStartButton.SetActive(false);
         activePlayer = companion1; //Default
         isBattleStarted = true;
         // Existing logic to start the battle
     endOfBattlePanel.SetActive(false);
     heroSelectionPanel.SetActive(false);
-   // companionSkillsPanel.SetActive(true);
+    companionSkillsPanel.SetActive(true);
    
    // RestoreHealthAndEnergy();
     InitializeTurnOrder();
@@ -257,23 +251,18 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
 
     private void ChangeState(BattleState newState)
     {
-         
         CheckBattleEnd();
         turnOrderList.RemoveAll(character => character.health <= 0);
         State = newState;
         if (State == BattleState.PlayerTurn)
         {
-            
-            StartCoroutine(EnableAllButtons());
-
+            EnableAllButtons();
         }
     }
 
     public List<Character> turnOrderList = new List<Character>();
     public void InitializeTurnOrder()
 {
-    if (battleLost != true)
-    {
     turnOrderList.Clear();
     
     
@@ -289,19 +278,13 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
 
     turnOrderList = turnOrderList.OrderByDescending(character => character.speed).ToList();
     StartTurn();
-    }
-    else 
-    {
-        Debug.Log("the battle is over");
-    }
 }
 
 
     public void StartTurn()
 {
     
-    if (battleLost != true)
-    {
+
     // Now check if there are characters left to take a turn
     if (turnOrderList.Count > 0)
     {
@@ -313,7 +296,6 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
     {
         // If no characters are left, re-initialize the turn order
         InitializeTurnOrder();
-    }
     }
 }
 
@@ -343,27 +325,19 @@ public void EndTurn()
     if (turnOrderList.Count == 0)
     {
         statusEffectController.ProcessEffects();
-
-       
         InitializeTurnOrder();
-        
         
     }
     else
     {
         StartTurn(); // Proceed to the next character's turn
     }
-    
 }
 
 
 
 
-    private void DisableSkillSelection()
-    {
-        companionSkillsPanel.SetActive(false);
-        SkillsPanel.SetActive(false);
-    }
+
     
 
     public void DisableAllButtons()
@@ -379,22 +353,17 @@ public void EndTurn()
    public GameObject companionSkillsPanel;
    public GameObject SkillsPanel;
 
-    public IEnumerator EnableAllButtons()
-{
-    // Wait for half a second before executing the rest of the function
-    yield return new WaitForSeconds(0.25f);
-
-    // Check if the current state allows enabling buttons
-    if (state == BattleState.PlayerTurn)
+    public void EnableAllButtons()
     {
+        if (state == BattleState.PlayerTurn)
+        {
         companionSkillsPanel.SetActive(true);
+        }
+        SkillsPanel.SetActive(true);
+        enemyUIPanel.SetActive(true);
+        heroUIPanels.SetActive(true);
+        
     }
-
-    SkillsPanel.SetActive(true);
-    enemyUIPanel.SetActive(true);
-    heroUIPanels.SetActive(true);
-}
-
 
     public void MoveCursorToTarget()
      {
@@ -540,8 +509,7 @@ public void EndTurn()
             StartCoroutine(zoomEffect.ZoomOutEffect());
         }
         
-        StartCoroutine(EnableAllButtons());
-
+        EnableAllButtons();
        
         yield return activePlayer.ReturnToPosition();
         }
@@ -582,7 +550,7 @@ public void EndTurn()
     }
 
     // Decide whether or not to use the special attack or the normal one
-    if (!currentEnemy.isAttacking && battleLost != true)
+    if (!currentEnemy.isAttacking)
     {
         /*
         currentEnemy.currentSkill = (currentEnemy.energy >= currentEnemy.maxEnergy) ? 
@@ -613,9 +581,8 @@ public void EndTurn()
 
     if (potentialTargets.Count == 0)
     {
-        Debug.Log("No valid targets available.");
+        Debug.LogError("No valid targets available.");
         return null;
-        
     }
 
     // Use weighted random selection to choose a target
@@ -653,8 +620,7 @@ public void EndTurn()
         {
             StartCoroutine(zoomEffect.ZoomOutEffect());
             yield return currentEnemy.ReturnToPosition();
-            StartCoroutine(EnableAllButtons());
-
+            EnableAllButtons();
         }
     }
     else
@@ -705,7 +671,7 @@ public void EndTurn()
 
 
 
-
+    //Remember, the window needs to match the animation, if Slash is 60 frames then 0.0f to 0.5f makes it perfect timing on the 30th frame
         
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<TimingEventResult> callback)
 {
@@ -920,14 +886,69 @@ private TimingEventResult GetTimingAccuracy(Vector3 innerCircleScale, Vector3 ou
 
 private float CalculateSliderValue(int currentExp, int expToNextLevel)
 {
-    
-    // 'expToNextLevel' is the total EXP needed to level up from the current level
+    // Example calculation, adjust according to your EXP system
+    // This assumes 'expToNextLevel' is the total EXP needed to level up from the current level
     // and 'currentExp' is the current EXP amount towards that goal.
     return (float)currentExp / expToNextLevel;
 }
 
 
-public bool isSkillSelected = false;  
+
+    public void EndOfBattleRewards(List<Character> enemies)
+{
+    int totalExp = 0;
+    int totalGold = 0;
+
+    // Calculate total EXP and gold from defeated enemies
+    foreach (Enemy enemy in enemies)
+    {
+        totalExp += enemy.expReward;
+        totalGold += enemy.goldReward;
+    }
+
+    Debug.Log($"Running end of battle rewards +{totalExp} EXP +{totalGold} Gold");
+/*
+    // Update EXP for each companion
+    foreach (Character character in playerParty)
+    {
+        if (character is Companion companion)
+        {
+            RestoreHealthAndEnergy();
+            // Directly update companion EXP using GameManager
+            GameManager.Instance.UpdateCompanionExp(companion.heroID, totalExp);
+        }
+    }
+*/
+    // Update the player's gold and save player data
+    PlayerData.Instance.gold += totalGold;
+    PlayerData.Instance.SavePlayerData();
+
+     foreach (Character character in playerParty)
+    {
+        if (character is Companion companion)
+        {
+            Debug.Log("saving in BM " + character);
+            companion.heroExp += totalExp;
+            companion.LevelUp();
+            
+            companion.SaveCharacterData();
+        }
+    }
+
+    TextMeshProUGUI expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
+    expGainedTextComponent.text = totalExp.ToString();
+
+    TextMeshProUGUI goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
+    goldGainedTextComponent.text = totalGold.ToString();
+
+    // Optionally, display EXP to next level for each companion
+    DisplayExpToLevel(playerParty);
+}
+
+
+
+
+    public bool isSkillSelected = false;  // New variable
 
 
 
@@ -1018,7 +1039,10 @@ public void CheckBattleEnd()
     // Check if the battle has ended
     if (allEnemiesDefeated || allAlliesDefeated)
     {
-    
+        // Deduct stamina from participating companions only once after battle ends
+        DeductStaminaFromParticipants();
+
+
         if (allEnemiesDefeated)
         {
             ProcessVictory();
@@ -1035,74 +1059,12 @@ private void DeductStaminaFromParticipants()
 {
     foreach (Character character in playerParty)
     {
-        Companion companion = (Companion)character;  // Explicitly casting Character to Companion
-        //If they had stamina, fully recover resources
-        if (companion.stamina > 0)
-        {
-        companion.stamina -= 1;
-        companion.health = companion.maxHealth;
-        companion.energy = companion.maxEnergy;
-        }
-        companion.SaveCharacterData();
-    }
-
-        Debug.Log("No stamina");
-    
-}
-
-public void EndOfBattleRewards(List<Character> enemies)
-{
-    int totalExp = 0;
-    int totalGold = 0;
-
-    // Calculate total EXP and gold from defeated enemies
-    foreach (Enemy enemy in enemies)
-    {
-        totalExp += enemy.expReward;
-        totalGold += enemy.goldReward;
-    }
-
-    Debug.Log($"Running end of battle rewards +{totalExp} EXP +{totalGold} Gold");
-/*
-    // Update EXP for each companion
-    foreach (Character character in playerParty)
-    {
         if (character is Companion companion)
         {
-            RestoreHealthAndEnergy();
-            // Directly update companion EXP using GameManager
-            GameManager.Instance.UpdateCompanionExp(companion.heroID, totalExp);
+            GameManager.Instance.UpdateCompanionStamina(companion.heroID);
         }
     }
-*/
-    // Update the player's gold and save player data
-    PlayerData.Instance.gold += totalGold;
-    PlayerData.Instance.SavePlayerData();
-
-     foreach (Character character in playerParty)
-    {
-        if (character is Companion companion)
-        {
-            Debug.Log("saving in BM " + character);
-            companion.heroExp += totalExp;
-            companion.LevelUp();
-            
-            companion.SaveCharacterData();
-        }
-        
-       // DeductStaminaFromParticipants();  Moved to StartBattle() for testing
-    }
-
-    TextMeshProUGUI expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
-    expGainedTextComponent.text = totalExp.ToString();
-
-    TextMeshProUGUI goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
-    goldGainedTextComponent.text = totalGold.ToString();
-
-    // Optionally, display EXP to next level for each companion
-    DisplayExpToLevel(playerParty);
 }
-
 
 private void ProcessVictory()
 {
@@ -1120,23 +1082,11 @@ private void ProcessVictory()
     endOfBattlePanel.SetActive(true);
     DisplayExpToLevel(playerParty);
 }
-public bool battleLost = false;
+
 private void ProcessDefeat()
 {
-   foreach (Character character in playerParty)
-    {
-        if (character is Companion companion)
-        {
-        
-            companion.SaveCharacterData();
-        }   
-        
-    }
     Debug.Log("Battle lost");
-    StopAllCoroutines();
-    battleLost = true;
     endOfBattleLossPanel.SetActive(true);
-    
 }
 
 
