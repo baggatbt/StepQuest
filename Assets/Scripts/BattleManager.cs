@@ -581,7 +581,7 @@ public void EndTurn()
 
     if (potentialTargets.Count == 0)
     {
-        Debug.LogError("No valid targets available.");
+        Debug.Log("No valid targets available.");
         return null;
     }
 

@@ -42,13 +42,13 @@ public class Goblin : Enemy
         base.UpdateStats(); // Ensures that any updates that happen in the base class, including expReward and goldReward updates, are applied
 
         // Goblin-specific updates
-       // this.maxHealth = 9 + (this.level * 2);
+        this.maxHealth = 6 + (this.level * 4);
         this.health = this.maxHealth;
-        this.expReward = 10 + (this.level * 2);
+        this.expReward = 10 + (this.level * 4);
         this.goldReward = 3 + (this.level * 2); // You can keep or modify this if you want specific gold logic for Goblins
         this.attacksBeforeSpecial = 2;
-      //  this.attackPower = 6 + (this.level * 2); 
-      // this.defensePower = 5 + (this.level + 1);
+        this.attackPower = 4 + (this.level * 3); 
+        //this.defensePower = 0 + (this.level + 1);
         this.energy = 0;
     }
    
