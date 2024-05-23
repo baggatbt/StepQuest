@@ -82,7 +82,18 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        LoadInventory();  
+         TimerManager.Instance.OnTimerCompleted += HandleTimerCompletion;
+         TimerManager.Instance.SetPeriodicTimer("StaminaIncrement", 1);  // 1800 seconds = 30 minutes
+
+         LoadInventory();  
+    }
+
+    private void HandleTimerCompletion(string timerId)
+    {
+        if (timerId == "StaminaIncrement")
+        {
+            IncrementCompanionStamina();
+        }
     }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -463,6 +474,15 @@ public void DeleteSavedInventory()
         currentCompanion.stamina = currentCompanion.maxStamina;
         Debug.Log("Current Companion " + currentCompanion);
         currentCompanion.SaveCharacterData();
+    }
+
+    private void IncrementCompanionStamina()
+    {
+        foreach (Companion companion in companions)
+        if (companion.stamina < companion.maxStamina)
+        {
+        companion.stamina += 1;
+        }
     }
 
     public void RecoverAllForSteps()
