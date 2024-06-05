@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
     public Character companion3;
     public Companion currentCompanion; //Used to expose the selected companion 
     public Inventory inventory;
+     public EquipmentManager equipmentManager; // Reference to the EquipmentManager
 
     // Centralized item list managed by GameManager
     [SerializeField]
@@ -164,15 +165,17 @@ void OnEnable()
     {
         Debug.Log("[GameManager] Adding item to inventory: " + (newItem != null ? newItem.itemName : "null"));
 
-    if (newItem == null) {
-        Debug.LogError("Attempted to add a null item to the inventory.");
-        return;
-    }
+        if (newItem == null)
+        {
+            Debug.LogError("Attempted to add a null item to the inventory.");
+            return;
+        }
 
-    if (itemList == null) {
-        Debug.LogError("Item list is null.");
-        itemList = new List<Item>();  // Initialize if null
-    }
+        if (itemList == null)
+        {
+            Debug.LogError("Item list is null.");
+            itemList = new List<Item>();  // Initialize if null
+        }
         if (itemList.Count >= maxInventorySlots)
         {
             Debug.Log("Inventory is full!");
@@ -549,7 +552,20 @@ public void DeleteSavedInventory()
         }
     }
 
-    
+    public Equipment GetItemForSlot(EquipmentType slotType)
+    {
+        // Loop through the itemList to find an equipment item that matches the slot type
+        foreach (Item item in itemList)
+        {
+            if (item is Equipment equipment && equipment.equipmentType == slotType)
+            {
+                inventory.UpdateInventoryUI();
+                return equipment;
+            }
+        }
+        // If no matching item is found, return null
+        return null;
+    }
 
 
     

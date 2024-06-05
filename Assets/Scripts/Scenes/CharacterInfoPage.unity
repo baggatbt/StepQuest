@@ -4049,6 +4049,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inventoryUI: {fileID: 2009918416}
   slotPrefab: {fileID: 7376581010048672609, guid: 57ccb21085c27454aa5a7a89f65d064d, type: 3}
+  equipmentManager: {fileID: 0}
 --- !u!225 &163357875
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -5851,7 +5852,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &209358578
 GameObject:
@@ -17745,7 +17746,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -7.0390015, y: -7.9223633}
+  m_AnchoredPosition: {x: -7.0390625, y: -7.9223633}
   m_SizeDelta: {x: -350.51, y: -647.67}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &513042678
@@ -19676,6 +19677,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 622323565}
+  - component: {fileID: 622323566}
   m_Layer: 5
   m_Name: EquipSlotContainer
   m_TagString: Untagged
@@ -19707,6 +19709,23 @@ RectTransform:
   m_AnchoredPosition: {x: -755.1774, y: -155}
   m_SizeDelta: {x: 380.40002, y: 368.30002}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &622323566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 622323564}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a80e2c892bef147458536afeb99cdf09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  equipmentManager: {fileID: 1819698148}
+  helmSlotButton: {fileID: 346114782}
+  chestSlotButton: {fileID: 1860295001}
+  weaponSlotButton: {fileID: 662458666}
+  footSlotButton: {fileID: 578316262}
 --- !u!1001 &625356939
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20446,7 +20465,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 0}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -22209,7 +22228,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -9.913879, y: -261.44995}
+  m_AnchoredPosition: {x: -9.913818, y: -261.44995}
   m_SizeDelta: {x: -204.2, y: -1241.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &727565508
@@ -22288,6 +22307,7 @@ MonoBehaviour:
   companion3: {fileID: 0}
   currentCompanion: {fileID: 0}
   inventory: {fileID: 0}
+  equipmentManager: {fileID: 0}
   allItemsMasterList:
   - {fileID: 11400000, guid: 12a9ba489cc5c5d4e8b0cc4d0ac36d49, type: 2}
   - {fileID: 11400000, guid: 0e099d02a41705243bc8943faa3bebb5, type: 2}
@@ -22331,7 +22351,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &737053926
 GameObject:
@@ -23406,7 +23426,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.0018109537, y: 0.0041503906}
+  m_AnchoredPosition: {x: 0.0018109537, y: 0.00390625}
   m_SizeDelta: {x: 1066.5, y: 1910.8}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &790441604
@@ -26387,7 +26407,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &937494371
 MonoBehaviour:
@@ -36065,7 +36085,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5ff9b869a12e70b4db7a137f84ed920b, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -44098,6 +44118,54 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1811326340}
   m_CullTransparentMesh: 1
+--- !u!1 &1819698147
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1819698149}
+  - component: {fileID: 1819698148}
+  m_Layer: 0
+  m_Name: EquipmentManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1819698148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1819698147}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5552778fe7f64443a69bf2a06604121, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  helmSlotImage: {fileID: 1368499417}
+  chestSlotImage: {fileID: 256366622}
+  weaponSlotImage: {fileID: 1047541749}
+  footSlotImage: {fileID: 631354951}
+--- !u!4 &1819698149
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1819698147}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 513.251, y: 343.80322, z: 54.17184}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1821711107
 GameObject:
   m_ObjectHideFlags: 0

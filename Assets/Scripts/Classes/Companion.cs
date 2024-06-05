@@ -38,6 +38,8 @@ public abstract class Companion : Character
         {"sp",0}
         
     };
+    public Dictionary<EquipmentType, Equipment> equippedItems = new Dictionary<EquipmentType, Equipment>();
+
 
 
 
@@ -212,6 +214,47 @@ public abstract class Companion : Character
         {
             energy += amount;
         }
+    }
+
+    
+
+    // Method to equip an item
+    public void EquipItem(Equipment equipment)
+    {
+        if (equippedItems.ContainsKey(equipment.equipmentType))
+        {
+            UnequipItem(equipment.equipmentType);
+        }
+
+        equippedItems[equipment.equipmentType] = equipment;
+        ApplyStatBonuses(equipment);
+    }
+
+    // Method to unequip an item
+    public void UnequipItem(EquipmentType equipmentType)
+    {
+        if (equippedItems.ContainsKey(equipmentType))
+        {
+            Equipment equipment = equippedItems[equipmentType];
+            RemoveStatBonuses(equipment);
+            equippedItems.Remove(equipmentType);
+        }
+    }
+
+    // Method to apply stat bonuses
+    private void ApplyStatBonuses(Equipment equipment)
+    {
+        attackPower += equipment.attackBonus;
+        defensePower += equipment.defenseBonus;
+        // Add other stat bonuses as needed
+    }
+
+    // Method to remove stat bonuses
+    private void RemoveStatBonuses(Equipment equipment)
+    {
+        attackPower -= equipment.attackBonus;
+        defensePower -= equipment.defenseBonus;
+        // Remove other stat bonuses as needed
     }
 
 }
