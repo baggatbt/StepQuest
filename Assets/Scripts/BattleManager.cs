@@ -1111,11 +1111,11 @@ private void ProcessVictory()
 
       Stage completedStage = GameManager.Instance.CurrentBattleConfig.stage;
       GameManager.Instance.UnlockConnectedStages(completedStage);
-   // if (completedStage.isFirstCompletion)
-    {
-    //    PlayerData.Instance.currentStageIndex++;
-    //    completedStage.isFirstCompletion = false;
-    }
+      if (completedStage.isBossBattle)
+      {
+        GameManager.Instance.ResetStagesOnBossDefeat();
+      }
+  
     
     endOfBattlePanel.SetActive(true);
     DisplayExpToLevel(playerParty);

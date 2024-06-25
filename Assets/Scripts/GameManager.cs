@@ -60,6 +60,7 @@ public class GameManager : MonoBehaviour
             currentStageIndex = PlayerData.Instance.currentStageIndex; //Gets the current stage from PlayerData
             maxInventorySlots = 16;
             Debug.Log("Initial item list count: " + itemList.Count);
+            LoadUnlockedStages(); // Ensure this is called to initialize unlocked stages
 
             //Each companion has equal chance to be selected for attack, need to change so it uses the class's variable threat
             probabilityCompanion1 = 1f;
@@ -343,26 +344,22 @@ void OnEnable()
 
     foreach (Stage connectedStage in completedStage.connectedStages)
     {
-        if (connectedStage.stageID != null){
         if (!UnlockedStageNames.Contains(connectedStage.stageID))
         {
             Debug.Log($"Unlocking connected stage: {connectedStage.stageID}");
             UnlockedStageNames.Add(connectedStage.stageID);
+            connectedStage.isUnlocked = true;
+          //  connectedStage.UpdateButtonColor();
             hasUnlockedAny = true; // Indicate that a new stage has been unlocked
-        }
-        }
-        else
-        {
-            Debug.Log($"Stage already unlocked: {connectedStage.stageID}");
         }
     }
 
-    // If any new stages were unlocked, save the updated list
     if (hasUnlockedAny)
     {
         SaveUnlockedStages();
     }
 }
+
 
 private void SaveUnlockedStages()
 {
@@ -377,6 +374,34 @@ private void SaveUnlockedStages()
     PlayerPrefs.Save();
     Debug.Log("Unlocked stages saved.");
 }
+
+
+private void LoadUnlockedStages() {
+    string json = PlayerPrefs.GetString("UnlockedStages", "{}");
+    if (json != "{}") {
+        StageList stageList = JsonUtility.FromJson<StageList>(json);
+        UnlockedStageNames = new HashSet<string>(stageList.Stages);
+    } else {
+        // Setup default unlocked stages
+        UnlockedStageNames.Add("0"); // Default first stage unlocked
+    }
+}
+
+public void ResetStagesOnBossDefeat()
+{
+    // Clear all currently unlocked stages
+    UnlockedStageNames.Clear();
+
+    // Re-unlock the initial stage (assuming stage ID "0" is your initial stage ID)
+    UnlockedStageNames.Add("0");
+
+    // Optionally, force update UI or state of all stages if they are listening to changes
+   // UpdateAllStagesState();
+
+    // Save the updated stage unlocks
+    SaveUnlockedStages();
+}
+
 
 [System.Serializable]
 private class StageList

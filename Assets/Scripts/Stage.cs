@@ -4,17 +4,15 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-
-
 public class Stage : MonoBehaviour
 {
     public Button stageButton;
-    public BattleConfig stageBattleConfig;
-    public string battleSceneName = "TestPortraitBattle"; 
+    public string battleSceneName; 
     public bool isUnlocked;
-    public bool isFirstCompletion;
+    public bool isBossBattle;
+    public BattleConfig stageBattleConfig;
     public string stageID; // Unique identifier for the stage
-    public List<Stage> connectedStages; // Stages that get unlocked after completing this one
+    public List<Stage> connectedStages; // Add this line to define connected stages
 
     private void Start()
     {
@@ -25,28 +23,6 @@ public class Stage : MonoBehaviour
         
     }
 
-    
-    public void UpdateButtonColor()
-{
-    // Check if the stageButton is not null before accessing it
-    /*
-    if (stageButton != null)
-    {
-        if (isUnlocked)
-        {
-            stageButton.GetComponent<Image>().color = Color.green;
-        }
-        else
-        {
-            stageButton.GetComponent<Image>().color = Color.red;
-        }
-    }
-    */
-}
-
-
-
-
     private void OnStageButtonClicked()
     {
         if (isUnlocked)
@@ -55,4 +31,25 @@ public class Stage : MonoBehaviour
         SceneManager.LoadScene(battleSceneName); // Load the battle scene
         }
     }
+
+
+
+    public void Configure(StageConfig config)
+    {
+        this.stageID = config.stageID;
+        this.battleSceneName = config.battleSceneName;
+        this.isUnlocked = config.isUnlocked;
+
+        UpdateButtonAppearance();
+    }
+
+    public void UpdateButtonAppearance()
+    {
+        if (stageButton != null)
+        {
+            stageButton.interactable = isUnlocked;
+            stageButton.GetComponent<Image>().color = isUnlocked ? Color.green : Color.red;
+        }
+    }
+
 }
