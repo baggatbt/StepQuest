@@ -179,8 +179,44 @@ public class MainMenuUIManager : MonoBehaviour
         }
     }
 }
+    public GameObject heroSelectPanel;
 
-            public SkillPanelController skillPanelController;
+    public void SetActiveSelectPanel()
+    {
+        heroSelectPanel.SetActive(true);
+        OpenSelectHeroList();
+    }
+    public void OpenSelectHeroList()
+    {
+         GameObject companionButtonContainer = GameObject.Find("Companion Selection Container"); // Find or reference directly
+
+        // Clear existing buttons to avoid duplicates
+        foreach (Transform child in companionButtonContainer.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        HashSet<string> addedCompanions = new HashSet<string>(); // To track added companions
+
+        foreach (Companion companion in GameManager.Instance.companions)
+        {
+            if (companion.isUnlocked && addedCompanions.Add(companion.heroID)) // Checks if heroID is not already added
+            {
+                // Instantiate the button within the container
+                GameObject buttonObject = Instantiate(companionButtonPrefab, companionButtonContainer.transform);
+
+                // Find components
+                Image heroIconImage = buttonObject.transform.Find("Background/HeroIconBorder/HeroIcon")?.GetComponent<Image>();
+
+                 if (heroIconImage != null && companion.heroIcon != null)
+            {
+                heroIconImage.sprite = companion.heroIcon;
+            }
+            }
+        }
+    }
+
+ public SkillPanelController skillPanelController;
 
 public void OpenSkillPanel()
 {   
