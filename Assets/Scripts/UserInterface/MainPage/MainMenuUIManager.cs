@@ -179,6 +179,7 @@ public class MainMenuUIManager : MonoBehaviour
         }
     }
 }
+    public GameObject heroSpriteIconButton;
     public GameObject heroSelectPanel;
 
     public void SetActiveSelectPanel()
@@ -186,35 +187,51 @@ public class MainMenuUIManager : MonoBehaviour
         heroSelectPanel.SetActive(true);
         OpenSelectHeroList();
     }
-    public void OpenSelectHeroList()
+  public void OpenSelectHeroList()
+{
+    GameObject companionButtonContainer = GameObject.Find("Companion Selection Container"); // Find or reference directly
+
+    // Clear existing buttons to avoid duplicates
+    foreach (Transform child in companionButtonContainer.transform)
     {
-         GameObject companionButtonContainer = GameObject.Find("Companion Selection Container"); // Find or reference directly
+        Destroy(child.gameObject);
+    }
 
-        // Clear existing buttons to avoid duplicates
-        foreach (Transform child in companionButtonContainer.transform)
+    HashSet<string> addedCompanions = new HashSet<string>(); // To track added companions
+
+    foreach (Companion companion in GameManager.Instance.companions)
+    {
+        if (companion.isUnlocked && addedCompanions.Add(companion.heroID)) // Checks if heroID is not already added
         {
-            Destroy(child.gameObject);
-        }
+            // Instantiate the button within the container
+            GameObject buttonObject = Instantiate(heroSpriteIconButton, companionButtonContainer.transform);
 
-        HashSet<string> addedCompanions = new HashSet<string>(); // To track added companions
-
-        foreach (Companion companion in GameManager.Instance.companions)
-        {
-            if (companion.isUnlocked && addedCompanions.Add(companion.heroID)) // Checks if heroID is not already added
+            // Find components
+            Transform heroIconTransform = buttonObject.transform.Find("heroSpriteIcon");
+            if (heroIconTransform == null)
             {
-                // Instantiate the button within the container
-                GameObject buttonObject = Instantiate(companionButtonPrefab, companionButtonContainer.transform);
+                Debug.LogError("heroSpriteIcon child not found in the instantiated button prefab.");
+                continue; // Skip to the next companion
+            }
 
-                // Find components
-                Image heroIconImage = buttonObject.transform.Find("Background/HeroIconBorder/HeroIcon")?.GetComponent<Image>();
-
-                 if (heroIconImage != null && companion.heroIcon != null)
+            Image heroIconImage = heroIconTransform.GetComponent<Image>();
+            if (heroIconImage == null)
             {
-                heroIconImage.sprite = companion.heroIcon;
+                Debug.LogError("Image component not found on heroSpriteIcon.");
+                continue; // Skip to the next companion
             }
+
+            if (companion.heroIcon == null)
+            {
+                Debug.LogError("companion.heroIcon is null for companion: " + companion.heroID);
+                continue; // Skip to the next companion
             }
+
+            heroIconImage.sprite = companion.heroIcon;
+            Debug.Log("Successfully assigned heroIcon for companion: " + companion.heroID);
         }
     }
+}
 
  public SkillPanelController skillPanelController;
 
