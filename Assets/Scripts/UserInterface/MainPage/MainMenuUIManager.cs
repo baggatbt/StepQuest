@@ -179,7 +179,7 @@ public class MainMenuUIManager : MonoBehaviour
         }
     }
 }
-    public GameObject heroSpriteIconButton;
+    //public GameObject heroSpriteIconButton;
     public GameObject heroSelectPanel;
 
     public void SetActiveSelectPanel()
@@ -187,9 +187,19 @@ public class MainMenuUIManager : MonoBehaviour
         heroSelectPanel.SetActive(true);
         OpenSelectHeroList();
     }
-  public void OpenSelectHeroList()
+
+
+    //For the dungeons
+    [SerializeField] private GameObject heroSpriteIconButtonPrefab; // Drag your button prefab here in the inspector
+
+    public void OpenSelectHeroList()
 {
-    GameObject companionButtonContainer = GameObject.Find("Companion Selection Container"); // Find or reference directly
+    GameObject companionButtonContainer = GameObject.Find("Companion Selection Container");
+    if (!companionButtonContainer)
+    {
+        Debug.LogError("Companion Selection Container not found in the scene.");
+        return;
+    }
 
     // Clear existing buttons to avoid duplicates
     foreach (Transform child in companionButtonContainer.transform)
@@ -197,41 +207,105 @@ public class MainMenuUIManager : MonoBehaviour
         Destroy(child.gameObject);
     }
 
-    HashSet<string> addedCompanions = new HashSet<string>(); // To track added companions
+    HashSet<string> addedCompanions = new HashSet<string>(); // To track added companions to avoid duplicates
 
+    // Iterate over the full companions list from GameManager
     foreach (Companion companion in GameManager.Instance.companions)
     {
-        if (companion.isUnlocked && addedCompanions.Add(companion.heroID)) // Checks if heroID is not already added
+        if (companion.isUnlocked && addedCompanions.Add(companion.heroID)) // Check if unlocked and not already added
         {
             // Instantiate the button within the container
-            GameObject buttonObject = Instantiate(heroSpriteIconButton, companionButtonContainer.transform);
+            GameObject buttonObject = Instantiate(heroSpriteIconButtonPrefab, companionButtonContainer.transform);
 
-            // Find components
-            Transform heroIconTransform = buttonObject.transform.Find("heroSpriteIcon");
-            if (heroIconTransform == null)
-            {
-                Debug.LogError("heroSpriteIcon child not found in the instantiated button prefab.");
-                continue; // Skip to the next companion
-            }
-
-            Image heroIconImage = heroIconTransform.GetComponent<Image>();
-            if (heroIconImage == null)
-            {
-                Debug.LogError("Image component not found on heroSpriteIcon.");
-                continue; // Skip to the next companion
-            }
-
-            if (companion.heroIcon == null)
-            {
-                Debug.LogError("companion.heroIcon is null for companion: " + companion.heroID);
-                continue; // Skip to the next companion
-            }
-
-            heroIconImage.sprite = companion.heroIcon;
-            Debug.Log("Successfully assigned heroIcon for companion: " + companion.heroID);
+            // Setup the hero icon
+            SetupHeroIcon(buttonObject, companion);
         }
     }
 }
+
+
+    private void SetupHeroIcon(GameObject buttonObject, Companion companion)
+{
+    Image heroIconImage = buttonObject.GetComponentInChildren<Image>();
+    if (heroIconImage == null)
+    {
+        Debug.LogError("Image component not found in button prefab.");
+        return;
+    }
+
+    if (companion.heroIcon == null)
+    {
+        Debug.LogError("companion.heroIcon is null for companion: " + companion.heroID);
+        return;
+    }
+
+    heroIconImage.sprite = companion.heroIcon;
+
+    Button button = buttonObject.GetComponent<Button>();
+    if (button != null)
+    {
+        button.onClick.AddListener(() => AddToParty(companion));
+    }
+    else
+    {
+        Debug.LogError("Button component not found on the hero icon button prefab.");
+    }
+}
+
+private void AddToParty(Companion companion)
+{
+    if (GameManager.Instance.currentParty.Count < 2) // Check if there is space in the party
+    {
+        if (!GameManager.Instance.currentParty.Contains(companion))
+        {
+            GameManager.Instance.currentParty.Add(companion);
+            Debug.Log("Added to party: " + companion.heroID);
+            ShowPartyMembers(); // Update UI to reflect changes
+        }
+        else
+        {
+            Debug.Log("Companion already in party: " + companion.heroID);
+        }
+    }
+    else
+    {
+        Debug.LogError("Party is full. Cannot add more companions.");
+    }
+}
+
+
+public GameObject heroSlotOne;
+public GameObject heroSlotTwo;
+[SerializeField] private Sprite defaultHeroSprite; //The border they sit in
+
+private void ShowPartyMembers()
+{
+    Image heroSlotOneImage = heroSlotOne.GetComponent<Image>();
+    Image heroSlotTwoImage = heroSlotTwo.GetComponent<Image>();
+
+    if (heroSlotOneImage == null || heroSlotTwoImage == null)
+    {
+        Debug.LogError("One or both hero slots do not have an Image component.");
+        return;
+    }
+
+    // Reset slot images to default sprite
+    heroSlotOneImage.sprite = defaultHeroSprite;
+    heroSlotTwoImage.sprite = defaultHeroSprite;
+
+    // Assign icons to slots based on current party members
+    if (GameManager.Instance.currentParty.Count > 0)
+    {
+        heroSlotOneImage.sprite = GameManager.Instance.currentParty[0].heroIcon;
+    }
+    if (GameManager.Instance.currentParty.Count > 1)
+    {
+        heroSlotTwoImage.sprite = GameManager.Instance.currentParty[1].heroIcon;
+    }
+}
+
+
+
 
  public SkillPanelController skillPanelController;
 
