@@ -28,7 +28,7 @@ public class GameManager : MonoBehaviour
 
     public List<Item> itemList = new List<Item>(); //Items player has
     public int maxInventorySlots = 16;
-    
+    public List<Companion> currentParty = new List<Companion>();
     
 
     public int currentStageIndex;

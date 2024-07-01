@@ -19540,14 +19540,14 @@ RectTransform:
   m_GameObject: {fileID: 585382006}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 0.99999994, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1558189080}
   - {fileID: 764926378}
   - {fileID: 145633723}
   m_Father: {fileID: 1091708940}
-  m_RootOrder: 1
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -22601,7 +22601,7 @@ RectTransform:
   - {fileID: 3219912768761417507}
   - {fileID: 424937110}
   m_Father: {fileID: 1091708940}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -22769,6 +22769,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 023e4bd9727a6744b820c88789971e35, type: 2}
   itemList: []
   maxInventorySlots: 16
+  currentParty: []
   currentStageIndex: 0
   allStages:
   - poolName: Forest
@@ -31091,7 +31092,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1078800210
 RectTransform:
   m_ObjectHideFlags: 0
@@ -31331,9 +31332,9 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1799933554}
-  - {fileID: 585382007}
   - {fileID: 722691540}
   - {fileID: 1687866858}
+  - {fileID: 585382007}
   - {fileID: 1509396037}
   m_Father: {fileID: 172172395}
   m_RootOrder: 1
@@ -42827,11 +42828,11 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1091708940}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.69931966, y: 0.2413572}
   m_AnchorMax: {x: 0.8304821, y: 0.3018595}
-  m_AnchoredPosition: {x: -718.00006, y: -346}
+  m_AnchoredPosition: {x: -718, y: -346.00006}
   m_SizeDelta: {x: 7.7876587, y: -16.136932}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1687866859

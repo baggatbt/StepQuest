@@ -778,7 +778,7 @@ private void UpdateCompanionStatsDisplay(Companion companion)
 
     public void openCompanionInterface()
     {
-        companionGUI.SetActive(true);
+       // companionGUI.SetActive(true);
     }
 
     public void closeCompanionInterface()

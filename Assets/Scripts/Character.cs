@@ -398,6 +398,19 @@ public class Character : MonoBehaviour
     Time.timeScale = 1f; // Resumes the game time
 }
 
+    public void SlowTime(float newTimeScale)
+    {
+        Time.timeScale = newTimeScale;  // Adjust the value to what feels right for the effect
+        Time.fixedDeltaTime = 0.02f * Time.timeScale;  // Keep physics simulation smooth
+    }
+
+    // Function to normalize time
+    public void NormalizeTime()
+    {
+        Time.timeScale = 1.0f;
+        Time.fixedDeltaTime = 0.02f;  // Reset to default fixed delta time
+    }
+
 
     public void animationDamageTiming()
 {
