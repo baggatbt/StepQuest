@@ -144,7 +144,7 @@ public class BattleManager : MonoBehaviour
         BattleConfig config = GameManager.Instance.CurrentBattleConfig;
         if (config != null)
         {
-         //   StartBattle(config);
+           StartBattle(config);
         }
         else
         {
