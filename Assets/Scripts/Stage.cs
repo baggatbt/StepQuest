@@ -7,32 +7,29 @@ using UnityEngine.SceneManagement;
 public class Stage : MonoBehaviour
 {
     public Button stageButton;
-    public string battleSceneName; 
+    public string battleSceneName;
     public bool isUnlocked;
     public bool isBossBattle;
     public BattleConfig stageBattleConfig;
-    public string stageID; // Unique identifier for the stage
-    public List<Stage> connectedStages; // Add this line to define connected stages
+    public string stageID;
+    public List<Stage> connectedStages;
 
     private void Start()
     {
-         stageButton.onClick.AddListener(OnStageButtonClicked);
-        // Initialize the unlocked state based on GameManager's data
+        stageButton.onClick.AddListener(OnStageButtonClicked);
         isUnlocked = GameManager.Instance.UnlockedStageNames.Contains(this.stageID);
-       // UpdateButtonColor();
-        
     }
 
     private void OnStageButtonClicked()
     {
         if (isUnlocked)
         {
-        GameManager.Instance.CurrentBattleConfig = stageBattleConfig; // Store the config in the GameManager
-        SceneManager.LoadScene(battleSceneName); // Load the battle scene
+            stageBattleConfig.currentParty = new List<Companion>(GameManager.Instance.currentParty);
+            GameManager.Instance.CurrentBattleConfig = stageBattleConfig;
+          //  GameManager.Instance.SaveAllCompanions(); // Save companion data before switching scenes
+            SceneManager.LoadScene(battleSceneName);
         }
     }
-
-
 
     public void Configure(StageConfig config)
     {
@@ -51,5 +48,4 @@ public class Stage : MonoBehaviour
             stageButton.GetComponent<Image>().color = isUnlocked ? Color.green : Color.red;
         }
     }
-
 }

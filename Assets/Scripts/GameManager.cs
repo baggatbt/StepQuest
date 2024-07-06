@@ -102,6 +102,7 @@ public class GameManager : MonoBehaviour
     {
         ReassignInventoryComponent();
         LoadAllCompanionData();
+        //companion.LoadCharacterData();
     }
 
     private void ReassignInventoryComponent()

@@ -2547,6 +2547,7 @@ MonoBehaviour:
     maxEnemiesToSpawn: 0
     levelOfEnemies: 0
     stage: {fileID: 0}
+    currentParty: []
   stageID: 0
   connectedStages: []
 --- !u!114 &121382715
@@ -4848,6 +4849,105 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 175051599}
   m_CullTransparentMesh: 1
+--- !u!1 &178813140
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 178813142}
+  - component: {fileID: 178813141}
+  m_Layer: 0
+  m_Name: KnightReference
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &178813141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 178813140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 102bb4db4df8f474aa531fee7fd2e77c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  level: 0
+  health: 0
+  maxHealth: 0
+  characterIDNumber: 
+  isSelected: 0
+  energy: 0
+  maxEnergy: 0
+  teamEnergy: 0
+  attackPower: 0
+  defensePower: 0
+  defensePenetration: 0
+  enemyDamageReductionModifier: 0
+  speed: 0
+  healthBar: {fileID: 0}
+  energyBar: {fileID: 0}
+  attackTarget: {fileID: 0}
+  originalPosition: {x: 0, y: 0, z: 0}
+  isAttacking: 0
+  isFront: 0
+  spriteRenderer: {fileID: 0}
+  animator: {fileID: 0}
+  healthText: {fileID: 0}
+  energyText: {fileID: 0}
+  hasNotGone: 0
+  isMoving: 0
+  attackTrigger: 0
+  animationEnded: 0
+  didBlock: 0
+  attacksBeforeSpecial: 0
+  enemyHealthUI: {fileID: 0}
+  damageReflectionPercentage: 0
+  statusEffectController: {fileID: 0}
+  cameraShake: {fileID: 0}
+  isAnimationDone: 0
+  currentBarrier: {fileID: 0}
+  animationDamageTime: 0
+  enemyDeathEffect: {fileID: 0}
+  audioSource: {fileID: 0}
+  hitSound: {fileID: 0}
+  criticalHitSound: {fileID: 0}
+  availableSkills: 
+  heroID: 
+  heroLevel: 0
+  heroExp: 0
+  skillTreePanel: {fileID: 0}
+  heroIcon: {fileID: 0}
+  fullHeroImage: {fileID: 0}
+  heroStatPoints: 0
+  heroSkillPoints: 0
+  stamina: 0
+  maxStamina: 0
+  isUnlocked: 0
+  atkGrowth: 0
+  healthGrowth: 0
+  energyGrowth: 0
+--- !u!4 &178813142
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 178813140}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 728042707}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &183317685
 GameObject:
   m_ObjectHideFlags: 0
@@ -5629,6 +5729,7 @@ MonoBehaviour:
     maxEnemiesToSpawn: 1
     levelOfEnemies: 1
     stage: {fileID: 0}
+    currentParty: []
   stageID: 0
   connectedStages: []
 --- !u!1 &192894865
@@ -22769,21 +22870,25 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 023e4bd9727a6744b820c88789971e35, type: 2}
   itemList: []
   maxInventorySlots: 16
-  currentParty: []
+  currentParty:
+  - {fileID: 178813141}
   currentStageIndex: 0
   allStages:
   - poolName: Forest
     maxEnemiesToSpawn: 1
     levelOfEnemies: 1
     stage: {fileID: 0}
+    currentParty: []
   - poolName: Forest
     maxEnemiesToSpawn: 2
     levelOfEnemies: 1
     stage: {fileID: 0}
+    currentParty: []
   - poolName: ForestElite
     maxEnemiesToSpawn: 1
     levelOfEnemies: 1
     stage: {fileID: 0}
+    currentParty: []
   companions: []
   knight: {fileID: 0}
   wizard: {fileID: 1956162160}
@@ -22804,7 +22909,8 @@ Transform:
   m_LocalPosition: {x: 512.2601, y: 343.3782, z: 64.826225}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 178813142}
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -37813,6 +37919,7 @@ MonoBehaviour:
     maxEnemiesToSpawn: 0
     levelOfEnemies: 0
     stage: {fileID: 0}
+    currentParty: []
   stageID: 0
   connectedStages: []
 --- !u!114 &1379323795
@@ -47306,6 +47413,7 @@ MonoBehaviour:
     maxEnemiesToSpawn: 0
     levelOfEnemies: 0
     stage: {fileID: 0}
+    currentParty: []
   stageID: 0
   connectedStages: []
 --- !u!114 &1910094592

@@ -121,7 +121,7 @@ public class BattleManager : MonoBehaviour
 
     private void Awake()
     {
-        companionSpawnController.CreateHeroSelectionUI();
+       // companionSpawnController.CreateHeroSelectionUI();
     }
     public bool isBattleStarted = false;
    private void Start()
@@ -144,7 +144,7 @@ public class BattleManager : MonoBehaviour
         BattleConfig config = GameManager.Instance.CurrentBattleConfig;
         if (config != null)
         {
-           StartBattle(config);
+         //   StartBattle(config);
         }
         else
         {

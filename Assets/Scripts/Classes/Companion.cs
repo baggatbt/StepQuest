@@ -4,8 +4,9 @@ using UnityEngine;
 using System;
 using System.Linq;
 
+[Serializable]
 public abstract class Companion : Character
-{   
+{
     [SerializeField]
     protected List<SkillType> availableSkills = new List<SkillType>();
     protected List<SkillType> lockedSkills = new List<SkillType>();
@@ -30,28 +31,20 @@ public abstract class Companion : Character
     public int atkGrowth;
     public int healthGrowth;
     public int energyGrowth;
+
     public Dictionary<string, int> statUpgradeProgress = new Dictionary<string, int>
     {
         {"atk", 0},
         {"hp", 0},
         {"spd", 0},
         {"sp",0}
-        
     };
+
     public Dictionary<EquipmentType, Equipment> equippedItems = new Dictionary<EquipmentType, Equipment>();
 
-
-
-
-    
-    //public Sprite companionIcon; // Icon associated with the companion
-
-    
-    
     [Serializable]
     public struct SerializableCharacterData
     {
-      //  public int level;
         public int health;
         public int maxHealth;
         public int energy;
@@ -68,50 +61,37 @@ public abstract class Companion : Character
         public int heroExp;
         public int stamina;
         public int maxStamina;
-        
     }
 
     public int expToLevel
-{
-    get
     {
-        
-        return ExpToNextLevel(heroLevel);
+        get
+        {
+            return ExpToNextLevel(heroLevel);
+        }
     }
-}
 
-
-
-    //abstract LevelUp method
     public abstract void LevelUp();
-
     public abstract void InitializeSkillsBasedOnLevel();
 
     public void UnlockSkill(SkillType skillType)
     {
-        // Check if the skill exists in the LockedSkills list
         if (LockedSkills.Contains(skillType))
         {
-            // Remove the skill from LockedSkills
             LockedSkills.Remove(skillType);
-
-            // Add the skill to AvailableSkills
             AvailableSkills.Add(skillType);
-
-            Debug.Log(skillType.ToString() + " unlocked."); // Log that the skill is unlocked
+            Debug.Log(skillType.ToString() + " unlocked.");
         }
         else
         {
-            Debug.LogError(skillType.ToString() + " is not in the LockedSkills list."); // Log an error if the skill is not found in LockedSkills
+            Debug.LogError(skillType.ToString() + " is not in the LockedSkills list.");
         }
     }
 
-    
     public void SaveCharacterData()
     {
         SerializableCharacterData data = new SerializableCharacterData
         {
-            //level = this.level,
             health = this.health,
             maxHealth = this.maxHealth,
             maxEnergy = this.maxEnergy,
@@ -124,8 +104,7 @@ public abstract class Companion : Character
             heroSkillPoints = this.heroSkillPoints,
             heroStatPoints = this.heroStatPoints,
             stamina = this.stamina,
-            maxStamina = this.maxStamina,
-            
+            maxStamina = this.maxStamina
         };
         Debug.Log("saved stamina" + stamina);
         string jsonData = JsonUtility.ToJson(data);
@@ -134,74 +113,56 @@ public abstract class Companion : Character
     }
 
     public void LoadCharacterData()
-{
-    string jsonData = PlayerPrefs.GetString("CharacterData_" + heroID, "{}");
-    if (jsonData != "{}") // Check if jsonData is not empty
     {
-        SerializableCharacterData data = JsonUtility.FromJson<SerializableCharacterData>(jsonData);
-
-       // this.level = data.level;
-        this.health = data.health;
-        this.maxHealth = data.maxHealth;
-        this.maxEnergy = data.maxEnergy; 
-        this.attackPower = data.attackPower; 
-        this.defensePower = data.defensePower; 
-        this.defensePenetration = data.defensePenetration; 
-        this.speed = data.speed; 
-        this.heroLevel = data.heroLevel;
-        this.heroExp = data.heroExp;
-        this.heroStatPoints = data.heroStatPoints;
-        this.heroSkillPoints = data.heroSkillPoints;
-        this.stamina = data.stamina;
-        this.maxStamina = data.maxStamina;
+        string jsonData = PlayerPrefs.GetString("CharacterData_" + heroID, "{}");
+        if (jsonData != "{}")
+        {
+            SerializableCharacterData data = JsonUtility.FromJson<SerializableCharacterData>(jsonData);
+            this.health = data.health;
+            this.maxHealth = data.maxHealth;
+            this.maxEnergy = data.maxEnergy;
+            this.attackPower = data.attackPower;
+            this.defensePower = data.defensePower;
+            this.defensePenetration = data.defensePenetration;
+            this.speed = data.speed;
+            this.heroLevel = data.heroLevel;
+            this.heroExp = data.heroExp;
+            this.heroStatPoints = data.heroStatPoints;
+            this.heroSkillPoints = data.heroSkillPoints;
+            this.stamina = data.stamina;
+            this.maxStamina = data.maxStamina;
+        }
+        else
+        {
+            this.stamina = 10;
+            this.maxStamina = 10;
+        }
     }
-    else // Set default values if there is no data
-    {
-        this.stamina = 10;
-        this.maxStamina = 10;
-    }
-}
-
 
     public void DeleteCharacterData()
-{
-    string key = "CharacterData_" + this.name;
-    if (PlayerPrefs.HasKey(key))
     {
-        PlayerPrefs.DeleteKey(key);
-        Debug.Log("Deleted data for " + this.name);
+        string key = "CharacterData_" + this.name;
+        if (PlayerPrefs.HasKey(key))
+        {
+            PlayerPrefs.DeleteKey(key);
+            Debug.Log("Deleted data for " + this.name);
+        }
+        else
+        {
+            Debug.Log("No data found for " + this.name);
+        }
     }
-    else
-    {
-        Debug.Log("No data found for " + this.name);
-    }
-}
-
 
     public int ExpToNextLevel(int heroLevel)
-{
-    Debug.Log("EXP to level : " + (30 * heroLevel * heroLevel));
-    //TEMP
-     return 30 * heroLevel * heroLevel;
-    /*
-    if (heroLevel < 100)
     {
-        // For levels 1-100, use a quadratic polynomial formula
+        Debug.Log("EXP to level : " + (30 * heroLevel * heroLevel));
         return 30 * heroLevel * heroLevel;
     }
-    
-    else
-    {
-        // Beyond level 20, use an exponential model to steeply increase EXP requirements
-        return (int)(100 * Math.Pow(1.5, heroLevel - 19) * 400);
-    }
-    */
-}
 
     public void RecoverHealth(int amount)
     {
         health += amount;
-        health = Mathf.Clamp(health, 0, maxHealth); // Ensure health doesn't exceed maxHealth
+        health = Mathf.Clamp(health, 0, maxHealth);
     }
 
     public void RecoverEnergy(int amount)
@@ -216,21 +177,16 @@ public abstract class Companion : Character
         }
     }
 
-    
-
-    // Method to equip an item
     public void EquipItem(Equipment equipment)
     {
         if (equippedItems.ContainsKey(equipment.equipmentType))
         {
             UnequipItem(equipment.equipmentType);
         }
-
         equippedItems[equipment.equipmentType] = equipment;
         ApplyStatBonuses(equipment);
     }
 
-    // Method to unequip an item
     public void UnequipItem(EquipmentType equipmentType)
     {
         if (equippedItems.ContainsKey(equipmentType))
@@ -241,24 +197,15 @@ public abstract class Companion : Character
         }
     }
 
-    // Method to apply stat bonuses
     private void ApplyStatBonuses(Equipment equipment)
     {
         attackPower += equipment.attackBonus;
         defensePower += equipment.defenseBonus;
-        // Add other stat bonuses as needed
     }
 
-    // Method to remove stat bonuses
     private void RemoveStatBonuses(Equipment equipment)
     {
         attackPower -= equipment.attackBonus;
         defensePower -= equipment.defenseBonus;
-        // Remove other stat bonuses as needed
     }
-
 }
-
-   
-
-

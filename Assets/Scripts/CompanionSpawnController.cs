@@ -23,10 +23,42 @@ public class CompanionSpawnController : MonoBehaviour
     public List<Character> activeCompanions = new List<Character>();
 
 
-    private void Start()
+     void Start()
+{
+    // Add all companions from GameManager.Instance.currentParty to activeCompanions
+    if (GameManager.Instance != null && GameManager.Instance.currentParty != null)
     {
-        
+        foreach (Companion companion in GameManager.Instance.currentParty)
+        {
+            // Instantiate the companion based on heroID
+            Character instantiatedCompanion = GameManager.Instance.InstantiateSelectedCompanion(companion.heroID);
+            Companion instantiatedCompanionAsCompanion = instantiatedCompanion as Companion;
+            
+            if (instantiatedCompanionAsCompanion != null)
+            {
+                // Initialize skills based on level
+                instantiatedCompanionAsCompanion.InitializeSkillsBasedOnLevel();
+                
+                // Perform any setup needed for the companion
+                SetupSelectedCompanion(instantiatedCompanion);
+                
+                // Assign the companion to active companions list
+                activeCompanions.Add(instantiatedCompanionAsCompanion);
+                
+                // Enable UI for the hero
+                EnableHeroUI(instantiatedCompanionAsCompanion);
+                
+                // Mark as selected
+                instantiatedCompanionAsCompanion.isSelected = true;
+            }
+        }
     }
+    else
+    {
+        Debug.LogWarning("GameManager or currentParty is null.");
+    }
+}
+
 
     public void SetupCompanion(Character companionCharacter)
 {
