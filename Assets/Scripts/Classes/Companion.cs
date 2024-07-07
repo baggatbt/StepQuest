@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 using System.Linq;
 
-[Serializable]
+
 public abstract class Companion : Character
 {
     [SerializeField]

@@ -26,7 +26,7 @@ public class Stage : MonoBehaviour
         {
             stageBattleConfig.currentParty = new List<Companion>(GameManager.Instance.currentParty);
             GameManager.Instance.CurrentBattleConfig = stageBattleConfig;
-          //  GameManager.Instance.SaveAllCompanions(); // Save companion data before switching scenes
+            GameManager.Instance.SaveCurrentParty();
             SceneManager.LoadScene(battleSceneName);
         }
     }

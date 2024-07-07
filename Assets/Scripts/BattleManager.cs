@@ -135,7 +135,8 @@ public class BattleManager : MonoBehaviour
     activePlayerIndicator.SetActive(false);
     innerCircle.SetActive(false);
     
-
+     GameManager.Instance.LoadCurrentParty();
+        SetupBattle(GameManager.Instance.currentParty);
     // Cache the components
     expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
     goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
@@ -182,6 +183,37 @@ Debug.Log("Companions: " + GameManager.Instance.companions);
         }
     }
 }
+    public GameObject knightPrefab;
+
+    private void SetupSelectedCompanion(Companion companion)
+    {
+        // Set up the companion (e.g., position, stats, etc.)
+        
+        playerParty.Add(companion);
+        companion.gameObject.SetActive(true);
+    }
+    private Character InstantiateCompanion(string heroID)
+    {
+        if (heroID == "Knight")
+        {
+            return Instantiate(knightPrefab).GetComponent<Knight>();
+        }
+        return null;
+    }
+    public void SetupBattle(List<Companion> currentParty)
+    {
+        foreach (var companion in currentParty)
+        {
+            Character instantiatedCompanion = InstantiateCompanion(companion.heroID);
+            if (instantiatedCompanion is Companion instantiatedCompanionAsCompanion)
+            {
+                instantiatedCompanionAsCompanion.InitializeSkillsBasedOnLevel();
+                companionSpawnController.SetupSelectedCompanion(instantiatedCompanionAsCompanion);
+                companionSpawnController.EnableHeroUI(instantiatedCompanionAsCompanion);
+                instantiatedCompanionAsCompanion.isSelected = true;
+            }
+        }
+    }
     public Button nextBattleButton;
     
     /*

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 //Storing and managing game states across scenes
 public class GameManager : MonoBehaviour
@@ -20,7 +21,7 @@ public class GameManager : MonoBehaviour
     public Character companion3;
     public Companion currentCompanion; //Used to expose the selected companion 
     public Inventory inventory;
-     public EquipmentManager equipmentManager; // Reference to the EquipmentManager
+    public EquipmentManager equipmentManager; // Reference to the EquipmentManager
 
     // Centralized item list managed by GameManager
     [SerializeField]
@@ -29,11 +30,10 @@ public class GameManager : MonoBehaviour
     public List<Item> itemList = new List<Item>(); //Items player has
     public int maxInventorySlots = 16;
     public List<Companion> currentParty = new List<Companion>();
-    
 
     public int currentStageIndex;
     private bool isUnlocked;
-     public List<BattleConfig> allStages; // list is populated with all stages in order
+    public List<BattleConfig> allStages; // list is populated with all stages in order
 
     public List<Companion> companions = new List<Companion>();
 
@@ -51,7 +51,6 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        
         if (Instance == null)
         {
             Instance = this;
@@ -66,28 +65,81 @@ public class GameManager : MonoBehaviour
             probabilityCompanion1 = 1f;
             probabilityCompanion2 = 1f;
             probabilityCompanion3 = 1f;
-            
-           
+
             Debug.Log(PlayerData.Instance.firstTimeLogin);
-           if (PlayerData.Instance.firstTimeLogin)
-        {
-           
-        }
+            if (PlayerData.Instance.firstTimeLogin)
+            {
+                // Handle first-time login logic
+            }
         }
         else
         {
             Destroy(gameObject);
         }
-         Application.targetFrameRate = 60;  // Set target frame rate to 60 FPS.
-         
+        Application.targetFrameRate = 60;  // Set target frame rate to 60 FPS.
+    }
+
+    [Serializable]
+    private class SerializableCompanionData
+    {
+        public string type;
+        public string json;
+    }
+
+    public void SaveCurrentParty()
+    {
+        List<SerializableCompanionData> companionDataList = new List<SerializableCompanionData>();
+        foreach (var companion in currentParty)
+        {
+            SerializableCompanionData data = new SerializableCompanionData
+            {
+                type = companion.GetType().AssemblyQualifiedName,
+                json = JsonUtility.ToJson(companion)
+            };
+            companionDataList.Add(data);
+        }
+        string json = JsonUtility.ToJson(new SerializableList<SerializableCompanionData>(companionDataList));
+        PlayerPrefs.SetString("CurrentParty", json);
+        PlayerPrefs.Save();
+    }
+
+    public void LoadCurrentParty()
+    {
+        currentParty.Clear();
+        string json = PlayerPrefs.GetString("CurrentParty", "{}");
+        SerializableList<SerializableCompanionData> companionDataList = JsonUtility.FromJson<SerializableList<SerializableCompanionData>>(json);
+
+        foreach (var data in companionDataList.Items)
+        {
+            Type type = Type.GetType(data.type);
+            if (type != null)
+            {
+                Companion companion = JsonUtility.FromJson(data.json, type) as Companion;
+                if (companion != null)
+                {
+                    currentParty.Add(companion);
+                }
+            }
+        }
+    }
+
+    [Serializable]
+    private class SerializableList<T>
+    {
+        public List<T> Items;
+
+        public SerializableList(List<T> items)
+        {
+            Items = items;
+        }
     }
 
     private void Start()
     {
-         TimerManager.Instance.OnTimerCompleted += HandleTimerCompletion;
-         TimerManager.Instance.SetPeriodicTimer("StaminaIncrement", 1);  // 1800 seconds = 30 minutes
+        TimerManager.Instance.OnTimerCompleted += HandleTimerCompletion;
+        TimerManager.Instance.SetPeriodicTimer("StaminaIncrement", 1);  // 1800 seconds = 30 minutes
 
-         LoadInventory();  
+        LoadInventory();  
     }
 
     private void HandleTimerCompletion(string timerId)
@@ -98,37 +150,35 @@ public class GameManager : MonoBehaviour
         }
     }
 
-        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         ReassignInventoryComponent();
         LoadAllCompanionData();
-        //companion.LoadCharacterData();
     }
 
     private void ReassignInventoryComponent()
-{
-    GameObject inventoryPanel = GameObject.Find("Inventory Panel");
-    if (inventoryPanel != null)
     {
-        inventory = inventoryPanel.GetComponent<Inventory>();
-        if (inventory != null)
+        GameObject inventoryPanel = GameObject.Find("Inventory Panel");
+        if (inventoryPanel != null)
         {
-            Debug.Log("Inventory component reassigned successfully.");
-            inventory.UpdateInventoryUI();  // Optionally update UI here if it's safe to do so
+            inventory = inventoryPanel.GetComponent<Inventory>();
+            if (inventory != null)
+            {
+                Debug.Log("Inventory component reassigned successfully.");
+                inventory.UpdateInventoryUI();  // Optionally update UI here if it's safe to do so
+            }
+            else
+            {
+                Debug.LogError("Failed to find Inventory component on the Inventory Panel.");
+            }
         }
         else
         {
-            Debug.LogError("Failed to find Inventory component on the Inventory Panel.");
+            Debug.Log("Inventory Panel not found in the scene. This may be expected in some scenes.");
         }
     }
-    else
-    {
-        Debug.Log("Inventory Panel not found in the scene. This may be expected in some scenes.");
-    }
-}
 
-
-void OnEnable()
+    void OnEnable()
     {
         Debug.Log("SceneManagement is enabled and registering to sceneLoaded event.");
         SceneManager.sceneLoaded += OnSceneLoaded;
@@ -140,30 +190,25 @@ void OnEnable()
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-
-    
-
     public void LoadAllItems()
-{
-    // Assuming all item prefabs are stored under a Resources/Items directory
-    Item[] items = Resources.LoadAll<Item>("Items");
-    itemList = new List<Item>(items);
-
-    if (itemList == null || itemList.Count == 0)
     {
-        Debug.LogError("Failed to load items or no items available.");
-        return;
+        // Assuming all item prefabs are stored under a Resources/Items directory
+        Item[] items = Resources.LoadAll<Item>("Items");
+        itemList = new List<Item>(items);
+
+        if (itemList == null || itemList.Count == 0)
+        {
+            Debug.LogError("Failed to load items or no items available.");
+            return;
+        }
+
+        foreach (Item item in itemList)
+        {
+            Debug.Log("Loaded item: " + item.itemName);
+        }
     }
 
-    foreach (Item item in itemList)
-    {
-        Debug.Log("Loaded item: " + item.itemName);
-    }
-}
-
-
-  
- public void AddItem(Item newItem)
+    public void AddItem(Item newItem)
     {
         Debug.Log("[GameManager] Adding item to inventory: " + (newItem != null ? newItem.itemName : "null"));
 
@@ -202,15 +247,15 @@ void OnEnable()
     }
 
     public Item FindItemInMasterList(int id)
-{
-    foreach (Item item in allItemsMasterList)
     {
-        if (item.itemID == id)
-            return item;
+        foreach (Item item in allItemsMasterList)
+        {
+            if (item.itemID == id)
+                return item;
+        }
+        Debug.LogWarning("Item with ID " + id + " not found in master list.");
+        return null;
     }
-    Debug.LogWarning("Item with ID " + id + " not found in master list.");
-    return null;
-}
 
     public void RemoveItem(Item item)
     {
@@ -235,58 +280,52 @@ void OnEnable()
     }
 
     public void LoadInventory()
-{
-    GameObject inventoryPanel = GameObject.Find("Inventory Panel"); // Adjust the name as per your hierarchy
-    if (inventoryPanel != null && inventory != null)
     {
-        inventory.UpdateInventoryUI();
-    }
-    else
-    {
-        Debug.LogError("InventoryPanel or inventory is null.");
-    }
-    string filePath = $"{Application.persistentDataPath}/inventory.json";
-    if (System.IO.File.Exists(filePath))
-    {
-        string json = System.IO.File.ReadAllText(filePath);
-        ItemContainer itemContainer = JsonUtility.FromJson<ItemContainer>(json);
-        if (itemContainer != null && itemContainer.Items != null)
+        GameObject inventoryPanel = GameObject.Find("Inventory Panel"); // Adjust the name as per your hierarchy
+        if (inventoryPanel != null && inventory != null)
         {
-            itemList.Clear(); // Clear the current inventory list
-            foreach (var itemData in itemContainer.Items)
-            {
-                // Use FindItemInMasterList to match itemData with the actual item object
-                Item item = FindItemInMasterList(itemData.itemID); // Ensure itemData has itemID
-                if (item != null)
-                {
-                    item.quantity = itemData.quantity; // Set the quantity from the saved data
-                    itemList.Add(item); // Add to the player's inventory
-                }
-            }
-            inventory.UpdateInventoryUI(); // Update UI to reflect the loaded inventory
+            inventory.UpdateInventoryUI();
         }
         else
         {
-            Debug.LogError("Failed to parse inventory data.");
+            Debug.LogError("InventoryPanel or inventory is null.");
+        }
+        string filePath = $"{Application.persistentDataPath}/inventory.json";
+        if (System.IO.File.Exists(filePath))
+        {
+            string json = System.IO.File.ReadAllText(filePath);
+            ItemContainer itemContainer = JsonUtility.FromJson<ItemContainer>(json);
+            if (itemContainer != null && itemContainer.Items != null)
+            {
+                itemList.Clear(); // Clear the current inventory list
+                foreach (var itemData in itemContainer.Items)
+                {
+                    // Use FindItemInMasterList to match itemData with the actual item object
+                    Item item = FindItemInMasterList(itemData.itemID); // Ensure itemData has itemID
+                    if (item != null)
+                    {
+                        item.quantity = itemData.quantity; // Set the quantity from the saved data
+                        itemList.Add(item); // Add to the player's inventory
+                    }
+                }
+                inventory.UpdateInventoryUI(); // Update UI to reflect the loaded inventory
+            }
+            else
+            {
+                Debug.LogError("Failed to parse inventory data.");
+            }
+        }
+        else
+        {
+            Debug.Log("No inventory save file found at: " + filePath);
         }
     }
-    else
-    {
-        Debug.Log("No inventory save file found at: " + filePath);
-    }
-}
 
-
-
-
-
-
-    [System.Serializable]
+    [Serializable]
     class ItemContainer
     {
         public List<Item> Items;
     }
-
 
     public Item testItem;
     public void AddTestItem()
@@ -294,9 +333,6 @@ void OnEnable()
         AddItem(testItem);
     }
 
-    
-
-    
     public Character InstantiateSelectedCompanion(string heroID)
     {
         GameObject companionObject = null;
@@ -305,17 +341,16 @@ void OnEnable()
         {
             case "Knight":
                 companionObject = Instantiate(knightPrefab);
-
                 break;
             case "Archer":
                 companionObject = Instantiate(archerPrefab);
                 break;
             case "Wizard":
-               // companionObject = Instantiate(wizardPrefab);
+                companionObject = Instantiate(wizardPrefab);
                 break;
             // Add cases for other companions
         }
-         if (companionObject != null)
+        if (companionObject != null)
         {
             Companion companion = companionObject.GetComponent<Companion>();
             companion.LoadCharacterData();
@@ -337,107 +372,102 @@ void OnEnable()
         }
     }
 
-
     public void UnlockConnectedStages(Stage completedStage)
-{
-    Debug.Log($"Unlocking stages connected to: {completedStage.stageID}");
-    bool hasUnlockedAny = false; // Track if any new stages were unlocked
-
-    foreach (Stage connectedStage in completedStage.connectedStages)
     {
-        if (!UnlockedStageNames.Contains(connectedStage.stageID))
+        Debug.Log($"Unlocking stages connected to: {completedStage.stageID}");
+        bool hasUnlockedAny = false; // Track if any new stages were unlocked
+
+        foreach (Stage connectedStage in completedStage.connectedStages)
         {
-            Debug.Log($"Unlocking connected stage: {connectedStage.stageID}");
-            UnlockedStageNames.Add(connectedStage.stageID);
-            connectedStage.isUnlocked = true;
-          //  connectedStage.UpdateButtonColor();
-            hasUnlockedAny = true; // Indicate that a new stage has been unlocked
+            if (!UnlockedStageNames.Contains(connectedStage.stageID))
+            {
+                Debug.Log($"Unlocking connected stage: {connectedStage.stageID}");
+                UnlockedStageNames.Add(connectedStage.stageID);
+                connectedStage.isUnlocked = true;
+                //  connectedStage.UpdateButtonColor();
+                hasUnlockedAny = true; // Indicate that a new stage has been unlocked
+            }
+        }
+
+        if (hasUnlockedAny)
+        {
+            SaveUnlockedStages();
         }
     }
 
-    if (hasUnlockedAny)
+    private void SaveUnlockedStages()
     {
+        // Convert HashSet to a List to serialize
+        List<string> unlockedStagesList = new List<string>(UnlockedStageNames);
+
+        // Convert the list to a JSON string
+        string json = JsonUtility.ToJson(new StageList { Stages = unlockedStagesList });
+
+        // Save the JSON string to PlayerPrefs
+        PlayerPrefs.SetString("UnlockedStages", json);
+        PlayerPrefs.Save();
+        Debug.Log("Unlocked stages saved.");
+    }
+
+    private void LoadUnlockedStages()
+    {
+        string json = PlayerPrefs.GetString("UnlockedStages", "{}");
+        if (json != "{}")
+        {
+            StageList stageList = JsonUtility.FromJson<StageList>(json);
+            UnlockedStageNames = new HashSet<string>(stageList.Stages);
+        }
+        else
+        {
+            // Setup default unlocked stages
+            UnlockedStageNames.Add("0"); // Default first stage unlocked
+        }
+    }
+
+    public void ResetStagesOnBossDefeat()
+    {
+        // Clear all currently unlocked stages
+        UnlockedStageNames.Clear();
+
+        // Re-unlock the initial stage (assuming stage ID "0" is your initial stage ID)
+        UnlockedStageNames.Add("0");
+
+        // Optionally, force update UI or state of all stages if they are listening to changes
+        // UpdateAllStagesState();
+
+        // Save the updated stage unlocks
         SaveUnlockedStages();
     }
-}
 
-
-private void SaveUnlockedStages()
-{
-    // Convert HashSet to a List to serialize
-    List<string> unlockedStagesList = new List<string>(UnlockedStageNames);
-
-    // Convert the list to a JSON string
-    string json = JsonUtility.ToJson(new StageList { Stages = unlockedStagesList });
-
-    // Save the JSON string to PlayerPrefs
-    PlayerPrefs.SetString("UnlockedStages", json);
-    PlayerPrefs.Save();
-    Debug.Log("Unlocked stages saved.");
-}
-
-
-private void LoadUnlockedStages() {
-    string json = PlayerPrefs.GetString("UnlockedStages", "{}");
-    if (json != "{}") {
-        StageList stageList = JsonUtility.FromJson<StageList>(json);
-        UnlockedStageNames = new HashSet<string>(stageList.Stages);
-    } else {
-        // Setup default unlocked stages
-        UnlockedStageNames.Add("0"); // Default first stage unlocked
+    [Serializable]
+    private class StageList
+    {
+        public List<string> Stages;
     }
-}
 
-public void ResetStagesOnBossDefeat()
-{
-    // Clear all currently unlocked stages
-    UnlockedStageNames.Clear();
-
-    // Re-unlock the initial stage (assuming stage ID "0" is your initial stage ID)
-    UnlockedStageNames.Add("0");
-
-    // Optionally, force update UI or state of all stages if they are listening to changes
-   // UpdateAllStagesState();
-
-    // Save the updated stage unlocks
-    SaveUnlockedStages();
-}
-
-
-[System.Serializable]
-private class StageList
-{
-    public List<string> Stages;
-}
-
-
-
-   
-
-    
     //Testing method for deleting all saved data
     public void DeleteEverything()
-{
-    // Delete data for each companion
-    foreach (var companion in companions)
     {
-        if (companion != null)
+        // Delete data for each companion
+        foreach (var companion in companions)
         {
-            companion.DeleteCharacterData();
-            companion.SaveCharacterData();
-            Debug.Log("Deleted data for " + companion.name);
+            if (companion != null)
+            {
+                companion.DeleteCharacterData();
+                companion.SaveCharacterData();
+                Debug.Log("Deleted data for " + companion.name);
+            }
         }
+
+        // After individual deletions, clear all PlayerPrefs
+        PlayerPrefs.DeleteAll();
+        Debug.Log("All PlayerPrefs deleted");
+        DeleteSavedInventory();
+        PlayerData.Instance.ResetSteps();
+        PlayerData.Instance.SavePlayerData();
     }
 
-    // After individual deletions, clear all PlayerPrefs
-    PlayerPrefs.DeleteAll();
-    Debug.Log("All PlayerPrefs deleted");
-    DeleteSavedInventory();
-    PlayerData.Instance.ResetSteps();
-    PlayerData.Instance.SavePlayerData();
-}
-
-public void DeleteSavedInventory()
+    public void DeleteSavedInventory()
     {
         string filePath = $"{Application.persistentDataPath}/inventory.json";
         if (System.IO.File.Exists(filePath))
@@ -453,8 +483,8 @@ public void DeleteSavedInventory()
         }
     }
 
-// Method to add a companion to the list
-   public void RegisterCompanion(Companion companion)
+    // Method to add a companion to the list
+    public void RegisterCompanion(Companion companion)
     {
         if (!companions.Contains(companion))
         {
@@ -475,7 +505,6 @@ public void DeleteSavedInventory()
         }
     }
 
-    
     public void UpdateCompanionStamina(string heroID)
     {
         foreach (var companion in companions)
@@ -486,16 +515,16 @@ public void DeleteSavedInventory()
                 Debug.Log("Companion stamina: " + companion.stamina);
                 RestoreHealthAndEnergyForCompanion(companion);
                 companion.SaveCharacterData(); // Save updated data
-            }      
+            }
         }
     }
-    
 
     public void RestoreHealthAndEnergyForCompanion(Companion companion)
     {
-                companion.health = companion.maxHealth;
-                companion.energy = companion.maxEnergy;
+        companion.health = companion.maxHealth;
+        companion.energy = companion.maxEnergy;
     }
+
     private void RecoverCompanion()
     {
         currentCompanion.health = currentCompanion.maxHealth;
@@ -508,32 +537,32 @@ public void DeleteSavedInventory()
     private void IncrementCompanionStamina()
     {
         foreach (Companion companion in companions)
-        if (companion.stamina < companion.maxStamina)
-        {
-        companion.stamina += 1;
-        }
+            if (companion.stamina < companion.maxStamina)
+            {
+                companion.stamina += 1;
+            }
     }
 
     public void RecoverAllForSteps()
     {
-       int stepsToUse = CalculateStepCostForResting();
+        int stepsToUse = CalculateStepCostForResting();
 
-       if (PlayerData.Instance.UseSteps(stepsToUse))
-       {
-        RecoverCompanion();
-       }
-       else
-       {
-        Debug.Log("not enough steps");
-       }
+        if (PlayerData.Instance.UseSteps(stepsToUse))
+        {
+            RecoverCompanion();
+        }
+        else
+        {
+            Debug.Log("not enough steps");
+        }
     }
 
     public int CalculateStepCostForResting() //Later include modifiers for upgraded player buildings
     {
-       int staminaToRecover = (currentCompanion.maxStamina - currentCompanion.stamina);
-       int calculatedStepCost = (staminaToRecover * 200); //1000 steps for full recovery
+        int staminaToRecover = (currentCompanion.maxStamina - currentCompanion.stamina);
+        int calculatedStepCost = (staminaToRecover * 200); //1000 steps for full recovery
 
-       return calculatedStepCost;
+        return calculatedStepCost;
     }
 
     // Call this method to save the data of all companions
@@ -546,28 +575,25 @@ public void DeleteSavedInventory()
         }
     }
 
-
-
     private void LoadAllCompanionData()
     {
         // Clear existing companions list to repopulate it
         companions.Clear();
-        
+
         // Instantiate and load data for each companion type
         CreateAndLoadCompanion(knightPrefab, "Knight");
         CreateAndLoadCompanion(archerPrefab, "Archer");
         CreateAndLoadCompanion(wizardPrefab, "Wizard");
     }
 
-    
-     void OnDestroy()
+    void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
-    
+
     private void OnApplicationQuit()
     {
-       SaveAllCompanionData();
+        SaveAllCompanionData();
     }
 
     private void OnApplicationPause(bool pause)
@@ -592,10 +618,4 @@ public void DeleteSavedInventory()
         // If no matching item is found, return null
         return null;
     }
-
-
-    
-   
-    
-
 }

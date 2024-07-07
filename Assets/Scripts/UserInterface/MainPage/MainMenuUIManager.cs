@@ -254,24 +254,33 @@ public class MainMenuUIManager : MonoBehaviour
 
 private void AddToParty(Companion companion)
 {
-    if (GameManager.Instance.currentParty.Count < 2) // Check if there is space in the party
+    GameManager gameManager = GameManager.Instance;
+    if (gameManager != null)
     {
-        if (!GameManager.Instance.currentParty.Contains(companion))
+        if (gameManager.currentParty.Count < 2) // Check if there is space in the party
         {
-            GameManager.Instance.currentParty.Add(companion);
-            Debug.Log("Added to party: " + companion.heroID);
-            ShowPartyMembers(); // Update UI to reflect changes
+            if (!gameManager.currentParty.Contains(companion))
+            {
+                gameManager.currentParty.Add(companion);
+                Debug.Log("Added to party: " + companion.heroID);
+                ShowPartyMembers(); // Update UI to reflect changes
+            }
+            else
+            {
+                Debug.Log("Companion already in party: " + companion.heroID);
+            }
         }
         else
         {
-            Debug.Log("Companion already in party: " + companion.heroID);
+            Debug.LogError("Party is full. Cannot add more companions.");
         }
     }
     else
     {
-        Debug.LogError("Party is full. Cannot add more companions.");
+        Debug.LogError("GameManager instance is null.");
     }
 }
+
 
 
 public GameObject heroSlotOne;
