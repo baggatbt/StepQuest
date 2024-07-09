@@ -141,14 +141,7 @@ public class BattleManager : MonoBehaviour
     }
 
     public GameObject knightPrefab;
-    private Character InstantiateCompanion(string heroID)
-    {
-        if (heroID == "Knight")
-        {
-            Character knight = GameManager.Instance.InstantiateCharacter(knightPrefab, GameManager.Instance.knightData, new Vector3(0, 0, 0), Quaternion.identity);
-        }
-        return null;
-    }
+    
 
     /*
    public void SetupBattle(List<Companion> currentParty)
@@ -401,7 +394,7 @@ public class BattleManager : MonoBehaviour
     if ((state == BattleState.PlayerTurn) && currentTarget)
     {
         activePlayerIndicator.SetActive(false);
-        if (activePlayer.currentSkill.requiresMovement && skillsExecuted == 0)
+        if (activePlayer.currentSkill.requiresMovement)
         {
             Debug.Log("Player moving to attack target: " + currentTarget.transform.position);
             yield return StartCoroutine(PlayerMoveAndAttackCoroutine());

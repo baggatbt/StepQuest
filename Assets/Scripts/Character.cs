@@ -475,6 +475,7 @@ public class Character : MonoBehaviour
 
     public IEnumerator MoveToTarget()
     {
+        Debug.Log("MOVING IS CALLED");
         animator.SetTrigger("MovementAnimationTrigger");
         this.isMoving = true;
 
