@@ -50,6 +50,7 @@ public class GameManager : MonoBehaviour
     public int accountLevel;
 
     //Testing data object implementation
+    public Dictionary<string, CharacterData> characterDataDictionary = new Dictionary<string, CharacterData>();
     public List<CharacterData> allCharacterData = new List<CharacterData>(); 
     public CharacterData currentCompanionData;
     public CharacterData knightData;
@@ -65,7 +66,14 @@ public class GameManager : MonoBehaviour
             currentStageIndex = PlayerData.Instance.currentStageIndex; //Gets the current stage from PlayerData
             maxInventorySlots = 16;
             Debug.Log("Initial item list count: " + itemList.Count);
-            LoadUnlockedStages(); // Ensure this is called to initialize unlocked stages
+            LoadUnlockedStages(); 
+
+            //Initialize character data dictionary here
+            foreach (var data in allCharacterData)
+            {
+                data.LoadData(); // Load data for each character
+                characterDataDictionary[data.heroID] = data;
+            }
 
             //Each companion has equal chance to be selected for attack, need to change so it uses the class's variable threat
             probabilityCompanion1 = 1f;
@@ -77,6 +85,8 @@ public class GameManager : MonoBehaviour
             {
                 // Handle first-time login logic
             }
+            Application.quitting += SaveAllCharacterData; // Save all character data on application quit
+      
         }
         else
         {
@@ -611,13 +621,21 @@ public class GameManager : MonoBehaviour
         return calculatedStepCost;
     }
 
-    // Call this method to save the data of all companions
+    // WILL BE PHASING THIS OUT ONCE REPLACED WITH SCRIPTABLE DATA OBJECTS
     public void SaveAllCompanionData()
     {
         foreach (var companion in companions)
         {
             companion?.SaveCharacterData();
             Debug.Log("In game manager saving: " + companion);
+        }
+    }
+    //THIS WILL BE THE ONLY SAVE METHOD
+    private void SaveAllCharacterData()
+    {
+        foreach (var data in allCharacterData)
+        {
+            data.SaveData();
         }
     }
 

@@ -384,22 +384,12 @@ private void AddToParty(CharacterData characterData)
                 GameObject characterPrefab = gameManager.GetCharacterPrefab(characterData.heroID);
                 if (characterPrefab != null)
                 {
-                    GameObject instantiatedObject = Instantiate(characterPrefab);
-                    Companion instantiatedCompanion = instantiatedObject.GetComponent<Companion>();
-                    
-                    if (instantiatedCompanion != null)
-                    {
-                        instantiatedCompanion.SetCharacterData(characterData); // Set character data and initialize stats
-                        
-                        gameManager.currentParty.Add(instantiatedCompanion);
-                        Debug.Log("Added to party: " + characterData.heroID);
-                        ShowPartyMembers(); // Update UI to reflect changes
-                    }
-                    else
-                    {
-                        Debug.LogError("Instantiated object does not have a Companion component.");
-                        Destroy(instantiatedObject); // Clean up if instantiation failed
-                    }
+                    Companion instantiatedCompanion = Instantiate(characterPrefab).GetComponent<Companion>();
+                    instantiatedCompanion.SetCharacterData(characterData);
+
+                    gameManager.currentParty.Add(instantiatedCompanion);
+                    Debug.Log("Added to party: " + characterData.heroID);
+                    ShowPartyMembers(); // Update UI to reflect changes
                 }
                 else
                 {
@@ -421,6 +411,7 @@ private void AddToParty(CharacterData characterData)
         Debug.LogError("GameManager instance is null.");
     }
 }
+
 
 
 

@@ -137,6 +137,7 @@ public class BattleManager : MonoBehaviour
                 enemies.Add(spawnedEnemy);
             }
         }
+        RestoreHealthAndEnergy();
        // StartBattle(config);
     }
 
@@ -168,7 +169,8 @@ public class BattleManager : MonoBehaviour
     {
          if (playerParty.Count > 0) {
      if (isBattleStarted) return; // Prevent starting the battle multiple times
-        DeductStaminaFromParticipants();
+        //TODO To be moved outside of the dungeon entry call DeductStaminaFromParticipants();
+        
         battleStartButton.SetActive(false);
         
         isBattleStarted = true;
@@ -189,6 +191,7 @@ public class BattleManager : MonoBehaviour
 
             
         }
+        
         activePlayer = companion1; //Default
         InitializeTurnOrder();
     }

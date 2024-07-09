@@ -37,12 +37,13 @@ public class CompanionSpawnController : MonoBehaviour
 
                 if (instantiatedCompanionAsCompanion != null)
                 {
+                    instantiatedCompanionAsCompanion.SetCharacterData(companion.characterData);
                     instantiatedCompanionAsCompanion.InitializeSkillsBasedOnLevel();
                     SetupCompanions(instantiatedCompanionAsCompanion, companionIndex);
                     activeCompanions.Add(instantiatedCompanionAsCompanion);
                     instantiatedCompanionAsCompanion.isSelected = true;
-                     instantiatedCompanionAsCompanion.originalPosition = companionSpawnPoints[companionIndex].position;
-                    
+                    instantiatedCompanionAsCompanion.originalPosition = companionSpawnPoints[companionIndex].position;
+
                     Debug.Log($"Companion {companion.heroID} instantiated at index {companionIndex} and {instantiatedCompanionAsCompanion.originalPosition} location");
                 }
                 companionIndex++;
@@ -157,6 +158,7 @@ public class CompanionSpawnController : MonoBehaviour
             Companion companion = instantiatedCompanion as Companion;
             if (instantiatedCompanion != null)
             {
+                companion.SetCharacterData(selectedCompanion.characterData);
                 companion.InitializeSkillsBasedOnLevel();
                 SetupCompanion(instantiatedCompanion, selectedCompanionCount);
                 AssignCompanion(instantiatedCompanion);

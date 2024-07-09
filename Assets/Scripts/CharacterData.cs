@@ -31,5 +31,21 @@ public class CharacterData : ScriptableObject
         Debug.Log("EXP to level : " + (30 * heroLevel * heroLevel));
         return 30 * heroLevel * heroLevel;
     }
+
+    public void SaveData()
+    {
+        string jsonData = JsonUtility.ToJson(this);
+        PlayerPrefs.SetString("CharacterData_" + heroID, jsonData);
+        PlayerPrefs.Save();
+    }
+
+    public void LoadData()
+    {
+        string jsonData = PlayerPrefs.GetString("CharacterData_" + heroID, "{}");
+        if (jsonData != "{}")
+        {
+            JsonUtility.FromJsonOverwrite(jsonData, this);
+        }
+    }
 }
 
