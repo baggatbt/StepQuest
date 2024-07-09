@@ -3,17 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-
 [Serializable]
 public class Knight : Companion
 {
-    // Your existing implementation
-
     protected override void Awake()
     {
         base.Awake();
-        // Load the skill tree prefab from the Resources folder
-    
+        
+        // Load the skill tree prefab from the Resources folder (Assuming this step is required and has a method)
+        //LoadSkillTree();
+
         // Initialize with default values if no data is loaded
         if (this.heroLevel == 0)
         {
@@ -32,6 +31,7 @@ public class Knight : Companion
             this.heroStatPoints = 0;
             this.characterIDNumber = "1";
             this.maxStamina = 10;
+            this.stamina = this.maxStamina; // Ensure stamina is initialized
         }
         else
         {
@@ -43,7 +43,7 @@ public class Knight : Companion
 
     public override void InitializeSkillsBasedOnLevel()
     {
-        availableSkills.Clear(); // Directly manipulate the protected field
+        availableSkills.Clear();
         availableSkills.Add(SkillType.Slash);
         if (this.heroLevel >= 2) availableSkills.Add(SkillType.TripleHit);
         if (this.heroLevel >= 5) availableSkills.Add(SkillType.Taunt);
@@ -54,49 +54,48 @@ public class Knight : Companion
     {
         if (this.heroExp >= ExpToNextLevel(this.heroLevel))
         {
-            this.heroExp -= ExpToNextLevel(this.heroLevel); // Handles exp past the required amount
+            this.heroExp -= ExpToNextLevel(this.heroLevel);
             this.heroLevel++;
 
             switch (this.heroLevel)
             {
                 case 2:
-                    this.maxHealth += 2; 
+                    this.maxHealth += 2;
                     Debug.Log("Your max health went up by 2!");
                     break;
                 case 3:
-                    this.attackPower += 1; 
+                    this.attackPower += 1;
                     break;
                 case 4:
-                    this.maxHealth += 3; 
+                    this.maxHealth += 3;
                     break;
                 case 5:
-                    this.attackPower += 1; 
+                    this.attackPower += 1;
                     break;
                 case 6:
-                    this.maxEnergy += 1; 
+                    this.maxEnergy += 1;
                     break;
                 case 7:
-                    this.maxHealth += 3; 
+                    this.maxHealth += 3;
                     break;
                 case 8:
-                    this.attackPower += 1; 
+                    this.attackPower += 1;
                     break;
                 case 9:
-                    this.defensePower += 1; 
+                    this.defensePower += 1;
                     break;
                 case 10:
-                    this.maxHealth += 4; 
+                    this.maxHealth += 4;
                     break;
                 default:
-                    break; //TODO: extend this later when I have concrete balance plans
+                    break; // Extend this later when you have concrete balance plans
             }
 
-            // Update current health and energy to new max values
             this.health = this.maxHealth;
             this.energy = this.maxEnergy;
 
-            this.heroStatPoints += 1; // Every 3 levels will allow player to upgrade one stat of their choice +1
-            this.heroSkillPoints += 1; //TODO: Implement skill unlocking
+            this.heroStatPoints += 1;
+            this.heroSkillPoints += 1;
 
             Debug.Log("Hero leveled up to level " + this.heroLevel + ", stat upgraded.");
         }
@@ -118,7 +117,7 @@ public class Knight : Companion
         SkillType.SpeedBreak,
     };
 
-    private List<SkillType> mainSkills = new List<SkillType>()
+    private List<SkillType> mainSkills = new List<SkillType>
     {
         SkillType.Slash,
         SkillType.TripleHit,
@@ -134,7 +133,6 @@ public class Knight : Companion
         {
             case SkillType.Slash:
                 return new Slash();
-            // ... other cases ..
             case SkillType.TripleHit:
                 return new TripleHitSkill();
             case SkillType.Taunt:

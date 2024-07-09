@@ -49,6 +49,12 @@ public class GameManager : MonoBehaviour
 
     public int accountLevel;
 
+    //Testing data object implementation
+    public List<CharacterData> allCharacterData = new List<CharacterData>(); 
+    public CharacterData currentCompanionData;
+    public CharacterData knightData;
+    
+
     private void Awake()
     {
         if (Instance == null)
@@ -79,6 +85,28 @@ public class GameManager : MonoBehaviour
         Application.targetFrameRate = 60;  // Set target frame rate to 60 FPS.
     }
 
+    public Companion InstantiateCharacter(GameObject characterPrefab, CharacterData characterData, Vector3 position, Quaternion rotation)
+    {
+        GameObject characterObject = Instantiate(characterPrefab, position, rotation);
+        Companion companion = characterObject.GetComponent<Companion>();
+        companion.characterData = characterData;
+        return companion;
+    }
+
+    public GameObject GetCharacterPrefab(string heroID)
+{
+    switch (heroID)
+    {
+        case "Knight":
+            return knightPrefab;
+        case "Archer":
+            return archerPrefab;
+        // Add cases for other characters
+        default:
+            return null;
+    }
+}
+
     [Serializable]
     private class SerializableCompanionData
     {
@@ -88,39 +116,57 @@ public class GameManager : MonoBehaviour
 
     public void SaveCurrentParty()
     {
-        List<SerializableCompanionData> companionDataList = new List<SerializableCompanionData>();
+        List<string> companionDataList = new List<string>();
         foreach (var companion in currentParty)
         {
-            SerializableCompanionData data = new SerializableCompanionData
-            {
-                type = companion.GetType().AssemblyQualifiedName,
-                json = JsonUtility.ToJson(companion)
-            };
-            companionDataList.Add(data);
+            string json = SerializationHelper.SerializeCompanion(companion);
+            companionDataList.Add(json);
         }
-        string json = JsonUtility.ToJson(new SerializableList<SerializableCompanionData>(companionDataList));
-        PlayerPrefs.SetString("CurrentParty", json);
+        string jsonList = JsonUtility.ToJson(new SerializableList<string>(companionDataList));
+        PlayerPrefs.SetString("CurrentParty", jsonList);
         PlayerPrefs.Save();
     }
 
     public void LoadCurrentParty()
     {
         currentParty.Clear();
-        string json = PlayerPrefs.GetString("CurrentParty", "{}");
-        SerializableList<SerializableCompanionData> companionDataList = JsonUtility.FromJson<SerializableList<SerializableCompanionData>>(json);
+        string jsonList = PlayerPrefs.GetString("CurrentParty", "{}");
+        var companionDataList = JsonUtility.FromJson<SerializableList<string>>(jsonList);
 
-        foreach (var data in companionDataList.Items)
+        foreach (var json in companionDataList.Items)
         {
-            Type type = Type.GetType(data.type);
-            if (type != null)
-            {
-                Companion companion = JsonUtility.FromJson(data.json, type) as Companion;
-                if (companion != null)
-                {
-                    currentParty.Add(companion);
-                }
-            }
+            CompanionData data = SerializationHelper.DeserializeCompanionData(json);
+          //  Companion companion = InstantiateCompanion(data);
+          //  currentParty.Add(companion);
         }
+    }
+
+    private Companion InstantiateCompanion(CompanionData data)
+    {
+        GameObject prefab = null;
+        if (data.heroID == "Knight")
+        {
+            prefab = Instantiate(knightPrefab);  // Assign your Knight prefab here
+        }
+        // Handle other heroID cases...
+
+        if (prefab != null)
+        {
+            var companion = prefab.GetComponent<Companion>();
+            companion.heroID = data.heroID;
+            companion.heroLevel = data.heroLevel;
+            // Set other properties...
+
+            if (data is KnightData knightData && companion is Knight knight)
+            {
+                
+                // Set other Knight-specific properties...
+            }
+
+            return companion;
+        }
+
+        return null;
     }
 
     [Serializable]
@@ -581,9 +627,9 @@ public class GameManager : MonoBehaviour
         companions.Clear();
 
         // Instantiate and load data for each companion type
-        CreateAndLoadCompanion(knightPrefab, "Knight");
-        CreateAndLoadCompanion(archerPrefab, "Archer");
-        CreateAndLoadCompanion(wizardPrefab, "Wizard");
+       // CreateAndLoadCompanion(knightPrefab, "Knight");
+      //  CreateAndLoadCompanion(archerPrefab, "Archer");
+       // CreateAndLoadCompanion(wizardPrefab, "Wizard");
     }
 
     void OnDestroy()

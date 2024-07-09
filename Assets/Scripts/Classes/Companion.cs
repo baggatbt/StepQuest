@@ -2,9 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using System.Linq;
-
-
+[Serializable]
 public abstract class Companion : Character
 {
     [SerializeField]
@@ -17,10 +15,10 @@ public abstract class Companion : Character
     public abstract List<SkillType> MainSkills { get; }
     public abstract Skill GetSkillInstance(SkillType skillType);
 
-    public string heroID; // Name of the class/character 
-    public int heroLevel; // Level of the hero
-    public int heroExp;   // Experience of the hero
-    public GameObject skillTreePanel; 
+    public string heroID;
+    public int heroLevel;
+    public int heroExp;
+    public GameObject skillTreePanel;
     public Sprite heroIcon;
     public Sprite fullHeroImage;
     public int heroStatPoints;
@@ -31,15 +29,15 @@ public abstract class Companion : Character
     public int atkGrowth;
     public int healthGrowth;
     public int energyGrowth;
-
+    //Implementing Scriptable Objects for hero data
+    public CharacterData characterData;
     public Dictionary<string, int> statUpgradeProgress = new Dictionary<string, int>
     {
         {"atk", 0},
         {"hp", 0},
         {"spd", 0},
-        {"sp",0}
+        {"sp", 0}
     };
-
     public Dictionary<EquipmentType, Equipment> equippedItems = new Dictionary<EquipmentType, Equipment>();
 
     [Serializable]
@@ -49,16 +47,14 @@ public abstract class Companion : Character
         public int maxHealth;
         public int energy;
         public int maxEnergy;
-        public int teamEnergy;
         public int attackPower;
         public int defensePower;
         public int defensePenetration;
         public int speed;
-        public int expToLevel;
-        public int heroSkillPoints;
-        public int heroStatPoints;
         public int heroLevel;
         public int heroExp;
+        public int heroSkillPoints;
+        public int heroStatPoints;
         public int stamina;
         public int maxStamina;
     }
@@ -71,7 +67,49 @@ public abstract class Companion : Character
         }
     }
 
+    protected override void Awake()
+    {
+        base.Awake();
+        
+    }
+
+    public void SetCharacterData(CharacterData data)
+    {
+        characterData = data;
+        InitializeCharacterStats();
+    }
+
+   public void InitializeCharacterStats()
+    {
+        if (characterData != null)
+        {
+            heroID = characterData.heroID;
+            heroLevel = characterData.heroLevel;
+            heroExp = characterData.heroExp;
+            skillTreePanel = characterData.skillTreePanel;
+            heroIcon = characterData.heroIcon;
+            fullHeroImage = characterData.fullHeroImage;
+            heroStatPoints = characterData.heroStatPoints;
+            heroSkillPoints = characterData.heroSkillPoints;
+            stamina = characterData.stamina;
+            maxStamina = characterData.maxStamina;
+            maxHealth = characterData.maxHealth;
+            health = characterData.health;
+            maxEnergy = characterData.maxEnergy;
+            energy = characterData.energy;
+            speed = characterData.speed;
+            // Load other stats and methods from characterData
+        }
+        else
+        {
+            Debug.LogError("Character data is not assigned.");
+        }
+    }
+
+    
+
     public abstract void LevelUp();
+
     public abstract void InitializeSkillsBasedOnLevel();
 
     public void UnlockSkill(SkillType skillType)
@@ -104,9 +142,9 @@ public abstract class Companion : Character
             heroSkillPoints = this.heroSkillPoints,
             heroStatPoints = this.heroStatPoints,
             stamina = this.stamina,
-            maxStamina = this.maxStamina
+            maxStamina = this.maxStamina,
         };
-        Debug.Log("saved stamina" + stamina);
+
         string jsonData = JsonUtility.ToJson(data);
         PlayerPrefs.SetString("CharacterData_" + heroID, jsonData);
         PlayerPrefs.Save();
@@ -167,14 +205,7 @@ public abstract class Companion : Character
 
     public void RecoverEnergy(int amount)
     {
-        if ((energy + amount) >= maxEnergy)
-        {
-            energy = maxEnergy;
-        }
-        else
-        {
-            energy += amount;
-        }
+        energy = Mathf.Min(energy + amount, maxEnergy);
     }
 
     public void EquipItem(Equipment equipment)
@@ -183,6 +214,7 @@ public abstract class Companion : Character
         {
             UnequipItem(equipment.equipmentType);
         }
+
         equippedItems[equipment.equipmentType] = equipment;
         ApplyStatBonuses(equipment);
     }

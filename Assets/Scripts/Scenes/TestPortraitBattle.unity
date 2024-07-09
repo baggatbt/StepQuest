@@ -2181,11 +2181,10 @@ MonoBehaviour:
   associatedEnergyText: {fileID: 856343206}
   associatedHealthBarSlider2: {fileID: 538387189}
   associatedEnergyBarSlider2: {fileID: 1179878296}
-  heroHealthUI1: {fileID: 8359779}
-  heroHealthUI2: {fileID: 625883354}
   associatedHealthText2: {fileID: 300187005}
   associatedEnergyText2: {fileID: 183761479}
-  associatedtempEnergyBarSlider2: {fileID: 0}
+  heroHealthUI1: {fileID: 8359779}
+  heroHealthUI2: {fileID: 625883354}
   battleManager: {fileID: 1020165693}
   activeCompanions: []
 --- !u!1 &439519252
@@ -5750,7 +5749,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &948254632
 Transform:
   m_ObjectHideFlags: 0
@@ -6052,8 +6051,14 @@ MonoBehaviour:
   battleStartButton: {fileID: 1927400503}
   heroButtonPrefab: {fileID: 99105589723124578, guid: 0bab15fb24c968a4eb3b39e498c3ead6, type: 3}
   skillDescriptionPanel: {fileID: 1295422132}
-  enemyAttackCount: 0
-  currentTarget: {fileID: 0}
+  outerCircle: {fileID: 1626096152}
+  innerCircle: {fileID: 1227564317}
+  ExpGainedText: {fileID: 1778247465}
+  GoldGainedText: {fileID: 1153100819}
+  endOfBattlePanel: {fileID: 1663765536}
+  endOfBattleLossPanel: {fileID: 2100539942}
+  damagePopupPrefab: {fileID: 1537480710157673141, guid: cc9a21cc11214a24384120534efdf528, type: 3}
+  popupStartPoint: {fileID: 484004676}
   holdReleaseSlider: {fileID: 590349167}
   healthBars:
   - {fileID: 446944932}
@@ -6074,16 +6079,9 @@ MonoBehaviour:
   launchAttacksButton: {fileID: 0}
   statusEffectController: {fileID: 175760104}
   timingFeedbackText: {fileID: 655014006}
-  damagePopupPrefab: {fileID: 1537480710157673141, guid: cc9a21cc11214a24384120534efdf528, type: 3}
-  popupStartPoint: {fileID: 484004676}
-  outerCircle: {fileID: 1626096152}
-  innerCircle: {fileID: 1227564317}
-  ExpGainedText: {fileID: 1778247465}
-  GoldGainedText: {fileID: 1153100819}
-  endOfBattlePanel: {fileID: 1663765536}
-  endOfBattleLossPanel: {fileID: 2100539942}
   enemySpawnController: {fileID: 58845270}
   companionSpawnController: {fileID: 432939964}
+  nextBattleButton: {fileID: 1214940462}
   enemySpawnPoints:
   - {fileID: 1412309851}
   - {fileID: 5737051}
@@ -6095,9 +6093,9 @@ MonoBehaviour:
     stage: {fileID: 0}
     currentParty: []
   battleConfigs: []
+  currentTarget: {fileID: 0}
   isBattleStarted: 0
   knightPrefab: {fileID: 358661848719693019, guid: b4b862f04ff76be49b8874238e0e0f0d, type: 3}
-  nextBattleButton: {fileID: 1214940462}
   turnOrderList: []
   enemyUIPanel: {fileID: 757580007}
   heroUIPanels: {fileID: 1325780246}
@@ -6108,7 +6106,6 @@ MonoBehaviour:
   zoomEffect: {fileID: 1629118930}
   attackingEnemy: {fileID: 0}
   cameraShake: {fileID: 519420033}
-  colorChanger: {fileID: 1420394429}
   companion: {fileID: 0}
   expSliders:
   - {fileID: 384145366}
@@ -6120,7 +6117,6 @@ MonoBehaviour:
   - {fileID: 2011876057}
   - {fileID: 474008330}
   isSkillSelected: 0
-  battleLost: 0
 --- !u!4 &1020165694
 Transform:
   m_ObjectHideFlags: 0
@@ -8023,7 +8019,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.011522634, y: 0}
   m_AnchorMax: {x: 0.99341565, y: 0.1807037}
-  m_AnchoredPosition: {x: -161, y: 863.9997}
+  m_AnchoredPosition: {x: -161, y: 863.9996}
   m_SizeDelta: {x: -209.65, y: 16.64}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1325780248
@@ -11992,7 +11988,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1927400506}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1020165693}
+        m_TargetAssemblyTypeName: BattleManager, Assembly-CSharp
+        m_MethodName: StartBattle
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1927400506
 MonoBehaviour:
   m_ObjectHideFlags: 0

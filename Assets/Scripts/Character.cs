@@ -60,18 +60,29 @@ public class Character : MonoBehaviour
     //STATUS EFFECTS
     public StatusEffectController statusEffectController;
 
+
+    
     
 
     protected virtual void Awake()
     {
         isSelected = false;
+        
         animator = GetComponent<Animator>();
         statusEffectController = GetComponent<StatusEffectController>();
         enemyDeathEffect = GetComponent<EnemyDeathEffect>();
-        originalPosition = transform.position;
+        // Ensure originalPosition is set to the character's initial position if not already set
+        if (originalPosition == Vector3.zero || originalPosition == new Vector3(10000f, 10000f, -16.20f))
+        {
+            originalPosition = transform.position;
+            Debug.Log($"OP at Awake() {originalPosition}");
+        }
+     //   originalPosition = transform.position;
         Debug.Log("OP at Awake() " + originalPosition);
        // this.hasNotGone = true;
     }
+
+    
 
     
     public void Update()
@@ -462,50 +473,51 @@ public class Character : MonoBehaviour
 }
 
 
-     public IEnumerator MoveToTarget()
-{
-    animator.SetTrigger("MovementAnimationTrigger");
-    this.isMoving = true;
-
-    // Define a speed for moving to the target. 
-    float moveSpeed = 17f; 
-
-    Vector3 targetPosition = new Vector3(attackTarget.position.x, attackTarget.position.y, attackTarget.position.z);
-    checkCollisionsDuringMovement = true;
-
-    // Pass the moveSpeed as the third argument to the Move coroutine
-    yield return Move(targetPosition, 3.0f, moveSpeed);
-
-    animator.SetTrigger("StopMovementAnimationTrigger");
-    this.isMoving = false;
-}
-
-
-
-private IEnumerator Move(Vector3 targetPosition, float stoppingDistance, float speed)
-{
-    Debug.Log($"Starting Move towards {targetPosition}");
-    while (Vector3.Distance(transform.position, targetPosition) > stoppingDistance)
+    public IEnumerator MoveToTarget()
     {
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
-        yield return null; // Wait for the next frame
+        animator.SetTrigger("MovementAnimationTrigger");
+        this.isMoving = true;
+
+        float moveSpeed = 17f; 
+        Vector3 targetPosition = new Vector3(attackTarget.position.x, attackTarget.position.y, attackTarget.position.z);
+        checkCollisionsDuringMovement = true;
+
+        Debug.Log($"Moving to target: {targetPosition}");
+        Debug.Log($"Current position: {transform.position}");
+        Debug.Log($"Original position before moving: {originalPosition}");
+
+        yield return Move(targetPosition, 3.0f, moveSpeed);
+
+        animator.SetTrigger("StopMovementAnimationTrigger");
+        this.isMoving = false;
     }
-    Debug.Log("Completed Move");
-}
 
-public IEnumerator ReturnToPosition(float returnSpeed = 20f)
-{
-    Debug.Log($"Returning to original position at: {originalPosition}");
-    animator.SetTrigger("MovementAnimationTrigger");
-    this.isMoving = true;
+    public IEnumerator ReturnToPosition(float returnSpeed = 20f)
+    {
+        Debug.Log($"Returning to original position at: {originalPosition}");
+        animator.SetTrigger("MovementAnimationTrigger");
+        this.isMoving = true;
 
-    yield return Move(originalPosition, 0.00f, returnSpeed); // Use a small stopping distance and adjustable speed
+        yield return Move(originalPosition, 0.00f, returnSpeed);
 
-    transform.position = originalPosition; // Ensure exact original position, remove if snapping still occurs but I think its fixed
-    animator.SetTrigger("StopMovementAnimationTrigger");
-    this.isMoving = false;
-    Debug.Log("Returned to original position");
-}
+        transform.position = originalPosition;
+        animator.SetTrigger("StopMovementAnimationTrigger");
+        this.isMoving = false;
+        Debug.Log("Returned to original position");
+    }
+
+    private IEnumerator Move(Vector3 targetPosition, float stoppingDistance, float speed)
+    {
+        Debug.Log($"Starting Move towards {targetPosition}");
+        while (Vector3.Distance(transform.position, targetPosition) > stoppingDistance)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
+            Debug.Log($"Moving towards {targetPosition} from {transform.position}");
+            yield return null;
+        }
+        Debug.Log("Completed Move");
+    }
+
 
 /*
 // Updated to check for an appropriate stopping distance
