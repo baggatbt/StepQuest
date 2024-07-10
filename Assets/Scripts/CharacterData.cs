@@ -2,10 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
-
-
-
 [CreateAssetMenu(fileName = "NewCharacterData", menuName = "Character Data", order = 51)]
 public class CharacterData : ScriptableObject
 {
@@ -17,6 +13,7 @@ public class CharacterData : ScriptableObject
     public Sprite fullHeroImage;
     public int heroStatPoints;
     public int heroSkillPoints;
+    public int attackPower;
     public int stamina;
     public int maxStamina;
     public int maxHealth;
@@ -47,5 +44,21 @@ public class CharacterData : ScriptableObject
             JsonUtility.FromJsonOverwrite(jsonData, this);
         }
     }
-}
 
+    public void InitializeDefaults()
+    {
+        attackPower = 5;
+        maxHealth = 12;
+        health = maxHealth;
+        speed = 4;
+        maxEnergy = 5;
+        energy = maxEnergy;
+        heroID = "Knight";
+        heroLevel = 1;
+        heroExp = 0;
+        heroSkillPoints = 0;
+        heroStatPoints = 0;
+        maxStamina = 10;
+        stamina = maxStamina;
+    }
+}

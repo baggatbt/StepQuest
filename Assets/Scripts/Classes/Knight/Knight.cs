@@ -9,34 +9,6 @@ public class Knight : Companion
     protected override void Awake()
     {
         base.Awake();
-        
-        // Load the skill tree prefab from the Resources folder (Assuming this step is required and has a method)
-        //LoadSkillTree();
-
-        // Initialize with default values if no data is loaded
-        if (this.heroLevel == 0)
-        {
-            this.attackPower = 5;
-            this.maxHealth = 12;
-            this.health = this.maxHealth;
-            this.defensePower = 1;
-            this.speed = 4;
-            this.maxEnergy = 5;
-            this.energy = maxEnergy;
-            this.defensePenetration = 0;
-            this.heroID = "Knight";
-            this.heroLevel = 1;
-            this.heroExp = 0;
-            this.heroSkillPoints = 0;
-            this.heroStatPoints = 0;
-            this.characterIDNumber = "1";
-            this.maxStamina = 10;
-            this.stamina = this.maxStamina; // Ensure stamina is initialized
-        }
-        else
-        {
-            LoadCharacterData(); // Load saved data
-        }
 
         InitializeSkillsBasedOnLevel();
     }
@@ -88,7 +60,7 @@ public class Knight : Companion
                     this.maxHealth += 4;
                     break;
                 default:
-                    break; // Extend this later when you have concrete balance plans
+                    break;
             }
 
             this.health = this.maxHealth;

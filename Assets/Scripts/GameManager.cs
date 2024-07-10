@@ -393,27 +393,30 @@ public class GameManager : MonoBehaviour
     {
         GameObject companionObject = null;
 
-        switch (heroID)
+    switch (heroID)
+    {
+        case "Knight":
+            companionObject = Instantiate(knightPrefab);
+            break;
+        case "Archer":
+            companionObject = Instantiate(archerPrefab);
+            break;
+        case "Wizard":
+            companionObject = Instantiate(wizardPrefab);
+            break;
+        // Add cases for other companions
+    }
+    if (companionObject != null)
+    {
+        Companion companion = companionObject.GetComponent<Companion>();
+        if (characterDataDictionary.TryGetValue(heroID, out CharacterData characterData))
         {
-            case "Knight":
-                companionObject = Instantiate(knightPrefab);
-                break;
-            case "Archer":
-                companionObject = Instantiate(archerPrefab);
-                break;
-            case "Wizard":
-                companionObject = Instantiate(wizardPrefab);
-                break;
-            // Add cases for other companions
+            companion.SetCharacterData(characterData);
         }
-        if (companionObject != null)
-        {
-            Companion companion = companionObject.GetComponent<Companion>();
-            companion.LoadCharacterData();
-            return companion;
-        }
+        return companion;
+    }
 
-        return null;
+    return null;
     }
 
     private void CreateAndLoadCompanion(GameObject prefab, string heroID)

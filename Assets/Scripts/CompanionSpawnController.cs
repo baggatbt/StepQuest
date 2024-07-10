@@ -137,9 +137,7 @@ public class CompanionSpawnController : MonoBehaviour
             buttonObj.GetComponent<Button>().onClick.AddListener(() => OnHeroSelected(localCompanion));
         }
 
-      //  battleManager.heroSelectionPanel.SetActive(true);
         battleManager.battleStartButton.SetActive(true);
-       
     }
 
     private int selectedCompanionCount = 0;

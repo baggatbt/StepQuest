@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+
 [Serializable]
 public abstract class Companion : Character
 {
@@ -59,27 +60,37 @@ public abstract class Companion : Character
         public int maxStamina;
     }
 
-    public int expToLevel
-    {
-        get
-        {
-            return ExpToNextLevel(heroLevel);
-        }
-    }
-
     protected override void Awake()
     {
         base.Awake();
         
+        if (characterData != null)
+        {
+            SetCharacterData(characterData);
+        }
+        else
+        {
+            Debug.LogError("Character data is not assigned.");
+        }
     }
 
     public void SetCharacterData(CharacterData data)
     {
         characterData = data;
+
+        if (characterData.heroLevel == 0)
+        {
+            characterData.InitializeDefaults();
+        }
+        else
+        {
+            characterData.LoadData(); // Load saved data
+        }
+
         InitializeCharacterStats();
     }
 
-   public void InitializeCharacterStats()
+    public void InitializeCharacterStats()
     {
         if (characterData != null)
         {
@@ -98,15 +109,13 @@ public abstract class Companion : Character
             maxEnergy = characterData.maxEnergy;
             energy = characterData.energy;
             speed = characterData.speed;
-            // Load other stats and methods from characterData
+            attackPower = characterData.attackPower;
         }
         else
         {
             Debug.LogError("Character data is not assigned.");
         }
     }
-
-    
 
     public abstract void LevelUp();
 
@@ -128,52 +137,31 @@ public abstract class Companion : Character
 
     public void SaveCharacterData()
     {
-        SerializableCharacterData data = new SerializableCharacterData
+        if (characterData != null)
         {
-            health = this.health,
-            maxHealth = this.maxHealth,
-            maxEnergy = this.maxEnergy,
-            attackPower = this.attackPower,
-            defensePower = this.defensePower,
-            defensePenetration = this.defensePenetration,
-            speed = this.speed,
-            heroLevel = this.heroLevel,
-            heroExp = this.heroExp,
-            heroSkillPoints = this.heroSkillPoints,
-            heroStatPoints = this.heroStatPoints,
-            stamina = this.stamina,
-            maxStamina = this.maxStamina,
-        };
+            characterData.health = health;
+            characterData.maxHealth = maxHealth;
+            characterData.energy = energy;
+            characterData.maxEnergy = maxEnergy;
+            characterData.attackPower = attackPower;
+            characterData.speed = speed;
+            characterData.heroLevel = heroLevel;
+            characterData.heroExp = heroExp;
+            characterData.heroSkillPoints = heroSkillPoints;
+            characterData.heroStatPoints = heroStatPoints;
+            characterData.stamina = stamina;
+            characterData.maxStamina = maxStamina;
 
-        string jsonData = JsonUtility.ToJson(data);
-        PlayerPrefs.SetString("CharacterData_" + heroID, jsonData);
-        PlayerPrefs.Save();
+            characterData.SaveData();
+        }
     }
 
     public void LoadCharacterData()
     {
-        string jsonData = PlayerPrefs.GetString("CharacterData_" + heroID, "{}");
-        if (jsonData != "{}")
+        if (characterData != null)
         {
-            SerializableCharacterData data = JsonUtility.FromJson<SerializableCharacterData>(jsonData);
-            this.health = data.health;
-            this.maxHealth = data.maxHealth;
-            this.maxEnergy = data.maxEnergy;
-            this.attackPower = data.attackPower;
-            this.defensePower = data.defensePower;
-            this.defensePenetration = data.defensePenetration;
-            this.speed = data.speed;
-            this.heroLevel = data.heroLevel;
-            this.heroExp = data.heroExp;
-            this.heroStatPoints = data.heroStatPoints;
-            this.heroSkillPoints = data.heroSkillPoints;
-            this.stamina = data.stamina;
-            this.maxStamina = data.maxStamina;
-        }
-        else
-        {
-            this.stamina = 10;
-            this.maxStamina = 10;
+            characterData.LoadData();
+            InitializeCharacterStats();
         }
     }
 
@@ -239,5 +227,13 @@ public abstract class Companion : Character
     {
         attackPower -= equipment.attackBonus;
         defensePower -= equipment.defenseBonus;
+    }
+
+    public int expToLevel
+    {
+        get
+        {
+            return ExpToNextLevel(heroLevel);
+        }
     }
 }
