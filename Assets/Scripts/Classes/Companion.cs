@@ -98,8 +98,8 @@ public abstract class Companion : Character
             heroLevel = characterData.heroLevel;
             heroExp = characterData.heroExp;
             skillTreePanel = characterData.skillTreePanel;
-            heroIcon = characterData.heroIcon;
-            fullHeroImage = characterData.fullHeroImage;
+           // heroIcon = characterData.heroIcon;
+           // fullHeroImage = characterData.fullHeroImage;
             heroStatPoints = characterData.heroStatPoints;
             heroSkillPoints = characterData.heroSkillPoints;
             stamina = characterData.stamina;
