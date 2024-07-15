@@ -390,6 +390,7 @@ private void AddToParty(CharacterData characterData)
                     gameManager.currentParty.Add(instantiatedCompanion);
                     Debug.Log("Added to party: " + characterData.heroID);
                     ShowPartyMembers(); // Update UI to reflect changes
+                    CheckPartyNotEmpty();
                 }
                 else
                 {
@@ -412,8 +413,36 @@ private void AddToParty(CharacterData characterData)
     }
 }
 
+//Add more as needed
+public GameObject dungeonSelectionPanel;
+public GameObject forestDungeonButton;
 
+//ASSIGN THE DUNGEON PANEL TO CHECK PARTY 
+public void OpenDungeonPanel()
+{
+    dungeonSelectionPanel.SetActive(true);
+}
+public void ActivateDungeonButtons()
+{
+    forestDungeonButton.SetActive(true);
+}
 
+public void DeactivateDungeonButtons()
+{
+    forestDungeonButton.SetActive(false);
+}
+
+private void CheckPartyNotEmpty()
+{
+    if (GameManager.Instance.currentParty.Count == 0)
+    {
+        DeactivateDungeonButtons();
+    }
+    else
+    {
+        ActivateDungeonButtons();
+    }
+}
 
 
 
