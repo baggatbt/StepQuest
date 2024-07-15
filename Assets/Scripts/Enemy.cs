@@ -10,6 +10,7 @@ public class Enemy : Character
     public int attackGrowth;
     public int defenseGrowth;
     public int healthGrowth;
+    public Sprite enemyIcon;
     public MaterialItem[] possibleDrops; // Assign this in the Inspector with your material items.
     public int dropChancePercentage = 50; // Example drop chance.
 

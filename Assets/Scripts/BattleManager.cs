@@ -103,7 +103,7 @@ public class BattleManager : MonoBehaviour
 
         GameManager.Instance.LoadCurrentParty();
        // SetupBattle(GameManager.Instance.currentParty);
-
+         RestoreHealthAndEnergy();
         expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
         goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
         mainCamera = Camera.main;
@@ -137,7 +137,7 @@ public class BattleManager : MonoBehaviour
                 enemies.Add(spawnedEnemy);
             }
         }
-        RestoreHealthAndEnergy();
+       
        // StartBattle(config);
     }
 
@@ -227,11 +227,22 @@ public class BattleManager : MonoBehaviour
     }
 
     public List<Character> turnOrderList = new List<Character>();
+
+    public GameObject turnOrderBarPanel;
+    public GameObject iconPrefab; //Has an image attached so it can be used for enemy or hero
+
+
     public void InitializeTurnOrder()
     {
         if (!battleLost)
         {
             turnOrderList.Clear();
+            
+            // Clear existing icons from the TurnOrderBarPanel
+            foreach (Transform child in turnOrderBarPanel.transform)
+            {
+                Destroy(child.gameObject);
+            }
 
             if (companion1 != null) turnOrderList.Add(companion1);
             if (companion2 != null) turnOrderList.Add(companion2);
@@ -246,7 +257,25 @@ public class BattleManager : MonoBehaviour
                 }
             }
 
+            // Order by speed descending
             turnOrderList = turnOrderList.OrderByDescending(character => character.speed).ToList();
+
+            // Create icons for each character in the turn order list
+            foreach (var character in turnOrderList)
+            {
+                GameObject icon = Instantiate(iconPrefab, turnOrderBarPanel.transform);
+                Image iconImage = icon.GetComponent<Image>();
+                
+                if (character is Companion)
+                {
+                    iconImage.sprite = (character as Companion).heroIcon;
+                }
+                else if (character is Enemy)
+                {
+                    iconImage.sprite = (character as Enemy).enemyIcon;
+                }
+            }
+
             StartTurn();
         }
         else

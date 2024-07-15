@@ -75,11 +75,13 @@ public class CompanionSpawnController : MonoBehaviour
         companionCharacter.transform.rotation = spawnPoint.rotation;
 
         if (index == 0)
-        {
+        {   
+            Debug.Log("INdex was 0");
             SetupBars(companionCharacter, associatedHealthBarSlider, associatedEnergyBarSlider, associatedHealthText, associatedEnergyText, heroHealthUI1);
         }
         else if (index == 1)
         {
+            Debug.Log("INdex was 1");
             SetupBars(companionCharacter, associatedHealthBarSlider2, associatedEnergyBarSlider2, associatedHealthText2, associatedEnergyText2, heroHealthUI2);
         }
 
