@@ -415,22 +415,23 @@ private void AddToParty(CharacterData characterData)
 
 //Add more as needed
 public GameObject dungeonSelectionPanel;
-public GameObject forestDungeonButton;
+public Button forestDungeonButton;
 
 //ASSIGN THE DUNGEON PANEL TO CHECK PARTY 
 public void OpenDungeonPanel()
 {
     dungeonSelectionPanel.SetActive(true);
+    CheckPartyNotEmpty();
 }
 public void ActivateDungeonButtons()
-{
-    forestDungeonButton.SetActive(true);
-}
+    {
+        forestDungeonButton.interactable = true;
+    }
 
-public void DeactivateDungeonButtons()
-{
-    forestDungeonButton.SetActive(false);
-}
+    public void DeactivateDungeonButtons()
+    {
+        forestDungeonButton.interactable = false;
+    }
 
 private void CheckPartyNotEmpty()
 {
