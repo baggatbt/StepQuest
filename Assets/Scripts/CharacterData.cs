@@ -14,6 +14,7 @@ public class CharacterData : ScriptableObject
     public int heroStatPoints;
     public int heroSkillPoints;
     public int attackPower;
+    public int defensePower;
     public int stamina;
     public int maxStamina;
     public int maxHealth;
@@ -48,6 +49,7 @@ public class CharacterData : ScriptableObject
     public void InitializeDefaults()
     {
         attackPower = 5;
+        defensePower = 2;
         maxHealth = 12;
         health = maxHealth;
         speed = 4;
@@ -60,5 +62,6 @@ public class CharacterData : ScriptableObject
         heroStatPoints = 0;
         maxStamina = 10;
         stamina = maxStamina;
+        
     }
 }

@@ -31,7 +31,7 @@ public class MainMenuUIManager : MonoBehaviour
     public Transform consumableListContent;  // Assign the content transform of your scroll view in the consumables panel
 
     // References to stat UI Text elements
-    public TextMeshProUGUI levelText,atkText, hpText, spText, expText, spdText; 
+    public TextMeshProUGUI levelText,atkText, hpText, spText, expText, spdText, defText; 
 
     //KNIGHT 
     //public Knight knight;
@@ -209,9 +209,11 @@ private void UpdateCompanionStatsDisplay(CharacterData characterData)
 {
     // Update the stats display with data from characterData
     // Example:
-   // healthText.text = $"{characterData.health} / {characterData.maxHealth}";
-  //  energyText.text = $"{characterData.energy} / {characterData.maxEnergy}";
-   // speedText.text = $"{characterData.speed}";
+    atkText.text = $"{characterData.attackPower}";
+   hpText.text = $"{characterData.maxHealth}";
+   spText.text = $"{characterData.maxEnergy}";
+   spdText.text = $"{characterData.speed}";
+   defText.text = $"{characterData.defensePower}";
     // Add other stat updates here
 }
 
@@ -664,13 +666,7 @@ public void PopulateInventoryList() {
     GameManager.Instance.currentCompanion = companion;
     companion.InitializeSkillsBasedOnLevel();
 
-    // Setup and subscribe to events for each upgrade bar
-    /*
-    SetupUpgradeBar(atkUpgradeBar, companion.statUpgradeProgress["atk"], () => IncreaseCompanionStat(companion, "atk"));
-    SetupUpgradeBar(hpUpgradeBar, companion.statUpgradeProgress["hp"], () => IncreaseCompanionStat(companion, "hp"));
-    SetupUpgradeBar(spdUpgradeBar, companion.statUpgradeProgress["spd"], () => IncreaseCompanionStat(companion, "spd"));
-    SetupUpgradeBar(spUpgradeBar, companion.statUpgradeProgress["sp"], () => IncreaseCompanionStat(companion, "sp"));
-    */
+
     // Update companion's stats display and make sure the stats panel is visible
     UpdateCompanionStatsDisplay(companion);
     companionStatsPanel.SetActive(true);
@@ -834,13 +830,13 @@ private void SetupUpgradeBar(GameObject upgradeBarGO, int initialProgress, Actio
 private void UpdateCompanionStatsDisplay(Companion companion)
 {
     levelText.text = "Lv: " + companion.heroLevel.ToString();
-    atkText.text = "ATK: " + companion.attackPower.ToString();
-    hpText.text = "HP: " + companion.health + " / " + companion.maxHealth.ToString();
-    spText.text = "SP: " + companion.maxEnergy.ToString();
+    atkText.text = companion.attackPower.ToString();
+    hpText.text = companion.maxHealth.ToString();
+    spText.text = companion.maxEnergy.ToString();
     expText.text = "EXP: " + companion.heroExp.ToString() + " / " + companion.ExpToNextLevel(companion.heroLevel);
-    spdText.text = "SPD: " + companion.speed.ToString();
+    spdText.text = companion.speed.ToString();
 }
-
+/*
     public void IncreaseCompanionStat(Companion companion, string statType)
 {
     // Increase the stat based on the type
@@ -869,6 +865,7 @@ private void UpdateCompanionStatsDisplay(Companion companion)
 
     }
 }
+*/
    
     
     public CanvasGroup currentPanel;
