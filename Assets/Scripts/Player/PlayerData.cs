@@ -16,8 +16,6 @@ public class PlayerData : MonoBehaviour
     public int level;
     public int exp;
     public int gold;
-    public int silver;
-    public int copper;
     public int attackPower;
     public int defensePower;
     public int inGameSteps; //Steps used for the game

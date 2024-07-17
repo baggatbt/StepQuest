@@ -21,8 +21,6 @@ public class MainMenuUIManager : MonoBehaviour
     public GameObject knightSkillListView;
     public TextMeshProUGUI stepsText;
     public TextMeshProUGUI goldText;
-    public TextMeshProUGUI silverText;
-    public TextMeshProUGUI copperText;
     public GameObject companionButtonPrefab;
     public GameObject companionListPanel;
     public GameObject companionStatsPanel;
@@ -53,9 +51,7 @@ public class MainMenuUIManager : MonoBehaviour
     private void Update()
     {
          if (stepsText != null) stepsText.text =  PlayerData.Instance.inGameSteps.ToString();  
-         if (goldText != null) goldText.text =  PlayerData.Instance.gold.ToString();  
-         if (silverText != null) silverText.text =  PlayerData.Instance.silver.ToString();  
-         if (copperText != null) copperText.text =  PlayerData.Instance.copper.ToString();  
+         if (goldText != null) goldText.text =  PlayerData.Instance.gold.ToString();    
          UpdateTimerDisplay();
          UpdateKnightRecoveryTimerDisplay();
     }
@@ -211,11 +207,11 @@ private void UpdateCompanionStatsDisplay(CharacterData characterData)
     // Example:
 
     atkText.text = $"{characterData.attackPower}";
-   hpText.text = $"{characterData.maxHealth}";
-   spText.text = $"{characterData.maxEnergy}";
+   hpText.text = $"{characterData.health}/{characterData.maxHealth}";
+   spText.text = $"{characterData.energy}/{characterData.maxEnergy}";
    spdText.text = $"{characterData.speed}";
    defText.text = $"{characterData.defensePower}";
-   expText.text = $"{characterData.heroExp} / ${characterData.expToLevel}";
+   expText.text = $"Exp:{characterData.heroExp}/{characterData.ExpToNextLevel(characterData.heroLevel)}";
     // Add other stat updates here
 }
 
