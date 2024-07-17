@@ -209,11 +209,13 @@ private void UpdateCompanionStatsDisplay(CharacterData characterData)
 {
     // Update the stats display with data from characterData
     // Example:
+
     atkText.text = $"{characterData.attackPower}";
    hpText.text = $"{characterData.maxHealth}";
    spText.text = $"{characterData.maxEnergy}";
    spdText.text = $"{characterData.speed}";
    defText.text = $"{characterData.defensePower}";
+   expText.text = $"{characterData.heroExp} / ${characterData.expToLevel}";
     // Add other stat updates here
 }
 
@@ -834,8 +836,10 @@ private void UpdateCompanionStatsDisplay(Companion companion)
     hpText.text = companion.maxHealth.ToString();
     spText.text = companion.maxEnergy.ToString();
     expText.text = "EXP: " + companion.heroExp.ToString() + " / " + companion.ExpToNextLevel(companion.heroLevel);
+    Debug.Log(expText.text);
     spdText.text = companion.speed.ToString();
 }
+
 /*
     public void IncreaseCompanionStat(Companion companion, string statType)
 {

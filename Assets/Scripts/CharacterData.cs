@@ -23,6 +23,7 @@ public class CharacterData : ScriptableObject
     public int energy;
     public int speed;
     public bool isUnlocked;
+    public int expToLevel;
 
     public int ExpToNextLevel(int heroLevel)
     {
@@ -62,6 +63,7 @@ public class CharacterData : ScriptableObject
         heroStatPoints = 0;
         maxStamina = 10;
         stamina = maxStamina;
+        expToLevel = ExpToNextLevel(heroLevel);
         
     }
 }
