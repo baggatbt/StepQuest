@@ -119,8 +119,15 @@ public class BattleManager : MonoBehaviour
             Debug.LogError("No battle configuration found.");
         }
 
+        
         for (int i = 0; i < config.maxEnemiesToSpawn; i++)
         {
+            // Activate the spawn point if it is inactive
+            if (!enemySpawnPoints[i].gameObject.activeSelf)
+            {
+                enemySpawnPoints[i].gameObject.SetActive(true);
+            }
+
             Character spawnedEnemy = enemySpawnController.SpawnEnemiesFromPool(
                 config.poolName,
                 1,

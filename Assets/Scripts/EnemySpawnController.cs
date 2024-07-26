@@ -44,6 +44,7 @@ public class EnemySpawnController : MonoBehaviour
        
         return null;
     }
+     
 
     Character lastSpawnedCharacter = null;
     for (int i = 0; i < numberToSpawn; i++)

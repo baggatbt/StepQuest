@@ -71,17 +71,23 @@ public class CompanionSpawnController : MonoBehaviour
 
         Transform spawnPoint = companionSpawnPoints[index];
 
+        // Activate the spawn point if it is inactive
+        if (!spawnPoint.gameObject.activeSelf)
+        {
+            spawnPoint.gameObject.SetActive(true);
+        }
+
         companionCharacter.transform.position = spawnPoint.position;
         companionCharacter.transform.rotation = spawnPoint.rotation;
 
         if (index == 0)
         {   
-            Debug.Log("INdex was 0");
+            Debug.Log("Index was 0");
             SetupBars(companionCharacter, associatedHealthBarSlider, associatedEnergyBarSlider, associatedHealthText, associatedEnergyText, heroHealthUI1);
         }
         else if (index == 1)
         {
-            Debug.Log("INdex was 1");
+            Debug.Log("Index was 1");
             SetupBars(companionCharacter, associatedHealthBarSlider2, associatedEnergyBarSlider2, associatedHealthText2, associatedEnergyText2, heroHealthUI2);
         }
 
