@@ -30,7 +30,8 @@ public abstract class Companion : Character
     public int atkGrowth;
     public int healthGrowth;
     public int energyGrowth;
-    //Implementing Scriptable Objects for hero data
+
+    // Implementing Scriptable Objects for hero data
     public CharacterData characterData;
     public Dictionary<string, int> statUpgradeProgress = new Dictionary<string, int>
     {
@@ -98,8 +99,8 @@ public abstract class Companion : Character
             heroLevel = characterData.heroLevel;
             heroExp = characterData.heroExp;
             skillTreePanel = characterData.skillTreePanel;
-           // heroIcon = characterData.heroIcon;
-           // fullHeroImage = characterData.fullHeroImage;
+            heroIcon = characterData.heroIcon;  // Assign heroIcon from characterData
+            fullHeroImage = characterData.fullHeroImage;  // Assign fullHeroImage from characterData
             heroStatPoints = characterData.heroStatPoints;
             heroSkillPoints = characterData.heroSkillPoints;
             stamina = characterData.stamina;

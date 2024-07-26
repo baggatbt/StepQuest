@@ -49,6 +49,8 @@ public class CharacterData : ScriptableObject
 
     public void InitializeDefaults()
     {
+        // Initialize only the fields that do not hold references to assets
+        heroLevel = 1;
         attackPower = 5;
         defensePower = 2;
         maxHealth = 12;
@@ -64,6 +66,7 @@ public class CharacterData : ScriptableObject
         maxStamina = 10;
         stamina = maxStamina;
         expToLevel = ExpToNextLevel(heroLevel);
+
         
     }
 }
