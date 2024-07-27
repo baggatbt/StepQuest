@@ -10,7 +10,13 @@ public class Knight : Companion
     {
         base.Awake();
 
-        InitializeSkillsBasedOnLevel();
+        // Assign specific paths for Knight icons
+        if (characterData != null)
+        {
+            characterData.heroIconPath = "Path/To/KnightIcon";
+            characterData.fullHeroImagePath = "Path/To/KnightFullImage";
+        }
+         InitializeSkillsBasedOnLevel();
     }
 
     public override void InitializeSkillsBasedOnLevel()

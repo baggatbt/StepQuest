@@ -76,47 +76,48 @@ public abstract class Companion : Character
     }
 
     public void SetCharacterData(CharacterData data)
+{
+    characterData = data;
+
+    if (characterData.heroLevel == 0)
     {
-        characterData = data;
-
-        if (characterData.heroLevel == 0)
-        {
-            characterData.InitializeDefaults();
-        }
-        else
-        {
-            characterData.LoadData(); // Load saved data
-        }
-
-        InitializeCharacterStats();
+        characterData.InitializeDefaults();
+    }
+    else
+    {
+        characterData.LoadData(); // Load saved data
     }
 
-    public void InitializeCharacterStats()
+    InitializeCharacterStats();
+}
+
+public void InitializeCharacterStats()
+{
+    if (characterData != null)
     {
-        if (characterData != null)
-        {
-            heroID = characterData.heroID;
-            heroLevel = characterData.heroLevel;
-            heroExp = characterData.heroExp;
-            skillTreePanel = characterData.skillTreePanel;
-            heroIcon = characterData.heroIcon;  // Assign heroIcon from characterData
-            fullHeroImage = characterData.fullHeroImage;  // Assign fullHeroImage from characterData
-            heroStatPoints = characterData.heroStatPoints;
-            heroSkillPoints = characterData.heroSkillPoints;
-            stamina = characterData.stamina;
-            maxStamina = characterData.maxStamina;
-            maxHealth = characterData.maxHealth;
-            health = characterData.health;
-            maxEnergy = characterData.maxEnergy;
-            energy = characterData.energy;
-            speed = characterData.speed;
-            attackPower = characterData.attackPower;
-        }
-        else
-        {
-            Debug.LogError("Character data is not assigned.");
-        }
+        heroID = characterData.heroID;
+        heroLevel = characterData.heroLevel;
+        heroExp = characterData.heroExp;
+        skillTreePanel = characterData.skillTreePanel;
+        heroStatPoints = characterData.heroStatPoints;
+        heroSkillPoints = characterData.heroSkillPoints;
+        stamina = characterData.stamina;
+        maxStamina = characterData.maxStamina;
+        maxHealth = characterData.maxHealth;
+        health = characterData.health;
+        maxEnergy = characterData.maxEnergy;
+        energy = characterData.energy;
+        speed = characterData.speed;
+        attackPower = characterData.attackPower;
     }
+    else
+    {
+        Debug.LogError("Character data is not assigned.");
+    }
+}
+
+
+
 
     public abstract void LevelUp();
 
@@ -137,25 +138,27 @@ public abstract class Companion : Character
     }
 
     public void SaveCharacterData()
+{
+    if (characterData != null)
     {
-        if (characterData != null)
-        {
-            characterData.health = health;
-            characterData.maxHealth = maxHealth;
-            characterData.energy = energy;
-            characterData.maxEnergy = maxEnergy;
-            characterData.attackPower = attackPower;
-            characterData.speed = speed;
-            characterData.heroLevel = heroLevel;
-            characterData.heroExp = heroExp;
-            characterData.heroSkillPoints = heroSkillPoints;
-            characterData.heroStatPoints = heroStatPoints;
-            characterData.stamina = stamina;
-            characterData.maxStamina = maxStamina;
+        characterData.health = health;
+        characterData.maxHealth = maxHealth;
+        characterData.energy = energy;
+        characterData.maxEnergy = maxEnergy;
+        characterData.attackPower = attackPower;
+        characterData.speed = speed;
+        characterData.heroLevel = heroLevel;
+        characterData.heroExp = heroExp;
+        characterData.heroSkillPoints = heroSkillPoints;
+        characterData.heroStatPoints = heroStatPoints;
+        characterData.stamina = stamina;
+        characterData.maxStamina = maxStamina;
 
-            characterData.SaveData();
-        }
+       
+
+        characterData.SaveData();
     }
+}
 
     public void LoadCharacterData()
     {

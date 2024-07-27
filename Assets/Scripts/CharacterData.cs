@@ -11,6 +11,8 @@ public class CharacterData : ScriptableObject
     public GameObject skillTreePanel;
     public Sprite heroIcon;
     public Sprite fullHeroImage;
+    public string heroIconPath;  // Path or ID for the heroIcon
+    public string fullHeroImagePath;  // Path or ID for the fullHeroImage
     public int heroStatPoints;
     public int heroSkillPoints;
     public int attackPower;
@@ -67,6 +69,11 @@ public class CharacterData : ScriptableObject
         stamina = maxStamina;
         expToLevel = ExpToNextLevel(heroLevel);
 
-        
+    }
+
+    // Methods to load sprites from paths
+    public Sprite LoadSprite(string path)
+    {
+        return Resources.Load<Sprite>(path);
     }
 }
