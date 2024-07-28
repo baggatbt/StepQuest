@@ -685,4 +685,52 @@ public class GameManager : MonoBehaviour
         // If no matching item is found, return null
         return null;
     }
+
+
+    //Map Nodes Management
+    public Node currentNode; // The player's current node
+    public List<Node> allNodes; // List of all nodes in the scene
+
+    public int CalculateTravelCost(Node fromNode, Node toNode)
+    {
+        return Node.CalculateCost(fromNode, toNode);
+    }
+
+    public void OnNodeSelected(Node selectedNode)
+    {
+        if (selectedNode != null && selectedNode != currentNode)
+        {
+            int cost = CalculateTravelCost(currentNode, selectedNode);
+            bool paymentConfirmed = PromptPayment(cost);
+
+            if (paymentConfirmed)
+            {
+                MoveToNode(selectedNode);
+            }
+        }
+    }
+
+    private bool PromptPayment(int cost)
+    {
+        // Implement your payment prompt logic here
+        // Example: Show a UI dialog asking for confirmation to pay the cost
+        // Return true if the payment is confirmed, otherwise return false
+
+        Debug.Log($"Prompting payment of {cost} units to move to the selected node.");
+        // Simulate payment confirmation for the example
+        return true; // Replace this with actual confirmation logic
+    }
+
+    
+    
+
+    public void MoveToNode(Node destinationNode)
+    {
+        // Move player to the destination node
+        currentNode = destinationNode;
+        transform.position = destinationNode.position; // Update the player's position
+        Debug.Log($"Moved to {destinationNode.nodeName}");
+    }
+
+    
 }
