@@ -182,11 +182,15 @@ public void InitializeCharacterStats()
             Debug.Log("No data found for " + this.name);
         }
     }
+    
 
+    public int baseExp = 50; // Starting value for experience points
+    public float growthFactor = 1.1f; // Growth factor for exponential increase
     public int ExpToNextLevel(int heroLevel)
     {
-        Debug.Log("EXP to level : " + (30 * heroLevel * heroLevel));
-        return 30 * heroLevel * heroLevel;
+        int exp = Mathf.RoundToInt(baseExp * Mathf.Pow(growthFactor, heroLevel));
+        Debug.Log($"EXP to next level (Level {heroLevel}): {exp}");
+        return exp;
     }
 
     public void RecoverHealth(int amount)

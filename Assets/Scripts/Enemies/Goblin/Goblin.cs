@@ -18,6 +18,9 @@ public class Goblin : Enemy
         this.attackPower = 4;
         this.defensePower = 0;
         this.energy = 0;
+        this.baseExp = 10; // Base experience points given by goblins
+        this.growthFactor = 1.1f; // Growth factor to control the steepness
+        this.multiplier = 1; // Multiplier for the experience calculation
     }
 
     protected override void Start()
@@ -37,6 +40,8 @@ public class Goblin : Enemy
         this.currentSkill = this.normalSkill;
     }
 
+   
+
     public override void UpdateStats()
     {
         base.UpdateStats(); // Ensures that any updates that happen in the base class, including expReward and goldReward updates, are applied
@@ -44,7 +49,10 @@ public class Goblin : Enemy
         // Goblin-specific updates
         this.maxHealth = 6 + (this.level * 4);
         this.health = this.maxHealth;
-        this.expReward = 10 + (this.level * 4);
+
+        // Calculate expReward based on the specific multiplier (2 in this case)
+        this.expReward = ExpGivenByEnemy(this.level);
+        
         this.goldReward = 3 + (this.level * 2); // You can keep or modify this if you want specific gold logic for Goblins
         this.attacksBeforeSpecial = 2;
         this.attackPower = 4 + (this.level * 3); 
