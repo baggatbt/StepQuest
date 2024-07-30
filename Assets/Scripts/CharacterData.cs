@@ -43,6 +43,7 @@ public class CharacterData : ScriptableObject
     public void LoadData()
     {
         string jsonData = PlayerPrefs.GetString("CharacterData_" + heroID, "{}");
+        
         if (jsonData != "{}")
         {
             JsonUtility.FromJsonOverwrite(jsonData, this);
@@ -51,6 +52,7 @@ public class CharacterData : ScriptableObject
 
     public void InitializeDefaults()
     {
+        /*
         // Initialize only the fields that do not hold references to assets
         heroLevel = 1;
         attackPower = 5;
@@ -60,7 +62,7 @@ public class CharacterData : ScriptableObject
         speed = 4;
         maxEnergy = 5;
         energy = maxEnergy;
-        heroID = "Knight";
+       // heroID = "Knight";
         heroLevel = 1;
         heroExp = 0;
         heroSkillPoints = 0;
@@ -68,6 +70,7 @@ public class CharacterData : ScriptableObject
         maxStamina = 10;
         stamina = maxStamina;
         expToLevel = ExpToNextLevel(heroLevel);
+        */
 
     }
 

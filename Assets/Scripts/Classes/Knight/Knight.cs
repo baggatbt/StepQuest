@@ -14,7 +14,7 @@ public class Knight : Companion
         if (characterData != null)
         {
             characterData.heroIconPath = "Assets/Resources/Sprites/GUI/knightIcon.png";
-            characterData.fullHeroImagePath = "Path/To/KnightFullImage";
+           // characterData.fullHeroImagePath = "Path/To/KnightFullImage";
         }
          InitializeSkillsBasedOnLevel();
     }

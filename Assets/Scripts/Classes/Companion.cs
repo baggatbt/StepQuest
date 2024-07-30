@@ -153,6 +153,7 @@ public void InitializeCharacterStats()
         characterData.heroStatPoints = heroStatPoints;
         characterData.stamina = stamina;
         characterData.maxStamina = maxStamina;
+        characterData.heroIcon = heroIcon;
 
        
 
@@ -165,7 +166,7 @@ public void InitializeCharacterStats()
         if (characterData != null)
         {
             characterData.LoadData();
-            InitializeCharacterStats();
+            
         }
     }
 
@@ -182,7 +183,7 @@ public void InitializeCharacterStats()
             Debug.Log("No data found for " + this.name);
         }
     }
-    
+
 
     public int baseExp = 50; // Starting value for experience points
     public float growthFactor = 1.1f; // Growth factor for exponential increase

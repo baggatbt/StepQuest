@@ -166,6 +166,7 @@ public class MainMenuUIManager : MonoBehaviour
             if (heroIconImage != null && characterData.heroIcon != null)
             {
                 heroIconImage.sprite = characterData.heroIcon;
+                Debug.Log("Hero icon set from characterData");
             }
 
             healthBarSlider.maxValue = characterData.maxHealth;
