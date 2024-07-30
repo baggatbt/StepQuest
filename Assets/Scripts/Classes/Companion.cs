@@ -109,6 +109,7 @@ public void InitializeCharacterStats()
         energy = characterData.energy;
         speed = characterData.speed;
         attackPower = characterData.attackPower;
+        defensePower = characterData.defensePower;
     }
     else
     {
@@ -146,6 +147,7 @@ public void InitializeCharacterStats()
         characterData.energy = energy;
         characterData.maxEnergy = maxEnergy;
         characterData.attackPower = attackPower;
+        characterData.defensePower = defensePower;
         characterData.speed = speed;
         characterData.heroLevel = heroLevel;
         characterData.heroExp = heroExp;
