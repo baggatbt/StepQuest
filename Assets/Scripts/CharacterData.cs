@@ -50,6 +50,8 @@ public class CharacterData : ScriptableObject
         }
     }
 
+    
+
     public void InitializeDefaults()
     {
         /*

@@ -28,12 +28,32 @@ public class Knight : Companion
         Debug.Log($"Total Available skills: {availableSkills.Count}");
     }
 
+    public void UpdateStats()
+    {
+
+        
+        this.maxHealth = 12 + (this.level - 1) * 2;
+        this.health = this.maxHealth;
+
+        
+        
+       
+        this.attackPower = 5 + ((this.level - 1) / 2);
+        
+        
+    }
+
+    
+
     public override void LevelUp()
     {
         if (this.heroExp >= ExpToNextLevel(this.heroLevel))
         {
             this.heroExp -= ExpToNextLevel(this.heroLevel);
             this.heroLevel++;
+            UpdateStats();
+
+            /*
 
             switch (this.heroLevel)
             {
@@ -60,7 +80,7 @@ public class Knight : Companion
                     this.attackPower += 1;
                     break;
                 case 9:
-                    this.defensePower += 1;
+                   // this.defensePower += 1;
                     break;
                 case 10:
                     this.maxHealth += 4;
@@ -68,7 +88,7 @@ public class Knight : Companion
                 default:
                     break;
             }
-
+        */
             this.health = this.maxHealth;
             this.energy = this.maxEnergy;
 

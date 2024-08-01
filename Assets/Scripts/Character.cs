@@ -237,6 +237,7 @@ public class Character : MonoBehaviour
         Debug.Log("did block from character" + this.didBlock);
         if (!this.didBlock){
         this.animator.SetTrigger("IsHurtTrigger");
+        StartCoroutine(TintRed());
         }
         // Trigger hit reaction, damage popup, etc.
         
@@ -257,6 +258,21 @@ public class Character : MonoBehaviour
     
    
 }
+public float tintDuration = 0.1f; // Duration of the tint
+private IEnumerator TintRed()
+    {
+        // Store the original color of the sprite
+        Color originalColor = spriteRenderer.color;
+
+        // Set the sprite color to red
+        spriteRenderer.color = Color.red;
+
+        // Wait for the tint duration
+        yield return new WaitForSeconds(tintDuration);
+
+        // Revert the sprite color to its original color
+        spriteRenderer.color = originalColor;
+    }
 
 
     IEnumerator FadeOutSprite()

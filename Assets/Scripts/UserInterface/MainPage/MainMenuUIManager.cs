@@ -206,7 +206,7 @@ private void UpdateCompanionStatsDisplay(CharacterData characterData)
 {
     // Update the stats display with data from characterData
     // Example:
-
+    levelText.text = $"Lv: {characterData.heroLevel}";
     atkText.text = $"{characterData.attackPower}";
    hpText.text = $"{characterData.health}/{characterData.maxHealth}";
    spText.text = $"{characterData.energy}/{characterData.maxEnergy}";
