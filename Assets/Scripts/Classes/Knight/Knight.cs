@@ -13,7 +13,7 @@ public class Knight : Companion
         // Assign specific paths for Knight icons
         if (characterData != null)
         {
-            characterData.heroIconPath = "Assets/Resources/Sprites/GUI/knightIcon.png";
+           // characterData.heroIconPath = "Assets/Resources/Sprites/GUI/knightIcon.png";
            // characterData.fullHeroImagePath = "Path/To/KnightFullImage";
         }
          InitializeSkillsBasedOnLevel();

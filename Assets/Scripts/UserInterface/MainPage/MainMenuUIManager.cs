@@ -481,47 +481,16 @@ private void ShowPartyMembers()
 
 
 
- public SkillPanelController skillPanelController;
+ public GameObject skillPanel;
 
 public void OpenSkillPanel()
 {   
-    string companionName = GameManager.Instance.currentCompanion.heroID;
+   skillPanel.SetActive(true);
+}
 
-    // Concatenate the companion name with "SkillTreePanel"
-    string panelName = companionName + "SkillTreePanel";
-    GameObject skillTreePanelObject = GameObject.Find(panelName);
-    GameObject skillTreeSkillPointTextObject = GameObject.Find("SkillPointText");
-    Debug.Log(GameManager.Instance.currentCompanion);
-
-    // Check if the GameObjects are found
-    if (skillTreePanelObject != null && skillTreeSkillPointTextObject != null)
-    {
-        // Get the CanvasGroup component of the skill tree panel GameObject
-        CanvasGroup canvasGroup = skillTreePanelObject.GetComponent<CanvasGroup>();
-
-        // Get the Text component of the skill point text GameObject
-        TextMeshProUGUI skillPointText = skillTreeSkillPointTextObject.GetComponent<TextMeshProUGUI>();
-
-        // Check if the CanvasGroup and Text components exist
-        if (canvasGroup != null && skillPointText != null)
-        {
-            // Show the panel by setting its alpha and interactable properties
-            canvasGroup.alpha = 1;
-            canvasGroup.interactable = true;
-            canvasGroup.blocksRaycasts = true;
-
-            // Update the text of the skill point text
-            skillPointText.text = "SP: " + GameManager.Instance.currentCompanion.heroSkillPoints.ToString();
-        }
-        else
-        {
-            Debug.LogError("CanvasGroup or Text component not found on the corresponding GameObject.");
-        }
-    }
-    else
-    {
-        Debug.LogError("Skill tree panel or skill point text GameObject not found.");
-    }
+public void CloseSkillPanel()
+{
+    skillPanel.SetActive(false);
 }
 
 
@@ -895,7 +864,7 @@ private void UpdateCompanionStatsDisplay(Companion companion)
    public void TogglePanel(GameObject panel)
 {
     panel.SetActive(!panel.activeSelf);
-    companionStatsPanel.SetActive(false);
+    //companionStatsPanel.SetActive(false);
 }
 
     public void ToggleCanvasGroup(GameObject canvasGroupObject)

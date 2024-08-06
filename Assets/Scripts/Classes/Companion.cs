@@ -81,13 +81,13 @@ public abstract class Companion : Character
 
     if (characterData.heroLevel == 0)
     {
-        characterData.InitializeDefaults();
+        characterData.heroLevel = 1;
+        characterData.heroExp = 0;
+        characterData.heroSkillPoints = 0;
+        characterData.heroStatPoints = 0;
     }
-    else
-    {
-        characterData.LoadData(); // Load saved data
-    }
-
+    
+    characterData.LoadData();
     InitializeCharacterStats();
 }
 
@@ -155,7 +155,7 @@ public void InitializeCharacterStats()
         characterData.heroStatPoints = heroStatPoints;
         characterData.stamina = stamina;
         characterData.maxStamina = maxStamina;
-        characterData.heroIcon = heroIcon;
+   
 
        
 
@@ -167,7 +167,7 @@ public void InitializeCharacterStats()
     {
         if (characterData != null)
         {
-            characterData.LoadData();
+         //   characterData.LoadData();
             
         }
     }
@@ -247,4 +247,6 @@ public void InitializeCharacterStats()
             return ExpToNextLevel(heroLevel);
         }
     }
+
+    
 }

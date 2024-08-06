@@ -9,10 +9,8 @@ public class CharacterData : ScriptableObject
     public int heroLevel;
     public int heroExp;
     public GameObject skillTreePanel;
-    public Sprite heroIcon;
+    public Sprite heroIcon; // Set this in the Editor
     public Sprite fullHeroImage;
-    public string heroIconPath;  // Path or ID for the heroIcon
-    public string fullHeroImagePath;  // Path or ID for the fullHeroImage
     public int heroStatPoints;
     public int heroSkillPoints;
     public int attackPower;
@@ -27,6 +25,9 @@ public class CharacterData : ScriptableObject
     public bool isUnlocked;
     public int expToLevel;
 
+    // Do not touch this field after setting it in the Editor
+    // Remove methods that might modify heroIcon like OnEnable or LoadSprite
+    
     public int ExpToNextLevel(int heroLevel)
     {
         Debug.Log("EXP to level : " + (30 * heroLevel * heroLevel));
@@ -48,37 +49,5 @@ public class CharacterData : ScriptableObject
         {
             JsonUtility.FromJsonOverwrite(jsonData, this);
         }
-    }
-
-    
-
-    public void InitializeDefaults()
-    {
-        /*
-        // Initialize only the fields that do not hold references to assets
-        heroLevel = 1;
-        attackPower = 5;
-        defensePower = 2;
-        maxHealth = 12;
-        health = maxHealth;
-        speed = 4;
-        maxEnergy = 5;
-        energy = maxEnergy;
-       // heroID = "Knight";
-        heroLevel = 1;
-        heroExp = 0;
-        heroSkillPoints = 0;
-        heroStatPoints = 0;
-        maxStamina = 10;
-        stamina = maxStamina;
-        expToLevel = ExpToNextLevel(heroLevel);
-        */
-
-    }
-
-    // Methods to load sprites from paths
-    public Sprite LoadSprite(string path)
-    {
-        return Resources.Load<Sprite>(path);
     }
 }

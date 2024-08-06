@@ -10986,7 +10986,7 @@ GameObject:
   - component: {fileID: 307676186}
   - component: {fileID: 307676185}
   m_Layer: 5
-  m_Name: Scroll View
+  m_Name: SkillTreeScrollView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11056,7 +11056,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -25087,6 +25087,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1274183892}
+        m_TargetAssemblyTypeName: MainMenuUIManager, Assembly-CSharp
+        m_MethodName: CloseSkillPanel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &778930393
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28341,9 +28353,9 @@ RectTransform:
   m_Father: {fileID: 1648918258}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 1040.2494, y: -550}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &929256629
@@ -28697,7 +28709,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -8.737061, y: 380.69995}
+  m_AnchoredPosition: {x: -8.736816, y: 380.69995}
   m_SizeDelta: {x: -1447.9, y: -5534.1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &936387587
@@ -29907,7 +29919,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &994307428
 RectTransform:
   m_ObjectHideFlags: 0
@@ -29936,8 +29948,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.14887111, y: 0}
   m_AnchorMax: {x: 0.86519843, y: 0.7768858}
-  m_AnchoredPosition: {x: -8.272461, y: 536.7158}
-  m_SizeDelta: {x: 1971.3003, y: 3916.9995}
+  m_AnchoredPosition: {x: -22.8, y: 536.7158}
+  m_SizeDelta: {x: 2326, y: 3917}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &994307429
 MonoBehaviour:
@@ -30627,9 +30639,9 @@ RectTransform:
   m_Father: {fileID: 1648918258}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 2060.2495, y: -550}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1034334436
@@ -30815,7 +30827,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2255148490054618754, guid: d69c1ea3d2e9050499de5bfbf9e856e5, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3349296499348391448, guid: d69c1ea3d2e9050499de5bfbf9e856e5, type: 3}
       propertyPath: m_Pivot.x
@@ -33019,9 +33031,9 @@ RectTransform:
   m_Father: {fileID: 1648918258}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 1550.2494, y: -550}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1099443979
@@ -37451,7 +37463,7 @@ MonoBehaviour:
   heroSlotOne: {fileID: 8550172747517521384}
   heroSlotTwo: {fileID: 2140815267}
   defaultHeroSprite: {fileID: 21300000, guid: 5199eb4dd3d15744c856ccf6219e3723, type: 3}
-  skillPanelController: {fileID: 0}
+  skillPanel: {fileID: 1543386176}
   restRecoverStaminaPanel: {fileID: 0}
   stepsToPayText: {fileID: 0}
   uiCanvasGroup: {fileID: 0}
@@ -38471,7 +38483,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.0149081275, y: 2280.7021}
+  m_AnchoredPosition: {x: -0.0149081275, y: 2280.6875}
   m_SizeDelta: {x: 0, y: 6186.1}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1339290606
@@ -45517,12 +45529,12 @@ GameObject:
   - component: {fileID: 1543386179}
   - component: {fileID: 1543386178}
   m_Layer: 5
-  m_Name: SkillOneSelectionPanel
+  m_Name: KnightSkillPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1543386177
 RectTransform:
   m_ObjectHideFlags: 0
@@ -51645,9 +51657,9 @@ RectTransform:
   m_Father: {fileID: 1648918258}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 530.2494, y: -550}
   m_SizeDelta: {x: 400, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1793188593
@@ -56045,11 +56057,11 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1274183892}
         m_TargetAssemblyTypeName: MainMenuUIManager, Assembly-CSharp
-        m_MethodName: OpenSkillPanel
-        m_Mode: 1
+        m_MethodName: TogglePanel
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 1543386176}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -58106,7 +58118,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2037130038
 RectTransform:
   m_ObjectHideFlags: 0
