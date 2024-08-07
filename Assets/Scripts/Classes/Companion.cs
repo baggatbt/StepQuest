@@ -30,6 +30,8 @@ public abstract class Companion : Character
     public int atkGrowth;
     public int healthGrowth;
     public int energyGrowth;
+    public SkillType skillOne;
+    public SkillType skillTwo;
 
     // Implementing Scriptable Objects for hero data
     public CharacterData characterData;

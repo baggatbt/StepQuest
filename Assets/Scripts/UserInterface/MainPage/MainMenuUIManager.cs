@@ -806,6 +806,11 @@ private void UpdateCompanionStatsDisplay(Companion companion)
     spdText.text = companion.speed.ToString();
 }
 
+public void UnlockSkillOneForHero()
+{
+    GameManager.Instance.currentCompanionData.UnlockSkill(GameManager.Instance.currentCompanionData.skillOne);
+    Debug.Log("added skill one");
+}
 /*
     public void IncreaseCompanionStat(Companion companion, string statType)
 {

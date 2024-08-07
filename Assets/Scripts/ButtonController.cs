@@ -100,7 +100,7 @@ public void PopulateSkillPanelWithCompanionSkills()
     skillButtons.Clear();
     Debug.Log($"Populating skills for {activeCompanion.heroID}. Number of available skills: {activeCompanion.AvailableSkills.Count}");
 
-    foreach (SkillType skillType in activeCompanion.AvailableSkills)  // Changed to property access
+    foreach (SkillType skillType in activeCompanion.characterData.AvailableSkills)  // Changed to property access
     {
         Skill currentSkill = activeCompanion.GetSkillInstance(skillType);
         if (currentSkill == null)

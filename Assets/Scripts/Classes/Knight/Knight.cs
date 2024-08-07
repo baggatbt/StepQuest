@@ -9,7 +9,8 @@ public class Knight : Companion
     protected override void Awake()
     {
         base.Awake();
-
+        skillOne = SkillType.TripleHit;
+        skillTwo = SkillType.Taunt;
         // Assign specific paths for Knight icons
         if (characterData != null)
         {
@@ -23,8 +24,10 @@ public class Knight : Companion
     {
         availableSkills.Clear();
         availableSkills.Add(SkillType.Slash);
-        if (this.heroLevel >= 2) availableSkills.Add(SkillType.TripleHit);
-        if (this.heroLevel >= 5) availableSkills.Add(SkillType.Taunt);
+        //testing methods
+
+      //  if (this.heroLevel >= 2) availableSkills.Add(SkillType.TripleHit);
+      //  if (this.heroLevel >= 5) availableSkills.Add(SkillType.Taunt);
         Debug.Log($"Total Available skills: {availableSkills.Count}");
     }
 

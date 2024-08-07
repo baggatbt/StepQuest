@@ -24,6 +24,9 @@ public class CharacterData : ScriptableObject
     public int speed;
     public bool isUnlocked;
     public int expToLevel;
+    public SkillType skillOne;
+    public  List<SkillType> AvailableSkills;
+    public  List<SkillType> LockedSkills;
 
     // Do not touch this field after setting it in the Editor
     // Remove methods that might modify heroIcon like OnEnable or LoadSprite
@@ -32,6 +35,20 @@ public class CharacterData : ScriptableObject
     {
         Debug.Log("EXP to level : " + (30 * heroLevel * heroLevel));
         return 30 * heroLevel * heroLevel;
+    }
+
+    public void UnlockSkill(SkillType skillType)
+    {
+        if (LockedSkills.Contains(skillType))
+        {
+            LockedSkills.Remove(skillType);
+            AvailableSkills.Add(skillType);
+            Debug.Log(skillType.ToString() + " unlocked.");
+        }
+        else
+        {
+            Debug.LogError(skillType.ToString() + " is not in the LockedSkills list.");
+        }
     }
 
     public void SaveData()
