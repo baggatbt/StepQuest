@@ -231,7 +231,7 @@ private void UpdateHeroImage(CharacterData characterData)
         if (heroImage != null)
         {
             // Set the sprite of the Image component to the character's fullHeroImage
-            heroImage.sprite = characterData.fullHeroImage;
+         //   heroImage.sprite = characterData.fullHeroImage;
         }
         else
         {
@@ -676,7 +676,7 @@ public void PopulateInventoryList() {
         if (heroImage != null)
         {
             // Set the sprite of the Image component to the companion's heroIcon
-            heroImage.sprite = companion.fullHeroImage;
+          //  heroImage.sprite = companion.fullHeroImage;
         }
         else
         {
@@ -810,6 +810,12 @@ public void UnlockSkillOneForHero()
 {
     GameManager.Instance.currentCompanionData.UnlockSkill(GameManager.Instance.currentCompanionData.skillOne);
     Debug.Log("added skill one");
+}
+
+public void UnlockSkillTwoForHero()
+{
+    GameManager.Instance.currentCompanionData.UnlockSkill(GameManager.Instance.currentCompanionData.skillTwo);
+    Debug.Log("added skill two");
 }
 /*
     public void IncreaseCompanionStat(Companion companion, string statType)

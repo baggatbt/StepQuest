@@ -25,6 +25,11 @@ public class CharacterData : ScriptableObject
     public bool isUnlocked;
     public int expToLevel;
     public SkillType skillOne;
+    public SkillType skillTwo;
+    public SkillType skillThree;
+    public SkillType skillFour;
+    public SkillType skillFive;
+    public SkillType skillSix;
     public  List<SkillType> AvailableSkills;
     public  List<SkillType> LockedSkills;
 

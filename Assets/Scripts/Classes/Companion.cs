@@ -89,7 +89,7 @@ public abstract class Companion : Character
         characterData.heroStatPoints = 0;
     }
     
-    characterData.LoadData();
+   // characterData.LoadData();
     InitializeCharacterStats();
 }
 
