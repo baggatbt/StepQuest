@@ -24,6 +24,7 @@ public class CharacterData : ScriptableObject
     public int speed;
     public bool isUnlocked;
     public int expToLevel;
+    public float damageReflectionPercentage;
     public SkillType skillOne;
     public SkillType skillTwo;
     public SkillType skillThree;
@@ -43,18 +44,48 @@ public class CharacterData : ScriptableObject
     }
 
     public void UnlockSkill(SkillType skillType)
+{
+    if (LockedSkills.Contains(skillType))
     {
-        if (LockedSkills.Contains(skillType))
+        LockedSkills.Remove(skillType);
+        AvailableSkills.Add(skillType);
+
+        // Find the skill instance and apply passive effect if it's a passive skill
+        Skill skillInstance = GetSkillInstance(skillType);
+        if (skillInstance != null && !skillInstance.isActiveSkill)
         {
-            LockedSkills.Remove(skillType);
-            AvailableSkills.Add(skillType);
-            Debug.Log(skillType.ToString() + " unlocked.");
+            skillInstance.ApplyPassiveEffect(this);
         }
-        else
-        {
-            Debug.LogError(skillType.ToString() + " is not in the LockedSkills list.");
-        }
+        
+        Debug.Log(skillType.ToString() + " unlocked.");
     }
+    else
+    {
+        Debug.LogError(skillType.ToString() + " is not in the LockedSkills list.");
+    }
+}
+
+public Skill GetSkillInstance(SkillType skillType)
+{
+    // This method returns a new instance of the specified skill
+    switch (skillType)
+    {
+        case SkillType.Slash:
+            return new Slash();
+        case SkillType.TripleHit:
+            return new TripleHitSkill();
+        case SkillType.Taunt:
+            return new Taunt();
+        case SkillType.ReflectDamagePassive:
+            return new ReflectDamagePassive();
+        case SkillType.SpeedBreak:
+            return new SpeedBreak();
+        default:
+            Debug.LogError("Unknown skill type: " + skillType);
+            return null;
+    }
+}
+
 
     public void SaveData()
     {

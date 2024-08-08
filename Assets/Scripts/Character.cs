@@ -240,7 +240,8 @@ public class Character : MonoBehaviour
         StartCoroutine(TintRed());
         }
         // Trigger hit reaction, damage popup, etc.
-        
+        int damageToReflect = (int)Math.Ceiling(damageReflectionPercentage * totalDamageAfterDefense);
+        attacker.health -= damageToReflect;
         GameObject damagePopupPrefab = Resources.Load<GameObject>("PreFab/DamagePopup");
         Transform endOfBattleRewardsTransform = GameObject.Find("EndOfBattleRewardsCanvas").transform;
         if(damagePopupPrefab != null)

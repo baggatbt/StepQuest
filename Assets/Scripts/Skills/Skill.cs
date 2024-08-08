@@ -70,6 +70,12 @@ public abstract class Skill
 
     public abstract IEnumerator Execute(Character user, Character target, BattleManager battleManager);
 
+    public virtual void ApplyPassiveEffect(CharacterData characterData)
+    {
+        // Default implementation can be empty
+    }
+    
+
     public void HandleAoeAttack(Character user, List<Character> enemies, TimingEventResult timingResult, int baseDamage)
 {
     float damageTimingMultiplier = 1.0f;
