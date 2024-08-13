@@ -9,6 +9,7 @@ public class EnemySpawnController : MonoBehaviour
     public TextMeshProUGUI healthText2;
     public TextMeshProUGUI healthText3;
     public GameObject[] healthUI;
+    private Camera mainCamera;
 
     private TextMeshProUGUI[] healthTexts; // Array to store all health texts
 
@@ -35,17 +36,18 @@ public class EnemySpawnController : MonoBehaviour
 
         // Initialize the health texts array
         healthTexts = new TextMeshProUGUI[] { healthText, healthText2, healthText3 };
+
+        // Initialize the main camera reference
+        mainCamera = Camera.main;
     }
 
     public Character SpawnEnemiesFromPool(string poolName, int numberToSpawn, Transform spawnPoint, Slider associatedHealthBarSlider, Slider associatedEnergyBarSlider, int healthTextIndex, int level, GameObject enemyHealthUI)
 {
     if (!poolDictionary.ContainsKey(poolName))
     {
-       
         return null;
     }
      
-
     Character lastSpawnedCharacter = null;
     for (int i = 0; i < numberToSpawn; i++)
     {
@@ -57,46 +59,50 @@ public class EnemySpawnController : MonoBehaviour
         if (lastSpawnedCharacter == null) continue;
 
         lastSpawnedCharacter.level = level;
-        
+
         // Set health and energy bars
         lastSpawnedCharacter.enemyHealthUI = healthUI[i];
-       
-
         lastSpawnedCharacter.enemyHealthUI = enemyHealthUI;
+        lastSpawnedCharacter.healthBar = associatedHealthBarSlider;
+
         lastSpawnedCharacter.energyBar = associatedEnergyBarSlider;
 
-        // Calculate the position 3 units below the spawned character
+        // Calculate the position above the spawned character
         Renderer enemyRenderer = spawnedEnemy.GetComponent<Renderer>();
-        float characterBottom = 0f;
+        float characterTop = 0f;
         if (enemyRenderer != null)
         {
-            characterBottom = enemyRenderer.bounds.min.y; // Get the lowest point of the character
+            characterTop = enemyRenderer.bounds.max.y; // Get the highest point of the character
         }
-        Vector3 sliderPositionOffset = new Vector3(spawnedEnemy.transform.position.x, characterBottom - 0.5f, spawnedEnemy.transform.position.z);
+        Vector3 worldPosition = new Vector3(spawnedEnemy.transform.position.x, characterTop + 0.5f, spawnedEnemy.transform.position.z); // Adjust the offset as needed
 
-       
+        // Convert the world position to screen space with RectTransformUtility
+        Vector2 screenPosition;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            (RectTransform)associatedHealthBarSlider.transform.parent, 
+            mainCamera.WorldToScreenPoint(worldPosition), 
+            mainCamera, 
+            out screenPosition);
+
+        associatedHealthBarSlider.transform.localPosition = screenPosition;
+
         lastSpawnedCharacter.UpdateStats();
-        // Update health text and sliders
         lastSpawnedCharacter.healthText = healthTexts[healthTextIndex];
         enemiesSpawned++;  // Increment the spawn count
 
-        
-       
         lastSpawnedCharacter.enemyHealthUI.gameObject.SetActive(true);
-        
-        
-        lastSpawnedCharacter.healthText.text = lastSpawnedCharacter.health + ""  ;
+        lastSpawnedCharacter.healthText.text = lastSpawnedCharacter.health + "";
 
         associatedEnergyBarSlider.gameObject.SetActive(false);
         associatedEnergyBarSlider.maxValue = lastSpawnedCharacter.maxEnergy;
         associatedEnergyBarSlider.value = 0;
-
-        
     }
     enemiesSpawned = 0;
 
     return lastSpawnedCharacter;
 }
+
+
 
 
 }
