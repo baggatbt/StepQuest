@@ -312,6 +312,7 @@ private void OnCharacterDataSelected(CharacterData characterData)
 
     public void OpenSelectHeroList()
 {
+    Debug.Log("This button was clicked");
     GameObject companionButtonContainer = GameObject.Find("Companion Selection Container");
     if (!companionButtonContainer)
     {
