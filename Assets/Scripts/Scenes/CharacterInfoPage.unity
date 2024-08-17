@@ -3262,7 +3262,7 @@ GameObject:
   - component: {fileID: 129360678}
   - component: {fileID: 129360677}
   m_Layer: 5
-  m_Name: DungeonTitle
+  m_Name: NodeTitle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7533,7 +7533,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74c1d0a714f30ab4389dbcc7d3f8d723, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nodeName: 
+  nodeName: Fight
   position: {x: 1, y: 1}
   neighbors: []
 --- !u!114 &262869778
@@ -33450,12 +33450,12 @@ GameObject:
   - component: {fileID: 1091708942}
   - component: {fileID: 1091708941}
   m_Layer: 5
-  m_Name: ForestDungeonMenu
+  m_Name: NodeInfoPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1091708940
 RectTransform:
   m_ObjectHideFlags: 0
@@ -38204,6 +38204,8 @@ MonoBehaviour:
   heroSpriteIconButtonPrefab: {fileID: 1533298571360289476, guid: d77d0cc43b4aabd4382db2121c17e851, type: 3}
   dungeonSelectionPanel: {fileID: 1091708939}
   forestDungeonButton: {fileID: 1799933555}
+  nodeInfoPanel: {fileID: 1091708939}
+  nodeNameText: {fileID: 129360677}
   heroSlotOne: {fileID: 8550172747517521384}
   heroSlotTwo: {fileID: 2140815267}
   defaultHeroSprite: {fileID: 21300000, guid: 5199eb4dd3d15744c856ccf6219e3723, type: 3}
@@ -41980,7 +41982,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1469430083
 RectTransform:
   m_ObjectHideFlags: 0
@@ -54162,7 +54164,7 @@ GameObject:
   - component: {fileID: 1985612392}
   - component: {fileID: 1985612391}
   m_Layer: 5
-  m_Name: DungeonDescriptionTexts
+  m_Name: DescriptionTexts
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -57646,7 +57648,7 @@ GameObject:
   - component: {fileID: 2107380846}
   - component: {fileID: 2107380845}
   m_Layer: 5
-  m_Name: LevelRange
+  m_Name: InfoText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

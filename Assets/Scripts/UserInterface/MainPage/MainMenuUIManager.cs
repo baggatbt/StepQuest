@@ -419,6 +419,17 @@ private void AddToParty(CharacterData characterData)
 public GameObject dungeonSelectionPanel;
 public Button forestDungeonButton;
 
+ // Assuming you have a panel and a TextMeshProUGUI element assigned in the inspector
+    public GameObject nodeInfoPanel;
+    public TextMeshProUGUI nodeNameText;
+
+    // Method to show the node information panel and update the text
+    public void ShowNodeInfo(string nodeName)
+    {
+        nodeNameText.text = nodeName;
+        nodeInfoPanel.SetActive(true);
+    }
+
 //ASSIGN THE DUNGEON PANEL TO CHECK PARTY 
 public void OpenDungeonPanel()
 {
