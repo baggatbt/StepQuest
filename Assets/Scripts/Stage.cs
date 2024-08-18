@@ -16,7 +16,7 @@ public class Stage : MonoBehaviour
 
     private void Start()
     {
-        stageButton.onClick.AddListener(OnStageButtonClicked);
+      //  stageButton.onClick.AddListener(OnStageButtonClicked);
         isUnlocked = GameManager.Instance.UnlockedStageNames.Contains(this.stageID);
     }
 
