@@ -7,6 +7,7 @@ public class Node : MonoBehaviour, IPointerClickHandler
     public string nodeName;
     public Vector2 position; // Position on the map
     public List<Node> neighbors = new List<Node>(); // Adjacent nodes
+    public BattleConfig nodeBattleConfig;
 
     private MainMenuUIManager uiManager;
 
@@ -21,6 +22,7 @@ public class Node : MonoBehaviour, IPointerClickHandler
         if (uiManager != null)
         {
             uiManager.ShowNodeInfo(nodeName);
+            GameManager.Instance.CurrentBattleConfig = nodeBattleConfig;
         }
     }
 
