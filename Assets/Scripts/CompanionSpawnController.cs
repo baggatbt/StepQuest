@@ -150,30 +150,36 @@ public class CompanionSpawnController : MonoBehaviour
 
     private int selectedCompanionCount = 0;
 
-    public void OnHeroSelected(Companion selectedCompanion)
+   public void OnHeroSelected(Companion selectedCompanion)
+{
+    if (selectedCompanion.isSelected)
     {
-        if (selectedCompanion.isSelected)
+        RemoveCompanionFromGame(selectedCompanion);
+        selectedCompanion.isSelected = false;
+        selectedCompanionCount--;
+    }
+    else
+    {
+        Character instantiatedCompanion = GameManager.Instance.InstantiateSelectedCompanion(selectedCompanion.heroID);
+        Companion companion = instantiatedCompanion as Companion;
+        if (instantiatedCompanion != null)
         {
-            RemoveCompanionFromGame(selectedCompanion);
-            selectedCompanion.isSelected = false;
-            selectedCompanionCount--;
+            companion.SetCharacterData(selectedCompanion.characterData);
+            companion.InitializeSkillsBasedOnLevel();
+            SetupCompanion(instantiatedCompanion, selectedCompanionCount);
+            AssignCompanion(instantiatedCompanion);
+            EnableHeroUI(instantiatedCompanion);
+            selectedCompanion.InitializeSkillsBasedOnLevel();
+            selectedCompanion.isSelected = true;
+            Debug.Log($"Companion {selectedCompanion} added at index {selectedCompanionCount}.");
         }
         else
         {
-            Character instantiatedCompanion = GameManager.Instance.InstantiateSelectedCompanion(selectedCompanion.heroID);
-            Companion companion = instantiatedCompanion as Companion;
-            if (instantiatedCompanion != null)
-            {
-                companion.SetCharacterData(selectedCompanion.characterData);
-                companion.InitializeSkillsBasedOnLevel();
-                SetupCompanion(instantiatedCompanion, selectedCompanionCount);
-                AssignCompanion(instantiatedCompanion);
-                EnableHeroUI(instantiatedCompanion);
-                selectedCompanion.InitializeSkillsBasedOnLevel();
-                selectedCompanion.isSelected = true;
-            }
+            Debug.LogError("Failed to instantiate companion.");
         }
     }
+}
+
 
     private void AssignCompanion(Character companion)
     {

@@ -56,42 +56,6 @@ public class Knight : Companion
             this.heroLevel++;
             UpdateStats();
 
-            /*
-
-            switch (this.heroLevel)
-            {
-                case 2:
-                    this.maxHealth += 2;
-                    Debug.Log("Your max health went up by 2!");
-                    break;
-                case 3:
-                    this.attackPower += 1;
-                    break;
-                case 4:
-                    this.maxHealth += 3;
-                    break;
-                case 5:
-                    this.attackPower += 1;
-                    break;
-                case 6:
-                    this.maxEnergy += 1;
-                    break;
-                case 7:
-                    this.maxHealth += 3;
-                    break;
-                case 8:
-                    this.attackPower += 1;
-                    break;
-                case 9:
-                   // this.defensePower += 1;
-                    break;
-                case 10:
-                    this.maxHealth += 4;
-                    break;
-                default:
-                    break;
-            }
-        */
             this.health = this.maxHealth;
             this.energy = this.maxEnergy;
 

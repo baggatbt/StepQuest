@@ -7,104 +7,76 @@ public class Archer : Companion
     protected override void Awake()
     {
         base.Awake();
+        skillOne = SkillType.MeleeCombo;
+        skillTwo = SkillType.ArrowRain;
+        // Assign specific paths for Knight icons
+        if (characterData != null)
+        {
+          
+        }
+         InitializeSkillsBasedOnLevel();
+    }
+
+    public override void InitializeSkillsBasedOnLevel()
+    {
+        availableSkills.Clear();
+        availableSkills.Add(SkillType.ShootArrow);
+        //testing methods
+
+      //  if (this.heroLevel >= 2) availableSkills.Add(SkillType.TripleHit);
+      //  if (this.heroLevel >= 5) availableSkills.Add(SkillType.Taunt);
+        Debug.Log($"Total Available skills: {availableSkills.Count}");
+    }
+
+    public void UpdateStats()
+    {
+
         
-    
-        // Initialize with default values if no data is loaded
-        if (this.heroLevel == 0)
-        {
-          //  this.level = 1;
-            this.attackPower = 8;
-            this.maxHealth = 14;
-            this.health = this.maxHealth;
-            this.defensePower = 0;
-            this.speed = 10;
-            this.maxEnergy = 6;
-            this.energy = this.maxEnergy;
-            this.defensePenetration = 0;
-            this.heroID = "Archer";
-            this.heroLevel = 1;
-            this.heroExp = 0;
-            this.heroSkillPoints = 0;
-            this.heroStatPoints = 0;
-            this.characterIDNumber = "2";
-            this.stamina = 10;
-        }
-        else
-        {
-        LoadCharacterData(); // Load saved data
-        }
+        this.maxHealth = 8 + (this.level - 1) * 2;
+        this.health = this.maxHealth;
+
+        
+        
+       
+        this.attackPower = 5 + ((this.level - 1) / 2);
+        
+        
     }
 
     
 
     public override void LevelUp()
-{
-    if (this.heroExp >= ExpToNextLevel(this.heroLevel))
     {
-        this.heroExp -= ExpToNextLevel(this.heroLevel); // Handles exp past the required amount
-        this.heroLevel++;
-        
-
-        switch (this.heroLevel)
+        if (this.heroExp >= ExpToNextLevel(this.heroLevel))
         {
-            case 2:
-                this.attackPower += 1; 
-                break;
-            case 3:
-                this.maxHealth += 2; 
-                break;
-            case 4:
-                this.attackPower += 3; 
-                break;
-            case 5:
-                this.attackPower += 1; 
-                break;
-            case 6:
-                this.maxEnergy += 2; 
-                break;
-            case 7:
-                this.maxHealth += 3; 
-                break;
-            case 8:
-                this.speed += 1;
-                break;
-            case 9:
-                this.attackPower += 2; 
-                break;
-            case 10:
-                this.maxHealth += 2; 
-                break;
-            default:
-                break; //TODO: extend this later when I have concrete balance plans
+            this.heroExp -= ExpToNextLevel(this.heroLevel);
+            this.heroLevel++;
+            UpdateStats();
+
+            this.health = this.maxHealth;
+            this.energy = this.maxEnergy;
+
+            this.heroStatPoints += 1;
+            this.heroSkillPoints += 1;
+
+            Debug.Log("Hero leveled up to level " + this.heroLevel + ", stat upgraded.");
         }
-
-        // Update current health and energy to new max values
-        this.health = this.maxHealth;
-        this.energy = this.maxEnergy;
-
-        this.heroStatPoints += 1; // Every 3 levels will allow player to upgrade one stat of their choice +1
-        this.heroSkillPoints += 1; //TODO: Implement skill unlocking
-
-        Debug.Log("Hero leveled up to level " + this.heroLevel + ", stat upgraded.");
-    }
-}
-
-    public override void InitializeSkillsBasedOnLevel()
-    {
-         availableSkills.Clear(); // Directly manipulate the protected field
-        availableSkills.Add(SkillType.ShootArrow);
-        if (this.heroLevel >= 2) availableSkills.Add(SkillType.MeleeCombo);
-        if (this.heroLevel >= 5) availableSkills.Add(SkillType.ArrowRain);
-        Debug.Log($"Total Available skills: {availableSkills.Count}");
     }
 
     
+
+    
+          
+      
+
+    
+      
     
 
-    public override List<SkillType> AvailableSkills
-    {
-        get { return availableSkills; }
-    }
+    
+    
+    public override List<SkillType> AvailableSkills => availableSkills;
+    
 
     public override List<SkillType> LockedSkills => new List<SkillType>
     {
@@ -127,10 +99,7 @@ public class Archer : Companion
        SkillType.ShootArrow, //Temp add until 4th skill made
     };
 
-    public override List<SkillType> MainSkills
-    {
-        get { return mainSkills; }
-    }
+     public override List<SkillType> MainSkills => mainSkills;
 
     public override Skill GetSkillInstance(SkillType skillType)
     {

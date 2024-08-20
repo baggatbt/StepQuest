@@ -35654,8 +35654,10 @@ MonoBehaviour:
   accountLevel: 0
   allCharacterData:
   - {fileID: 11400000, guid: 20326644b4c85224982fa2bfe1287dd8, type: 2}
+  - {fileID: 11400000, guid: 835e3de1052161e48afbf9c4fd5b1a78, type: 2}
   currentCompanionData: {fileID: 0}
   knightData: {fileID: 11400000, guid: 20326644b4c85224982fa2bfe1287dd8, type: 2}
+  archerData: {fileID: 11400000, guid: 835e3de1052161e48afbf9c4fd5b1a78, type: 2}
   testItem: {fileID: 11400000, guid: 0e099d02a41705243bc8943faa3bebb5, type: 2}
   currentNode: {fileID: 763789452}
   allNodes:
@@ -44613,7 +44615,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1091708940
 RectTransform:
   m_ObjectHideFlags: 0
@@ -70080,7 +70082,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2140815270}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1274183892}
+        m_TargetAssemblyTypeName: MainMenuUIManager, Assembly-CSharp
+        m_MethodName: SetActiveSelectPanel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2140815270
 MonoBehaviour:
   m_ObjectHideFlags: 0

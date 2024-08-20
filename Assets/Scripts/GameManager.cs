@@ -54,6 +54,7 @@ public class GameManager : MonoBehaviour
     public List<CharacterData> allCharacterData = new List<CharacterData>(); 
     public CharacterData currentCompanionData;
     public CharacterData knightData;
+    public CharacterData archerData;
     
 
     private void Awake()
@@ -157,6 +158,10 @@ public class GameManager : MonoBehaviour
         if (data.heroID == "Knight")
         {
             prefab = Instantiate(knightPrefab);  // Assign your Knight prefab here
+        }
+        if (data.heroID == "Archer")
+        {
+            prefab = Instantiate(archerPrefab);  // Assign your Knight prefab here
         }
         // Handle other heroID cases...
 
