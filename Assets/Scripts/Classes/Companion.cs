@@ -113,6 +113,7 @@ public void InitializeCharacterStats()
         speed = characterData.speed;
         attackPower = characterData.attackPower;
         defensePower = characterData.defensePower;
+        heroIcon = characterData.heroIcon;
     }
     else
     {
@@ -170,7 +171,7 @@ public void InitializeCharacterStats()
     {
         if (characterData != null)
         {
-         //   characterData.LoadData();
+            characterData.LoadData();
             
         }
     }
