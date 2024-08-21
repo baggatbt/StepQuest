@@ -113,7 +113,7 @@ public void InitializeCharacterStats()
         speed = characterData.speed;
         attackPower = characterData.attackPower;
         defensePower = characterData.defensePower;
-        heroIcon = characterData.heroIcon;
+       
     }
     else
     {
