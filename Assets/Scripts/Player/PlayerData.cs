@@ -38,25 +38,25 @@ public class PlayerData : MonoBehaviour
 
     private StepCounterController stepCounterController;
 
-  
-
     private void Awake()
     {
         if (_instance == null)
         {
             _instance = this;
             DontDestroyOnLoad(gameObject);
-           //REMOVE AFTER TESTING
-          //  PlayerPrefs.DeleteAll();  // Clears all keys and values from PlayerPrefs
-          //  PlayerPrefs.Save();       // Make sure changes are saved immediately
 
             InitializeStepCounter();
-            if (!firstTimeLogin)
+            LoadPlayerData(); // Load player data first
+
+            if (firstTimeLogin)
             {
-                 UpdateSteps(); //Compares the phones sensor from the last time it ran to now, adds steps if its greater
+                HandleFirstLogin();
             }
-            
-            LoadPlayerData();
+            else
+            {
+                UpdateSteps(); // Only update steps if it's not the first time login
+            }
+
             Debug.Log("PlayerData Awake complete");
         }
         else
@@ -67,15 +67,15 @@ public class PlayerData : MonoBehaviour
 
     private void Start()
     {
-        if (firstTimeLogin)
-        {
-            HandleFirstLogin();
-        }
+        // Ensure any first login tasks are handled in Awake
     }
 
     private void Update()
     {
-        UpdateSteps();
+        if (!firstTimeLogin) // Ensure steps are not updated on the first login
+        {
+            UpdateSteps();
+        }
     }
 
     private void OnApplicationPause(bool pauseStatus)
@@ -86,17 +86,19 @@ public class PlayerData : MonoBehaviour
         }
         else
         {
-            // Update the step offset based on the current steps count from the device and add difference to ingamesteps
-            UpdateSteps();
+            if (!firstTimeLogin)
+            {
+                UpdateSteps(); // Update steps only if it's not the first time login
+            }
         }
     }
 
-     private void OnApplicationQuit()
+    private void OnApplicationQuit()
     {
         SavePlayerData();
     }
 
-   private void InitializeStepCounter()
+    private void InitializeStepCounter()
     {
         stepCounterController = FindObjectOfType<StepCounterController>();
         if (stepCounterController == null)
@@ -104,7 +106,6 @@ public class PlayerData : MonoBehaviour
             Debug.LogError("StepCounterController not found in the scene!");
             return;
         }
-        
     }
 
     private void HandleFirstLogin()
@@ -114,74 +115,59 @@ public class PlayerData : MonoBehaviour
         inGameSteps = 0;
         currentSensorTotal = stepCounterController.GetSteps();
         SavePlayerData();
-    }
 
+        Debug.Log("First time login handled, step data initialized.");
+    }
 
     private void UpdateSteps()
     {
-            newSensorTotal = stepCounterController.GetSteps();
+        newSensorTotal = stepCounterController.GetSteps();
         int differenceBetweenSensorCounts = newSensorTotal - currentSensorTotal;
-        //Debug.Log("Difference between sensor counts = " + differenceBetweenSensorCounts);
 
         if (differenceBetweenSensorCounts > 0)
         {
-            //Add the steps to game, then reset the totalCount for next reboot
             inGameSteps += differenceBetweenSensorCounts;
             currentSensorTotal = newSensorTotal;
-            //Debug.Log("updating old total, currentSensorTotal = " + currentSensorTotal);
-     
         }
         else
         {
             currentSensorTotal = newSensorTotal;
-           // Debug.Log("No new steps to load from sensor, updating old total, currentSensorTotal = " + currentSensorTotal);
         }
-        
-
-        
     }
 
     public void SavePlayerData()
-{
-    PlayerPrefs.SetInt("PlayerLevel", level);
-    PlayerPrefs.SetInt("PlayerGold", gold);
-    PlayerPrefs.SetInt("CurrentStageIndex", currentStageIndex);
+    {
+        PlayerPrefs.SetInt("PlayerLevel", level);
+        PlayerPrefs.SetInt("PlayerGold", gold);
+        PlayerPrefs.SetInt("CurrentStageIndex", currentStageIndex);
 
-    // Save the current step count when saving player data
-    PlayerPrefs.SetInt("InGameSteps", inGameSteps);
-    PlayerPrefs.SetInt("CurrentSensorTotal", currentSensorTotal);
+        // Save the current step count when saving player data
+        PlayerPrefs.SetInt("InGameSteps", inGameSteps);
+        PlayerPrefs.SetInt("CurrentSensorTotal", currentSensorTotal);
 
-    Debug.Log("Saving Player Data with in-game steps: " + inGameSteps);
-    Debug.Log("Saving Player Data with sensor total: " + currentSensorTotal);
+        Debug.Log("Saving Player Data with in-game steps: " + inGameSteps);
+        Debug.Log("Saving Player Data with sensor total: " + currentSensorTotal);
 
-    
-
-    PlayerPrefs.Save();
-}
-
+        PlayerPrefs.Save();
+    }
 
     public void LoadPlayerData()
-{
-    level = PlayerPrefs.GetInt("PlayerLevel", 1);
-    gold = PlayerPrefs.GetInt("PlayerGold", 0);
-    currentStageIndex = PlayerPrefs.GetInt("CurrentStageIndex", 0);
-    firstTimeLogin = PlayerPrefs.GetInt("FirstLogin", 0) == 1;
+    {
+        level = PlayerPrefs.GetInt("PlayerLevel", 1);
+        gold = PlayerPrefs.GetInt("PlayerGold", 0);
+        currentStageIndex = PlayerPrefs.GetInt("CurrentStageIndex", 0);
+        firstTimeLogin = PlayerPrefs.GetInt("FirstTimeLogin", 1) == 1;
 
-    // Load the saved step count
-    inGameSteps = PlayerPrefs.GetInt("InGameSteps", 0);
+        // Load the saved step count
+        inGameSteps = PlayerPrefs.GetInt("InGameSteps", 0);
 
-    // Load the step count from the last reset to calculate the current step count
-    currentSensorTotal = PlayerPrefs.GetInt("CurrentSensorTotal", currentSensorTotal);
-    
-    // The actual step count should be updated in the Update method using the current sensor value
-    Debug.Log("Loading Player Data with in-game steps: " + inGameSteps);
-}
+        // Load the step count from the last reset to calculate the current step count
+        currentSensorTotal = PlayerPrefs.GetInt("CurrentSensorTotal", 0);
 
+        Debug.Log("Loading Player Data with in-game steps: " + inGameSteps);
+    }
 
-
-    
-
-        public bool UseSteps(int amountToUse)
+    public bool UseSteps(int amountToUse)
     {
         if (inGameSteps >= amountToUse)
         {
@@ -192,17 +178,11 @@ public class PlayerData : MonoBehaviour
         }
         return false;
     }
+
     public void ResetSteps()
-{
-    // Reset the in-game steps count
-    inGameSteps = 0;
-
-    // Immediately save this change to PlayerPrefs
-    SavePlayerData();
-
-    Debug.Log("In-game steps have been reset to 0.");
+    {
+        inGameSteps = 0;
+        SavePlayerData();
+        Debug.Log("In-game steps have been reset to 0.");
+    }
 }
-
-
-}
- 
