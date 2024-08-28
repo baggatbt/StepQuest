@@ -31,7 +31,7 @@ public class PlayerData : MonoBehaviour
 
     private StepCounterController stepCounterController;
 
-    private void Awake()
+     private void Awake()
     {
         if (_instance == null)
         {
@@ -112,9 +112,9 @@ public class PlayerData : MonoBehaviour
 
     public void SavePlayerData()
     {
-        PlayerPrefs.SetInt("PlayerLevel", level);
+        
         PlayerPrefs.SetInt("PlayerGold", gold);
-        PlayerPrefs.SetInt("CurrentStageIndex", currentStageIndex);
+       
 
         // Save the current step count when saving player data
         PlayerPrefs.SetInt("InGameSteps", inGameSteps);
@@ -123,14 +123,13 @@ public class PlayerData : MonoBehaviour
 
         Debug.Log("Player data saved.");
         PlayerPrefs.Save();
+        
     }
 
     public void LoadPlayerData()
     {
-        level = PlayerPrefs.GetInt("PlayerLevel", 1);
+      
         gold = PlayerPrefs.GetInt("PlayerGold", 0);
-        currentStageIndex = PlayerPrefs.GetInt("CurrentStageIndex", 0);
-        firstTimeLogin = PlayerPrefs.GetInt("FirstTimeLogin", 1) == 1;
 
         inGameSteps = PlayerPrefs.GetInt("InGameSteps", 0);
         baselineSteps = PlayerPrefs.GetInt("BaselineSteps", 0);
