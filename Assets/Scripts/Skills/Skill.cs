@@ -212,18 +212,5 @@ public void HandlePlayerRangedAttack(Character user, Projectile projectile, Timi
 
 
 
-    public int GetSkillLevel()
-    {
-        // Check if the player's data contains a level for this skill
-        if (PlayerData.Instance.skillLevels.TryGetValue(skillName, out int level))
-        {
-            // If it does, return that level
-            return level;
-        }
-        else
-        {
-            // If it doesn't, return a default level 
-            return 1;
-        }
-    }
+   
 }
