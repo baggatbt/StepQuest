@@ -331,7 +331,7 @@ private IEnumerator TintRed()
 }
 
 
-
+/*
     public void GainTeamEnergy(int energyGained)
 {
     if (PlayerData.Instance.teamEnergy + energyGained > maxEnergy) // If the gained energy will bring the total over the max
@@ -360,6 +360,7 @@ private IEnumerator TintRed()
     }
     Debug.Log("Not passing any");
 }
+*/
     //For enemy rage bars
    public void GainEnergy(int energyGained)
 {

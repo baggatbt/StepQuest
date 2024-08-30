@@ -56,7 +56,7 @@ public abstract class Skill
       // New virtual function for calculating base damage.
     protected virtual int CalculateBaseDamage(Character user)
     {
-        return PlayerData.Instance.attackPower;
+        return 5;
     }
     public Sprite LoadIconImage(string path)
     {

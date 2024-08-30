@@ -50,7 +50,7 @@ public class WizardBasicAttack : Skill
         Debug.Log("waiting on animation to finish");
     
         yield return new WaitUntil(() => user.isAnimationDone == true);
-        user.GainTeamEnergy(energyGain);
+       // user.GainTeamEnergy(energyGain);
         user.animationDamageTime = false;
         user.isAnimationDone = false;
         user.isAttacking = false;
