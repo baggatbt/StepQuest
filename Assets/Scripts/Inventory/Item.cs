@@ -7,6 +7,7 @@ public enum ItemType
     Consumable,
     Quest,
     MaterialItem,
+    CraftableItem,
 
     // Add other types as needed
 }
@@ -20,12 +21,14 @@ public class Item : ScriptableObject
     public int itemID;
     public string itemDescription;
     public int quantity = 1; // Default quantity
+    public int stepCostToProduce;
+    public List<MaterialRequirement> materialRequirements;
 }
 
 [CreateAssetMenu(fileName = "New Craftable Item", menuName = "Inventory/Craftable Item")]
 public class CraftableItem : Item
 {
-    public List<MaterialRequirement> materialRequirements;
+   // public List<MaterialRequirement> materialRequirements;
     // Other properties specific to the craftable item...
 }
 

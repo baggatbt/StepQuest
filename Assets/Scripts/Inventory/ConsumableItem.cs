@@ -6,6 +6,7 @@ using UnityEngine;
 public class ConsumableItem : Item
 {
      public int healthRecoveryAmount;  // How much health this item recovers
+   
     
 
     
@@ -26,7 +27,7 @@ public class ConsumableItem : Item
         // If quantity falls below 1, it could be removed from the inventory.
         if (quantity < 1)
         {
-            GameManager.Instance.RemoveItem(this);
+            GameManager.Instance.RemoveItem(this, 0);
         }
     }
 }

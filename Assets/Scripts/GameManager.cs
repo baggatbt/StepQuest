@@ -318,20 +318,28 @@ public class GameManager : MonoBehaviour
         return null;
     }
 
-    public void RemoveItem(Item item)
+    public void RemoveItem(Item item, int quantity)
+{
+    var foundItem = itemList.Find(i => i.itemID == item.itemID);
+    if (foundItem != null)
     {
-        Item foundItem = itemList.Find(i => i.itemID == item.itemID);
-        if (foundItem != null && foundItem.quantity > 1)
+        foundItem.quantity -= quantity;
+        if (foundItem.quantity <= 0)
         {
-            foundItem.quantity--;
+            itemList.Remove(foundItem); // Remove the item if quantity drops to zero
         }
-        else
-        {
-            itemList.Remove(foundItem);
-        }
+
         SaveInventory();
         inventory.UpdateInventoryUI();
     }
+}
+
+
+    public bool HasItem(Item item, int quantity)
+{
+    var foundItem = itemList.Find(i => i.itemID == item.itemID);
+    return foundItem != null && foundItem.quantity >= quantity;
+}
 
     public void SaveInventory()
     {

@@ -43,7 +43,7 @@ public class PlayerData : MonoBehaviour
             else
             {
                 currentSensorTotal = stepCounterController.GetTotalSteps();
-                ProduceOfflineResources();
+              //  ProduceOfflineResources();
                 UpdateSteps();
             }
 
@@ -61,7 +61,7 @@ public class PlayerData : MonoBehaviour
         while (true)
         {
             UpdateSteps();
-            ProduceResourcesDuringGameplay();
+          //  ProduceResourcesDuringGameplay();
 
             yield return new WaitForSeconds(updateInterval); // Wait for the specified interval before running again
         }
@@ -111,7 +111,7 @@ public class PlayerData : MonoBehaviour
         {
             if (building.IsProducing())
             {
-                building.Produce(stepsSinceLastSession);
+              //  building.Produce(stepsSinceLastSession);
             }
         }
 
@@ -127,7 +127,7 @@ public class PlayerData : MonoBehaviour
             {
                 if (building.IsProducing())
                 {
-                    building.Produce(newSteps); // Produce resources based on new steps
+                  //  building.Produce(newSteps); // Produce resources based on new steps
                 }
             }
         }
