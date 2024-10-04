@@ -165,7 +165,7 @@ public class MainMenuUIManager : MonoBehaviour
             // Set the hero's icon
             if (heroIconImage != null && characterData.heroIcon != null)
             {
-                heroIconImage.sprite = characterData.heroIcon;
+              //  heroIconImage.sprite = characterData.heroIcon;
                 Debug.Log("Hero icon set from characterData");
             }
 
@@ -359,7 +359,10 @@ private void OnCharacterDataSelected(CharacterData characterData)
         return;
     }
 
-    heroIconImage.sprite = characterData.heroIcon;
+    if (heroIconImage != null)
+    {
+        heroIconImage.sprite = characterData.heroIcon;
+    }
 
     Button button = buttonObject.GetComponent<Button>();
     if (button != null)
@@ -658,7 +661,7 @@ public void PopulateInventoryList() {
         if (heroImage != null)
         {
             // Set the sprite of the Image component to the companion's heroIcon
-            heroImage.sprite = companion.heroIcon;
+           // heroImage.sprite = companion.heroIcon;
         }
         else
         {
