@@ -16,20 +16,24 @@ public class Stage : MonoBehaviour
 
     private void Start()
     {
-      //  stageButton.onClick.AddListener(OnStageButtonClicked);
+        stageButton.onClick.AddListener(OnStageButtonClicked);
         isUnlocked = GameManager.Instance.UnlockedStageNames.Contains(this.stageID);
     }
 
     private void OnStageButtonClicked()
+{
+    if (isUnlocked)
     {
-        if (isUnlocked)
-        {
-            stageBattleConfig.currentParty = new List<Companion>(GameManager.Instance.currentParty);
-            GameManager.Instance.CurrentBattleConfig = stageBattleConfig;
-            GameManager.Instance.SaveCurrentParty();
-            SceneManager.LoadScene(battleSceneName);
-        }
+        // Store the current stage in GameManager
+        GameManager.Instance.CurrentStage = this;
+
+        stageBattleConfig.currentParty = new List<Companion>(GameManager.Instance.currentParty);
+        GameManager.Instance.CurrentBattleConfig = stageBattleConfig;
+        GameManager.Instance.SaveCurrentParty();
+       // SceneManager.LoadScene(battleSceneName);
     }
+}
+
 
     public void Configure(StageConfig config)
     {
@@ -47,5 +51,19 @@ public class Stage : MonoBehaviour
             stageButton.interactable = isUnlocked;
             stageButton.GetComponent<Image>().color = isUnlocked ? Color.green : Color.red;
         }
+    }
+
+    // Method to get the next stage in the series
+    public Stage GetNextStage()
+    {
+        
+        if (connectedStages != null && connectedStages.Count > 0)
+        {
+            // Picks the first connected stage of which each stage has one
+            return connectedStages[0]; // Or use Random.Range(0, connectedStages.Count) for random stage selection
+        }
+
+        // If no connected stages, then go back to town. TODO
+        return null;
     }
 }

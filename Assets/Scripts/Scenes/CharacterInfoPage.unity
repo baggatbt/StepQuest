@@ -7220,7 +7220,7 @@ GameObject:
   - component: {fileID: 262869777}
   - component: {fileID: 262869781}
   m_Layer: 5
-  m_Name: FightNode
+  m_Name: DungeonOneNode
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7239,12 +7239,13 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1220560665}
+  - {fileID: 1362636211}
   m_Father: {fileID: 1296674854}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 64, y: -10}
+  m_AnchoredPosition: {x: -402, y: 1012}
   m_SizeDelta: {x: 274.5, y: 461.8}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &262869777
@@ -7396,8 +7397,9 @@ MonoBehaviour:
     levelOfEnemies: 1
     stage: {fileID: 262869781}
     currentParty: []
-  stageID: 2
-  connectedStages: []
+  stageID: 1
+  connectedStages:
+  - {fileID: 1362636209}
 --- !u!1 &291407637
 GameObject:
   m_ObjectHideFlags: 0
@@ -35299,10 +35301,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 607aefc664c690848845413aeef12e0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  allStagesData:
+  - stageID: 1.1
+    battleSceneName: TestPortraitBattle
+    isUnlocked: 1
+    isBossBattle: 0
+    stageBattleConfig:
+      poolName: Forest
+      maxEnemiesToSpawn: 1
+      levelOfEnemies: 1
+      stage: {fileID: 0}
+      currentParty: []
+  - stageID: 1.2
+    battleSceneName: TestPortraitBattle
+    isUnlocked: 1
+    isBossBattle: 0
+    stageBattleConfig:
+      poolName: Forest
+      maxEnemiesToSpawn: 2
+      levelOfEnemies: 1
+      stage: {fileID: 0}
+      currentParty: []
   knightPrefab: {fileID: 358661848719693019, guid: b4b862f04ff76be49b8874238e0e0f0d, type: 3}
   archerPrefab: {fileID: 3837466525552236748, guid: 4b1888b18dd457640b7968b34c1fc87d, type: 3}
   wizardPrefab: {fileID: 1719300229918294577, guid: 58b48e8529f72e2439d59fce0fe167d1, type: 3}
   characterSelectionPanel: {fileID: 0}
+  CurrentBattleConfig:
+    poolName: 
+    maxEnemiesToSpawn: 0
+    levelOfEnemies: 0
+    stage: {fileID: 0}
+    currentParty: []
+  CurrentStage: {fileID: 0}
   companion1: {fileID: 0}
   companion2: {fileID: 0}
   companion3: {fileID: 0}
@@ -35320,22 +35350,6 @@ MonoBehaviour:
   maxInventorySlots: 16
   currentParty: []
   currentStageIndex: 0
-  allStages:
-  - poolName: Forest
-    maxEnemiesToSpawn: 1
-    levelOfEnemies: 1
-    stage: {fileID: 0}
-    currentParty: []
-  - poolName: Forest
-    maxEnemiesToSpawn: 2
-    levelOfEnemies: 1
-    stage: {fileID: 0}
-    currentParty: []
-  - poolName: ForestElite
-    maxEnemiesToSpawn: 1
-    levelOfEnemies: 1
-    stage: {fileID: 0}
-    currentParty: []
   companions: []
   knight: {fileID: 0}
   wizard: {fileID: 0}
@@ -36168,7 +36182,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &763789448
 RectTransform:
   m_ObjectHideFlags: 0
@@ -50989,6 +51003,77 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1358125144}
   m_CullTransparentMesh: 1
+--- !u!1 &1362636208
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1362636211}
+  - component: {fileID: 1362636210}
+  - component: {fileID: 1362636209}
+  m_Layer: 5
+  m_Name: Stage two
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1362636209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1362636208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fc3781848b4f23418f18704bb82a611, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stageButton: {fileID: 0}
+  battleSceneName: TestPortraitBattle
+  isUnlocked: 1
+  isBossBattle: 0
+  stageBattleConfig:
+    poolName: Forest
+    maxEnemiesToSpawn: 3
+    levelOfEnemies: 1
+    stage: {fileID: 1362636209}
+    currentParty: []
+  stageID: 2
+  connectedStages: []
+--- !u!222 &1362636210
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1362636208}
+  m_CullTransparentMesh: 1
+--- !u!224 &1362636211
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1362636208}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1990649646}
+  m_Father: {fileID: 262869776}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -21, y: 540}
+  m_SizeDelta: {x: 274.5, y: 461.8}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1367152040
 GameObject:
   m_ObjectHideFlags: 0
@@ -53022,7 +53107,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1469430083
 RectTransform:
   m_ObjectHideFlags: 0
@@ -59029,7 +59114,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.7248701}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 557.21, y: -1528.9999}
+  m_AnchoredPosition: {x: 557.21, y: -1528.9996}
   m_SizeDelta: {x: 905.69, y: -307.24}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1739596800
@@ -65491,6 +65576,82 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1989523043}
+  m_CullTransparentMesh: 1
+--- !u!1 &1990649645
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1990649646}
+  - component: {fileID: 1990649648}
+  - component: {fileID: 1990649647}
+  m_Layer: 5
+  m_Name: townImage
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1990649646
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1990649645}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.74367, y: 0.74367, z: 0.74367}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1362636211}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -1, y: 23}
+  m_SizeDelta: {x: 196.7, y: 363.7}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1990649647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1990649645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 1f402bf833d4a3043b64b6801da88115, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1990649648
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1990649645}
   m_CullTransparentMesh: 1
 --- !u!1 &2002256900
 GameObject:

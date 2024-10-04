@@ -10,11 +10,14 @@ using System;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
+     public List<StageData> allStagesData = new List<StageData>(); // Store stage data instead of references
+    public Dictionary<string, Stage> stageDictionary = new Dictionary<string, Stage>();
     public GameObject knightPrefab; 
     public GameObject archerPrefab; 
     public GameObject wizardPrefab;
     public GameObject characterSelectionPanel;
-    public BattleConfig CurrentBattleConfig { get; set; }
+    public BattleConfig CurrentBattleConfig; 
+    public Stage CurrentStage; // Track the current stage
     public HashSet<string> UnlockedStageNames = new HashSet<string>();
     public Character companion1; 
     public Character companion2; 
@@ -33,9 +36,10 @@ public class GameManager : MonoBehaviour
 
     public int currentStageIndex;
     private bool isUnlocked;
-    public List<BattleConfig> allStages; // list is populated with all stages in order
+    //public List<BattleConfig> allStages; // list is populated with all stages in order
 
     public List<Companion> companions = new List<Companion>();
+   
 
     //Instantiate any unlocked characters
     public Knight knight;
@@ -64,7 +68,7 @@ public class GameManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
             SceneManager.sceneLoaded += OnSceneLoaded;
-            currentStageIndex = PlayerData.Instance.currentStageIndex; //Gets the current stage from PlayerData
+            //currentStageIndex = PlayerData.Instance.currentStageIndex; //Gets the current stage from PlayerData
             maxInventorySlots = 16;
             Debug.Log("Initial item list count: " + itemList.Count);
             LoadUnlockedStages(); 
@@ -215,6 +219,16 @@ public class GameManager : MonoBehaviour
     {
         ReassignInventoryComponent();
         LoadAllCompanionData();
+    }
+
+    public void LoadStageData()
+    {
+        // Here you would dynamically re-link or recreate stages when loading a new scene
+        foreach (StageData stageData in allStagesData)
+        {
+            // Instantiate or find the stage and assign data as needed
+            // Example: Find the stage by name or ID, then configure it with data
+        }
     }
 
     private void ReassignInventoryComponent()

@@ -627,13 +627,26 @@ public void PopulateInventoryList() {
 
     
      public void GoToBattle()
-    {
-        
+{
+    // Find the first stage (stage 1.1)
+    StageData selectedStage = GameManager.Instance.allStagesData.Find(stage => stage.stageID == "1.1");
 
-        // Load the battle scene with the new configuration
-        SceneManager.LoadScene("TestPortraitBattle");
-        Debug.Log("Going to battle");
+    if (selectedStage != null)
+    {
+        // Set the GameManager's CurrentBattleConfig to this stage's battle config
+        GameManager.Instance.CurrentBattleConfig = selectedStage.stageBattleConfig;
+        
+        Debug.Log($"Going to battle with stage ID: {selectedStage.stageID} and battle scene: {selectedStage.battleSceneName}");
+        
+        // Load the battle scene associated with this stage
+        SceneManager.LoadScene(selectedStage.battleSceneName);
     }
+    else
+    {
+        Debug.LogError("Stage with ID 1.1 not found.");
+    }
+}
+
 
 
    
