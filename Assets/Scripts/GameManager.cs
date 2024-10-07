@@ -10,8 +10,10 @@ using System;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
-     public List<StageData> allStagesData = new List<StageData>(); // Store stage data instead of references
-    public Dictionary<string, Stage> stageDictionary = new Dictionary<string, Stage>();
+     public List<StageData> allStagesData = new List<StageData>(); // List of all stages
+    private Dictionary<string, StageData> stageDictionary = new Dictionary<string, StageData>();
+    
+    public StageData currentStage; // The current stage being played
     public GameObject knightPrefab; 
     public GameObject archerPrefab; 
     public GameObject wizardPrefab;
@@ -71,7 +73,7 @@ public class GameManager : MonoBehaviour
             //currentStageIndex = PlayerData.Instance.currentStageIndex; //Gets the current stage from PlayerData
             maxInventorySlots = 16;
             Debug.Log("Initial item list count: " + itemList.Count);
-            LoadUnlockedStages(); 
+             InitializeStageDictionary(); // Initialize dictionary at game start
 
             //Initialize character data dictionary here
             foreach (var data in allCharacterData)
@@ -128,6 +130,41 @@ public class GameManager : MonoBehaviour
         public string type;
         public string json;
     }
+
+    // Initialize the stage dictionary for quick lookups
+    private void InitializeStageDictionary()
+    {
+        foreach (StageData stageData in allStagesData)
+        {
+            if (!stageDictionary.ContainsKey(stageData.stageID))
+            {
+                stageDictionary.Add(stageData.stageID, stageData);
+            }
+        }
+    }
+
+    public void GetNextStage(int nextIndex)
+    {
+        if (currentStage != null && nextIndex < currentStage.connectedStageIDs.Count)
+        {
+            string nextStageID = currentStage.connectedStageIDs[nextIndex];
+            if (stageDictionary.TryGetValue(nextStageID, out StageData nextStage))
+            {
+                currentStage = nextStage; // Update the current stage to the new one
+                Debug.Log("Transitioning to next stage: " + nextStage.stageID);
+            }
+            else
+            {
+                Debug.LogError("No stage found with ID: " + nextStageID);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Invalid stage transition index: " + nextIndex);
+        }
+    }
+
+    
 
     public void SaveCurrentParty()
     {

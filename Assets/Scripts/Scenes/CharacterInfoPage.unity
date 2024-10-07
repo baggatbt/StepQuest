@@ -35312,6 +35312,8 @@ MonoBehaviour:
       levelOfEnemies: 1
       stage: {fileID: 0}
       currentParty: []
+    connectedStageIDs:
+    - 1.2
   - stageID: 1.2
     battleSceneName: TestPortraitBattle
     isUnlocked: 1
@@ -35322,6 +35324,19 @@ MonoBehaviour:
       levelOfEnemies: 1
       stage: {fileID: 0}
       currentParty: []
+    connectedStageIDs: []
+  currentStage:
+    stageID: 
+    battleSceneName: 
+    isUnlocked: 0
+    isBossBattle: 0
+    stageBattleConfig:
+      poolName: 
+      maxEnemiesToSpawn: 0
+      levelOfEnemies: 0
+      stage: {fileID: 0}
+      currentParty: []
+    connectedStageIDs: []
   knightPrefab: {fileID: 358661848719693019, guid: b4b862f04ff76be49b8874238e0e0f0d, type: 3}
   archerPrefab: {fileID: 3837466525552236748, guid: 4b1888b18dd457640b7968b34c1fc87d, type: 3}
   wizardPrefab: {fileID: 1719300229918294577, guid: 58b48e8529f72e2439d59fce0fe167d1, type: 3}
@@ -59114,7 +59129,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.7248701}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 557.21, y: -1528.9996}
+  m_AnchoredPosition: {x: 557.21, y: -1528.9995}
   m_SizeDelta: {x: 905.69, y: -307.24}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1739596800
@@ -67557,7 +67572,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 6.1328125, y: -351.57397}
+  m_AnchoredPosition: {x: 6.1328125, y: -351.574}
   m_SizeDelta: {x: -504.86, y: -1544.4645}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2065648691
@@ -69987,7 +70002,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 270}
   m_AnchorMin: {x: 0, y: 0.8157292}
   m_AnchorMax: {x: 1, y: 0.8157292}
-  m_AnchoredPosition: {x: -6.5, y: 466}
+  m_AnchoredPosition: {x: -6.5, y: 466.00003}
   m_SizeDelta: {x: -67.40735, y: 693.0521}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1704427371832752007

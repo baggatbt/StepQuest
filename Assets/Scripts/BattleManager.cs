@@ -929,11 +929,11 @@ public class BattleManager : MonoBehaviour
         Debug.Log("Battle won");
 
         Stage completedStage = GameManager.Instance.CurrentBattleConfig.stage;
-        GameManager.Instance.UnlockConnectedStages(completedStage);
-        if (completedStage.isBossBattle)
-        {
-            GameManager.Instance.ResetStagesOnBossDefeat();
-        }
+       // GameManager.Instance.UnlockConnectedStages(completedStage);
+       // if (completedStage.isBossBattle)
+       // {
+       //     GameManager.Instance.ResetStagesOnBossDefeat();
+       // }
 
         endOfBattlePanel.SetActive(true);
         DisplayExpToLevel(playerParty);
@@ -941,27 +941,8 @@ public class BattleManager : MonoBehaviour
 
     public void GoToNextStage()
     {
-            // Get the next stage from the current stage
-            Stage nextStage = GameManager.Instance.CurrentBattleConfig.stage.GetNextStage();
-            // Get the next stage from the current stage
             
-
-            if (nextStage != null)
-            {
-                // Set up the next stage's battle config
-                
-                GameManager.Instance.CurrentBattleConfig = nextStage.stageBattleConfig;
-
-                // Move to the next stage's battle scene
-                SceneManager.LoadScene("TestPortraitBattle");
-            }
-            
-        else
-        {
-            // Handle player choosing to leave (e.g., go back to town)
-           // SceneManager.LoadScene("TownScene");
-           Debug.Log("No further stages");
-        }
+         GameManager.Instance.GetNextStage(0); // Transitions to the first connected stage
     }
 
     private void ProcessDefeat()
