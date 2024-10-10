@@ -152,6 +152,7 @@ public class GameManager : MonoBehaviour
             {
                 currentStage = nextStage; // Update the current stage to the new one
                 Debug.Log("Transitioning to next stage: " + nextStage.stageID);
+                //Need to include logic to actually load the scene with new stage.
             }
             else
             {

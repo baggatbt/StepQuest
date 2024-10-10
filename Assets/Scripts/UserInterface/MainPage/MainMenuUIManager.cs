@@ -635,6 +635,7 @@ public void PopulateInventoryList() {
     {
         // Set the GameManager's CurrentBattleConfig to this stage's battle config
         GameManager.Instance.CurrentBattleConfig = selectedStage.stageBattleConfig;
+        GameManager.Instance.currentStage = selectedStage;
         
         Debug.Log($"Going to battle with stage ID: {selectedStage.stageID} and battle scene: {selectedStage.battleSceneName}");
         
