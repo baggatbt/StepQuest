@@ -101,8 +101,8 @@ public class BattleManager : MonoBehaviour
         activePlayerIndicator.SetActive(false);
         innerCircle.SetActive(false);
 
-        GameManager.Instance.LoadCurrentParty();
-       // SetupBattle(GameManager.Instance.currentParty);
+       // GameManager.Instance.LoadCurrentParty();
+        //SetupBattle(GameManager.Instance.currentParty);
          RestoreHealthAndEnergy();
         expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
         goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
@@ -151,26 +151,18 @@ public class BattleManager : MonoBehaviour
     public GameObject knightPrefab;
     
 
-    /*
+    
    public void SetupBattle(List<Companion> currentParty)
     {
         int companionIndex = 0; // Initialize the index
         foreach (var companion in currentParty)
         {
-            Character instantiatedCompanion = InstantiateCompanion(companion.heroID);
-            if (instantiatedCompanion is Companion instantiatedCompanionAsCompanion)
-            {
-                instantiatedCompanionAsCompanion.InitializeSkillsBasedOnLevel();
-                companionSpawnController.SetupCompanion(instantiatedCompanionAsCompanion, companionIndex); // Pass the index here
-                companionSpawnController.EnableHeroUI(instantiatedCompanionAsCompanion);
-                instantiatedCompanionAsCompanion.isSelected = true;
-                activePlayer = instantiatedCompanion;
-                companionIndex++; // Increment the index
-                playerParty.Add(instantiatedCompanion);
-            }
+            
+                playerParty.Add(companion);
+            
         }
     }
-    */
+    
 
     public void StartBattle()
     {
@@ -941,7 +933,8 @@ public class BattleManager : MonoBehaviour
 
     public void GoToNextStage()
     {
-            
+        
+         GameManager.Instance.LoadCurrentParty();    
          GameManager.Instance.GetNextStage(0); // Transitions to the first connected stage
     }
 

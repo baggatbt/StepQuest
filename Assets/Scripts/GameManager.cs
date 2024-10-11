@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviour
 
     public List<Item> itemList = new List<Item>(); //Items player has
     public int maxInventorySlots = 16;
-    public List<Companion> currentParty = new List<Companion>();
+    public List<Companion> currentParty = new List<Companion>(); //This is getting an instance, NOT the companions data
 
     public int currentStageIndex;
     private bool isUnlocked;
@@ -150,9 +150,12 @@ public class GameManager : MonoBehaviour
             string nextStageID = currentStage.connectedStageIDs[nextIndex];
             if (stageDictionary.TryGetValue(nextStageID, out StageData nextStage))
             {
+                SaveCurrentParty();
                 currentStage = nextStage; // Update the current stage to the new one
                 Debug.Log("Transitioning to next stage: " + nextStage.stageID);
-                //Need to include logic to actually load the scene with new stage.
+                CurrentBattleConfig = currentStage.stageBattleConfig;
+                SceneManager.LoadScene(currentStage.battleSceneName, LoadSceneMode.Single);
+
             }
             else
             {
@@ -169,11 +172,13 @@ public class GameManager : MonoBehaviour
 
     public void SaveCurrentParty()
     {
+        Debug.Log("Attempting to save party");
         List<string> companionDataList = new List<string>();
         foreach (var companion in currentParty)
         {
             string json = SerializationHelper.SerializeCompanion(companion);
             companionDataList.Add(json);
+            Debug.Log("Saved companion: " + companion);
         }
         string jsonList = JsonUtility.ToJson(new SerializableList<string>(companionDataList));
         PlayerPrefs.SetString("CurrentParty", jsonList);
@@ -185,12 +190,14 @@ public class GameManager : MonoBehaviour
         currentParty.Clear();
         string jsonList = PlayerPrefs.GetString("CurrentParty", "{}");
         var companionDataList = JsonUtility.FromJson<SerializableList<string>>(jsonList);
+        Debug.Log("Attempting to load party");
 
         foreach (var json in companionDataList.Items)
         {
             CompanionData data = SerializationHelper.DeserializeCompanionData(json);
-          //  Companion companion = InstantiateCompanion(data);
-          //  currentParty.Add(companion);
+            Companion companion = InstantiateCompanion(data);
+            currentParty.Add(companion);
+            Debug.Log("Added" + companion + "to party");
         }
     }
 

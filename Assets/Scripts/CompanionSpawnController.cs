@@ -43,11 +43,13 @@ public class CompanionSpawnController : MonoBehaviour
                     activeCompanions.Add(instantiatedCompanionAsCompanion);
                     instantiatedCompanionAsCompanion.isSelected = true;
                     instantiatedCompanionAsCompanion.originalPosition = companionSpawnPoints[companionIndex].position;
+                    
 
                     Debug.Log($"Companion {companion.heroID} instantiated at index {companionIndex} and {instantiatedCompanionAsCompanion.originalPosition} location");
                 }
                 companionIndex++;
             }
+            
         }
         else
         {
