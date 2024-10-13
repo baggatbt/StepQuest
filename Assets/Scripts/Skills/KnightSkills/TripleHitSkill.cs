@@ -51,7 +51,7 @@ public class TripleHitSkill : Skill
               
              if (i == 3)
              {
-               yield return battleManager.StartCoroutine(battleManager.TimeStop(0.4f, .1f));
+               yield return battleManager.StartCoroutine(battleManager.TimeStop(0.7f, 1.1f));
              }
             
              

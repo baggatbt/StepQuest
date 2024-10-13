@@ -93,60 +93,58 @@ public class BattleManager : MonoBehaviour
     }
 
     private void Start()
+{
+    outerCircleInitialScale = outerCircle.transform.localScale;
+    innerCircleInitialScale = innerCircle.transform.localScale;
+
+    outerCircle.SetActive(false);
+    activePlayerIndicator.SetActive(false);
+    innerCircle.SetActive(false);
+
+    expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
+    goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
+    mainCamera = Camera.main;
+
+    BattleConfig config = GameManager.Instance.CurrentBattleConfig;
+    if (config != null)
     {
-        outerCircleInitialScale = outerCircle.transform.localScale;
-        innerCircleInitialScale = innerCircle.transform.localScale;
-
-        outerCircle.SetActive(false);
-        activePlayerIndicator.SetActive(false);
-        innerCircle.SetActive(false);
-
-       // GameManager.Instance.LoadCurrentParty();
-        //SetupBattle(GameManager.Instance.currentParty);
-         RestoreHealthAndEnergy();
-        expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
-        goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
-        mainCamera = Camera.main;
-
-        BattleConfig config = GameManager.Instance.CurrentBattleConfig;
-        if (config != null)
-        {
-            
-            Debug.Log("StartBattle is being called");
-        }
-        else
-        {
-            Debug.LogError("No battle configuration found.");
-        }
-
-        
-        for (int i = 0; i < config.maxEnemiesToSpawn; i++)
-        {
-            // Activate the spawn point if it is inactive
-            if (!enemySpawnPoints[i].gameObject.activeSelf)
-            {
-                enemySpawnPoints[i].gameObject.SetActive(true);
-            }
-
-            Character spawnedEnemy = enemySpawnController.SpawnEnemiesFromPool(
-                config.poolName,
-                1,
-                enemySpawnPoints[i],
-                healthBars[i],
-                energyBars[i],
-                i,
-                config.levelOfEnemies,
-                enemyHealthUI[i]
-            );
-
-            if (spawnedEnemy != null)
-            {
-                enemies.Add(spawnedEnemy);
-            }
-        }
-       
-       // StartBattle(config);
+        Debug.Log("StartBattle is being called");
     }
+    else
+    {
+        Debug.LogError("No battle configuration found.");
+    }
+
+    // Loop through and spawn each enemy
+    for (int i = 0; i < config.maxEnemiesToSpawn; i++)
+    {
+        // Activate the spawn point if it is inactive
+        if (!enemySpawnPoints[i].gameObject.activeSelf)
+        {
+            enemySpawnPoints[i].gameObject.SetActive(true);
+        }
+
+        // Spawn each enemy using the modified SpawnEnemiesFromPool method
+        Character spawnedEnemy = enemySpawnController.SpawnEnemiesFromPool(
+            config.poolName,
+            enemySpawnPoints[i],     // Spawn point for this enemy
+            healthBars[i],           // Health bar for this enemy
+            energyBars[i],           // Energy bar for this enemy
+            i,                       // Health text index
+            config.levelOfEnemies,    // Enemy level
+            enemyHealthUI[i]          // Health UI for this enemy
+        );
+
+        if (spawnedEnemy != null)
+        {
+            enemies.Add(spawnedEnemy);
+        }
+    }
+
+    // Uncomment to start the battle after enemies are spawned
+    // StartBattle(config);
+}
+
 
     public GameObject knightPrefab;
     

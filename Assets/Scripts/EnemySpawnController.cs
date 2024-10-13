@@ -41,66 +41,96 @@ public class EnemySpawnController : MonoBehaviour
         mainCamera = Camera.main;
     }
 
-    public Character SpawnEnemiesFromPool(string poolName, int numberToSpawn, Transform spawnPoint, Slider associatedHealthBarSlider, Slider associatedEnergyBarSlider, int healthTextIndex, int level, GameObject enemyHealthUI)
+    public Character SpawnEnemiesFromPool(string poolName, Transform spawnPoint, Slider associatedHealthBarSlider, Slider associatedEnergyBarSlider, int healthTextIndex, int level, GameObject enemyHealthUI)
 {
     if (!poolDictionary.ContainsKey(poolName))
     {
+        Debug.LogWarning($"Pool '{poolName}' not found!");
         return null;
     }
-     
-    Character lastSpawnedCharacter = null;
-    for (int i = 0; i < numberToSpawn; i++)
+
+    // Spawn one enemy only
+    GameObject enemyToSpawn = poolDictionary[poolName][Random.Range(0, poolDictionary[poolName].Count)];
+    float yOffset = 0.4f; // Offset for enemy spawn position above the spawn point
+    GameObject spawnedEnemy = Instantiate(enemyToSpawn, new Vector3(spawnPoint.position.x, spawnPoint.position.y + yOffset, spawnPoint.position.z), spawnPoint.rotation);
+
+    // Get the Character component
+    Character lastSpawnedCharacter = spawnedEnemy.GetComponent<Character>();
+    if (lastSpawnedCharacter == null)
     {
-        GameObject enemyToSpawn = poolDictionary[poolName][Random.Range(0, poolDictionary[poolName].Count)];
-        float yOffset = 0.4f; // Offset for enemy spawn position above the spawn point
-        GameObject spawnedEnemy = Instantiate(enemyToSpawn, new Vector3(spawnPoint.position.x, spawnPoint.position.y + yOffset, spawnPoint.position.z), spawnPoint.rotation);
-            
-        lastSpawnedCharacter = spawnedEnemy.GetComponent<Character>();
-        if (lastSpawnedCharacter == null) continue;
-
-        lastSpawnedCharacter.level = level;
-
-        // Set health and energy bars
-        lastSpawnedCharacter.enemyHealthUI = healthUI[i];
-        lastSpawnedCharacter.enemyHealthUI = enemyHealthUI;
-        lastSpawnedCharacter.healthBar = associatedHealthBarSlider;
-
-        lastSpawnedCharacter.energyBar = associatedEnergyBarSlider;
-
-        // Calculate the position above the spawned character
-        Renderer enemyRenderer = spawnedEnemy.GetComponent<Renderer>();
-        float characterTop = 0f;
-        if (enemyRenderer != null)
-        {
-            characterTop = enemyRenderer.bounds.max.y; // Get the highest point of the character
-        }
-        Vector3 worldPosition = new Vector3(spawnedEnemy.transform.position.x, characterTop + 0.5f, spawnedEnemy.transform.position.z); // Adjust the offset as needed
-
-        // Convert the world position to screen space with RectTransformUtility
-        Vector2 screenPosition;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            (RectTransform)associatedHealthBarSlider.transform.parent, 
-            mainCamera.WorldToScreenPoint(worldPosition), 
-            mainCamera, 
-            out screenPosition);
-
-        associatedHealthBarSlider.transform.localPosition = screenPosition;
-
-        lastSpawnedCharacter.UpdateStats();
-        lastSpawnedCharacter.healthText = healthTexts[healthTextIndex];
-        enemiesSpawned++;  // Increment the spawn count
-
-        lastSpawnedCharacter.enemyHealthUI.gameObject.SetActive(true);
-        lastSpawnedCharacter.healthText.text = lastSpawnedCharacter.health + "";
-
-        associatedEnergyBarSlider.gameObject.SetActive(false);
-        associatedEnergyBarSlider.maxValue = lastSpawnedCharacter.maxEnergy;
-        associatedEnergyBarSlider.value = 0;
+        Debug.LogWarning("Spawned enemy does not have a Character component!");
+        return null;
     }
-    enemiesSpawned = 0;
+
+    lastSpawnedCharacter.level = level;
+
+    // Ensure each enemy has its own health bar UI and health text
+    lastSpawnedCharacter.enemyHealthUI = enemyHealthUI; // Assign unique health UI for this enemy
+    lastSpawnedCharacter.healthText = healthTexts[healthTextIndex]; // Assign unique health text
+
+    // Ensure the health UI is active
+    if (lastSpawnedCharacter.enemyHealthUI != null && !lastSpawnedCharacter.enemyHealthUI.activeInHierarchy)
+    {
+        // Activate the parent and the health UI
+        Transform healthUIParent = lastSpawnedCharacter.enemyHealthUI.transform.parent;
+        if (healthUIParent != null && !healthUIParent.gameObject.activeSelf)
+        {
+            healthUIParent.gameObject.SetActive(true);  // Activate parent if inactive
+        }
+
+        lastSpawnedCharacter.enemyHealthUI.SetActive(true);  // Activate the health UI
+        Debug.Log($"Health UI {lastSpawnedCharacter.enemyHealthUI.name} is now active for {spawnedEnemy.name}");
+    }
+
+    // Set health and energy bars
+    if (!associatedHealthBarSlider.gameObject.activeSelf)
+    {
+        associatedHealthBarSlider.gameObject.SetActive(true);
+    }
+
+    if (!associatedEnergyBarSlider.gameObject.activeSelf)
+    {
+       // associatedEnergyBarSlider.gameObject.SetActive(true);
+    }
+
+    lastSpawnedCharacter.healthBar = associatedHealthBarSlider;
+    lastSpawnedCharacter.energyBar = associatedEnergyBarSlider;
+
+    // Set the values for health and energy
+    lastSpawnedCharacter.healthBar.maxValue = lastSpawnedCharacter.maxHealth;
+    lastSpawnedCharacter.healthBar.value = lastSpawnedCharacter.health;
+
+    lastSpawnedCharacter.energyBar.maxValue = lastSpawnedCharacter.maxEnergy;
+    lastSpawnedCharacter.energyBar.value = 0;
+
+    // Calculate the position above the spawned character
+    Renderer enemyRenderer = spawnedEnemy.GetComponent<Renderer>();
+    float characterTop = enemyRenderer != null ? enemyRenderer.bounds.max.y : 0f;
+    Vector3 worldPosition = new Vector3(spawnedEnemy.transform.position.x, characterTop + 0.5f, spawnedEnemy.transform.position.z);
+    Vector2 screenPosition;
+
+    // Convert world position to screen space with RectTransformUtility
+    RectTransformUtility.ScreenPointToLocalPointInRectangle(
+        (RectTransform)associatedHealthBarSlider.transform.parent,
+        mainCamera.WorldToScreenPoint(worldPosition),
+        mainCamera,
+        out screenPosition
+    );
+
+    associatedHealthBarSlider.transform.localPosition = screenPosition;
+
+    // Update stats and UI after spawning
+    lastSpawnedCharacter.UpdateStats();
+    lastSpawnedCharacter.healthText.text = lastSpawnedCharacter.health.ToString();
 
     return lastSpawnedCharacter;
 }
+
+
+
+
+
+
 
 
 
