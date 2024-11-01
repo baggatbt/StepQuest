@@ -86,6 +86,9 @@ public class Archer : Companion
     public override List<SkillType> AllSkills => new List<SkillType>
     {
         SkillType.ShootArrow,
+       SkillType.ArrowRain,
+       SkillType.MeleeCombo,
+       
         
         
         
@@ -96,7 +99,7 @@ public class Archer : Companion
        SkillType.ShootArrow,
        SkillType.ArrowRain,
        SkillType.MeleeCombo,
-       SkillType.ShootArrow, //Temp add until 4th skill made
+       
     };
 
      public override List<SkillType> MainSkills => mainSkills;
@@ -113,6 +116,8 @@ public class Archer : Companion
 
             case SkillType.MeleeCombo:
                 return new MeleeCombo();
+
+             
             // ... other cases ..
             
         

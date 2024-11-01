@@ -165,7 +165,7 @@ public class MainMenuUIManager : MonoBehaviour
             // Set the hero's icon
             if (heroIconImage != null && characterData.heroIcon != null)
             {
-              //  heroIconImage.sprite = characterData.heroIcon;
+                heroIconImage.sprite = characterData.heroIcon;
                 Debug.Log("Hero icon set from characterData");
             }
 
