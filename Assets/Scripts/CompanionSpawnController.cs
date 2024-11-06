@@ -98,22 +98,46 @@ public class CompanionSpawnController : MonoBehaviour
     }
 
     private void SetupBars(Character character, Slider healthBar, Slider energyBar, TextMeshProUGUI healthText, TextMeshProUGUI energyText, GameObject heroHealthUI)
+{
+    heroHealthUI.SetActive(true);
+
+    character.healthText = healthText;
+    healthBar.maxValue = character.maxHealth;
+    healthBar.value = character.health;
+    character.healthBar = healthBar;
+    healthText.text = character.health.ToString();
+
+    character.energyText = energyText;
+    energyBar.maxValue = character.maxEnergy;
+    energyBar.value = character.energy;
+    character.energyBar = energyBar;
+    energyText.text = character.energy.ToString();
+
+    character.enemyHealthUI = heroHealthUI;
+
+    // Position the health UI based on the sprite bounds
+    PositionHealthUIAboveCharacter(heroHealthUI, character);
+}
+
+private void PositionHealthUIAboveCharacter(GameObject heroHealthUI, Character character)
+{
+    SpriteRenderer spriteRenderer = character.GetComponent<SpriteRenderer>();
+    if (spriteRenderer != null)
     {
-        heroHealthUI.SetActive(true);
-        character.healthText = healthText;
-        healthBar.maxValue = character.maxHealth;
-        healthBar.value = character.health;
-        character.healthBar = healthBar;
-        healthText.text = character.health.ToString();
+        // Get the sprite bounds and calculate the offset
+        float spriteHeight = spriteRenderer.bounds.size.y;
+        Vector3 offset = new Vector3(0, spriteHeight + 0.5f, 0); // Add extra offset above the character if needed
 
-        character.energyText = energyText;
-        energyBar.maxValue = character.maxEnergy;
-        energyBar.value = character.energy;
-        character.energyBar = energyBar;
-        energyText.text = character.energy.ToString();
-
-        character.enemyHealthUI = heroHealthUI;
+        // Set the health UI position above the character
+        heroHealthUI.transform.position = character.transform.position + offset;
     }
+    else
+    {
+        Debug.LogWarning("Character does not have a SpriteRenderer component.");
+    }
+}
+
+
 
     public void RemoveCompanion(Character companionCharacter)
     {

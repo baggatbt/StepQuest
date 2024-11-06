@@ -29,7 +29,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3837466525552236748}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 502.41815, y: 337.24, z: -16}
+  m_LocalPosition: {x: 502.2, y: 340.94, z: -16}
   m_LocalScale: {x: 8, y: 8, z: 6}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -78,12 +78,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 05b44a5a16042fe43a6b94d210e0a5c1, type: 3}
+  m_Sprite: {fileID: 2064044260, guid: 05b44a5a16042fe43a6b94d210e0a5c1, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 2.88, y: 1.28}
+  m_Size: {x: 0.49, y: 0.44}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -123,8 +123,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.008205414, y: 0.24637985}
-  m_Size: {x: 0.20236969, y: 0.3492508}
+  m_Offset: {x: -0.008205414, y: -0.0009784698}
+  m_Size: {x: 0.20236969, y: 0.25917435}
   m_Direction: 0
 --- !u!114 &8387075348163996620
 MonoBehaviour:
@@ -175,6 +175,8 @@ MonoBehaviour:
   isAnimationDone: 0
   currentBarrier: {fileID: 0}
   animationDamageTime: 0
+  isWindowOpen: 0
+  damageApplied: 0
   enemyDeathEffect: {fileID: 0}
   audioSource: {fileID: 7111989942290979110}
   hitSound: {fileID: 8300000, guid: 6cf83724a179e418e9c0fd0f17384fcc, type: 3}
@@ -319,7 +321,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6285312443893387354}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.306, y: 0.291, z: 0}
+  m_LocalPosition: {x: 0.182, y: 0.047, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
