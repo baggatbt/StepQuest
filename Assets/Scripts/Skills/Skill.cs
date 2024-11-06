@@ -162,20 +162,24 @@ public abstract class Skill
 
     public void HandleTimingResultForPlayerAttack(Character user, Character target, TimingEventResult timingResult, int baseDamage)
 {
+    if (user.damageApplied)
+    {
+        // If damage has already been applied, skip further processing
+        return;
+    }
+
     float damageTimingMultiplier = 1.0f;
     float skillBaseDamage = baseDamage; // Use float for baseDamage to allow for fractional multipliers
     int finalDamage;
-    
-    result = timingResult;
-    
-    if (result == TimingEventResult.Good)
+
+    if (timingResult == TimingEventResult.Good)
     {
         Debug.Log("Good Hit!");
         damageTimingMultiplier = 1.25f;  // Boost damage by 25%
-        
+
         // Calculate final damage and round up
         finalDamage = Mathf.CeilToInt(skillBaseDamage * damageTimingMultiplier);
-        
+
         target.TakeDamage(finalDamage, user);
         user.GainEnergy(1); // Bonus energy for a good hit
         user.PlayCriticalHitSound(); // Play critical hit sound
@@ -187,7 +191,11 @@ public abstract class Skill
         target.TakeDamage(finalDamage, user);
         user.PlayHitSound(); // Play hit sound
     }
+
+    // Mark that damage has been applied to prevent further instances
+    user.damageApplied = true;
 }
+
 
 
 

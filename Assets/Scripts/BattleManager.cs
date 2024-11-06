@@ -85,11 +85,14 @@ public class BattleManager : MonoBehaviour
             }
         }
     }
+    
+    public TimingVisualAid visualAid;
 
     private void Awake()
     {
         // Initialize any necessary components here
          companionSpawnController.CreateHeroSelectionUI();
+         visualAid = FindObjectOfType<TimingVisualAid>(); // Find the visual aid in the scene
     }
 
     private void Start()

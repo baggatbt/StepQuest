@@ -449,26 +449,39 @@ private IEnumerator TintRed()
     animationDamageTime = true;
 
 }
-/* Dont have a suitable flash material yet, but the idea works
-    public Material originalMaterial; // To store the original material
-    public Material newMaterial; // Material for the "flash" effect
-    public IEnumerator FlashWhiteAndReset() //handles setting and resetting of hero flashing
+//REWORKING TIMING EVENTS
+
+    public bool isWindowOpen = false;
+    public bool damageApplied = false; // New flag to track if damage has been applied
+
+    // Called by the animation event to open the timing window
+    
+    public void OpenTimingWindow()
     {
-        SwapMaterial();
-        yield return new WaitForSeconds(0.2f); // Delay so it doesnt flash back too early
-        ResetMaterial();
-        
+        isWindowOpen = true;
+        damageApplied = false; // Reset the flag when the window opens
+        Debug.Log("Timing window opened.");
     }
-    // Method to be called by the animation event to "flash" the hero at correct timing
-    public void SwapMaterial()
+
+    // Called by the animation event to close the timing window
+    public void CloseTimingWindow()
     {
-        GetComponent<SpriteRenderer>().material = newMaterial;
+        isWindowOpen = false;
+        Debug.Log("Timing window closed.");
     }
-     public void ResetMaterial()
+
+    // Method to check player input
+    public bool CheckPlayerInput()
     {
-        GetComponent<SpriteRenderer>().material = originalMaterial;
+        if (isWindowOpen && Input.GetMouseButtonDown(0))
+        {
+            Debug.Log("Player clicked within the timing window!");
+            return true; // Successful timing
+        }
+        return false; // Missed timing
     }
-    */
+
+//REWORKING TIMING EVENTS
     public EnemyDeathEffect enemyDeathEffect;
    public void CheckForDeath()
 {
