@@ -904,12 +904,20 @@ public void UnlockSkillTwoForHero()
 
     public GameObject goldGeneratorPanel; // Assign your main panel in the Inspector
     public GameObject closeGoldPanelOverlay; // Assign your overlay panel in the Inspector
+    public GameObject closeVillageGatePanelOverlay;
 
     public void TogglePanelAndOverlay(GameObject panel)
     {
-        bool isActive = goldGeneratorPanel.activeSelf;
-        goldGeneratorPanel.SetActive(!isActive);
+        bool isActive = panel.activeSelf;
+        panel.SetActive(!isActive);
         closeGoldPanelOverlay.SetActive(!isActive);
+    }
+
+    public void ToggleVillagePanelAndOverlay(GameObject panel)
+    {
+        bool isActive = panel.activeSelf;
+        panel.SetActive(!isActive);
+        closeVillageGatePanelOverlay.SetActive(!isActive);
     }
 
     public void ToggleCanvasGroup(GameObject canvasGroupObject)
