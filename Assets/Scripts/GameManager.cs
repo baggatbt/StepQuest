@@ -201,6 +201,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void ClearCurrentParty()
+    {
+        currentParty.Clear();
+    }
+
     private Companion InstantiateCompanion(CompanionData data)
     {
         GameObject prefab = null;

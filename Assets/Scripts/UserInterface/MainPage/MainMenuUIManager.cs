@@ -433,6 +433,22 @@ public Button forestDungeonButton;
         nodeInfoPanel.SetActive(true);
     }
 
+    public void ClearParty()
+    {
+        // Clear the current party in GameManager
+        GameManager.Instance.ClearCurrentParty();
+
+        // Reset hero icons back to default
+        ShowPartyMembers();
+    }
+
+    public void OpenPartyPanel(GameObject panel)
+    {
+        ClearParty();
+       
+        panel.SetActive(true);
+    }
+
 //ASSIGN THE DUNGEON PANEL TO CHECK PARTY 
 public void OpenDungeonPanel()
 {
