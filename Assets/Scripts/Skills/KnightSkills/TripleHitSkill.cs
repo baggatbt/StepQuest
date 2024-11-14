@@ -23,7 +23,7 @@ public class TripleHitSkill : Skill
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
 {
-    TimingVisualAid visualAid = battleManager.visualAid; // Get the visual aid from the BattleManager
+   // TimingVisualAid visualAid = battleManager.visualAid; // Get the visual aid from the BattleManager
 
     user.isAttacking = true;
     user.isAnimationDone = false; // Reset the flag at the start of the attack
@@ -33,8 +33,7 @@ public class TripleHitSkill : Skill
 
     for (int i = 0; i < numberOfAttacksPossible; i++)
     {
-        // Show the visual aid when the window opens
-        visualAid.StartTimingWindow();
+       
 
         // Use TimingManager to handle the timing and damage
         yield return TimingManager.Instance.HandleTimingWindow(user, target, baseDamage, (TimingEventResult result) =>
@@ -43,8 +42,7 @@ public class TripleHitSkill : Skill
             HandleTimingResultForPlayerAttack(user, target, result, baseDamage);
         });
 
-        // Hide the visual aid when the window closes
-        visualAid.EndTimingWindow();
+        
     }
 
     // Wait for the animation to finish

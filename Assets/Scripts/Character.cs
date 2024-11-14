@@ -470,6 +470,8 @@ private IEnumerator TintRed()
         Debug.Log("Timing window closed.");
     }
 
+    
+
     // Method to check player input
     public bool CheckPlayerInput()
     {
@@ -480,6 +482,8 @@ private IEnumerator TintRed()
         }
         return false; // Missed timing
     }
+
+    
 
 //REWORKING TIMING EVENTS
     public EnemyDeathEffect enemyDeathEffect;

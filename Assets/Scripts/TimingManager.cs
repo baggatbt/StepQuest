@@ -6,7 +6,8 @@ using UnityEngine;
 public class TimingManager : MonoBehaviour
 {
     public static TimingManager Instance; // Singleton instance
-    private TimingVisualAid visualAid;
+    
+    public GameObject timingWindowVisualAid; // Reference to the timing window visual aid GameObject
 
     private void Awake()
     {
@@ -14,7 +15,17 @@ public class TimingManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            visualAid = FindObjectOfType<TimingVisualAid>(); // Find and reference the visual aid
+
+
+            // Find timingWindowVisualAid GameObject by name if it hasn’t been assigned in the Inspector
+            if (timingWindowVisualAid == null)
+            {
+                timingWindowVisualAid = GameObject.Find("timingWindowVisualAid");
+                if (timingWindowVisualAid == null)
+                {
+                    Debug.LogWarning("timingWindowVisualAid GameObject not found in the scene.");
+                }
+            }
         }
         else
         {
@@ -30,10 +41,9 @@ public class TimingManager : MonoBehaviour
         // Wait for the timing window to open
         yield return new WaitUntil(() => user.isWindowOpen);
 
-        
-        
+        // Show timing aid if it exists
+        ShowTimingAid();
 
-        // Check for player input during the window
         bool successfulTiming = false;
 
         while (user.isWindowOpen)
@@ -41,13 +51,14 @@ public class TimingManager : MonoBehaviour
             if (!inputAttempted && user.CheckPlayerInput())
             {
                 successfulTiming = true;
-                inputAttempted = true; // Mark that the player has made an attempt
+                inputAttempted = true;
                 break;
             }
-            yield return null; // Wait until the next frame
+            yield return null;
         }
 
-       
+        // Hide timing aid once the window closes
+        HideTimingAid();
 
         // Determine the result based on whether input was attempted successfully
         TimingEventResult result = successfulTiming ? TimingEventResult.Good : TimingEventResult.Miss;
@@ -57,5 +68,21 @@ public class TimingManager : MonoBehaviour
 
         // Ensure the timing window is fully closed before exiting
         yield return new WaitUntil(() => !user.isWindowOpen);
+    }
+
+    public void ShowTimingAid()
+    {
+        if (timingWindowVisualAid != null)
+        {
+            timingWindowVisualAid.SetActive(true);
+        }
+    }
+
+    public void HideTimingAid()
+    {
+        if (timingWindowVisualAid != null)
+        {
+            timingWindowVisualAid.SetActive(false);
+        }
     }
 }
