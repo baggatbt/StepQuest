@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
+using System.Linq;
 public class MainMenuUIManager : MonoBehaviour
 {
     public GameObject knightSkillPanel;
@@ -20,8 +21,6 @@ public class MainMenuUIManager : MonoBehaviour
     public GameObject knightSkillListView;
     public TextMeshProUGUI stepsText;
     public TextMeshProUGUI goldText;
-    public TextMeshProUGUI silverText;
-    public TextMeshProUGUI copperText;
     public GameObject companionButtonPrefab;
     public GameObject companionListPanel;
     public GameObject companionStatsPanel;
@@ -30,7 +29,7 @@ public class MainMenuUIManager : MonoBehaviour
     public Transform consumableListContent;  // Assign the content transform of your scroll view in the consumables panel
 
     // References to stat UI Text elements
-    public TextMeshProUGUI levelText,atkText, hpText, spText, expText, spdText; 
+    public TextMeshProUGUI levelText,atkText, hpText, spText, expText, spdText, defText; 
 
     //KNIGHT 
     //public Knight knight;
@@ -51,10 +50,8 @@ public class MainMenuUIManager : MonoBehaviour
     }
     private void Update()
     {
-         if (stepsText != null) stepsText.text =  PlayerData.Instance.inGameSteps.ToString();  
-         if (goldText != null) goldText.text =  PlayerData.Instance.gold.ToString();  
-         if (silverText != null) silverText.text =  PlayerData.Instance.silver.ToString();  
-         if (copperText != null) copperText.text =  PlayerData.Instance.copper.ToString();  
+         if (stepsText != null) stepsText.text = PlayerData.Instance.inGameSteps.ToString();  
+         if (goldText != null) goldText.text =  PlayerData.Instance.gold.ToString();    
          UpdateTimerDisplay();
          UpdateKnightRecoveryTimerDisplay();
     }
@@ -110,9 +107,18 @@ public class MainMenuUIManager : MonoBehaviour
             UpdateCompanionStatsDisplay(GameManager.Instance.currentCompanion);
         }
     }
-  public void PopulateCompanionList()
+  
+    //public GameObject heroSpriteIconButton;
+    public GameObject heroSelectPanel;
+
+    public void PopulateCompanionList()
 {
-    GameObject companionButtonContainer = GameObject.Find("Companion Button Container"); // Find or reference directly
+    GameObject companionButtonContainer = GameObject.Find("Companion Button Container");
+    if (companionButtonContainer == null)
+    {
+        Debug.LogError("Companion Button Container not found.");
+        return;
+    }
 
     // Clear existing buttons to avoid duplicates
     foreach (Transform child in companionButtonContainer.transform)
@@ -122,105 +128,384 @@ public class MainMenuUIManager : MonoBehaviour
 
     HashSet<string> addedCompanions = new HashSet<string>(); // To track added companions
 
-    foreach (Companion companion in GameManager.Instance.companions)
+    foreach (CharacterData characterData in GameManager.Instance.allCharacterData)
     {
-        if (companion.isUnlocked && addedCompanions.Add(companion.heroID)) // Checks if heroID is not already added
+        if (characterData == null)
+        {
+            Debug.LogError("Found a null characterData in the allCharacterData list.");
+            continue;
+        }
+
+        Debug.Log($"Processing character: {characterData.heroID}, isUnlocked: {characterData.isUnlocked}");
+
+        if (characterData.isUnlocked && addedCompanions.Add(characterData.heroID)) // Checks if heroID is not already added
         {
             // Instantiate the button within the container
             GameObject buttonObject = Instantiate(companionButtonPrefab, companionButtonContainer.transform);
+            Debug.Log("Button object instantiated for character: " + characterData.heroID);
 
             // Find components
             Image heroIconImage = buttonObject.transform.Find("Background/HeroIconBorder/HeroIcon")?.GetComponent<Image>();
-            Slider healthBarSlider = buttonObject.transform.Find("HealthBar").GetComponent<Slider>();
-            Slider expBarSlider = buttonObject.transform.Find("ExpBar").GetComponent<Slider>();
-            Slider staBarSlider = buttonObject.transform.Find("StaminaBar").GetComponent<Slider>();
-            Text healthBarText = buttonObject.transform.Find("HealthBar/HealthText").GetComponent<Text>(); 
-            Text xpBarText = buttonObject.transform.Find("ExpBar/ExpText").GetComponent<Text>(); 
-            Text staBarText = buttonObject.transform.Find("StaminaBar/StaText").GetComponent<Text>(); 
+            Slider healthBarSlider = buttonObject.transform.Find("HealthBar")?.GetComponent<Slider>();
+            Slider expBarSlider = buttonObject.transform.Find("ExpBar")?.GetComponent<Slider>();
+            Slider staBarSlider = buttonObject.transform.Find("StaminaBar")?.GetComponent<Slider>();
+            Text healthBarText = buttonObject.transform.Find("HealthBar/HealthText")?.GetComponent<Text>();
+            Text xpBarText = buttonObject.transform.Find("ExpBar/ExpText")?.GetComponent<Text>();
+            Text staBarText = buttonObject.transform.Find("StaminaBar/StaText")?.GetComponent<Text>();
 
-            // Set the hero's icon
-            if (heroIconImage != null && companion.heroIcon != null)
-            {
-                heroIconImage.sprite = companion.heroIcon;
-            }
-             
-            healthBarSlider.maxValue = companion.maxHealth;
-            healthBarSlider.value = companion.health; 
-
-            expBarSlider.maxValue = companion.ExpToNextLevel(companion.heroLevel);
-            expBarSlider.value = companion.heroExp;
-
-            staBarSlider.maxValue = companion.maxStamina;
-            staBarSlider.value = companion.stamina;
-
-            // Set the text for health and experience
-            if (healthBarText != null)
-            {
-                healthBarText.text = $"{companion.health} / {companion.maxHealth}";
-            }
-
-            if (xpBarText != null)
-            {
-                xpBarText.text = $"{companion.heroExp} / {companion.ExpToNextLevel(companion.heroLevel)}";
-            }
-
-            if (staBarText != null)
-            {
-                staBarText.text = $"{companion.stamina} / {companion.maxStamina}";
-            }
-            else
+            // Check if components are found
+            if (heroIconImage == null || healthBarSlider == null || expBarSlider == null || staBarSlider == null ||
+                healthBarText == null || xpBarText == null || staBarText == null)
             {
                 Debug.LogError("One or more components were not found on the button prefab.");
+                Destroy(buttonObject); // Cleanup if the button is incomplete
+                continue;
             }
+
+            // Set the hero's icon
+            if (heroIconImage != null && characterData.heroIcon != null)
+            {
+                heroIconImage.sprite = characterData.heroIcon;
+                Debug.Log("Hero icon set from characterData");
+            }
+
+            healthBarSlider.maxValue = characterData.maxHealth;
+            healthBarSlider.value = characterData.health;
+
+            
+
+            staBarSlider.maxValue = characterData.maxStamina;
+            staBarSlider.value = characterData.stamina;
+
+            // Set the text for health and experience
+            healthBarText.text = $"{characterData.health} / {characterData.maxHealth}";
+           
+            staBarText.text = $"{characterData.stamina} / {characterData.maxStamina}";
 
             // Setup button to select the companion when clicked
             Button btn = buttonObject.GetComponent<Button>();
-            btn.onClick.AddListener(delegate { OnCompanionSelected(companion); });
+            btn.onClick.AddListener(() => OpenCompanionDetails(characterData));
+
+            Debug.Log($"Character {characterData.heroID} added to list.");
         }
     }
+
+    Debug.Log("Companion list populated.");
 }
 
-            public SkillPanelController skillPanelController;
+private void OpenCompanionDetails(CharacterData characterData)
+{
+    GameManager.Instance.currentCompanionData = characterData;
+    UpdateCompanionStatsDisplay(characterData);
+    companionStatsPanel.SetActive(true);
+    UpdateHeroImage(characterData);
+  //  UpdateSkillButtonImages(characterData);
+}
 
-public void OpenSkillPanel()
-{   
-    string companionName = GameManager.Instance.currentCompanion.heroID;
+private void UpdateCompanionStatsDisplay(CharacterData characterData)
+{
+    // Update the stats display with data from characterData
+    // Example:
+    levelText.text = $"Lv: {characterData.heroLevel}";
+    atkText.text = $"{characterData.attackPower}";
+   hpText.text = $"{characterData.health}/{characterData.maxHealth}";
+   spText.text = $"{characterData.energy}/{characterData.maxEnergy}";
+   spdText.text = $"{characterData.speed}";
+   defText.text = $"{characterData.defensePower}";
+   expText.text = $"Exp:{characterData.heroExp}/{characterData.ExpToNextLevel(characterData.heroLevel)}";
+    // Add other stat updates here
+}
 
-    // Concatenate the companion name with "SkillTreePanel"
-    string panelName = companionName + "SkillTreePanel";
-    GameObject skillTreePanelObject = GameObject.Find(panelName);
-    GameObject skillTreeSkillPointTextObject = GameObject.Find("SkillPointText");
-    Debug.Log(GameManager.Instance.currentCompanion);
+private void UpdateHeroImage(CharacterData characterData)
+{
+    // Find the GameObject with the name "HeroImage"
+    GameObject heroImageObject = GameObject.Find("HeroImage");
 
-    // Check if the GameObjects are found
-    if (skillTreePanelObject != null && skillTreeSkillPointTextObject != null)
+    // Ensure the heroImageObject is not null and has an Image component
+    if (heroImageObject != null)
     {
-        // Get the CanvasGroup component of the skill tree panel GameObject
-        CanvasGroup canvasGroup = skillTreePanelObject.GetComponent<CanvasGroup>();
+        // Get the Image component attached to the heroImageObject
+        Image heroImage = heroImageObject.GetComponent<Image>();
 
-        // Get the Text component of the skill point text GameObject
-        TextMeshProUGUI skillPointText = skillTreeSkillPointTextObject.GetComponent<TextMeshProUGUI>();
-
-        // Check if the CanvasGroup and Text components exist
-        if (canvasGroup != null && skillPointText != null)
+        // Ensure the heroImage is not null
+        if (heroImage != null)
         {
-            // Show the panel by setting its alpha and interactable properties
-            canvasGroup.alpha = 1;
-            canvasGroup.interactable = true;
-            canvasGroup.blocksRaycasts = true;
-
-            // Update the text of the skill point text
-            skillPointText.text = "SP: " + GameManager.Instance.currentCompanion.heroSkillPoints.ToString();
+            // Set the sprite of the Image component to the character's fullHeroImage
+         //   heroImage.sprite = characterData.fullHeroImage;
         }
         else
         {
-            Debug.LogError("CanvasGroup or Text component not found on the corresponding GameObject.");
+            Debug.LogError("HeroImage GameObject does not have an Image component attached.");
         }
     }
     else
     {
-        Debug.LogError("Skill tree panel or skill point text GameObject not found.");
+        Debug.LogError("HeroImage GameObject not found in the scene.");
     }
+}
+
+
+private void OnCharacterDataSelected(CharacterData characterData)
+{
+    GameManager gameManager = GameManager.Instance;
+    if (gameManager != null)
+    {
+        if (gameManager.currentParty.Count < 2) // Check if there is space in the party
+        {
+            if (!gameManager.currentParty.Any(companion => companion.characterData == characterData))
+            {
+                // Find the prefab associated with the characterData and instantiate the companion
+                GameObject characterPrefab = gameManager.GetCharacterPrefab(characterData.heroID);
+                if (characterPrefab != null)
+                {
+                    GameObject instantiatedObject = Instantiate(characterPrefab);
+                    Companion instantiatedCompanion = instantiatedObject.GetComponent<Companion>();
+                    
+                    if (instantiatedCompanion != null)
+                    {
+                        instantiatedCompanion.characterData = characterData;
+                        instantiatedCompanion.InitializeCharacterStats();
+
+                        gameManager.currentParty.Add(instantiatedCompanion);
+                        Debug.Log("Added to party: " + characterData.heroID);
+                        ShowPartyMembers(); // Update UI to reflect changes
+                    }
+                    else
+                    {
+                        Debug.LogError("Instantiated object does not have a Companion component.");
+                        Destroy(instantiatedObject); // Clean up if instantiation failed
+                    }
+                }
+                else
+                {
+                    Debug.LogError("Character prefab not found for heroID: " + characterData.heroID);
+                }
+            }
+            else
+            {
+                Debug.Log("Companion already in party: " + characterData.heroID);
+            }
+        }
+        else
+        {
+            Debug.LogError("Party is full. Cannot add more companions.");
+        }
+    }
+    else
+    {
+        Debug.LogError("GameManager instance is null.");
+    }
+}
+
+
+
+
+    public void SetActiveSelectPanel()
+    {
+        heroSelectPanel.SetActive(true);
+        OpenSelectHeroList();
+    }
+
+
+    //For the dungeons
+    [SerializeField] private GameObject heroSpriteIconButtonPrefab; // Drag your button prefab here in the inspector
+
+    public void OpenSelectHeroList()
+{
+    Debug.Log("This button was clicked");
+    GameObject companionButtonContainer = GameObject.Find("Companion Selection Container");
+    if (!companionButtonContainer)
+    {
+        Debug.LogError("Companion Selection Container not found in the scene.");
+        return;
+    }
+
+    // Clear existing buttons to avoid duplicates
+    foreach (Transform child in companionButtonContainer.transform)
+    {
+        Destroy(child.gameObject);
+    }
+
+    HashSet<string> addedCompanions = new HashSet<string>(); // To track added companions to avoid duplicates
+
+    // Iterate over the CharacterData list from GameManager
+    foreach (CharacterData characterData in GameManager.Instance.allCharacterData)
+    {
+        if (characterData.isUnlocked && addedCompanions.Add(characterData.heroID)) // Check if unlocked and not already added
+        {
+            // Instantiate the button within the container
+            GameObject buttonObject = Instantiate(heroSpriteIconButtonPrefab, companionButtonContainer.transform);
+
+            // Setup the hero icon
+            SetupHeroIcon(buttonObject, characterData);
+        }
+    }
+}
+
+
+
+    private void SetupHeroIcon(GameObject buttonObject, CharacterData characterData)
+{
+    Image heroIconImage = buttonObject.GetComponentInChildren<Image>();
+    if (heroIconImage == null)
+    {
+        Debug.LogError("Image component not found in button prefab.");
+        return;
+    }
+
+    if (characterData.heroIcon == null)
+    {
+        Debug.LogError("characterData.heroIcon is null for character: " + characterData.heroID);
+        return;
+    }
+
+    if (heroIconImage != null)
+    {
+        heroIconImage.sprite = characterData.heroIcon;
+    }
+
+    Button button = buttonObject.GetComponent<Button>();
+    if (button != null)
+    {
+        button.onClick.AddListener(() => AddToParty(characterData));
+    }
+    else
+    {
+        Debug.LogError("Button component not found on the hero icon button prefab.");
+    }
+}
+
+
+private void AddToParty(CharacterData characterData)
+{
+    GameManager gameManager = GameManager.Instance;
+    if (gameManager != null)
+    {
+        if (gameManager.currentParty.Count < 2) // Check if there is space in the party
+        {
+            if (!gameManager.currentParty.Any(companion => companion.characterData == characterData))
+            {
+                // Find the prefab associated with the characterData and instantiate the companion
+                GameObject characterPrefab = gameManager.GetCharacterPrefab(characterData.heroID);
+                if (characterPrefab != null)
+                {
+                    Companion instantiatedCompanion = Instantiate(characterPrefab).GetComponent<Companion>();
+                    instantiatedCompanion.SetCharacterData(characterData);
+
+                    gameManager.currentParty.Add(instantiatedCompanion);
+                    Debug.Log("Added to party: " + characterData.heroID);
+                    ShowPartyMembers(); // Update UI to reflect changes
+                    CheckPartyNotEmpty();
+                }
+                else
+                {
+                    Debug.LogError("Character prefab not found for heroID: " + characterData.heroID);
+                }
+            }
+            else
+            {
+                Debug.Log("Companion already in party: " + characterData.heroID);
+            }
+        }
+        else
+        {
+            Debug.LogError("Party is full. Cannot add more companions.");
+        }
+    }
+    else
+    {
+        Debug.LogError("GameManager instance is null.");
+    }
+}
+
+//Add more as needed
+public GameObject dungeonSelectionPanel;
+public Button forestDungeonButton;
+
+ // Assuming you have a panel and a TextMeshProUGUI element assigned in the inspector
+    public GameObject nodeInfoPanel;
+    public TextMeshProUGUI nodeNameText;
+
+    // Method to show the node information panel and update the text
+    public void ShowNodeInfo(string nodeName)
+    {
+        nodeNameText.text = nodeName;
+        nodeInfoPanel.SetActive(true);
+    }
+
+//ASSIGN THE DUNGEON PANEL TO CHECK PARTY 
+public void OpenDungeonPanel()
+{
+    dungeonSelectionPanel.SetActive(true);
+    CheckPartyNotEmpty();
+}
+public void ActivateDungeonButtons()
+    {
+        forestDungeonButton.interactable = true;
+    }
+
+    public void DeactivateDungeonButtons()
+    {
+        forestDungeonButton.interactable = false;
+    }
+
+private void CheckPartyNotEmpty()
+{
+    if (GameManager.Instance.currentParty.Count == 0)
+    {
+        DeactivateDungeonButtons();
+    }
+    else
+    {
+        ActivateDungeonButtons();
+    }
+}
+
+
+
+public GameObject heroSlotOne;
+public GameObject heroSlotTwo;
+[SerializeField] private Sprite defaultHeroSprite; //The border they sit in
+
+private void ShowPartyMembers()
+{
+    Image heroSlotOneImage = heroSlotOne.GetComponent<Image>();
+    Image heroSlotTwoImage = heroSlotTwo.GetComponent<Image>();
+
+    if (heroSlotOneImage == null || heroSlotTwoImage == null)
+    {
+        Debug.LogError("One or both hero slots do not have an Image component.");
+        return;
+    }
+
+    // Reset slot images to default sprite
+    heroSlotOneImage.sprite = defaultHeroSprite;
+    heroSlotTwoImage.sprite = defaultHeroSprite;
+
+    // Assign icons to slots based on current party members
+    if (GameManager.Instance.currentParty.Count > 0)
+    {
+        heroSlotOneImage.sprite = GameManager.Instance.currentParty[0].heroIcon;
+    }
+    if (GameManager.Instance.currentParty.Count > 1)
+    {
+        heroSlotTwoImage.sprite = GameManager.Instance.currentParty[1].heroIcon;
+    }
+}
+
+
+
+
+ public GameObject skillPanel;
+
+public void OpenSkillPanel()
+{   
+   skillPanel.SetActive(true);
+}
+
+public void CloseSkillPanel()
+{
+    skillPanel.SetActive(false);
 }
 
 
@@ -340,21 +625,30 @@ public void PopulateInventoryList() {
         }
     }
 
+    
+     public void GoToBattle()
+{
+    // Find the first stage (stage 1.1)
+    StageData selectedStage = GameManager.Instance.allStagesData.Find(stage => stage.stageID == "1.1");
 
-     public void GoToNextStage()
+    if (selectedStage != null)
     {
+        // Set the GameManager's CurrentBattleConfig to this stage's battle config
+        GameManager.Instance.CurrentBattleConfig = selectedStage.stageBattleConfig;
+        GameManager.Instance.currentStage = selectedStage;
         
-        if (GameManager.Instance.currentStageIndex >= GameManager.Instance.allStages.Count)
-        {
-            Debug.Log("The game is over, you win");
-        }
+        Debug.Log($"Going to battle with stage ID: {selectedStage.stageID} and battle scene: {selectedStage.battleSceneName}");
+        GameManager.Instance.SaveCurrentParty();
         
-        // Set the current battle configuration to the next stage
-        GameManager.Instance.CurrentBattleConfig = GameManager.Instance.allStages[GameManager.Instance.currentStageIndex];
-
-        // Load the battle scene with the new configuration
-        SceneManager.LoadScene("TestPortraitBattle");
+        // Load the battle scene associated with this stage
+        SceneManager.LoadScene(selectedStage.battleSceneName);
     }
+    else
+    {
+        Debug.LogError("Stage with ID 1.1 not found.");
+    }
+}
+
 
 
    
@@ -364,13 +658,7 @@ public void PopulateInventoryList() {
     GameManager.Instance.currentCompanion = companion;
     companion.InitializeSkillsBasedOnLevel();
 
-    // Setup and subscribe to events for each upgrade bar
-    /*
-    SetupUpgradeBar(atkUpgradeBar, companion.statUpgradeProgress["atk"], () => IncreaseCompanionStat(companion, "atk"));
-    SetupUpgradeBar(hpUpgradeBar, companion.statUpgradeProgress["hp"], () => IncreaseCompanionStat(companion, "hp"));
-    SetupUpgradeBar(spdUpgradeBar, companion.statUpgradeProgress["spd"], () => IncreaseCompanionStat(companion, "spd"));
-    SetupUpgradeBar(spUpgradeBar, companion.statUpgradeProgress["sp"], () => IncreaseCompanionStat(companion, "sp"));
-    */
+
     // Update companion's stats display and make sure the stats panel is visible
     UpdateCompanionStatsDisplay(companion);
     companionStatsPanel.SetActive(true);
@@ -388,7 +676,7 @@ public void PopulateInventoryList() {
         if (heroImage != null)
         {
             // Set the sprite of the Image component to the companion's heroIcon
-            heroImage.sprite = companion.heroIcon;
+           // heroImage.sprite = companion.heroIcon;
         }
         else
         {
@@ -412,7 +700,7 @@ public void PopulateInventoryList() {
         if (heroImage != null)
         {
             // Set the sprite of the Image component to the companion's heroIcon
-            heroImage.sprite = companion.fullHeroImage;
+          //  heroImage.sprite = companion.fullHeroImage;
         }
         else
         {
@@ -534,13 +822,26 @@ private void SetupUpgradeBar(GameObject upgradeBarGO, int initialProgress, Actio
 private void UpdateCompanionStatsDisplay(Companion companion)
 {
     levelText.text = "Lv: " + companion.heroLevel.ToString();
-    atkText.text = "ATK: " + companion.attackPower.ToString();
-    hpText.text = "HP: " + companion.health + " / " + companion.maxHealth.ToString();
-    spText.text = "SP: " + companion.maxEnergy.ToString();
+    atkText.text = companion.attackPower.ToString();
+    hpText.text = companion.maxHealth.ToString();
+    spText.text = companion.maxEnergy.ToString();
     expText.text = "EXP: " + companion.heroExp.ToString() + " / " + companion.ExpToNextLevel(companion.heroLevel);
-    spdText.text = "SPD: " + companion.speed.ToString();
+    Debug.Log(expText.text);
+    spdText.text = companion.speed.ToString();
 }
 
+public void UnlockSkillOneForHero()
+{
+    GameManager.Instance.currentCompanionData.UnlockSkill(GameManager.Instance.currentCompanionData.skillOne);
+    Debug.Log("added skill one");
+}
+
+public void UnlockSkillTwoForHero()
+{
+    GameManager.Instance.currentCompanionData.UnlockSkill(GameManager.Instance.currentCompanionData.skillTwo);
+    Debug.Log("added skill two");
+}
+/*
     public void IncreaseCompanionStat(Companion companion, string statType)
 {
     // Increase the stat based on the type
@@ -569,6 +870,7 @@ private void UpdateCompanionStatsDisplay(Companion companion)
 
     }
 }
+*/
    
     
     public CanvasGroup currentPanel;
@@ -597,8 +899,26 @@ private void UpdateCompanionStatsDisplay(Companion companion)
    public void TogglePanel(GameObject panel)
 {
     panel.SetActive(!panel.activeSelf);
-    companionStatsPanel.SetActive(false);
+    //companionStatsPanel.SetActive(false);
 }
+
+    public GameObject goldGeneratorPanel; // Assign your main panel in the Inspector
+    public GameObject closeGoldPanelOverlay; // Assign your overlay panel in the Inspector
+    public GameObject closeVillageGatePanelOverlay;
+
+    public void TogglePanelAndOverlay(GameObject panel)
+    {
+        bool isActive = panel.activeSelf;
+        panel.SetActive(!isActive);
+        closeGoldPanelOverlay.SetActive(!isActive);
+    }
+
+    public void ToggleVillagePanelAndOverlay(GameObject panel)
+    {
+        bool isActive = panel.activeSelf;
+        panel.SetActive(!isActive);
+        closeVillageGatePanelOverlay.SetActive(!isActive);
+    }
 
     public void ToggleCanvasGroup(GameObject canvasGroupObject)
 {
@@ -701,7 +1021,8 @@ private void UpdateCompanionStatsDisplay(Companion companion)
 
 
     
-
+    //CRAFTING SECTION
+    
 
 
 
@@ -725,7 +1046,7 @@ private void UpdateCompanionStatsDisplay(Companion companion)
 
     public void openCompanionInterface()
     {
-        companionGUI.SetActive(true);
+       // companionGUI.SetActive(true);
     }
 
     public void closeCompanionInterface()

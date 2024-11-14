@@ -15,7 +15,7 @@ public class Slime : Enemy
         this.health = this.maxHealth;
         this.maxEnergy = 3;
         this.speed = 3;
-        this.defensePower = 1;
+        this.defensePower = 0;
         this.attackPower = 2;
         this.attacksBeforeSpecial = 2;
         
@@ -52,7 +52,7 @@ public class Slime : Enemy
         this.health = maxHealth;
         this.goldReward = 3 + (this.level * 2);
         this.expReward = 5 + (this.level * 3);
-       // this.attackPower = 6 + (this.level + 1);
+        this.attackPower = 6 + (this.level + 1);
        // this.defensePower = 5 + (this.level + 1);
         this.energy = 0;
     }

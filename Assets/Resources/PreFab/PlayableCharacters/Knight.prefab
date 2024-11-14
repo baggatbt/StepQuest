@@ -140,7 +140,7 @@ MonoBehaviour:
   level: 0
   health: 0
   maxHealth: 0
-  characterIDNumber: 
+  characterIDNumber: 1
   isSelected: 0
   energy: 0
   maxEnergy: 0
@@ -156,7 +156,7 @@ MonoBehaviour:
   originalPosition: {x: 0, y: 0, z: 0}
   isAttacking: 0
   isFront: 0
-  spriteRenderer: {fileID: 0}
+  spriteRenderer: {fileID: 358661848719693021}
   animator: {fileID: 0}
   healthText: {fileID: 0}
   energyText: {fileID: 0}
@@ -170,6 +170,7 @@ MonoBehaviour:
   damageReflectionPercentage: 0
   statusEffectController: {fileID: 0}
   cameraShake: {fileID: 0}
+  tintDuration: 0.1
   isAnimationDone: 0
   currentBarrier: {fileID: 0}
   animationDamageTime: 0
@@ -177,7 +178,7 @@ MonoBehaviour:
   audioSource: {fileID: 1772341838862574825}
   hitSound: {fileID: 8300000, guid: 6cf83724a179e418e9c0fd0f17384fcc, type: 3}
   criticalHitSound: {fileID: 8300000, guid: 94f827a27b434434d85138f924464fe7, type: 3}
-  availableSkills: 
+  availableSkills: 0e000000
   heroID: 
   heroLevel: 0
   heroExp: 0
@@ -192,6 +193,11 @@ MonoBehaviour:
   atkGrowth: 0
   healthGrowth: 0
   energyGrowth: 0
+  skillOne: 0
+  skillTwo: 0
+  characterData: {fileID: 11400000, guid: 20326644b4c85224982fa2bfe1287dd8, type: 2}
+  baseExp: 50
+  growthFactor: 1.1
 --- !u!82 &1772341838862574825
 AudioSource:
   m_ObjectHideFlags: 0

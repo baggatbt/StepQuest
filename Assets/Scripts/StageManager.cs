@@ -14,22 +14,21 @@ public class StageManager : MonoBehaviour
 
    private void InitializeStages()
 {
-    if (GameManager.Instance.UnlockedStageNames.Count == 0 && allStages.Count > 0)
-    {
-        // Assuming the first stage is always at index 0
-        Stage firstStage = allStages[0];
-        firstStage.isUnlocked = true;
-        GameManager.Instance.UnlockedStageNames.Add(firstStage.stageID);
-        firstStage.UpdateButtonColor();
-    }
-
-    // Continue initializing other stages
     foreach (Stage stage in allStages)
     {
         stage.isUnlocked = GameManager.Instance.UnlockedStageNames.Contains(stage.stageID);
-        stage.UpdateButtonColor();
+        
+    }
+
+    if (GameManager.Instance.UnlockedStageNames.Count == 0 && allStages.Count > 0)
+    {
+        Stage firstStage = allStages[0];
+        firstStage.isUnlocked = true;
+        GameManager.Instance.UnlockedStageNames.Add(firstStage.stageID);
+        
     }
 }
+
 
    
 

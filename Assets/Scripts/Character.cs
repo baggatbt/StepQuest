@@ -60,18 +60,29 @@ public class Character : MonoBehaviour
     //STATUS EFFECTS
     public StatusEffectController statusEffectController;
 
+
+    
     
 
     protected virtual void Awake()
     {
         isSelected = false;
+        
         animator = GetComponent<Animator>();
         statusEffectController = GetComponent<StatusEffectController>();
         enemyDeathEffect = GetComponent<EnemyDeathEffect>();
-        originalPosition = transform.position;
+        // Ensure originalPosition is set to the character's initial position if not already set
+        if (originalPosition == Vector3.zero || originalPosition == new Vector3(10000f, 10000f, -16.20f))
+        {
+            originalPosition = transform.position;
+            Debug.Log($"OP at Awake() {originalPosition}");
+        }
+     //   originalPosition = transform.position;
         Debug.Log("OP at Awake() " + originalPosition);
        // this.hasNotGone = true;
     }
+
+    
 
     
     public void Update()
@@ -226,9 +237,11 @@ public class Character : MonoBehaviour
         Debug.Log("did block from character" + this.didBlock);
         if (!this.didBlock){
         this.animator.SetTrigger("IsHurtTrigger");
+        StartCoroutine(TintRed());
         }
         // Trigger hit reaction, damage popup, etc.
-        
+        int damageToReflect = (int)Math.Ceiling(damageReflectionPercentage * totalDamageAfterDefense);
+        attacker.health -= damageToReflect;
         GameObject damagePopupPrefab = Resources.Load<GameObject>("PreFab/DamagePopup");
         Transform endOfBattleRewardsTransform = GameObject.Find("EndOfBattleRewardsCanvas").transform;
         if(damagePopupPrefab != null)
@@ -246,6 +259,21 @@ public class Character : MonoBehaviour
     
    
 }
+public float tintDuration = 0.1f; // Duration of the tint
+private IEnumerator TintRed()
+    {
+        // Store the original color of the sprite
+        Color originalColor = spriteRenderer.color;
+
+        // Set the sprite color to red
+        spriteRenderer.color = Color.red;
+
+        // Wait for the tint duration
+        yield return new WaitForSeconds(tintDuration);
+
+        // Revert the sprite color to its original color
+        spriteRenderer.color = originalColor;
+    }
 
 
     IEnumerator FadeOutSprite()
@@ -303,7 +331,7 @@ public class Character : MonoBehaviour
 }
 
 
-
+/*
     public void GainTeamEnergy(int energyGained)
 {
     if (PlayerData.Instance.teamEnergy + energyGained > maxEnergy) // If the gained energy will bring the total over the max
@@ -332,6 +360,7 @@ public class Character : MonoBehaviour
     }
     Debug.Log("Not passing any");
 }
+*/
     //For enemy rage bars
    public void GainEnergy(int energyGained)
 {
@@ -398,6 +427,19 @@ public class Character : MonoBehaviour
     Time.timeScale = 1f; // Resumes the game time
 }
 
+    public void SlowTime(float newTimeScale)
+    {
+        Time.timeScale = newTimeScale;  // Adjust the value to what feels right for the effect
+        Time.fixedDeltaTime = 0.02f * Time.timeScale;  // Keep physics simulation smooth
+    }
+
+    // Function to normalize time
+    public void NormalizeTime()
+    {
+        Time.timeScale = 1.0f;
+        Time.fixedDeltaTime = 0.02f;  // Reset to default fixed delta time
+    }
+
 
     public void animationDamageTiming()
 {
@@ -407,26 +449,39 @@ public class Character : MonoBehaviour
     animationDamageTime = true;
 
 }
-/* Dont have a suitable flash material yet, but the idea works
-    public Material originalMaterial; // To store the original material
-    public Material newMaterial; // Material for the "flash" effect
-    public IEnumerator FlashWhiteAndReset() //handles setting and resetting of hero flashing
+//REWORKING TIMING EVENTS
+
+    public bool isWindowOpen = false;
+    public bool damageApplied = false; // New flag to track if damage has been applied
+
+    // Called by the animation event to open the timing window
+    
+    public void OpenTimingWindow()
     {
-        SwapMaterial();
-        yield return new WaitForSeconds(0.2f); // Delay so it doesnt flash back too early
-        ResetMaterial();
-        
+        isWindowOpen = true;
+        damageApplied = false; // Reset the flag when the window opens
+        Debug.Log("Timing window opened.");
     }
-    // Method to be called by the animation event to "flash" the hero at correct timing
-    public void SwapMaterial()
+
+    // Called by the animation event to close the timing window
+    public void CloseTimingWindow()
     {
-        GetComponent<SpriteRenderer>().material = newMaterial;
+        isWindowOpen = false;
+        Debug.Log("Timing window closed.");
     }
-     public void ResetMaterial()
+
+    // Method to check player input
+    public bool CheckPlayerInput()
     {
-        GetComponent<SpriteRenderer>().material = originalMaterial;
+        if (isWindowOpen && Input.GetMouseButtonDown(0))
+        {
+            Debug.Log("Player clicked within the timing window!");
+            return true; // Successful timing
+        }
+        return false; // Missed timing
     }
-    */
+
+//REWORKING TIMING EVENTS
     public EnemyDeathEffect enemyDeathEffect;
    public void CheckForDeath()
 {
@@ -449,50 +504,52 @@ public class Character : MonoBehaviour
 }
 
 
-     public IEnumerator MoveToTarget()
-{
-    animator.SetTrigger("MovementAnimationTrigger");
-    this.isMoving = true;
-
-    // Define a speed for moving to the target. 
-    float moveSpeed = 17f; 
-
-    Vector3 targetPosition = new Vector3(attackTarget.position.x, attackTarget.position.y, attackTarget.position.z);
-    checkCollisionsDuringMovement = true;
-
-    // Pass the moveSpeed as the third argument to the Move coroutine
-    yield return Move(targetPosition, 3.0f, moveSpeed);
-
-    animator.SetTrigger("StopMovementAnimationTrigger");
-    this.isMoving = false;
-}
-
-
-
-private IEnumerator Move(Vector3 targetPosition, float stoppingDistance, float speed)
-{
-    Debug.Log($"Starting Move towards {targetPosition}");
-    while (Vector3.Distance(transform.position, targetPosition) > stoppingDistance)
+    public IEnumerator MoveToTarget()
     {
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
-        yield return null; // Wait for the next frame
+        Debug.Log("MOVING IS CALLED");
+        animator.SetTrigger("MovementAnimationTrigger");
+        this.isMoving = true;
+
+        float moveSpeed = 17f; 
+        Vector3 targetPosition = new Vector3(attackTarget.position.x, attackTarget.position.y, attackTarget.position.z);
+        checkCollisionsDuringMovement = true;
+
+        Debug.Log($"Moving to target: {targetPosition}");
+        Debug.Log($"Current position: {transform.position}");
+        Debug.Log($"Original position before moving: {originalPosition}");
+
+        yield return Move(targetPosition, 3.0f, moveSpeed);
+
+        animator.SetTrigger("StopMovementAnimationTrigger");
+        this.isMoving = false;
     }
-    Debug.Log("Completed Move");
-}
 
-public IEnumerator ReturnToPosition(float returnSpeed = 20f)
-{
-    Debug.Log($"Returning to original position at: {originalPosition}");
-    animator.SetTrigger("MovementAnimationTrigger");
-    this.isMoving = true;
+    public IEnumerator ReturnToPosition(float returnSpeed = 20f)
+    {
+        Debug.Log($"Returning to original position at: {originalPosition}");
+        animator.SetTrigger("MovementAnimationTrigger");
+        this.isMoving = true;
 
-    yield return Move(originalPosition, 0.00f, returnSpeed); // Use a small stopping distance and adjustable speed
+        yield return Move(originalPosition, 0.00f, returnSpeed);
 
-    transform.position = originalPosition; // Ensure exact original position, remove if snapping still occurs but I think its fixed
-    animator.SetTrigger("StopMovementAnimationTrigger");
-    this.isMoving = false;
-    Debug.Log("Returned to original position");
-}
+        transform.position = originalPosition;
+        animator.SetTrigger("StopMovementAnimationTrigger");
+        this.isMoving = false;
+        Debug.Log("Returned to original position");
+    }
+
+    private IEnumerator Move(Vector3 targetPosition, float stoppingDistance, float speed)
+    {
+        Debug.Log($"Starting Move towards {targetPosition}");
+        while (Vector3.Distance(transform.position, targetPosition) > stoppingDistance)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
+            Debug.Log($"Moving towards {targetPosition} from {transform.position}");
+            yield return null;
+        }
+        Debug.Log("Completed Move");
+    }
+
 
 /*
 // Updated to check for an appropriate stopping distance

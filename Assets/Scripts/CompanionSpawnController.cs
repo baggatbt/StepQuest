@@ -1,193 +1,210 @@
+using System.Collections;
+using System;
+using UnityEngine.SceneManagement;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using System.Linq;
 using UnityEngine.UI;
 using TMPro;
-using System.Linq; // Needed for LINQ queries such as FirstOrDefault
-using System.Collections.Generic; // Needed for List
+using System.Collections.Generic;
+
 public class CompanionSpawnController : MonoBehaviour
 {
     public GameObject companionPrefab;
-    public Transform[] companionSpawnPoints; // Assign in the inspector
-    public Slider associatedHealthBarSlider; // Reference to the slider
+    public Transform[] companionSpawnPoints;
+    public Slider associatedHealthBarSlider;
     public Slider associatedEnergyBarSlider;
     public TextMeshProUGUI associatedHealthText;
     public TextMeshProUGUI associatedEnergyText;
-    public Slider associatedHealthBarSlider2; // Reference to the slider
+    public Slider associatedHealthBarSlider2;
     public Slider associatedEnergyBarSlider2;
-    public GameObject heroHealthUI1;
-    public GameObject heroHealthUI2;
     public TextMeshProUGUI associatedHealthText2;
     public TextMeshProUGUI associatedEnergyText2;
-    public Slider associatedtempEnergyBarSlider2;
+    public GameObject heroHealthUI1;
+    public GameObject heroHealthUI2;
     public BattleManager battleManager;
-
     public List<Character> activeCompanions = new List<Character>();
-
 
     private void Start()
     {
-        
+        if (GameManager.Instance != null && GameManager.Instance.currentParty != null)
+        {
+            int companionIndex = 0;
+            foreach (Companion companion in GameManager.Instance.currentParty)
+            {
+                Character instantiatedCompanion = GameManager.Instance.InstantiateSelectedCompanion(companion.heroID);
+                Companion instantiatedCompanionAsCompanion = instantiatedCompanion as Companion;
+
+                if (instantiatedCompanionAsCompanion != null)
+                {
+                    instantiatedCompanionAsCompanion.SetCharacterData(companion.characterData);
+                    instantiatedCompanionAsCompanion.InitializeSkillsBasedOnLevel();
+                    SetupCompanions(instantiatedCompanionAsCompanion, companionIndex);
+                    activeCompanions.Add(instantiatedCompanionAsCompanion);
+                    instantiatedCompanionAsCompanion.isSelected = true;
+                    instantiatedCompanionAsCompanion.originalPosition = companionSpawnPoints[companionIndex].position;
+                    
+
+                    Debug.Log($"Companion {companion.heroID} instantiated at index {companionIndex} and {instantiatedCompanionAsCompanion.originalPosition} location");
+                }
+                companionIndex++;
+            }
+            
+        }
+        else
+        {
+            Debug.LogWarning("GameManager or currentParty is null.");
+        }
     }
 
-    public void SetupCompanion(Character companionCharacter)
-{
-    // Removing existing companion of the same type if present
-    var existingCompanion = activeCompanions.FirstOrDefault(c => c.characterIDNumber == companionCharacter.characterIDNumber);
-    if (existingCompanion != null)
+    public void SetupCompanion(Character companionCharacter, int index)
     {
-        RemoveCompanion(existingCompanion);
+        var existingCompanion = activeCompanions.FirstOrDefault(c => c.characterIDNumber == companionCharacter.characterIDNumber);
+        if (existingCompanion != null)
+        {
+            RemoveCompanion(existingCompanion);
+        }
+
+        if (index >= companionSpawnPoints.Length)
+        {
+            Debug.Log("All spawn points are occupied.");
+            return;
+        }
+
+        Transform spawnPoint = companionSpawnPoints[index];
+
+        // Activate the spawn point if it is inactive
+        if (!spawnPoint.gameObject.activeSelf)
+        {
+            spawnPoint.gameObject.SetActive(true);
+        }
+
+        companionCharacter.transform.position = spawnPoint.position;
+        companionCharacter.transform.rotation = spawnPoint.rotation;
+
+        if (index == 0)
+        {   
+            Debug.Log("Index was 0");
+            SetupBars(companionCharacter, associatedHealthBarSlider, associatedEnergyBarSlider, associatedHealthText, associatedEnergyText, heroHealthUI1);
+        }
+        else if (index == 1)
+        {
+            Debug.Log("Index was 1");
+            SetupBars(companionCharacter, associatedHealthBarSlider2, associatedEnergyBarSlider2, associatedHealthText2, associatedEnergyText2, heroHealthUI2);
+        }
+
+        activeCompanions.Add(companionCharacter);
+        companionCharacter.isSelected = true;
     }
-
-    // Ensure you don't add more companions than spawn points or UI elements
-    if (activeCompanions.Count >= companionSpawnPoints.Length)
-    {
-        Debug.Log("All spawn points are occupied.");
-        return;
-    }
-
-    int spawnIndex = activeCompanions.Count; // Use the count for positioning
-    Transform spawnPoint = companionSpawnPoints[spawnIndex];
-
-    // Setting companion's position
-    companionCharacter.transform.position = spawnPoint.position;
-    companionCharacter.transform.rotation = spawnPoint.rotation;
-
-    // Dynamically assign UI elements based on the current number of active companions
-    if (activeCompanions.Count % 2 == 0)
-    {
-        SetupBars(companionCharacter, associatedHealthBarSlider, associatedEnergyBarSlider, associatedHealthText, associatedEnergyText,heroHealthUI1);
-    }
-    else
-    {
-        SetupBars(companionCharacter, associatedHealthBarSlider2, associatedEnergyBarSlider2, associatedHealthText2, associatedEnergyText2, heroHealthUI2);
-    }
-
-    // Adding to the list
-    activeCompanions.Add(companionCharacter);
-    companionCharacter.isSelected = true;
-}
-
-
 
     private void SetupBars(Character character, Slider healthBar, Slider energyBar, TextMeshProUGUI healthText, TextMeshProUGUI energyText, GameObject heroHealthUI)
-    {
-        heroHealthUI.SetActive(true);
-        character.healthText = healthText;
-        healthBar.maxValue = character.maxHealth;
-        healthBar.value = character.health;
-        character.healthBar = healthBar;
-        healthText.text = character.health.ToString();
-        
-
-        character.energyText = energyText;
-        energyBar.maxValue = character.maxEnergy;
-        energyBar.value = character.energy;
-        character.energyBar = energyBar;
-        energyText.text = character.energy.ToString();
-
-        character.enemyHealthUI = heroHealthUI;
-    }
-
-    
-
-    public void RemoveCompanion(Character companionCharacter)
 {
-    if (activeCompanions.Remove(companionCharacter)) // This now automatically removes the companion
-    {
-        companionCharacter.isSelected = false;
-        DisableHeroUI(companionCharacter);
+    heroHealthUI.SetActive(true);
 
-        // Remove the companion from the BattleManager's playerParty list
-        if (battleManager.playerParty.Contains(companionCharacter))
-        {
-            battleManager.playerParty.Remove(companionCharacter);
-        }
+    character.healthText = healthText;
+    healthBar.maxValue = character.maxHealth;
+    healthBar.value = character.health;
+    character.healthBar = healthBar;
+    healthText.text = character.health.ToString();
 
-        Destroy(companionCharacter.gameObject);
-    }
+    character.energyText = energyText;
+    energyBar.maxValue = character.maxEnergy;
+    energyBar.value = character.energy;
+    character.energyBar = energyBar;
+    energyText.text = character.energy.ToString();
+
+    character.enemyHealthUI = heroHealthUI;
+
+    // Position the health UI based on the sprite bounds
+    PositionHealthUIAboveCharacter(heroHealthUI, character);
 }
 
-
-   
-
-    // Update the RemoveCompanionFromGame method to work with the list
-    private void RemoveCompanionFromGame(Companion companion)
-    {
-        var characterToRemove = activeCompanions.FirstOrDefault(c => c.characterIDNumber == companion.characterIDNumber);
-        if (characterToRemove != null)
-        {
-            RemoveCompanion(characterToRemove);
-        }
-    }
-
-
-    public void CreateHeroSelectionUI()
+private void PositionHealthUIAboveCharacter(GameObject heroHealthUI, Character character)
 {
-    Debug.Log("Creating Hero Selection UI");
-
-    // Clear existing buttons
-    foreach (Transform child in battleManager.heroSelectionPanel.transform)
+    SpriteRenderer spriteRenderer = character.GetComponent<SpriteRenderer>();
+    if (spriteRenderer != null)
     {
-        Debug.Log("Destroying existing button: " + child.gameObject.name);
-        Destroy(child.gameObject);
-    }
+        // Get the sprite bounds and calculate the offset
+        float spriteHeight = spriteRenderer.bounds.size.y;
+        Vector3 offset = new Vector3(0, spriteHeight + 0.5f, 0); // Add extra offset above the character if needed
 
-    // Log the count of companions
-    Debug.Log("Number of companions: " + GameManager.Instance.companions.Count);
-
-    // Create a button for each companion
-    foreach (Companion companion in GameManager.Instance.companions)
-{
-    Debug.Log("Creating button for: " + companion.heroID);
-    GameObject buttonObj = Instantiate(battleManager.heroButtonPrefab, battleManager.heroSelectionPanel.transform);
-    buttonObj.GetComponentInChildren<TextMeshProUGUI>().text = companion.heroID;
-
-    Companion localCompanion = companion; // Local copy
-    Debug.Log("This button's attached companion is: " + localCompanion);
-    buttonObj.GetComponent<Button>().onClick.AddListener(() => OnHeroSelected(localCompanion));
-}
-
-
-    // Make the panel visible
-    battleManager.heroSelectionPanel.SetActive(true);
-
-    // Activate the battle start button and add click listener
-       battleManager.battleStartButton.SetActive(true);
-        battleManager.battleStartButton.GetComponent<Button>().onClick.AddListener(() => battleManager.StartBattle(GameManager.Instance.CurrentBattleConfig));
-   
-}
-
- private int selectedCompanionCount = 0; // To track the number of companions selected
-
-    public void OnHeroSelected(Companion selectedCompanion)
-{
-    // Check if the companion is already selected
-    if (selectedCompanion.isSelected)
-    {
-        // If already selected, remove the companion
-        Debug.Log("Companion is already selected, removing");
-        RemoveCompanionFromGame(selectedCompanion);
-        selectedCompanion.isSelected = false;
-        selectedCompanionCount --;
+        // Set the health UI position above the character
+        heroHealthUI.transform.position = character.transform.position + offset;
     }
     else
     {
-        // If not selected, add the companion
-        Debug.Log("Companion wasn't selected, adding");
+        Debug.LogWarning("Character does not have a SpriteRenderer component.");
+    }
+}
+
+
+
+    public void RemoveCompanion(Character companionCharacter)
+    {
+        if (activeCompanions.Remove(companionCharacter))
+        {
+            companionCharacter.isSelected = false;
+            DisableHeroUI(companionCharacter);
+
+            if (battleManager.playerParty.Contains(companionCharacter))
+            {
+                battleManager.playerParty.Remove(companionCharacter);
+            }
+
+            Destroy(companionCharacter.gameObject);
+        }
+    }
+
+    public void CreateHeroSelectionUI()
+    {
+        foreach (Transform child in battleManager.heroSelectionPanel.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        foreach (Companion companion in GameManager.Instance.companions)
+        {
+            GameObject buttonObj = Instantiate(battleManager.heroButtonPrefab, battleManager.heroSelectionPanel.transform);
+            buttonObj.GetComponentInChildren<TextMeshProUGUI>().text = companion.heroID;
+
+            Companion localCompanion = companion;
+            buttonObj.GetComponent<Button>().onClick.AddListener(() => OnHeroSelected(localCompanion));
+        }
+
+        battleManager.battleStartButton.SetActive(true);
+    }
+
+    private int selectedCompanionCount = 0;
+
+   public void OnHeroSelected(Companion selectedCompanion)
+{
+    if (selectedCompanion.isSelected)
+    {
+        RemoveCompanionFromGame(selectedCompanion);
+        selectedCompanion.isSelected = false;
+        selectedCompanionCount--;
+    }
+    else
+    {
         Character instantiatedCompanion = GameManager.Instance.InstantiateSelectedCompanion(selectedCompanion.heroID);
         Companion companion = instantiatedCompanion as Companion;
         if (instantiatedCompanion != null)
         {
+            companion.SetCharacterData(selectedCompanion.characterData);
             companion.InitializeSkillsBasedOnLevel();
-            SetupSelectedCompanion(instantiatedCompanion);
+            SetupCompanion(instantiatedCompanion, selectedCompanionCount);
             AssignCompanion(instantiatedCompanion);
             EnableHeroUI(instantiatedCompanion);
             selectedCompanion.InitializeSkillsBasedOnLevel();
             selectedCompanion.isSelected = true;
+            Debug.Log($"Companion {selectedCompanion} added at index {selectedCompanionCount}.");
+        }
+        else
+        {
+            Debug.LogError("Failed to instantiate companion.");
         }
     }
 }
-
-
 
 
     private void AssignCompanion(Character companion)
@@ -204,25 +221,30 @@ public class CompanionSpawnController : MonoBehaviour
         selectedCompanionCount++;
     }
 
-
-    public void SetupSelectedCompanion(Character selectedCompanion)
+    private void SetupCompanions(Character selectedCompanion, int index)
     {
-        SetupCompanion(selectedCompanion);
+        SetupCompanion(selectedCompanion, index);
         battleManager.playerParty.Add(selectedCompanion);
-        Debug.Log(selectedCompanion.transform.position);
     }
 
-    private void EnableHeroUI(Character selectedCompanion)
+    public void EnableHeroUI(Character selectedCompanion)
     {
-       selectedCompanion.healthBar.gameObject.SetActive(true);
-       selectedCompanion.energyBar.gameObject.SetActive(true);
+        selectedCompanion.healthBar.gameObject.SetActive(true);
+        selectedCompanion.energyBar.gameObject.SetActive(true);
     }
 
-    private void DisableHeroUI(Character selectedCompanion)
+    public void DisableHeroUI(Character selectedCompanion)
     {
         selectedCompanion.healthBar.gameObject.SetActive(false);
         selectedCompanion.energyBar.gameObject.SetActive(false);
-        
     }
 
-} 
+    private void RemoveCompanionFromGame(Companion companion)
+    {
+        var characterToRemove = activeCompanions.FirstOrDefault(c => c.characterIDNumber == companion.characterIDNumber);
+        if (characterToRemove != null)
+        {
+            RemoveCompanion(characterToRemove);
+        }
+    }
+}

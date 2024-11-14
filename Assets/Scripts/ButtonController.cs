@@ -67,19 +67,11 @@ public class ButtonController : MonoBehaviour
 
 
 //changed to just display the description
-private IEnumerator ShowSkillDescriptionAfterDelay(Skill skill)
-{
-    yield return new WaitForSeconds(0.0f); // Wait for 1 second
-    skillDescriptionText.text = skill.description;
-    skillDescriptionPanel.SetActive(true);
-}
+
 
 private Coroutine holdCoroutine; // To keep track of the coroutine
 
-private void OnSkillButtonHold(Skill skill)
-{
-    holdCoroutine = StartCoroutine(ShowSkillDescriptionAfterDelay(skill));
-}
+
 
 
 private void OnSkillButtonRelease()
@@ -108,7 +100,7 @@ public void PopulateSkillPanelWithCompanionSkills()
     skillButtons.Clear();
     Debug.Log($"Populating skills for {activeCompanion.heroID}. Number of available skills: {activeCompanion.AvailableSkills.Count}");
 
-    foreach (SkillType skillType in activeCompanion.AvailableSkills)  // Changed to property access
+    foreach (SkillType skillType in activeCompanion.characterData.AvailableSkills)  // Changed to property access
     {
         Skill currentSkill = activeCompanion.GetSkillInstance(skillType);
         if (currentSkill == null)
@@ -157,7 +149,7 @@ private void SetupButtonEvents(GameObject buttonObj, Skill skill)
 
     var pointerDown = new EventTrigger.Entry();
     pointerDown.eventID = EventTriggerType.PointerDown;
-    pointerDown.callback.AddListener((data) => { OnSkillButtonHold(skill); });
+   // pointerDown.callback.AddListener((data) => { OnSkillButtonHold(skill); });
     eventTrigger.triggers.Add(pointerDown);
 
     var pointerUp = new EventTrigger.Entry();
@@ -196,6 +188,7 @@ public void SelectAndUseSkill(Skill selectedSkill)
         // Queue the new skill
         skill = selectedSkill;
         skillDescriptionPanel.SetActive(true);
+        skillDescriptionText.text = skill.description;
         battleManager.skillQueue.Enqueue(skill);
         battleManager.isSkillSelected = true;
         Debug.Log("Skill " + skill.skillName + " queued. Current queue size: " + battleManager.skillQueue.Count);

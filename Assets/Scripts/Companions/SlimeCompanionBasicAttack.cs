@@ -50,7 +50,7 @@ public class SlimeCompanionBasicAttack : Skill
         yield return new WaitUntil(() => user.isAnimationDone == true);
         
         user.animationDamageTime = false;
-        user.GainTeamEnergy(energyGain);
+      //  user.GainTeamEnergy(energyGain);
         user.isAnimationDone = false;
         user.isAttacking = false;
         target.CheckForDeath();

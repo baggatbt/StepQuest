@@ -85,7 +85,7 @@ public class QuestOne : Quest
     {
         // Add rewards here.
         PlayerData.Instance.gold += 100;
-        PlayerData.Instance.exp += 100;
+        //Additional rewards
         this.isActive = false; // End the mission.  
         Debug.Log("Rewards have been claimed");     
     }  

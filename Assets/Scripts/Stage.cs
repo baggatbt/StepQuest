@@ -4,55 +4,66 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-
-
 public class Stage : MonoBehaviour
 {
     public Button stageButton;
-    public BattleConfig stageBattleConfig;
-    public string battleSceneName = "TestPortraitBattle"; 
+    public string battleSceneName;
     public bool isUnlocked;
-    public bool isFirstCompletion;
-    public string stageID; // Unique identifier for the stage
-    public List<Stage> connectedStages; // Stages that get unlocked after completing this one
+    public bool isBossBattle;
+    public BattleConfig stageBattleConfig;
+    public string stageID;
+    public List<Stage> connectedStages;
 
     private void Start()
     {
-         stageButton.onClick.AddListener(OnStageButtonClicked);
-        // Initialize the unlocked state based on GameManager's data
+       // stageButton.onClick.AddListener(OnStageButtonClicked);
         isUnlocked = GameManager.Instance.UnlockedStageNames.Contains(this.stageID);
-       // UpdateButtonColor();
-        
     }
 
-    
-    public void UpdateButtonColor()
+    private void OnStageButtonClicked()
 {
-    // Check if the stageButton is not null before accessing it
-    /*
-    if (stageButton != null)
+    if (isUnlocked)
     {
-        if (isUnlocked)
-        {
-            stageButton.GetComponent<Image>().color = Color.green;
-        }
-        else
-        {
-            stageButton.GetComponent<Image>().color = Color.red;
-        }
+        // Store the current stage in GameManager
+        GameManager.Instance.CurrentStage = this;
+
+        stageBattleConfig.currentParty = new List<Companion>(GameManager.Instance.currentParty);
+        GameManager.Instance.CurrentBattleConfig = stageBattleConfig;
+        GameManager.Instance.SaveCurrentParty();
+       // SceneManager.LoadScene(battleSceneName);
     }
-    */
 }
 
 
-
-
-    private void OnStageButtonClicked()
+    public void Configure(StageConfig config)
     {
-        if (isUnlocked)
+        this.stageID = config.stageID;
+        this.battleSceneName = config.battleSceneName;
+        this.isUnlocked = config.isUnlocked;
+
+        UpdateButtonAppearance();
+    }
+
+    public void UpdateButtonAppearance()
+    {
+        if (stageButton != null)
         {
-        GameManager.Instance.CurrentBattleConfig = stageBattleConfig; // Store the config in the GameManager
-        SceneManager.LoadScene(battleSceneName); // Load the battle scene
+            stageButton.interactable = isUnlocked;
+            stageButton.GetComponent<Image>().color = isUnlocked ? Color.green : Color.red;
         }
+    }
+
+    // Method to get the next stage in the series
+    public Stage GetNextStage()
+    {
+        
+        if (connectedStages != null && connectedStages.Count > 0)
+        {
+            // Picks the first connected stage of which each stage has one
+            return connectedStages[0]; // Or use Random.Range(0, connectedStages.Count) for random stage selection
+        }
+
+        // If no connected stages, then go back to town. TODO
+        return null;
     }
 }

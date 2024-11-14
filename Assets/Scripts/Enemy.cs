@@ -6,10 +6,15 @@ public class Enemy : Character
 {
     public int expReward;
     public int goldReward;
+    public int baseExp; // Base experience points given by enemies
+    public float growthFactor = 1.1f; // Growth factor to control the steepness of curve
+    public int multiplier; // Multiplier for the experience calculation
+
 
     public int attackGrowth;
     public int defenseGrowth;
     public int healthGrowth;
+    public Sprite enemyIcon;
     public MaterialItem[] possibleDrops; // Assign this in the Inspector with your material items.
     public int dropChancePercentage = 50; // Example drop chance.
 
@@ -24,6 +29,14 @@ public class Enemy : Character
         expReward = CalculateExpReward(level);
         goldReward = CalculateGoldReward(level);
     }
+
+    protected virtual int ExpGivenByEnemy(int heroLevel)
+    {
+        int exp = Mathf.RoundToInt(baseExp + multiplier * Mathf.Pow(heroLevel, growthFactor));
+        Debug.Log($"Level {heroLevel} with Multiplier {multiplier}: EXP Reward {exp}");
+        return exp;
+    }
+
 
     protected int CalculateExpReward(int level)
     {

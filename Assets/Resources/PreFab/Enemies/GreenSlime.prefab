@@ -4899,15 +4899,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8370724005610461912}
-  m_LocalRotation: {x: 0, y: 0.9999619, z: 0, w: 0.008726652}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 320.5453, y: 95.9567, z: -16.46}
-  m_LocalScale: {x: 2.2, y: 2.5, z: 3}
+  m_LocalScale: {x: 2.4, y: 2.5, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1071514198848266543}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 179, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!212 &8370724005610461908
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -5030,9 +5030,13 @@ MonoBehaviour:
   criticalHitSound: {fileID: 0}
   expReward: 5
   goldReward: 2
+  baseExp: 0
+  growthFactor: 1.1
+  multiplier: 0
   attackGrowth: 0
   defenseGrowth: 0
   healthGrowth: 0
+  enemyIcon: {fileID: -429316454, guid: 034776700acf73040887a7e7b8662972, type: 3}
   possibleDrops:
   - {fileID: 11400000, guid: 023e4bd9727a6744b820c88789971e35, type: 2}
   dropChancePercentage: 50
