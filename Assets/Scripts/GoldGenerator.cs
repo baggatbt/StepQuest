@@ -83,7 +83,7 @@ public class GoldGenerator : MonoBehaviour
             collectedGold += goldToCollect;
             goldReadyToCollect = false; // Reset flag after collecting
             Debug.Log($"Gold collected: {collectedGold} (Generated: {goldToCollect})");
-
+            PlayerData.Instance.gold += goldToCollect;
             // Optionally, update the UI with the collected gold amount here.
         }
         else

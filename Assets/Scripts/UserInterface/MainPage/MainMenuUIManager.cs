@@ -902,6 +902,16 @@ public void UnlockSkillTwoForHero()
     //companionStatsPanel.SetActive(false);
 }
 
+    public GameObject goldGeneratorPanel; // Assign your main panel in the Inspector
+    public GameObject closeGoldPanelOverlay; // Assign your overlay panel in the Inspector
+
+    public void TogglePanelAndOverlay(GameObject panel)
+    {
+        bool isActive = goldGeneratorPanel.activeSelf;
+        goldGeneratorPanel.SetActive(!isActive);
+        closeGoldPanelOverlay.SetActive(!isActive);
+    }
+
     public void ToggleCanvasGroup(GameObject canvasGroupObject)
 {
     // Check if the canvas group object exists
