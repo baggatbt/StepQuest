@@ -44,6 +44,8 @@ public class Slash : Skill
         {
             // Call the centralized damage handling method
             HandleTimingResultForPlayerAttack(user, target, result, baseDamage);
+            battleManager.CameraShakeMagnitude(result);
+            
         });
 
         
@@ -51,6 +53,7 @@ public class Slash : Skill
 
     // Wait for the animation to finish
     yield return new WaitUntil(() => user.isAnimationDone);
+    
 
     // Reset flags
     user.isAnimationDone = false;

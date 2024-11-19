@@ -179,7 +179,6 @@ public abstract class Skill
 
         // Calculate final damage and round up
         finalDamage = Mathf.CeilToInt(skillBaseDamage * damageTimingMultiplier);
-
         target.TakeDamage(finalDamage, user);
         user.GainEnergy(1); // Bonus energy for a good hit
         user.PlayCriticalHitSound(); // Play critical hit sound

@@ -705,6 +705,25 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    public void CameraShakeMagnitude(TimingEventResult result)
+    {
+        if (result == TimingEventResult.Good)
+            {
+                StartCoroutine(cameraShake.Shake(0.5f));
+               // return TimingEventResult.Good;
+            }
+                else if (result != TimingEventResult.Good)
+            {
+                StartCoroutine(cameraShake.Shake(0.25f));
+               // return TimingEventResult.Early;
+            }
+                else
+            {
+                StartCoroutine(cameraShake.Shake(0.25f));
+                //return TimingEventResult.Late;
+            }
+    }
+
     public IEnumerator PlayerHoldReleaseTimeEvent(float holdStart, float holdEnd, Action<TimingEventResult> callback)
     {
         float totalHoldDuration = holdEnd - holdStart;
