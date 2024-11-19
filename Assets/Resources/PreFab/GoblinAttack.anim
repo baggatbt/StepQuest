@@ -33,7 +33,7 @@ AnimationClip:
       value: {fileID: 162327558, guid: 751222b5648459142a9747cedd9203c7, type: 3}
     - time: 0.51666665
       value: {fileID: -2096112888, guid: 751222b5648459142a9747cedd9203c7, type: 3}
-    - time: 0.55
+    - time: 0.53333336
       value: {fileID: -2038085432, guid: 751222b5648459142a9747cedd9203c7, type: 3}
     - time: 0.5833333
       value: {fileID: 758160529, guid: f84c06efa9991bd49b5553f54f400348, type: 3}
@@ -73,7 +73,7 @@ AnimationClip:
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 0.68333334
+    m_StopTime: 0.71666664
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0
@@ -93,14 +93,21 @@ AnimationClip:
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 0
   m_Events:
-  - time: 0.5833333
-    functionName: animationDamageTiming
+  - time: 0.51666665
+    functionName: OpenTimingWindow
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 0.6666667
+    functionName: CloseTimingWindow
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 0.71666664
     functionName: AnimationEnded
     data: 
     objectReferenceParameter: {fileID: 0}

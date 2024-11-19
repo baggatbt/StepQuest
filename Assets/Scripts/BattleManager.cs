@@ -705,6 +705,7 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    //Works with new timing system to control shake effect on hit
     public void CameraShakeMagnitude(TimingEventResult result)
     {
         if (result == TimingEventResult.Good)

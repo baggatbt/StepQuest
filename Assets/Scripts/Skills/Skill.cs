@@ -106,6 +106,13 @@ public abstract class Skill
 
      public void HandleTimingResultForEnemyAttack(Character user, Character target, TimingEventResult timingResult, int baseDamage)
     {
+
+        if (user.damageApplied)
+    {
+        // If damage has already been applied, skip further processing
+        return;
+    }
+
         float damageTimingMultiplier = 1.0f;
         int skillBaseDamage = baseDamage;
         int finalDamage;
@@ -147,6 +154,9 @@ public abstract class Skill
             
            // AudioManager.instance.PlayBlockSound();
         }
+
+        // Mark that damage has been applied to prevent further instances
+    user.damageApplied = true;
     }
 
     private int CalculateReflectDamage(Character user, int damage)
