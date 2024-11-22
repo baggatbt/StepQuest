@@ -15,7 +15,7 @@ public class Goblin : Enemy
         this.speed = 7;
         this.defensePenetration = 0;
         this.attacksBeforeSpecial = 2;
-        this.attackPower = 5;
+        this.attackPower = 4;
         this.defensePower = 0;
         this.energy = 0;
         this.baseExp = 6; // Base experience points given by goblins
@@ -53,7 +53,7 @@ public class Goblin : Enemy
         // Calculate expReward based on the specific multiplier (2 in this case)
         this.expReward = ExpGivenByEnemy(this.level);
         
-        this.goldReward = 3 + (this.level * 2); // You can keep or modify this if you want specific gold logic for Goblins
+        this.goldReward = 5 + (this.level * 2); // You can keep or modify this if you want specific gold logic for Goblins
         this.attacksBeforeSpecial = 2;
         this.attackPower = 4 + ((this.level - 1) / 2) + 1 ;
         //this.defensePower = 0 + (this.level + 1);

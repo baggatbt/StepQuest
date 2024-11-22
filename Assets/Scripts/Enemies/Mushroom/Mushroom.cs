@@ -13,9 +13,13 @@ public class Mushroom : Enemy
         this.health = this.maxHealth;
         this.maxEnergy = 3;
         this.speed = 3;
-        this.attackPower = 8;
+        this.attackPower = 6;
         this.defensePower = 0;
         this.energy = 0;
+        this.baseExp = 10; // Base experience points given
+        this.growthFactor = 1.1f; // Growth factor to control the steepness
+        this.multiplier = 0; // Multiplier for the experience calculation
+ 
     }
 
     protected override void Start()
@@ -41,10 +45,11 @@ public class Mushroom : Enemy
 
         // Apply any Mushroom-specific stat updates
       //  this.maxHealth = 18 + (this.level * 5); // Adjusted to match the original pattern
+        this.maxHealth = 11 +(this.level - 1) * 2;
         this.health = this.maxHealth;
         this.expReward = 10 + (this.level * 2);
         this.goldReward = 4 + (this.level * 3); // You can keep or modify this if you want specific gold logic for Mushrooms
-        this.attackPower = 8 + (this.level + 1); // Adjusted to match the original pattern
+        this.attackPower = 6 + (this.level); // Adjusted to match the original pattern
        // this.defensePower = 15 + (this.level + 3); // Adjusted to match the original pattern
         this.energy = 0;
     }
