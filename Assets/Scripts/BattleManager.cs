@@ -965,6 +965,7 @@ public class BattleManager : MonoBehaviour
         {
             if (character is Companion companion)
             {
+                companion.health = companion.maxHealth;
                 companion.SaveCharacterData();
             }
         }
