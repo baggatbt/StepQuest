@@ -45,6 +45,7 @@ public class Slash : Skill
             // Call the centralized damage handling method
             HandleTimingResultForPlayerAttack(user, target, result, baseDamage);
             battleManager.CameraShakeMagnitude(result);
+            battleManager.ShowTimingResult(result.ToString());
             
         });
 

@@ -606,7 +606,7 @@ public class BattleManager : MonoBehaviour
 
     public CameraShake cameraShake;
 
-    private void ShowTimingResult(string message)
+    public void ShowTimingResult(string message)
     {
         if (currentTarget == null)
         {
