@@ -1,4 +1,4 @@
-# StepQuest(Placeholder Name)
+# StepQuest
  Android App developed in Unity
 
 
