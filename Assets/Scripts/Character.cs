@@ -146,49 +146,44 @@ public class Character : MonoBehaviour
         yield break;
     }
 
-    Debug.Log("MoveToTarget: Starting movement.");
+    Debug.Log($"{name}: MoveToTarget: Starting movement.");
     animator.ResetTrigger("StopMovementAnimationTrigger");
     animator.SetTrigger("MovementAnimationTrigger");
     isMoving = true;
 
-    // Current and target positions (only X and Y).
     Vector2 currentPos = rb.position;
     Vector2 targetPos = new Vector2(attackTarget.position.x, attackTarget.position.y);
+    Debug.Log($"{name}: Starting position: {currentPos}, Target position: {targetPos}");
 
-    // Calculate the normalized direction from our position to the target.
+    // Compute the direction and final destination.
     Vector2 direction = (targetPos - currentPos).normalized;
-
-    // Estimate collider "radii" from their bounds.
     float myRadius = Mathf.Max(myCollider.bounds.extents.x, myCollider.bounds.extents.y);
     float targetRadius = Mathf.Max(targetCollider.bounds.extents.x, targetCollider.bounds.extents.y);
-    
-    // Compute the desired distance between centers when the colliders just touch.
     float desiredDistance = myRadius + targetRadius;
-    
-    // Calculate the final destination so that the character stops just outside the target.
     Vector2 finalDestination = targetPos - direction * desiredDistance;
-    Debug.Log("Final destination calculated: " + finalDestination);
+    Debug.Log($"{name}: Final destination calculated: {finalDestination}");
 
-    // Move towards the final destination.
+    // Move toward the final destination.
     while (Vector2.Distance(currentPos, finalDestination) > 0.05f)
     {
         Vector2 newPos = Vector2.MoveTowards(currentPos, finalDestination, movementSpeed * Time.deltaTime);
         rb.MovePosition(newPos);
+        Debug.Log($"{name}: Moving... New position: {newPos}");
         yield return null;
         currentPos = rb.position;
     }
 
-    // Snap to the final destination (preserve current Z).
+    // Snap to the final destination.
     transform.position = new Vector3(finalDestination.x, finalDestination.y, transform.position.z);
-    Debug.Log("MoveToTarget: Reached final destination.");
+    Debug.Log($"{name}: Reached final destination: {finalDestination}");
 
-    // Stop movement and update animator.
     animator.ResetTrigger("MovementAnimationTrigger");
     animator.SetTrigger("StopMovementAnimationTrigger");
     isMoving = false;
-
     yield return null;
 }
+
+
 
 
 
