@@ -25,8 +25,6 @@ public class Character : MonoBehaviour
     public int speed;
     public Slider healthBar;
     public Slider energyBar;
-    public Transform attackTarget;
-    public Vector3 originalPosition;
     public bool isAttacking = false;
     public bool isFront;
     public SpriteRenderer spriteRenderer;
@@ -59,14 +57,24 @@ public class Character : MonoBehaviour
 
     //STATUS EFFECTS
     public StatusEffectController statusEffectController;
-
-
+    [Header("Movement Settings")]
+    public float movementSpeed = 5f;      // Adjust speed as needed.
+    public Transform attackTarget;        // (Assign in the Inspector or via code.)
+    public Vector3 originalPosition;      // Should be set to the starting position.
     
+    private Rigidbody2D rb;               // Reference to our Rigidbody2D.
+        
+    private Vector2 targetPosition;       // The destination in 2D space.
+
+   
+
     
 
     protected virtual void Awake()
     {
         isSelected = false;
+        rb = GetComponent<Rigidbody2D>();  // Ensure the Rigidbody2D component is attached.
+        originalPosition = transform.position;
         
         animator = GetComponent<Animator>();
         statusEffectController = GetComponent<StatusEffectController>();
@@ -116,6 +124,133 @@ public class Character : MonoBehaviour
         
 
     }
+
+   
+     /// <summary>
+    /// Moves the character from its current position to the attack target.
+    /// </summary>
+  public IEnumerator MoveToTarget()
+{
+    if (attackTarget == null)
+    {
+        Debug.LogWarning("No attack target assigned.");
+        yield break;
+    }
+
+    // Get colliders for both objects.
+    Collider2D myCollider = GetComponent<Collider2D>();
+    Collider2D targetCollider = attackTarget.GetComponent<Collider2D>();
+    if(myCollider == null || targetCollider == null)
+    {
+        Debug.LogWarning("Missing Collider2D on self or target.");
+        yield break;
+    }
+
+    Debug.Log("MoveToTarget: Starting movement.");
+    animator.ResetTrigger("StopMovementAnimationTrigger");
+    animator.SetTrigger("MovementAnimationTrigger");
+    isMoving = true;
+
+    // Current and target positions (only X and Y).
+    Vector2 currentPos = rb.position;
+    Vector2 targetPos = new Vector2(attackTarget.position.x, attackTarget.position.y);
+
+    // Calculate the normalized direction from our position to the target.
+    Vector2 direction = (targetPos - currentPos).normalized;
+
+    // Estimate collider "radii" from their bounds.
+    float myRadius = Mathf.Max(myCollider.bounds.extents.x, myCollider.bounds.extents.y);
+    float targetRadius = Mathf.Max(targetCollider.bounds.extents.x, targetCollider.bounds.extents.y);
+    
+    // Compute the desired distance between centers when the colliders just touch.
+    float desiredDistance = myRadius + targetRadius;
+    
+    // Calculate the final destination so that the character stops just outside the target.
+    Vector2 finalDestination = targetPos - direction * desiredDistance;
+    Debug.Log("Final destination calculated: " + finalDestination);
+
+    // Move towards the final destination.
+    while (Vector2.Distance(currentPos, finalDestination) > 0.05f)
+    {
+        Vector2 newPos = Vector2.MoveTowards(currentPos, finalDestination, movementSpeed * Time.deltaTime);
+        rb.MovePosition(newPos);
+        yield return null;
+        currentPos = rb.position;
+    }
+
+    // Snap to the final destination (preserve current Z).
+    transform.position = new Vector3(finalDestination.x, finalDestination.y, transform.position.z);
+    Debug.Log("MoveToTarget: Reached final destination.");
+
+    // Stop movement and update animator.
+    animator.ResetTrigger("MovementAnimationTrigger");
+    animator.SetTrigger("StopMovementAnimationTrigger");
+    isMoving = false;
+
+    yield return null;
+}
+
+
+
+
+
+
+public IEnumerator ReturnToPosition()
+{
+    Debug.Log("ReturnToPosition: Starting return movement.");
+    animator.ResetTrigger("StopMovementAnimationTrigger");
+    animator.SetTrigger("MovementAnimationTrigger");
+    isMoving = true;
+
+    // Create a 2D target from originalPosition (ignoring z)
+    Vector2 currentPos = rb.position;
+    Vector2 targetPos = new Vector2(originalPosition.x, originalPosition.y);
+    Debug.Log("ReturnToPosition: Returning to original position = " + targetPos);
+
+    while (Vector2.Distance(currentPos, targetPos) > 0.1f)
+    {
+        Vector2 newPos = Vector2.MoveTowards(currentPos, targetPos, movementSpeed * Time.deltaTime);
+        rb.MovePosition(newPos);
+        yield return null;
+        currentPos = rb.position;
+    }
+
+    // Snap to the original position (maintaining current z)
+    transform.position = new Vector3(targetPos.x, targetPos.y, transform.position.z);
+    Debug.Log("ReturnToPosition: Reached original position. Stopping movement.");
+    animator.ResetTrigger("MovementAnimationTrigger");
+    animator.SetTrigger("StopMovementAnimationTrigger");
+    isMoving = false;
+
+    yield return null;
+}
+
+
+    // At the top of your Character class:
+private bool hasCollidedWithTarget = false;
+private Vector2 collisionContactPoint = Vector2.zero;
+
+
+    /// <summary>
+    /// Optionally, stop movement if a collision occurs (for example, with obstacles).
+    /// </summary>
+    private void OnCollisionEnter2D(Collision2D collision)
+{
+    // Check if the collided object is our current attack target.
+    if (attackTarget != null && collision.gameObject == attackTarget.gameObject)
+    {
+        Debug.Log($"{name} collided with target {attackTarget.name} at {collisionContactPoint}");
+        hasCollidedWithTarget = true;
+        if (collision.contacts.Length > 0)
+        {
+            // Store the contact point from the collision.
+            collisionContactPoint = collision.contacts[0].point;
+        }
+        Debug.Log($"{name} collided with target {attackTarget.name} at {collisionContactPoint}");
+    }
+}
+
+
     
 
     protected virtual void Start()
@@ -508,51 +643,7 @@ private IEnumerator TintRed()
 }
 
 
-    public IEnumerator MoveToTarget()
-    {
-        Debug.Log("MOVING IS CALLED");
-        animator.SetTrigger("MovementAnimationTrigger");
-        this.isMoving = true;
-
-        float moveSpeed = 17f; 
-        Vector3 targetPosition = new Vector3(attackTarget.position.x, attackTarget.position.y, attackTarget.position.z);
-        checkCollisionsDuringMovement = true;
-
-        Debug.Log($"Moving to target: {targetPosition}");
-        Debug.Log($"Current position: {transform.position}");
-        Debug.Log($"Original position before moving: {originalPosition}");
-
-        yield return Move(targetPosition, 3.0f, moveSpeed);
-
-        animator.SetTrigger("StopMovementAnimationTrigger");
-        this.isMoving = false;
-    }
-
-    public IEnumerator ReturnToPosition(float returnSpeed = 20f)
-    {
-        Debug.Log($"Returning to original position at: {originalPosition}");
-        animator.SetTrigger("MovementAnimationTrigger");
-        this.isMoving = true;
-
-        yield return Move(originalPosition, 0.00f, returnSpeed);
-
-        transform.position = originalPosition;
-        animator.SetTrigger("StopMovementAnimationTrigger");
-        this.isMoving = false;
-        Debug.Log("Returned to original position");
-    }
-
-    private IEnumerator Move(Vector3 targetPosition, float stoppingDistance, float speed)
-    {
-        Debug.Log($"Starting Move towards {targetPosition}");
-        while (Vector3.Distance(transform.position, targetPosition) > stoppingDistance)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
-            Debug.Log($"Moving towards {targetPosition} from {transform.position}");
-            yield return null;
-        }
-        Debug.Log("Completed Move");
-    }
+    
 
 
 /*

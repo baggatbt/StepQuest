@@ -4885,6 +4885,7 @@ GameObject:
   - component: {fileID: 6178202463525426477}
   - component: {fileID: 3124176227126577940}
   - component: {fileID: 6853849219187960353}
+  - component: {fileID: 9159376447715170841}
   m_Layer: 0
   m_Name: Goblin
   m_TagString: Enemy
@@ -4970,11 +4971,11 @@ CapsuleCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.0077381725, y: 0.16924375}
-  m_Size: {x: 0.22972931, y: 0.24255641}
+  m_Offset: {x: 0.026751949, y: 0.16924375}
+  m_Size: {x: 0.2987095, y: 0.29846197}
   m_Direction: 0
 --- !u!95 &6178202463525426478
 Animator:
@@ -5024,8 +5025,6 @@ MonoBehaviour:
   speed: 0
   healthBar: {fileID: 0}
   energyBar: {fileID: 0}
-  attackTarget: {fileID: 0}
-  originalPosition: {x: 0, y: 0, z: 0}
   isAttacking: 0
   isFront: 0
   spriteRenderer: {fileID: 6178202463525426467}
@@ -5041,16 +5040,25 @@ MonoBehaviour:
   enemyHealthUI: {fileID: 0}
   damageReflectionPercentage: 0
   statusEffectController: {fileID: 0}
+  movementSpeed: 5
+  attackTarget: {fileID: 0}
+  originalPosition: {x: 0, y: 0, z: 0}
   cameraShake: {fileID: 0}
+  tintDuration: 0.1
   isAnimationDone: 0
   currentBarrier: {fileID: 0}
   animationDamageTime: 0
+  isWindowOpen: 0
+  damageApplied: 0
   enemyDeathEffect: {fileID: 0}
   audioSource: {fileID: 6853849219187960353}
   hitSound: {fileID: 8300000, guid: 88fb2c9b7ebc14930aab6648ac112f0d, type: 3}
   criticalHitSound: {fileID: 0}
   expReward: 0
   goldReward: 0
+  baseExp: 0
+  growthFactor: 1.1
+  multiplier: 0
   attackGrowth: 0
   defenseGrowth: 0
   healthGrowth: 0
@@ -5167,3 +5175,24 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!50 &9159376447715170841
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6178202463525426479}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
