@@ -6,6 +6,15 @@ using System;
 [Serializable]
 public class Knight : Companion
 {
+    // Constants for Knight's stat growth
+    private const int BASE_HEALTH = 12;            // Above average starting health
+    private const int HEALTH_GROWTH = 3;           // Gains 3 HP per level after level 1
+
+    private const int BASE_ATTACK = 2;             // Average starting attack
+    private const float ATTACK_GROWTH_FACTOR = 0.5f; // +1 attack every 2 levels
+
+    private const int BASE_SPEED = 4;              // Below average speed
+
     protected override void Awake()
     {
         base.Awake();
@@ -17,46 +26,38 @@ public class Knight : Companion
            // characterData.heroIconPath = "Assets/Resources/Sprites/GUI/knightIcon.png";
            // characterData.fullHeroImagePath = "Path/To/KnightFullImage";
         }
-         InitializeSkillsBasedOnLevel();
+        InitializeSkillsBasedOnLevel();
+        UpdateStats(); // Initialize stats on Awake
     }
 
     public override void InitializeSkillsBasedOnLevel()
     {
         availableSkills.Clear();
         availableSkills.Add(SkillType.Slash);
-        //testing methods
-
-      //  if (this.heroLevel >= 2) availableSkills.Add(SkillType.TripleHit);
-      //  if (this.heroLevel >= 5) availableSkills.Add(SkillType.Taunt);
+        // Uncomment these as needed for level-based unlocking:
+        // if (this.heroLevel >= 2) availableSkills.Add(SkillType.TripleHit);
+        // if (this.heroLevel >= 5) availableSkills.Add(SkillType.Taunt);
         Debug.Log($"Total Available skills: {availableSkills.Count}");
     }
 
     public void UpdateStats()
     {
-
-        
-        this.maxHealth = 12 + (this.level - 1) * 2;
+        // Update stats based on the current level using our growth formulas:
+        this.maxHealth = BASE_HEALTH + (this.level - 1) * HEALTH_GROWTH;
         this.health = this.maxHealth;
-
-        
-        
-       
-        this.attackPower = 5 + ((this.level - 1) / 2);
-        
-        
+        this.attackPower = BASE_ATTACK + Mathf.FloorToInt((this.level - 1) * ATTACK_GROWTH_FACTOR);
+        this.speed = BASE_SPEED;
+        // Optionally update energy or other stats if necessary
     }
 
-    
-
-    public override void LevelUp()
+     public override void LevelUp()
     {
         if (this.heroExp >= ExpToNextLevel(this.heroLevel))
         {
             this.heroExp -= ExpToNextLevel(this.heroLevel);
             this.heroLevel++;
             UpdateStats();
-
-            this.health = this.maxHealth;
+            // Do not reassign health here because UpdateStats already set health = maxHealth.
             this.energy = this.maxEnergy;
 
             this.heroStatPoints += 1;

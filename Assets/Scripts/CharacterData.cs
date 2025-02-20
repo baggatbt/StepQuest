@@ -9,8 +9,12 @@ public class CharacterData : ScriptableObject
     public int heroLevel;
     public int heroExp;
     public GameObject skillTreePanel;
-    public Sprite heroIcon; // Set this in the Editor
+    
+    // These fields are serialized so you can set them in the Editor.
+    // Their values will be preserved during load.
+    public Sprite heroIcon; 
     public Sprite fullHeroImage;
+    
     public int heroStatPoints;
     public int heroSkillPoints;
     public int attackPower;
@@ -31,12 +35,9 @@ public class CharacterData : ScriptableObject
     public SkillType skillFour;
     public SkillType skillFive;
     public SkillType skillSix;
-    public  List<SkillType> AvailableSkills;
-    public  List<SkillType> LockedSkills;
+    public List<SkillType> AvailableSkills;
+    public List<SkillType> LockedSkills;
 
-    // Do not touch this field after setting it in the Editor
-    // Remove methods that might modify heroIcon like OnEnable or LoadSprite
-    
     public int ExpToNextLevel(int heroLevel)
     {
         Debug.Log("EXP to level : " + (30 * heroLevel * heroLevel));
@@ -44,51 +45,52 @@ public class CharacterData : ScriptableObject
     }
 
     public void UnlockSkill(SkillType skillType)
-{
-    if (LockedSkills.Contains(skillType))
     {
-        LockedSkills.Remove(skillType);
-        AvailableSkills.Add(skillType);
-
-        // Find the skill instance and apply passive effect if it's a passive skill
-        Skill skillInstance = GetSkillInstance(skillType);
-        if (skillInstance != null && !skillInstance.isActiveSkill)
+        if (LockedSkills.Contains(skillType))
         {
-            skillInstance.ApplyPassiveEffect(this);
+            LockedSkills.Remove(skillType);
+            AvailableSkills.Add(skillType);
+            
+            // Find the skill instance and apply its passive effect if applicable
+            Skill skillInstance = GetSkillInstance(skillType);
+            if (skillInstance != null && !skillInstance.isActiveSkill)
+            {
+                skillInstance.ApplyPassiveEffect(this);
+            }
+            
+            Debug.Log(skillType.ToString() + " unlocked.");
         }
-        
-        Debug.Log(skillType.ToString() + " unlocked.");
+        else
+        {
+            Debug.LogError(skillType.ToString() + " is not in the LockedSkills list.");
+        }
     }
-    else
-    {
-        Debug.LogError(skillType.ToString() + " is not in the LockedSkills list.");
-    }
-}
 
-public Skill GetSkillInstance(SkillType skillType)
-{
-    // This method returns a new instance of the specified skill
-    switch (skillType)
+    public Skill GetSkillInstance(SkillType skillType)
     {
-        case SkillType.Slash:
-            return new Slash();
-        case SkillType.TripleHit:
-            return new TripleHitSkill();
-        case SkillType.Taunt:
-            return new Taunt();
-        case SkillType.ReflectDamagePassive:
-            return new ReflectDamagePassive();
-        case SkillType.SpeedBreak:
-            return new SpeedBreak();
-        default:
-            Debug.LogError("Unknown skill type: " + skillType);
-            return null;
+        // This method returns a new instance of the specified skill.
+        // (Assumes that your Skill, Slash, TripleHitSkill, etc. classes are defined elsewhere.)
+        switch (skillType)
+        {
+            case SkillType.Slash:
+                return new Slash();
+            case SkillType.TripleHit:
+                return new TripleHitSkill();
+            case SkillType.Taunt:
+                return new Taunt();
+            case SkillType.ReflectDamagePassive:
+                return new ReflectDamagePassive();
+            case SkillType.SpeedBreak:
+                return new SpeedBreak();
+            default:
+                Debug.LogError("Unknown skill type: " + skillType);
+                return null;
+        }
     }
-}
-
 
     public void SaveData()
     {
+        // Convert the CharacterData to JSON and save it in PlayerPrefs.
         string jsonData = JsonUtility.ToJson(this);
         PlayerPrefs.SetString("CharacterData_" + heroID, jsonData);
         PlayerPrefs.Save();
@@ -96,11 +98,18 @@ public Skill GetSkillInstance(SkillType skillType)
 
     public void LoadData()
     {
+        // Save the current sprite references before loading JSON.
+        Sprite savedHeroIcon = heroIcon;
+        Sprite savedFullHeroImage = fullHeroImage;
+
         string jsonData = PlayerPrefs.GetString("CharacterData_" + heroID, "{}");
-        
         if (jsonData != "{}")
         {
             JsonUtility.FromJsonOverwrite(jsonData, this);
         }
+
+        // Restore the sprite references so they remain unchanged.
+        heroIcon = savedHeroIcon;
+        fullHeroImage = savedFullHeroImage;
     }
 }
