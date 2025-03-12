@@ -251,6 +251,11 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        foreach (var i in itemList)
+{
+    Debug.Log($"Item: {i.name}, ID: {i.itemID}, Quantity: {i.quantity}");
+}
+
         TimerManager.Instance.OnTimerCompleted += HandleTimerCompletion;
         TimerManager.Instance.SetPeriodicTimer("StaminaIncrement", 1);  // 1800 seconds = 30 minutes
 

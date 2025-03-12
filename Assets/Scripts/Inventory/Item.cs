@@ -25,12 +25,7 @@ public class Item : ScriptableObject
     public List<MaterialRequirement> materialRequirements;
 }
 
-[CreateAssetMenu(fileName = "New Craftable Item", menuName = "Inventory/Craftable Item")]
-public class CraftableItem : Item
-{
-   // public List<MaterialRequirement> materialRequirements;
-    // Other properties specific to the craftable item...
-}
+
 
 [System.Serializable]
 public class MaterialRequirement
