@@ -1,15 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using System;
 
 [System.Serializable]
 public class PlayerAccountData
 {
     public int level;
-    public int totalGold;
+    public long totalCopper;  // Replaces totalGold as a long
     public int currentSteps;
     public int inGameSteps;
-
-    // Add other player-related fields here
+    // Add other fields as necessary
 }
-

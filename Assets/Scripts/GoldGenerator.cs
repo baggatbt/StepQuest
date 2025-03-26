@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using TMPro;
 
+/*
 public class GoldGenerator : MonoBehaviour
 {
     public string timerId = "GoldGenerator";
@@ -123,3 +124,4 @@ public class GoldGenerator : MonoBehaviour
         return $"{time.Minutes:D2}:{time.Seconds:D2}";
     }
 }
+*/

@@ -30,26 +30,25 @@ public class PlayerManager : MonoBehaviour
     }
 
     public void LoadPlayerAccountData()
-{
-    if (PlayerPrefs.HasKey("PlayerAccountData"))
     {
-        string json = PlayerPrefs.GetString("PlayerAccountData");
-        playerAccountData = JsonUtility.FromJson<PlayerAccountData>(json);
-    }
-    else
-    {
-        // Initialize with default values if no saved data exists
-        playerAccountData = new PlayerAccountData
+        if (PlayerPrefs.HasKey("PlayerAccountData"))
         {
-            level = 1,  // or whatever the default starting level should be
-            totalGold = 0,
-            currentSteps = 0,
-            inGameSteps = 0
-            // Initialize other fields as necessary
-        };
+            string json = PlayerPrefs.GetString("PlayerAccountData");
+            playerAccountData = JsonUtility.FromJson<PlayerAccountData>(json);
+        }
+        else
+        {
+            // Initialize with default values if no saved data exists
+            playerAccountData = new PlayerAccountData
+            {
+                level = 1,
+                totalCopper = 0,
+                currentSteps = 0,
+                inGameSteps = 0
+                // Initialize other fields as necessary
+            };
+        }
     }
-}
-
 
     public void IncrementInGameSteps()
     {

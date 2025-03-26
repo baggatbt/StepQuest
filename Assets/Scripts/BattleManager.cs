@@ -914,7 +914,7 @@ public class BattleManager : MonoBehaviour
             totalGold += enemy.goldReward;
         }
 
-        PlayerData.Instance.gold += totalGold;
+       // PlayerData.Instance.gold += totalGold;
         PlayerData.Instance.SavePlayerData();
 
         foreach (Character character in playerParty)

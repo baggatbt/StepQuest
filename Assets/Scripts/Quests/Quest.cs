@@ -21,7 +21,7 @@ public class Quest: MonoBehaviour
     public virtual void ClaimReward()
     {
         // Add rewards here.
-        PlayerData.Instance.gold += 1;
+       // PlayerData.Instance.gold += 1;
         PlayerData.Instance.exp += 1;
         this.isActive = false; // End the mission.       
     }  

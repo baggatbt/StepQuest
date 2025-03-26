@@ -1,7 +1,5 @@
 using System;
 using UnityEngine;
-using System.Collections.Generic;
-using System.Linq;
 using System.Collections;
 
 public class PlayerData : MonoBehaviour
@@ -11,7 +9,10 @@ public class PlayerData : MonoBehaviour
 
     public int level;
     public int exp;
-    public int gold;
+
+    // Store all currency in copper.
+    public long totalCopper;
+
     public int inGameSteps;
     public int baselineSteps;
     public int currentSensorTotal;
@@ -22,8 +23,8 @@ public class PlayerData : MonoBehaviour
     private Building[] buildings;
     private Coroutine stepCoroutine;
     public float updateInterval = 1f; // Interval in seconds for step-related updates
-    public int newSteps; // To track the new steps
-    public int newSensorTotal; //Compared against old total to see if player moved.
+    public int newSteps;      // To track new steps
+    public int newSensorTotal; // Compared against old total to see if player moved.
 
     private void Awake()
     {
@@ -43,7 +44,7 @@ public class PlayerData : MonoBehaviour
             else
             {
                 currentSensorTotal = stepCounterController.GetTotalSteps();
-              //  ProduceOfflineResources();
+                // ProduceOfflineResources();
                 UpdateSteps();
             }
 
@@ -61,9 +62,9 @@ public class PlayerData : MonoBehaviour
         while (true)
         {
             UpdateSteps();
-          //  ProduceResourcesDuringGameplay();
+            // ProduceResourcesDuringGameplay();
 
-            yield return new WaitForSeconds(updateInterval); // Wait for the specified interval before running again
+            yield return new WaitForSeconds(updateInterval);
         }
     }
 
@@ -100,6 +101,10 @@ public class PlayerData : MonoBehaviour
         {
             inGameSteps += newSteps;
             currentSensorTotal = newSensorTotal;
+
+            // Example: Add 1 copper per new step.
+            CurrencyManager.AddCopper(ref totalCopper, newSteps);
+
             SavePlayerData();
         }
     }
@@ -111,7 +116,7 @@ public class PlayerData : MonoBehaviour
         {
             if (building.IsProducing())
             {
-              //  building.Produce(stepsSinceLastSession);
+                // building.Produce(stepsSinceLastSession);
             }
         }
 
@@ -127,7 +132,7 @@ public class PlayerData : MonoBehaviour
             {
                 if (building.IsProducing())
                 {
-                  //  building.Produce(newSteps); // Produce resources based on new steps
+                    // building.Produce(newSteps);
                 }
             }
         }
@@ -136,7 +141,9 @@ public class PlayerData : MonoBehaviour
     public void SavePlayerData()
     {
         PlayerPrefs.SetInt("PlayerLevel", level);
-        PlayerPrefs.SetInt("PlayerGold", gold);
+
+        // Store totalCopper as a string because PlayerPrefs doesn't support long directly.
+        PlayerPrefs.SetString("PlayerTotalCopper", totalCopper.ToString());
 
         PlayerPrefs.SetInt("InGameSteps", inGameSteps);
         PlayerPrefs.SetInt("BaselineSteps", baselineSteps);
@@ -149,7 +156,18 @@ public class PlayerData : MonoBehaviour
     public void LoadPlayerData()
     {
         level = PlayerPrefs.GetInt("PlayerLevel", 1);
-        gold = PlayerPrefs.GetInt("PlayerGold", 0);
+
+        // Retrieve totalCopper from string
+        string copperString = PlayerPrefs.GetString("PlayerTotalCopper", "0");
+        long parsed;
+        if (long.TryParse(copperString, out parsed))
+        {
+            totalCopper = parsed;
+        }
+        else
+        {
+            totalCopper = 0;
+        }
 
         inGameSteps = PlayerPrefs.GetInt("InGameSteps", 0);
         baselineSteps = PlayerPrefs.GetInt("BaselineSteps", 0);
@@ -158,6 +176,9 @@ public class PlayerData : MonoBehaviour
         Debug.Log("Player data loaded.");
     }
 
+    /// <summary>
+    /// Spend in-game steps for some action (not related to currency).
+    /// </summary>
     public bool UseSteps(int amountToUse)
     {
         if (inGameSteps >= amountToUse)
@@ -175,5 +196,14 @@ public class PlayerData : MonoBehaviour
         inGameSteps = 0;
         SavePlayerData();
         Debug.Log("In-game steps have been reset to 0.");
+    }
+
+    /// <summary>
+    /// Returns the player's currency breakdown as a multi-line string.
+    /// This method now calls GetMultiCoinString from CurrencyManager.
+    /// </summary>
+    public string GetDisplayCurrency()
+    {
+        return CurrencyManager.GetMultiCoinString(totalCopper);
     }
 }
