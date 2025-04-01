@@ -102,8 +102,12 @@ public class PlayerData : MonoBehaviour
             inGameSteps += newSteps;
             currentSensorTotal = newSensorTotal;
 
-            // Example: Add 1 copper per new step.
-            CurrencyManager.AddCopper(ref totalCopper, newSteps);
+            // Instead of directly adding copper, if a building is active, feed steps to its production.
+            if (Building.ActiveBuilding != null)
+            {
+                Building.ActiveBuilding.AccumulateProduction(newSteps);
+            }
+            // Optionally, if no building is active, you could process steps in a default way.
 
             SavePlayerData();
         }
@@ -200,7 +204,7 @@ public class PlayerData : MonoBehaviour
 
     /// <summary>
     /// Returns the player's currency breakdown as a multi-line string.
-    /// This method now calls GetMultiCoinString from CurrencyManager.
+    /// (This can be used by UI elements if desired.)
     /// </summary>
     public string GetDisplayCurrency()
     {

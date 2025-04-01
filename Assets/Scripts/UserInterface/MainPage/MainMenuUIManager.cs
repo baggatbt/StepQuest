@@ -444,7 +444,7 @@ public Button forestDungeonButton;
 
     public void OpenPartyPanel(GameObject panel)
     {
-        ClearParty();
+       // ClearParty();
        
         panel.SetActive(true);
     }
@@ -654,7 +654,8 @@ public void PopulateInventoryList() {
         GameManager.Instance.currentStage = selectedStage;
         
         Debug.Log($"Going to battle with stage ID: {selectedStage.stageID} and battle scene: {selectedStage.battleSceneName}");
-        GameManager.Instance.SaveCurrentParty();
+        
+         GameManager.Instance.SaveCurrentParty();
         
         // Load the battle scene associated with this stage
         SceneManager.LoadScene(selectedStage.battleSceneName);

@@ -5,6 +5,8 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using System;
+using System.Linq;
+
 
 //Storing and managing game states across scenes
 public class GameManager : MonoBehaviour
@@ -64,43 +66,73 @@ public class GameManager : MonoBehaviour
     
 
     private void Awake()
+{
+    if (Instance == null)
     {
-        if (Instance == null)
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        //currentStageIndex = PlayerData.Instance.currentStageIndex; //Gets the current stage from PlayerData
+        maxInventorySlots = 16;
+        Debug.Log("Initial item list count: " + itemList.Count);
+        InitializeStageDictionary(); // Initialize dictionary at game start
+
+        // Initialize character data dictionary here
+        foreach (var data in allCharacterData)
         {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-            SceneManager.sceneLoaded += OnSceneLoaded;
-            //currentStageIndex = PlayerData.Instance.currentStageIndex; //Gets the current stage from PlayerData
-            maxInventorySlots = 16;
-            Debug.Log("Initial item list count: " + itemList.Count);
-             InitializeStageDictionary(); // Initialize dictionary at game start
-
-            //Initialize character data dictionary here
-            foreach (var data in allCharacterData)
-            {
-                data.LoadData(); // Load data for each character
-                characterDataDictionary[data.heroID] = data;
-            }
-
-            //Each companion has equal chance to be selected for attack, need to change so it uses the class's variable threat
-            probabilityCompanion1 = 1f;
-            probabilityCompanion2 = 1f;
-            probabilityCompanion3 = 1f;
-
-            Debug.Log(PlayerData.Instance.firstTimeLogin);
-            if (PlayerData.Instance.firstTimeLogin)
-            {
-                // Handle first-time login logic
-            }
-            Application.quitting += SaveAllCharacterData; // Save all character data on application quit
-      
+            data.LoadData(); // Load data for each character
+            characterDataDictionary[data.heroID] = data;
         }
-        else
-        {
-            Destroy(gameObject);
-        }
-        Application.targetFrameRate = 60;  // Set target frame rate to 60 FPS.
+
+        //Each companion has equal chance to be selected for attack, need to change so it uses the class's variable threat
+        probabilityCompanion1 = 1f;
+        probabilityCompanion2 = 1f;
+        probabilityCompanion3 = 1f;
+
+        
+        
+       
+        
+            // Mimic the AddToParty function for the knight companion using knightData
+            if (currentParty.Count < 2)
+            {
+                if (!currentParty.Any(companion => companion.characterData == knightData))
+                {
+                    // Get the prefab associated with knightData.heroID
+                    GameObject characterPrefab = GetCharacterPrefab(knightData.heroID);
+                    if (characterPrefab != null)
+                    {
+                        // Instantiate the companion and set its character data
+                        Companion instantiatedCompanion = Instantiate(characterPrefab).GetComponent<Companion>();
+                        instantiatedCompanion.SetCharacterData(knightData);
+                        
+                        // Add the instantiated companion to the party
+                        currentParty.Add(instantiatedCompanion);
+                        Debug.Log("Added to party: " + knightData.heroID);
+                    }
+                    else
+                    {
+                        Debug.LogError("Character prefab not found for heroID: " + knightData.heroID);
+                    }
+                }
+                else
+                {
+                    Debug.Log("Companion already in party: " + knightData.heroID);
+                }
+            }
+            else
+            {
+                Debug.LogError("Party is full. Cannot add more companions.");
+            }
+        
+        Application.quitting += SaveAllCharacterData; // Save all character data on application quit
     }
+    else
+    {
+        Destroy(gameObject);
+    }
+    Application.targetFrameRate = 60;  // Set target frame rate to 60 FPS.
+}
 
     public Companion InstantiateCharacter(GameObject characterPrefab, CharacterData characterData, Vector3 position, Quaternion rotation)
     {
@@ -274,7 +306,37 @@ public class GameManager : MonoBehaviour
     {
         ReassignInventoryComponent();
         LoadAllCompanionData();
+        ClearCurrentParty();
+        LoadDefaultPartyCharacter();
     }
+
+    public void LoadDefaultPartyCharacter()
+    {
+        if (!currentParty.Any(companion => companion.characterData == knightData))
+                {
+                    // Get the prefab associated with knightData.heroID
+                    GameObject characterPrefab = GetCharacterPrefab(knightData.heroID);
+                    if (characterPrefab != null)
+                    {
+                        // Instantiate the companion and set its character data
+                        Companion instantiatedCompanion = Instantiate(characterPrefab).GetComponent<Companion>();
+                        instantiatedCompanion.SetCharacterData(knightData);
+                        
+                        // Add the instantiated companion to the party
+                        currentParty.Add(instantiatedCompanion);
+                        Debug.Log("Added to party: " + knightData.heroID);
+                    }
+                    else
+                    {
+                        Debug.LogError("Character prefab not found for heroID: " + knightData.heroID);
+                    }
+                }
+                else
+                {
+                    Debug.Log("Companion already in party: " + knightData.heroID);
+                }
+    }
+    
 
     public void LoadStageData()
     {
