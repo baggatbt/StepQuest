@@ -68,6 +68,8 @@ public class PlayerData : MonoBehaviour
         }
     }
 
+    
+
     private void InitializeStepCounter()
     {
         stepCounterController = StepCounterController.Instance;
@@ -93,25 +95,29 @@ public class PlayerData : MonoBehaviour
     }
 
     private void UpdateSteps()
+{
+    newSensorTotal = stepCounterController.GetTotalSteps();
+    newSteps = newSensorTotal - currentSensorTotal;
+
+    if (newSteps > 0)
     {
-        newSensorTotal = stepCounterController.GetTotalSteps();
-        newSteps = newSensorTotal - currentSensorTotal; // Calculate new steps since last update
+        inGameSteps += newSteps;
+        currentSensorTotal = newSensorTotal;
 
-        if (newSteps > 0)
+        // Tell each building to produce resources
+        foreach (Building building in buildings)
         {
-            inGameSteps += newSteps;
-            currentSensorTotal = newSensorTotal;
-
-            // Instead of directly adding copper, if a building is active, feed steps to its production.
-            if (Building.ActiveBuilding != null)
+            if (building.IsProducing())  // your building “active” logic
             {
-                Building.ActiveBuilding.AccumulateProduction(newSteps);
+                building.AccumulateProduction(newSteps);
             }
-            // Optionally, if no building is active, you could process steps in a default way.
-
-            SavePlayerData();
         }
+
+        SavePlayerData();
     }
+}
+
+
 
     private void ProduceOfflineResources()
     {

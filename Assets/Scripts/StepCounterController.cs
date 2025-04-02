@@ -6,6 +6,9 @@ public class StepCounterController : MonoBehaviour
 
     private AndroidJavaObject stepCounterPluginInstance;
 
+    // Debug variable for non-Android platforms
+    private int debugTotalSteps = 0;
+
     private void Awake()
     {
         if (Instance == null)
@@ -51,22 +54,48 @@ public class StepCounterController : MonoBehaviour
 
     private void StartCounting()
     {
-        stepCounterPluginInstance.CallStatic("startCounting");
+        if (Application.platform == RuntimePlatform.Android && stepCounterPluginInstance != null)
+        {
+            stepCounterPluginInstance.CallStatic("startCounting");
+        }
     }
 
     private void StopCounting()
     {
-        stepCounterPluginInstance.CallStatic("stopCounting");
+        if (Application.platform == RuntimePlatform.Android && stepCounterPluginInstance != null)
+        {
+            stepCounterPluginInstance.CallStatic("stopCounting");
+        }
     }
 
-    public int GetStepsSinceStart() // Steps since the app started
+    /// <summary>
+    /// Returns total steps from the plugin on Android,
+    /// or the debug counter in the Editor / other platforms.
+    /// </summary>
+    public int GetTotalSteps()
     {
-        return CallStaticMethodOnPlugin<int>("getStepsSinceStart");
+        if (Application.platform == RuntimePlatform.Android && stepCounterPluginInstance != null)
+        {
+            return CallStaticMethodOnPlugin<int>("getSteps");
+        }
+        else
+        {
+            // Use our debug variable in the Editor / other platforms
+            return debugTotalSteps;
+        }
     }
 
-    public int GetTotalSteps() // Gets the total step count from the device
+    public int GetStepsSinceStart()
     {
-        return CallStaticMethodOnPlugin<int>("getSteps");
+        if (Application.platform == RuntimePlatform.Android && stepCounterPluginInstance != null)
+        {
+            return CallStaticMethodOnPlugin<int>("getStepsSinceStart");
+        }
+        else
+        {
+            // Not implemented for debug. You can do something similar if needed.
+            return 0;
+        }
     }
 
     private T CallStaticMethodOnPlugin<T>(string methodName)
@@ -76,5 +105,20 @@ public class StepCounterController : MonoBehaviour
             return stepCounterPluginInstance.CallStatic<T>(methodName);
         }
         return default(T);
+    }
+
+    // --------------- DEBUG METHODS ---------------
+
+    // A quick method so we can add steps in the Editor
+    public void DebugAddSteps(int stepsToAdd)
+    {
+        debugTotalSteps += stepsToAdd;
+        Debug.Log($"[DEBUG] Added {stepsToAdd} steps. debugTotalSteps = {debugTotalSteps}");
+    }
+
+    [ContextMenu("Add 100 Debug Steps")]
+    private void Add100DebugStepsMenu()
+    {
+        DebugAddSteps(100);
     }
 }

@@ -8205,8 +8205,9 @@ GameObject:
   - component: {fileID: 288094218}
   - component: {fileID: 288094217}
   - component: {fileID: 288094216}
+  - component: {fileID: 288094219}
   m_Layer: 5
-  m_Name: GoldGeneratorMineButton
+  m_Name: GoldGeneratorBuildingButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8327,6 +8328,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 288094214}
   m_CullTransparentMesh: 1
+--- !u!114 &288094219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 288094214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52c9ab9cf0201c14c942a070ff451f2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  resourcesPerStep: 0.1
+  uncollectedResources: 0
 --- !u!1 &291407637
 GameObject:
   m_ObjectHideFlags: 0
@@ -12599,6 +12614,37 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!1 &315655408
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 315655410}
+  m_Layer: 0
+  m_Name: BuildingManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &315655410
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 315655408}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 511.54413, y: 342.76727, z: 91.101974}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &316094205
 GameObject:
   m_ObjectHideFlags: 0
@@ -13969,9 +14015,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 696135233}
-        m_TargetAssemblyTypeName: GoldGenerator, Assembly-CSharp
-        m_MethodName: CollectGold
+      - m_Target: {fileID: 288094219}
+        m_TargetAssemblyTypeName: Building, Assembly-CSharp
+        m_MethodName: CollectResources
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -37050,7 +37096,6 @@ GameObject:
   - component: {fileID: 696135230}
   - component: {fileID: 696135232}
   - component: {fileID: 696135231}
-  - component: {fileID: 696135233}
   m_Layer: 5
   m_Name: GoldGeneratorPanel
   m_TagString: Untagged
@@ -37080,7 +37125,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 9}
+  m_AnchoredPosition: {x: 0, y: 119}
   m_SizeDelta: {x: 0, y: -992.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &696135231
@@ -37121,18 +37166,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 696135229}
   m_CullTransparentMesh: 1
---- !u!114 &696135233
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 696135229}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3da957701c6e1f6429eeff41796493aa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &697556633
 GameObject:
   m_ObjectHideFlags: 0
@@ -40097,7 +40130,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 788194584}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: Building, Assembly-CSharp
+        m_MethodName: Activate
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &788194584
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -47689,7 +47734,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1091708940
 RectTransform:
   m_ObjectHideFlags: 0
@@ -49556,7 +49601,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 868.23755, y: -110.37974}
+  m_AnchoredPosition: {x: 868.23755, y: -110.379745}
   m_SizeDelta: {x: 204.43, y: 141.14}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1144418370
@@ -50747,7 +50792,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1206619042
 GameObject:
@@ -58269,7 +58314,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1469430083
 RectTransform:
   m_ObjectHideFlags: 0
@@ -59398,7 +59443,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1521096188
 GameObject:
@@ -69374,7 +69419,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1910094588
 GameObject:
@@ -69943,13 +69988,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52c9ab9cf0201c14c942a070ff451f2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buildingName: Wood
-  level: 0
-  isProducing: 1
-  stepsRequiredForProduction: 10
-  totalResourcesProduced: 0
-  resourcesProduced: 0
-  productionMultiplier: 1
+  resourcesPerStep: 0.1
+  uncollectedResources: 0
 --- !u!1 &1917840283
 GameObject:
   m_ObjectHideFlags: 0
@@ -73390,13 +73430,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52c9ab9cf0201c14c942a070ff451f2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buildingName: WoodProduction
-  level: 0
-  isProducing: 0
-  stepsRequiredForProduction: 0
-  totalResourcesProduced: 0
-  resourcesProduced: 0
-  productionMultiplier: 1
+  resourcesPerStep: 0.1
+  uncollectedResources: 0
 --- !u!114 &2026948530
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -74570,9 +74605,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Current Bonus: 0%
-
-    Resource per hour: 100g'
+  m_text: 'Collect: 1g'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

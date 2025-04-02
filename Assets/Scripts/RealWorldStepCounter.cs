@@ -60,7 +60,7 @@ public class RealWorldStepCounter : MonoBehaviour
     private void SimulateStep()
     {
         simulatedSteps++;
-        PlayerManager.Instance.IncrementInGameSteps();
-        Debug.Log("Simulated step taken. Total simulated steps: " + simulatedSteps);
+        StepCounterController.Instance.DebugAddSteps(100);
+        Debug.Log("100 Steps Taken");
     }
 }
