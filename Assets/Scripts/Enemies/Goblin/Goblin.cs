@@ -15,7 +15,7 @@ public class Goblin : Enemy
     private const int BASE_GOLD = 5;                // Base gold reward offset
     private const int GOLD_PER_LEVEL = 2;           // Additional gold per level
 
-    private const int BASE_EXP = 6;                 // Base experience reward at level 1
+    private const int BASE_EXP = 10;                 // Base experience reward at level 1
     private const float EXP_GROWTH_FACTOR = 1.1f;     // EXP growth factor per level
 
     protected override void Awake()

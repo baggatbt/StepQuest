@@ -191,7 +191,7 @@ public void InitializeCharacterStats()
     }
 
 
-    public int baseExp = 50; // Starting value for experience points
+    public int baseExp = 30; // Starting value for experience points
     public float growthFactor = 1.1f; // Growth factor for exponential increase
     public int ExpToNextLevel(int heroLevel)
     {

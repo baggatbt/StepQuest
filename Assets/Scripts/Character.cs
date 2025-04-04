@@ -343,11 +343,16 @@ private Vector2 collisionContactPoint = Vector2.zero;
 
     // Calculate total damage after flat defense reduction
     int totalDamageAfterDefense = damageOfAttacker - effectiveDefense;
+    if (totalDamageAfterDefense <= 0)
+    {
+        totalDamageAfterDefense = 0;
+    }
     
 
     Debug.Log("Total damage dealt  = " + totalDamageAfterDefense);
 
     // Subtract the calculated damage from health
+
     this.health -= totalDamageAfterDefense;
     if (this.healthBar != null)
     {

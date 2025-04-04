@@ -13,7 +13,7 @@ public class Mushroom : Enemy
         this.health = this.maxHealth;
         this.maxEnergy = 3;
         this.speed = 3;
-        this.attackPower = 6;
+        this.attackPower = 3;
         this.defensePower = 0;
         this.energy = 0;
         this.baseExp = 10; // Base experience points given
