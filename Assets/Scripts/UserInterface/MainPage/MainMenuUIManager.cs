@@ -642,10 +642,10 @@ public void PopulateInventoryList() {
     }
 
     
-     public void GoToBattle()
+     public void GoToBattle(String stageID)
 {
     // Find the first stage (stage 1.1)
-    StageData selectedStage = GameManager.Instance.allStagesData.Find(stage => stage.stageID == "1.1");
+    StageData selectedStage = GameManager.Instance.allStagesData.Find(stage => stage.stageID == stageID);
 
     if (selectedStage != null)
     {
