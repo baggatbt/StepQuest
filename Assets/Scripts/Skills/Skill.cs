@@ -43,6 +43,9 @@ public abstract class Skill
 //got rid of can hit behind
     public int energyCost;
     public int energyGain;
+    public int energyGainBonus;
+    public bool energyGained;
+    public bool bonusGained;
     public int skillLevel;
     public bool noZoom; //Allows zoom to be disabled
      public bool isActiveSkill = true; //Determines whether the skill as active or passive
@@ -190,7 +193,12 @@ public abstract class Skill
         // Calculate final damage and round up
         finalDamage = Mathf.CeilToInt(skillBaseDamage * damageTimingMultiplier);
         target.TakeDamage(finalDamage, user);
-        user.GainEnergy(1); // Bonus energy for a good hit
+        if (!bonusGained)
+        {   
+            bonusGained = true;
+            user.GainEnergy(energyGainBonus); // Bonus energy for a good hit
+            Debug.Log("Gaining energybonus" + bonusGained);
+        }
         user.PlayCriticalHitSound(); // Play critical hit sound
     }
     else

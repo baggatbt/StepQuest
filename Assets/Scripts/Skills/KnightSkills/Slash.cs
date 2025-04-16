@@ -12,6 +12,7 @@ public class Slash : Skill
         description = "Tap at the right time for extra damage";
         energyCost = 0; 
         energyGain = 1;
+        energyGainBonus = 1;
         skillLevel = 1; 
         requiresMovement = true; 
         skillExecutionComplete = false;
@@ -47,6 +48,7 @@ public class Slash : Skill
             battleManager.CameraShakeMagnitude(result);
             battleManager.ShowTimingResult(result.ToString());
             
+            
         });
 
         
@@ -59,6 +61,10 @@ public class Slash : Skill
     // Reset flags
     user.isAnimationDone = false;
     user.isAttacking = false;
+    //reset the flag to allow energy generation on good timing
+    bonusGained = false;
+    //Always gain this energy back
+    user.GainEnergy(energyGain);
     target.CheckForDeath();
 }
 

@@ -12,6 +12,7 @@ public class TripleHitSkill : Skill
         requiresMovement = true;
         energyCost = 3;
         energyGain = 0;
+        energyGainBonus = 0;
         numberOfAttacksPossible = 3;
         skillPointCost = 1;
         iconImage = LoadIconImage("Sprites/SkillIcons/Knight/Knight_Icon_TripleSlash");
