@@ -11,6 +11,7 @@ public class TripleHitSkill : Skill
         description = "Tap before each hit for extra damage";
         requiresMovement = true;
         energyCost = 3;
+        energyGain = 0;
         numberOfAttacksPossible = 3;
         skillPointCost = 1;
         iconImage = LoadIconImage("Sprites/SkillIcons/Knight/Knight_Icon_TripleSlash");

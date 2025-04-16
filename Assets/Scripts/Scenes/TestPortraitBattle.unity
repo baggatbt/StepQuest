@@ -2482,7 +2482,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -2.0303965, y: 7.529869}
+  m_AnchoredPosition: {x: 50.300217, y: 9.599693}
   m_SizeDelta: {x: 114.77, y: 40.29}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &388070536
@@ -2722,7 +2722,7 @@ MonoBehaviour:
   associatedHealthBarSlider: {fileID: 388070536}
   associatedEnergyBarSlider: {fileID: 1458948016}
   associatedHealthText: {fileID: 1090784556}
-  associatedEnergyText: {fileID: 856343206}
+  associatedEnergyText: {fileID: 1387955808}
   associatedHealthBarSlider2: {fileID: 633191898}
   associatedEnergyBarSlider2: {fileID: 507690101}
   associatedHealthText2: {fileID: 1461574144}
@@ -5776,6 +5776,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 689911406}
+  - component: {fileID: 689911408}
+  - component: {fileID: 689911407}
   m_Layer: 5
   m_Name: HeroUIOne
   m_TagString: Untagged
@@ -5803,9 +5805,47 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 23, y: -125}
-  m_SizeDelta: {x: 258.59, y: 84.15}
+  m_AnchoredPosition: {x: 33, y: -553}
+  m_SizeDelta: {x: 421.49, y: 93.14}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &689911407
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 689911405}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 07aa414e449703c4c92a4a8135154bbc, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &689911408
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 689911405}
+  m_CullTransparentMesh: 1
 --- !u!1 &730998196
 GameObject:
   m_ObjectHideFlags: 0
@@ -7103,7 +7143,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &900941205
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7122,7 +7162,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -152.98, y: -2.43}
+  m_AnchoredPosition: {x: -113, y: -0.8}
   m_SizeDelta: {x: 200.19, y: 122.09}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &900941206
@@ -9857,7 +9897,7 @@ RectTransform:
   m_GameObject: {fileID: 1295422132}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 7.048}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.84974, y: 0.84974, z: 0.84974}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 647553935}
@@ -9866,7 +9906,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.07031688, y: 0.018555555}
   m_AnchorMax: {x: 0.9504527, y: 0.14277779}
-  m_AnchoredPosition: {x: -7, y: 12.209961}
+  m_AnchoredPosition: {x: -7, y: 799}
   m_SizeDelta: {x: 37.2, y: 107.45}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1295422134
@@ -9882,7 +9922,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -10500,7 +10540,7 @@ GameObject:
   - component: {fileID: 1387955809}
   - component: {fileID: 1387955808}
   m_Layer: 5
-  m_Name: HpValueText
+  m_Name: ManaValueText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11393,7 +11433,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 4.6696043, y: -17.0699}
+  m_AnchoredPosition: {x: 57, y: -15}
   m_SizeDelta: {x: 114.77, y: 40.29}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1458948016

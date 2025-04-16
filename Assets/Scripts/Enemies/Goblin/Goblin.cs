@@ -9,7 +9,7 @@ public class Goblin : Enemy
     private const int BASE_HEALTH = 6;              // Health at level 1
     private const int HEALTH_GROWTH = 2;            // Additional HP per level after 1
 
-    private const int BASE_ATTACK = 2;              // Attack at level 1
+    private const int BASE_ATTACK = 3;              // Attack at level 1
     private const float ATTACK_GROWTH_FACTOR = 0.5f;  // Adds +1 attack every 2 levels
 
     private const int BASE_GOLD = 5;                // Base gold reward offset

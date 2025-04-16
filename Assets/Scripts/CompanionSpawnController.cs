@@ -116,7 +116,7 @@ public class CompanionSpawnController : MonoBehaviour
     character.enemyHealthUI = heroHealthUI;
 
     // Position the health UI based on the sprite bounds
-    PositionHealthUIAboveCharacter(heroHealthUI, character);
+   // PositionHealthUIAboveCharacter(heroHealthUI, character);
 }
 
 private void PositionHealthUIAboveCharacter(GameObject heroHealthUI, Character character)

@@ -121,7 +121,7 @@ public abstract class Skill
         
         //finalDamage = Math.Max(finalDamage, 1);
         // Gain energy and set animations based on the result
-        user.GainEnergy(1);
+       // user.GainEnergy(1);
         
         if (result == TimingEventResult.Good)
         {
