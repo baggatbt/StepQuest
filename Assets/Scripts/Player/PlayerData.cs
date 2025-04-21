@@ -94,6 +94,9 @@ public class PlayerData : MonoBehaviour
         Debug.Log("First time login handled, step data initialized.");
     }
 
+
+    public static event Action<int> OnStepsAdded;
+
     private void UpdateSteps()
 {
     newSensorTotal = stepCounterController.GetTotalSteps();
@@ -103,6 +106,9 @@ public class PlayerData : MonoBehaviour
     {
         inGameSteps += newSteps;
         currentSensorTotal = newSensorTotal;
+
+        //Anything that needs stepData subscribes to this
+         OnStepsAdded?.Invoke(newSteps);
 
         // Tell each building to produce resources
         foreach (Building building in buildings)
@@ -216,4 +222,28 @@ public class PlayerData : MonoBehaviour
     {
         return CurrencyManager.GetMultiCoinString(totalCopper);
     }
+
+    // ──────────────────────────────────────────────────────────────
+// DEBUG ONLY ▸ lets Editor tools simulate real steps on demand
+// ──────────────────────────────────────────────────────────────
+#if UNITY_EDITOR
+public void DebugAddSteps(int amount)
+{
+    if (amount <= 0) return;
+
+    inGameSteps        += amount;
+    currentSensorTotal += amount;
+
+    // Notify all listeners (missions, buffs, etc.)
+    OnStepsAdded?.Invoke(amount);
+
+    // Give buildings a chance to produce resources
+    foreach (Building b in buildings)
+        if (b != null && b.IsProducing())
+            b.AccumulateProduction(amount);
+
+    SavePlayerData();
+    Debug.Log($"[PlayerData] DEBUG added {amount} steps");
+}
+#endif
 }

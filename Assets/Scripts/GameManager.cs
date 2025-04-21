@@ -30,6 +30,10 @@ public class GameManager : MonoBehaviour
     public Inventory inventory;
     public EquipmentManager equipmentManager; // Reference to the EquipmentManager
 
+    //WORKER SECTION
+    public int totalWorkers = 2;
+    public int availableWorkers;
+
     // Centralized item list managed by GameManager
     [SerializeField]
     private List<Item> allItemsMasterList = new List<Item>(); //All items in game
