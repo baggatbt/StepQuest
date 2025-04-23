@@ -1,58 +1,45 @@
+/*
+// Assets/Scripts/Missions/ResourceMission.cs
 using UnityEngine;
 using UnityEngine.Events;
 
-/// <summary>
-/// A mission that completes once the player has walked <see cref="stepTarget"/> steps.
-/// Progress and active state are written to PlayerPrefs so nothing is lost across sessions.
-/// </summary>
+/// <summary>Completes once the player has walked <see cref="stepTarget"/> steps.</summary>
 public class ResourceMission : MonoBehaviour
 {
-    // ──────────────── Inspector ▸ Identity & Settings ────────────────
-    [Tooltip("Unique name used as the save‑file key (e.g. “Woodcutting_1k”).")]
-    public string missionID = "Mission_1000Steps";
+    // --------------- Inspector ----------------
+    [Tooltip("Unique key used for saving progress.  MUST be unique.")]
+    public string missionID  = "LoggingOne";
+    public int    stepTarget = 1_000;
 
-    [Tooltip("Total steps that must be walked to finish this mission.")]
-    public int stepTarget = 1_000;
+    // --------------- Runtime state ------------
+    [SerializeField] private bool missionActive = false;
+    [SerializeField] private int  stepsSoFar    = 0;
 
-    // ──────────────── Runtime State (visible for debugging) ───────────
-    [SerializeField] private bool  missionActive = false;
-    [SerializeField] private int   stepsSoFar    = 0;
-
-    // ──────────────── Optional Unity‑Events (hook VFX, loot, etc.) ────
+    // --------------- Events -------------------
     public UnityEvent onMissionStarted;
     public UnityEvent onMissionCompleted;
 
-    // ──────────────────────────────────────────────────────────────────
-    #region public API
+    // --------------- Public read-only helpers --
+    public bool  IsActive         => missionActive;
+    public bool  IsComplete       => !missionActive && stepsSoFar >= stepTarget;
+    public float ProgressNormalized => Mathf.Clamp01((float)stepsSoFar / stepTarget);
 
-    /// <summary>Call from a UI button to start the mission.</summary>
-    public void StartMission()
-    {
-        if (missionActive) return;
+    // --------------------------------------------------------------------
+    #region Life-cycle / registration
 
-        stepsSoFar    = 0;
-        missionActive = true;
+    private void Awake()
+{
+    // Ensure a manager exists, even if someone forgot to place it
+    if (MissionManager.Instance == null)
+        new GameObject("MissionManager").AddComponent<MissionManager>();
 
-        SaveState();               // write to disk immediately
-        onMissionStarted?.Invoke();
-        Debug.Log($"[ResourceMission:{missionID}] begun – need {stepTarget} steps.");
-    }
+    MissionManager.Instance.Register(this);
+}
 
-    /// <summary>Returns 0 → 1 progress for UI bars, etc.</summary>
-    public float GetProgressNormalized()
-    {
-        return missionActive ? Mathf.Clamp01((float)stepsSoFar / stepTarget) : 0f;
-    }
-
-    #endregion
-    // ──────────────────────────────────────────────────────────────────
 
     private void OnEnable()
     {
-        // ① Load any saved progress.
         LoadState();
-
-        // ② Subscribe to the step event so we get notified once per update.
         PlayerData.OnStepsAdded += HandleStepsAdded;
     }
 
@@ -62,23 +49,55 @@ public class ResourceMission : MonoBehaviour
         SaveState();
     }
 
-    private void OnApplicationPause(bool paused)
+    public void StartMissionFromButton()
     {
-        if (paused) SaveState();
+        TryStartMission();
     }
 
-    private void OnApplicationQuit()
+    private void OnDestroy()
     {
+        if (MissionManager.Instance != null)
+            MissionManager.Instance.Unregister(this);
+    }
+
+    private void OnApplicationPause(bool pause) { if (pause) SaveState(); }
+    private void OnApplicationQuit()            { SaveState(); }
+
+    #endregion
+    // --------------------------------------------------------------------
+    #region Public API
+
+    /// <summary>UI calls this. Returns <c>true</c> if the mission actually began.</summary>
+    public bool TryStartMission()
+    {
+        if (missionActive || IsComplete)
+            return false;                                     // already running or done
+
+        if (!MissionManager.Instance.CanStartNewMission())
+        {
+            Debug.Log($"[Mission:{missionID}] Cannot start – limit reached.");
+            return false;
+        }
+
+        stepsSoFar    = 0;
+        missionActive = true;
+
         SaveState();
+        onMissionStarted?.Invoke();
+        Debug.Log($"[Mission:{missionID}] started (need {stepTarget} steps)");
+        return true;
     }
 
-    // ──────────────── Event Handler ────────────────
-    private void HandleStepsAdded(int newlyGainedSteps)
+    #endregion
+    // --------------------------------------------------------------------
+    #region Step event & completion
+
+    private void HandleStepsAdded(int newSteps)
     {
         if (!missionActive) return;
 
-        stepsSoFar += newlyGainedSteps;
-        SaveState();                        // cheap, but guarantees nothing is lost
+        stepsSoFar += newSteps;
+        SaveState();
 
         if (stepsSoFar >= stepTarget)
             CompleteMission();
@@ -87,14 +106,15 @@ public class ResourceMission : MonoBehaviour
     private void CompleteMission()
     {
         missionActive = false;
-        SaveState();                        // write the “inactive & done” state
+        SaveState();
         onMissionCompleted?.Invoke();
-
-        // ▸ Put your reward logic here or in the onMissionCompleted UnityEvent.
-        Debug.Log($"[ResourceMission:{missionID}] complete!");
+        Debug.Log($"[Mission:{missionID}] COMPLETE!");
     }
 
-    // ──────────────── Persistence ────────────────
+    #endregion
+    // --------------------------------------------------------------------
+    #region Persistence
+
     private string KeyActive   => $"{missionID}_Active";
     private string KeyProgress => $"{missionID}_Steps";
 
@@ -110,4 +130,7 @@ public class ResourceMission : MonoBehaviour
         missionActive = PlayerPrefs.GetInt(KeyActive,   0) == 1;
         stepsSoFar    = PlayerPrefs.GetInt(KeyProgress, 0);
     }
+
+    #endregion
 }
+*/
