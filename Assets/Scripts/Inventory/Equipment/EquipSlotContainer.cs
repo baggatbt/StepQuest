@@ -3,23 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-
-
-
-
+/// <summary>
+/// Handles clicks on each equipment slot button and delegates
+/// equip / unequip requests to EquipmentManager.
+/// </summary>
 public class EquipSlotContainer : MonoBehaviour
 {
+    [Header("References")]
     public EquipmentManager equipmentManager;
 
+    [Header("Slot Buttons")]
     public Button helmSlotButton;
     public Button chestSlotButton;
     public Button weaponSlotButton;
     public Button footSlotButton;
 
+    //────────────────────────────────────────────────────────────────
     private void Start()
     {
-        // Ensure the buttons are assigned
-        if (helmSlotButton == null || chestSlotButton == null || weaponSlotButton == null || footSlotButton == null)
+        // Verify button references
+        if (!helmSlotButton || !chestSlotButton || !weaponSlotButton || !footSlotButton)
         {
             Debug.LogError("One or more slot buttons are not assigned.");
             return;
@@ -30,38 +33,39 @@ public class EquipSlotContainer : MonoBehaviour
         weaponSlotButton.onClick.AddListener(() => OnEquipSlotClicked(EquipmentType.Hand));
         footSlotButton.onClick.AddListener(() => OnEquipSlotClicked(EquipmentType.Foot));
 
-        Debug.Log("Button click listeners assigned.");
+        Debug.Log("Equip-slot button listeners assigned.");
     }
 
+    //────────────────────────────────────────────────────────────────
     private void OnEquipSlotClicked(EquipmentType slotType)
     {
-        Debug.Log("Equip slot clicked: " + slotType);
+        Debug.Log($"Equip slot clicked: {slotType}");
 
-        var companion = GameManager.Instance.currentCompanion;
-        if (companion == null)
+        CharacterData cd = GameManager.Instance.currentCompanionData;
+        if (cd == null)
         {
-            Debug.LogWarning("No companion assigned. Cannot equip/unequip item.");
+            Debug.LogWarning("No CharacterData selected – can’t modify equipment.");
             return;
         }
 
-        if (companion.equippedItems.ContainsKey(slotType) && companion.equippedItems[slotType] != null)
+        // If something is already equipped → Unequip
+        if (cd.GetEquipped(slotType) != null)
         {
-            // Unequip the item if the slot is already occupied
-            Debug.Log("Unequipping item from slot: " + slotType);
+            Debug.Log($"Unequipping item from {slotType}");
             equipmentManager.Unequip(slotType);
         }
         else
         {
-            // Equip a new item if the slot is empty
-            Equipment equipment = GameManager.Instance.GetItemForSlot(slotType);
-            if (equipment != null)
+            // Try to fetch a matching item from the player’s inventory
+            Equipment equip = GameManager.Instance.GetItemForSlot(slotType);
+            if (equip != null)
             {
-                Debug.Log("Equipping item: " + equipment.itemName);
-                equipmentManager.Equip(equipment);
+                Debug.Log($"Equipping {equip.itemName}");
+                equipmentManager.Equip(equip);
             }
             else
             {
-                Debug.LogWarning("No item available for slot type: " + slotType);
+                Debug.LogWarning($"No item available for slot {slotType}");
             }
         }
     }

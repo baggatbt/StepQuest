@@ -1,100 +1,100 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Handles equipping / unequipping through the UI.
+/// Now talks directly to CharacterData instead of Companion.
+/// </summary>
 public class EquipmentManager : MonoBehaviour
 {
+    [Header("UI slot images")]
     public Image helmSlotImage;
     public Image chestSlotImage;
     public Image weaponSlotImage;
     public Image footSlotImage;
 
+    // Shortcut to whichever CharacterData the UI is showing
+    private CharacterData Current => GameManager.Instance?.currentCompanionData;
+
+    //────────────────────────────────────────────────────────────────
     private void Start()
     {
-        if (helmSlotImage == null) Debug.LogError("HelmSlotImage reference is missing.");
-        if (chestSlotImage == null) Debug.LogError("ChestSlotImage reference is missing.");
-        if (weaponSlotImage == null) Debug.LogError("WeaponSlotImage reference is missing.");
-        if (footSlotImage == null) Debug.LogError("FootSlotImage reference is missing.");
+        if (!helmSlotImage)   Debug.LogError("HelmSlotImage reference missing.");
+        if (!chestSlotImage)  Debug.LogError("ChestSlotImage reference missing.");
+        if (!weaponSlotImage) Debug.LogError("WeaponSlotImage reference missing.");
+        if (!footSlotImage)   Debug.LogError("FootSlotImage reference missing.");
+
+        UpdateUI();
     }
+
+    //────────────────────────────────────────────────────────────────
+    #region Public API (called by inventory buttons, etc.)
 
     public void Equip(Equipment equipment)
     {
-        var companion = GameManager.Instance.currentCompanion;
-        if (companion == null)
+        if (Current == null)
         {
-            Debug.LogWarning("No companion assigned. Cannot equip item.");
+            Debug.LogWarning("No CharacterData selected – can’t equip.");
             return;
         }
 
-        Debug.Log("Equip method called with item: " + equipment.itemName);
-        companion.EquipItem(equipment);
-         GameManager.Instance.itemList.Remove(equipment); // Remove from inventory
+        Debug.Log($"Equip {equipment.itemName}");
+        Current.EquipItem(equipment);                     // NEW: goes straight to CharacterData
+        GameManager.Instance.itemList.Remove(equipment); // remove from inventory
         UpdateUI();
-        Debug.Log(companion.heroID + " equipped " + equipment.itemName);
     }
 
-    public void Unequip(EquipmentType equipmentType)
+    public void Unequip(EquipmentType slot)
     {
-        var companion = GameManager.Instance.currentCompanion;
-        if (companion == null)
-        {
-            Debug.LogWarning("No companion assigned. Cannot unequip item.");
-            return;
-        }
+        if (Current == null) { Debug.LogWarning("No CharacterData selected."); return; }
 
-        if (companion.equippedItems.ContainsKey(equipmentType) && companion.equippedItems[equipmentType] != null)
-        {
-            Equipment unequippedItem = companion.equippedItems[equipmentType];
-            Debug.Log("Unequip method called for slot: " + equipmentType);
+        Equipment toUnequip = Current.GetEquipped(slot);
+        if (toUnequip == null) return;
 
-            companion.UnequipItem(equipmentType);
-
-            // Add the unequipped item back to the inventory
-            GameManager.Instance.AddItem(unequippedItem);
-
-            UpdateUI();
-            Debug.Log(companion.heroID + " unequipped " + equipmentType);
-        }
+        Debug.Log($"Unequip {slot}");
+        Current.UnequipItem(slot);
+        GameManager.Instance.AddItem(toUnequip);          // back to inventory
+        UpdateUI();
     }
+
+    #endregion
+    //────────────────────────────────────────────────────────────────
+    #region UI helpers
 
     private void UpdateUI()
     {
-        var companion = GameManager.Instance.currentCompanion;
-        Debug.Log("Updating UI");
+        if (Current == null) { ClearAllSlots(); return; }
 
-        if (companion == null)
-        {
-            // Clear all slot images if no companion is assigned
-            helmSlotImage.sprite = null;
-            helmSlotImage.color = Color.clear;
-            chestSlotImage.sprite = null;
-            chestSlotImage.color = Color.clear;
-            weaponSlotImage.sprite = null;
-            weaponSlotImage.color = Color.clear;
-            footSlotImage.sprite = null;
-            footSlotImage.color = Color.clear;
-            return;
-        }
-
-        UpdateSlotImage(helmSlotImage, EquipmentType.Helm);
-        UpdateSlotImage(chestSlotImage, EquipmentType.Chest);
-        UpdateSlotImage(weaponSlotImage, EquipmentType.Hand);
-        UpdateSlotImage(footSlotImage, EquipmentType.Foot);
+        SetSlotImage(helmSlotImage,   EquipmentType.Helm);
+        SetSlotImage(chestSlotImage,  EquipmentType.Chest);
+        SetSlotImage(weaponSlotImage, EquipmentType.Hand);
+        SetSlotImage(footSlotImage,   EquipmentType.Foot);
     }
 
-    private void UpdateSlotImage(Image slotImage, EquipmentType slotType)
+    private void SetSlotImage(Image img, EquipmentType slot)
     {
-        var companion = GameManager.Instance.currentCompanion;
-        if (companion.equippedItems.ContainsKey(slotType))
+        Equipment eq = Current.GetEquipped(slot);
+
+        if (eq != null)
         {
-            slotImage.sprite = companion.equippedItems[slotType].itemIcon;
-            slotImage.color = Color.white; // Ensure the image is visible
+            img.sprite = eq.itemIcon;
+            img.color  = Color.white;
         }
         else
         {
-            slotImage.sprite = null;
-            slotImage.color = Color.clear; // Hide the image if no item is equipped
+            img.sprite = null;
+            img.color  = Color.clear;
         }
     }
+
+    private void ClearAllSlots()
+    {
+        foreach (var img in new[] { helmSlotImage, chestSlotImage, weaponSlotImage, footSlotImage })
+        {
+            img.sprite = null;
+            img.color  = Color.clear;
+        }
+    }
+
+    #endregion
 }

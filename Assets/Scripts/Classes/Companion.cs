@@ -196,7 +196,7 @@ public void InitializeCharacterStats()
     public int ExpToNextLevel(int heroLevel)
     {
         int exp = Mathf.RoundToInt(baseExp * Mathf.Pow(growthFactor, heroLevel));
-        Debug.Log($"EXP to next level (Level {heroLevel}): {exp}");
+        Debug.Log($"EXP to next level (Level {heroLevel}): {exp} current EXP: {heroExp}");
         return exp;
     }
 
@@ -244,13 +244,7 @@ public void InitializeCharacterStats()
         defensePower -= equipment.defenseBonus;
     }
 
-    public int expToLevel
-    {
-        get
-        {
-            return ExpToNextLevel(heroLevel);
-        }
-    }
+    
 
     
 }
