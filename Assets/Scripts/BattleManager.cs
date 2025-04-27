@@ -166,35 +166,34 @@ public class BattleManager : MonoBehaviour
     
 
     public void StartBattle()
-    {
-         if (playerParty.Count > 0) {
-     if (isBattleStarted) return; // Prevent starting the battle multiple times
-        //TODO To be moved outside of the dungeon entry call DeductStaminaFromParticipants();
-        
-        battleStartButton.SetActive(false);
-        
-        isBattleStarted = true;
-        // Existing logic to start the battle
-    endOfBattlePanel.SetActive(false);
-    heroSelectionPanel.SetActive(false);
+{
+    const int battleCostPerHero = 1;          // cost to join this battle
 
-            if (playerParty.Count > 0)
-            {
-                companion1 = playerParty[0];
-                Debug.Log("Companion1 was assigned");
-            }
-            if (playerParty.Count > 1)
-            {
-                companion2 = playerParty[1];
-                Debug.Log("Companion2 was assigned");
-            }
-
-            
+    // NEW stamina gate 
+    foreach (var c in playerParty.OfType<Companion>())
+        if (!c.TrySpendStamina(battleCostPerHero))
+        {
+            Debug.Log($"{c.heroID} is exhausted ─ visit Recovery Center.");
+            return;                           // abort start
         }
-        
-        activePlayer = companion1; //Default
+    
+
+    if (playerParty.Count > 0)
+    {
+        if (isBattleStarted) return;          // prevent double-start
+        battleStartButton.SetActive(false);
+        isBattleStarted = true;
+
+        endOfBattlePanel.SetActive(false);
+        heroSelectionPanel.SetActive(false);
+
+        if (playerParty.Count > 0) companion1 = playerParty[0];
+        if (playerParty.Count > 1) companion2 = playerParty[1];
+
+        activePlayer = companion1;            // default
         InitializeTurnOrder();
     }
+}
 
 
     public void RestoreHealthAndEnergy()

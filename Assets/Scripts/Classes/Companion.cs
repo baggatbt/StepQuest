@@ -196,7 +196,7 @@ public void InitializeCharacterStats()
     public int ExpToNextLevel(int heroLevel)
     {
         int exp = Mathf.RoundToInt(baseExp * Mathf.Pow(growthFactor, heroLevel));
-        Debug.Log($"EXP to next level (Level {heroLevel}): {exp} current EXP: {heroExp}");
+        Debug.Log($"EXP to next level (Level {heroLevel}): {exp}");
         return exp;
     }
 
@@ -210,6 +210,18 @@ public void InitializeCharacterStats()
     {
         energy = Mathf.Min(energy + amount, maxEnergy);
     }
+
+    public bool TrySpendStamina(int amount)
+{
+    if (stamina >= amount)
+    {
+        stamina -= amount;
+        SaveCharacterData();
+        return true;
+    }
+    return false;
+}
+
 
     public void EquipItem(Equipment equipment)
     {
@@ -244,7 +256,13 @@ public void InitializeCharacterStats()
         defensePower -= equipment.defenseBonus;
     }
 
-    
+    public int expToLevel
+    {
+        get
+        {
+            return ExpToNextLevel(heroLevel);
+        }
+    }
 
     
 }
