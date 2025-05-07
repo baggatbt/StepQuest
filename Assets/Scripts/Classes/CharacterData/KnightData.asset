@@ -14,23 +14,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   heroID: Knight
   heroLevel: 1
-  heroExp: 40
+  heroExp: 10
   skillTreePanel: {fileID: 0}
   heroIcon: {fileID: 21300000, guid: 9f6d22b89f0bf7745b60a02d60a0fe65, type: 3}
   fullHeroImage: {fileID: 21300002, guid: 3a501bb3dcbdce54ba4b1f1dd4924979, type: 3}
-  heroStatPoints: 1
-  heroSkillPoints: 1
-  attackPower: 6
-  defensePower: 2
-  stamina: 10
+  heroStatPoints: 0
+  heroSkillPoints: 0
+  attackPower: 10
+  defensePower: 0
+  stamina: 6
   maxStamina: 10
-  maxHealth: 9
-  health: 4
+  maxHealth: 20
+  health: 12
   maxEnergy: 5
   energy: 5
   speed: 4
   isUnlocked: 1
-  expToLevel: 0
+  expToLevel: 30
   damageReflectionPercentage: 0.25
   skillOne: 2
   skillTwo: 13
@@ -42,6 +42,6 @@ MonoBehaviour:
   LockedSkills: 09000000
   equipped:
   - slot: 0
-    item: {fileID: 11400000, guid: 86e635bd06f2c0148b5eee7e15156218, type: 2}
+    item: {fileID: 3, guid: ca819640f53b48919bf7774744f7f15e, type: 3}
   baseExp: 30
   growthFactor: 1.1

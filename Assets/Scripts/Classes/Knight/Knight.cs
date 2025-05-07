@@ -6,64 +6,65 @@ using System;
 [Serializable]
 public class Knight : Companion
 {
-    // Constants for Knight's stat growth
-    private const int BASE_HEALTH = 12;            // Above average starting health
-    private const int HEALTH_GROWTH = 3;           // Gains 3 HP per level after level 1
+    // Base stats and growth
+    private const int BASE_HEALTH = 20;
+    private const int HEALTH_GROWTH = 5;
 
-    private const int BASE_ATTACK = 2;             // Average starting attack
-    private const float ATTACK_GROWTH_FACTOR = 0.5f; // +1 attack every 2 levels
+    private const int BASE_ATTACK = 10;
+    private const int ATTACK_GROWTH = 2;
 
-    private const int BASE_SPEED = 4;              // Below average speed
+    private const int BASE_SPEED = 4;
+
+    private const int BASE_DEFENSE = 2;
+    private const int DEFENSE_GROWTH = 1;
+
+    private const int BASE_ENERGY = 2;
 
     protected override void Awake()
     {
         base.Awake();
         skillOne = SkillType.TripleHit;
         skillTwo = SkillType.Taunt;
-        // Assign specific paths for Knight icons
+
         if (characterData != null)
         {
-           // characterData.heroIconPath = "Assets/Resources/Sprites/GUI/knightIcon.png";
-           // characterData.fullHeroImagePath = "Path/To/KnightFullImage";
+            // characterData.heroIconPath = "Assets/Resources/Sprites/GUI/knightIcon.png";
+            // characterData.fullHeroImagePath = "Path/To/KnightFullImage";
         }
+
         InitializeSkillsBasedOnLevel();
-        UpdateStats(); // Initialize stats on Awake
+        UpdateStats();
     }
 
     public override void InitializeSkillsBasedOnLevel()
     {
         availableSkills.Clear();
         availableSkills.Add(SkillType.Slash);
-        // Uncomment these as needed for level-based unlocking:
-        // if (this.heroLevel >= 2) availableSkills.Add(SkillType.TripleHit);
-        // if (this.heroLevel >= 5) availableSkills.Add(SkillType.Taunt);
         Debug.Log($"Total Available skills: {availableSkills.Count}");
     }
 
     public void UpdateStats()
     {
-        // Update stats based on the current level using our growth formulas:
         this.maxHealth = BASE_HEALTH + (this.level - 1) * HEALTH_GROWTH;
         this.health = this.maxHealth;
-        this.attackPower = BASE_ATTACK + Mathf.FloorToInt((this.level - 1) * ATTACK_GROWTH_FACTOR);
-        this.speed = BASE_SPEED;
-        // Optionally update energy or other stats if necessary
+
+        this.attackPower = BASE_ATTACK + (this.level - 1) * ATTACK_GROWTH;
+        this.speed = BASE_SPEED + Mathf.FloorToInt((this.level - 1) / 3);
+        this.defensePower = BASE_DEFENSE + Mathf.FloorToInt((this.level - 1) / 4);
+        this.maxEnergy = BASE_ENERGY + Mathf.FloorToInt((this.level - 1) / 2);
+        this.energy = this.maxEnergy;
     }
 
-     public override void LevelUp()
+    public override void LevelUp()
     {
         if (this.heroExp >= ExpToNextLevel(this.heroLevel))
         {
             this.heroExp -= ExpToNextLevel(this.heroLevel);
             this.heroLevel++;
             UpdateStats();
-            // Do not reassign health here because UpdateStats already set health = maxHealth.
-            this.energy = this.maxEnergy;
-
             this.heroStatPoints += 1;
             this.heroSkillPoints += 1;
-
-            Debug.Log("Hero leveled up to level " + this.heroLevel + ", stat upgraded.");
+            Debug.Log("Hero leveled up to level " + this.heroLevel);
         }
     }
 
