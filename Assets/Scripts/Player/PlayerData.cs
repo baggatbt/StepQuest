@@ -110,6 +110,7 @@ public class PlayerData : MonoBehaviour
         //Anything that needs stepData subscribes to this
          OnStepsAdded?.Invoke(newSteps);
 
+        /*
         // Tell each building to produce resources
         foreach (Building building in buildings)
         {
@@ -118,13 +119,14 @@ public class PlayerData : MonoBehaviour
                 building.AccumulateProduction(newSteps);
             }
         }
+        */
 
         SavePlayerData();
     }
 }
 
 
-
+    /*
     private void ProduceOfflineResources()
     {
         int stepsSinceLastSession = currentSensorTotal - baselineSteps;
@@ -139,7 +141,9 @@ public class PlayerData : MonoBehaviour
         baselineSteps = currentSensorTotal;
         SavePlayerData();
     }
+    */
 
+    /*
     private void ProduceResourcesDuringGameplay()
     {
         if (newSteps > 0) // Only produce resources if there are new steps
@@ -153,6 +157,8 @@ public class PlayerData : MonoBehaviour
             }
         }
     }
+
+    */
 
     public void SavePlayerData()
     {

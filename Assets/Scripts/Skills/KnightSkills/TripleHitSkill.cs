@@ -21,7 +21,7 @@ public class TripleHitSkill : Skill
 
     protected override int CalculateBaseDamage(Character user)
     {
-        return Mathf.CeilToInt(user.attackPower * 0.50f);
+        return Mathf.CeilToInt(user.attackPower * 0.4f);
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)

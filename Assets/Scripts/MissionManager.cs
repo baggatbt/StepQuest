@@ -77,21 +77,27 @@ public class MissionManager : MonoBehaviour
 
     /// <summary>Claim rewards; frees the slot & makes mission repeatable.</summary>
     public bool ClaimMission(string id)
+{
+    if (!missions.TryGetValue(id, out var m) || !m.isComplete)
+        return false;
+
+    // Roll drop table rewards
+    if (m.definition.dropTable != null)
     {
-        if (!missions.TryGetValue(id, out var m) || !m.isComplete)
-            return false;
-
-        // ▸ Grant reward
-        if (m.definition.item != null)
-            GameManager.Instance.AddItem(m.definition.item);
-
-        // ▸ Reset state so the mission becomes repeatable
-        m.stepsSoFar = 0;     // ←  **important line**
-        m.isActive   = false;
-        m.isClaimed  = false;
-        m.Save();
-        return true;
+        var rewards = m.definition.dropTable.RollRewards();
+        foreach (var item in rewards)
+        {
+            GameManager.Instance.AddItem(item);
+        }
     }
+
+    m.stepsSoFar = 0;
+    m.isActive = false;
+    m.isClaimed = false;
+    m.Save();
+    return true;
+}
+
 
 
     public float GetProgress01(string id)
@@ -109,7 +115,7 @@ public struct MissionDefinition
 {
     public string id;        // unique key, e.g. "LoggingOne"
     public int    stepTarget;
-    public Item   item;      // reward
+    public MissionDropTable dropTable;    // reward
 }
 //─────────────────────────────────────────────────────────────────
 [System.Serializable]
