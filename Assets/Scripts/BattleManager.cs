@@ -167,7 +167,7 @@ public class BattleManager : MonoBehaviour
 
     public void StartBattle()
 {
-    const int battleCostPerHero = 1;          // cost to join this battle
+    const int battleCostPerHero = 0;          // cost to join this battle
 
     // NEW stamina gate 
     foreach (var c in playerParty.OfType<Companion>())
