@@ -8,6 +8,7 @@ public class TimingManager : MonoBehaviour
     public static TimingManager Instance; // Singleton instance
     
     public GameObject timingWindowVisualAid; // Reference to the timing window visual aid GameObject
+    public bool isTimingAid; //Used to turn on and off for testing
 
     private void Awake()
     {
@@ -18,7 +19,7 @@ public class TimingManager : MonoBehaviour
 
 
             // Find timingWindowVisualAid GameObject by name if it hasn’t been assigned in the Inspector
-            if (timingWindowVisualAid == null)
+            if (timingWindowVisualAid == null )
             {
                 timingWindowVisualAid = GameObject.Find("timingWindowVisualAid");
                 if (timingWindowVisualAid == null)
@@ -72,7 +73,7 @@ public class TimingManager : MonoBehaviour
 
     public void ShowTimingAid()
     {
-        if (timingWindowVisualAid != null)
+        if (timingWindowVisualAid != null && isTimingAid)
         {
             timingWindowVisualAid.SetActive(true);
         }
@@ -80,7 +81,7 @@ public class TimingManager : MonoBehaviour
 
     public void HideTimingAid()
     {
-        if (timingWindowVisualAid != null)
+        if (timingWindowVisualAid != null && isTimingAid)
         {
             timingWindowVisualAid.SetActive(false);
         }

@@ -374,7 +374,7 @@ public class BattleManager : MonoBehaviour
     public Transform radialMenuPanelCenterPoint;
     public void MoveRadialMenuToActivePlayer()
     {
-        radialMenuPanelCenterPoint.transform.position = new Vector3(activePlayer.transform.position.x, activePlayer.transform.position.y + 3f, activePlayer.transform.position.z);
+      //  radialMenuPanelCenterPoint.transform.position = new Vector3(activePlayer.transform.position.x, activePlayer.transform.position.y + 3f, activePlayer.transform.position.z);
     }
 
     public void ExecuteQueuedSkills()

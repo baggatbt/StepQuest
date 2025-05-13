@@ -10,12 +10,12 @@ public class RadialMenuLayout : MonoBehaviour
 
     void Start()
     {
-        PositionButtons();
+       // PositionButtons();
     }
 
     void Update() //For game mode testing, remoive
     {
-        PositionButtons();
+       // PositionButtons();
     }
 
     void PositionButtons()
