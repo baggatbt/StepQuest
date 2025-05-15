@@ -30,6 +30,7 @@ public enum SkillType
         MeleeCombo,
         ReflectDamagePassive,
         SpeedBreak,
+        TamedGoblinAttackSkill
     }
 
 

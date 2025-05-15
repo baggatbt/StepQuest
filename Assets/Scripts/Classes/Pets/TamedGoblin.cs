@@ -13,8 +13,7 @@ public class TamedGoblin : Companion
     protected override void Awake()
     {
         base.Awake();
-        skillOne = SkillType.TripleHit;
-        skillTwo = SkillType.None; // Add more if you want
+        
 
         InitializeSkillsBasedOnLevel();
         UpdateStats();
@@ -23,7 +22,7 @@ public class TamedGoblin : Companion
     public override void InitializeSkillsBasedOnLevel()
     {
         availableSkills.Clear();
-        availableSkills.Add(SkillType.Slash);
+        availableSkills.Add(SkillType.TamedGoblinAttackSkill);
     }
 
     public override void LevelUp()
@@ -54,24 +53,17 @@ public class TamedGoblin : Companion
 
     public override List<SkillType> LockedSkills => new List<SkillType>
     {
-        SkillType.ReflectDamagePassive,
-        SkillType.SpeedBreak,
+        
     };
 
     public override List<SkillType> AllSkills => new List<SkillType>
     {
-        SkillType.Slash,
-        SkillType.TripleHit,
-        SkillType.Taunt,
-        SkillType.SpeedBreak,
+        SkillType.TamedGoblinAttackSkill
     };
 
     private List<SkillType> mainSkills = new List<SkillType>
     {
-        SkillType.Slash,
-        SkillType.TripleHit,
-        SkillType.Taunt,
-        SkillType.SpeedBreak
+        SkillType.TamedGoblinAttackSkill
     };
 
     public override List<SkillType> MainSkills => mainSkills;
@@ -80,16 +72,8 @@ public class TamedGoblin : Companion
     {
         switch (skillType)
         {
-            case SkillType.Slash:
-                return new Slash();
-            case SkillType.TripleHit:
-                return new TripleHitSkill();
-            case SkillType.Taunt:
-                return new Taunt();
-            case SkillType.ReflectDamagePassive:
-                return new ReflectDamagePassive();
-            case SkillType.SpeedBreak:
-                return new SpeedBreak();
+            case SkillType.TamedGoblinAttackSkill:
+                return new TamedGoblinAttackSkill();
             default:
                 Debug.LogError("Unknown skill type for Knight: " + skillType);
                 return null;
