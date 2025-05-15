@@ -172,6 +172,9 @@ public class MainMenuUIManager : MonoBehaviour
             healthBarSlider.maxValue = characterData.maxHealth;
             healthBarSlider.value = characterData.health;
 
+            expBarSlider.maxValue = characterData.ExpToNextLevel(characterData.heroLevel);
+            expBarSlider.value = characterData.heroExp;
+
             
 
             staBarSlider.maxValue = characterData.maxStamina;
@@ -179,7 +182,7 @@ public class MainMenuUIManager : MonoBehaviour
 
             // Set the text for health and experience
             healthBarText.text = $"{characterData.health} / {characterData.maxHealth}";
-           
+            xpBarText.text = $"{characterData.heroExp} / {characterData.ExpToNextLevel(characterData.heroLevel)}";
             staBarText.text = $"{characterData.stamina} / {characterData.maxStamina}";
 
             // Setup button to select the companion when clicked
