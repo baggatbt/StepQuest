@@ -40,6 +40,9 @@ public class CharacterData : ScriptableObject
 
     public List<SkillType> AvailableSkills;
     public List<SkillType> LockedSkills;
+    public List<SkillType> equippedSkills = new List<SkillType>();
+public int maxEquippedSkills = 3; // Optional limit
+
 
     #endregion
     //────────────────────────────────────────────────────────────────

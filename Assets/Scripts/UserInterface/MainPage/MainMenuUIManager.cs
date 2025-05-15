@@ -202,7 +202,11 @@ private void OpenCompanionDetails(CharacterData characterData)
     UpdateCompanionStatsDisplay(characterData);
     companionStatsPanel.SetActive(true);
     UpdateHeroImage(characterData);
-  //  UpdateSkillButtonImages(characterData);
+    PopulateLockedSkills(characterData);
+    PopulateAvailableSkills(characterData);
+
+
+ 
 }
 
 private void UpdateCompanionStatsDisplay(CharacterData characterData)
@@ -738,8 +742,94 @@ public void PopulateInventoryList() {
     
     
     
-    UpdateSkillButtonImages(companion);
+    //UpdateSkillButtonImages(companion);
 }
+
+    //ADDED 5/15/2025
+    [Header("Skill Settings")]
+    public GameObject lockedSkillButtonPrefab;
+public Transform lockedSkillListContainer; // Assign in inspector
+
+public void PopulateLockedSkills(CharacterData characterData)
+{
+    foreach (Transform child in lockedSkillListContainer)
+        Destroy(child.gameObject);
+
+    foreach (SkillType lockedSkill in characterData.LockedSkills)
+    {
+        Skill skillInstance = characterData.GetSkillInstance(lockedSkill);
+        if (skillInstance == null) continue;
+
+        GameObject buttonGO = Instantiate(lockedSkillButtonPrefab, lockedSkillListContainer);
+        buttonGO.GetComponentInChildren<TextMeshProUGUI>().text = skillInstance.skillName;
+
+        Button button = buttonGO.GetComponent<Button>();
+        button.onClick.AddListener(() => UnlockSkillForCharacter(characterData, lockedSkill));
+    }
+}
+
+public void UnlockSkillForCharacter(CharacterData characterData, SkillType skillType)
+{
+    characterData.UnlockSkill(skillType);
+    PopulateLockedSkills(characterData); // Refresh UI
+    
+}
+
+public GameObject availableSkillButtonPrefab; // A separate prefab for available skills (or reuse the locked one)
+public Transform availableSkillListContainer; // Assign in Inspector
+public void PopulateAvailableSkills(CharacterData characterData)
+{
+    foreach (Transform child in availableSkillListContainer)
+        Destroy(child.gameObject);
+
+    foreach (SkillType availableSkill in characterData.AvailableSkills)
+    {
+        Skill skillInstance = characterData.GetSkillInstance(availableSkill);
+        if (skillInstance == null) continue;
+
+        GameObject buttonGO = Instantiate(availableSkillButtonPrefab, availableSkillListContainer);
+        TextMeshProUGUI label = buttonGO.GetComponentInChildren<TextMeshProUGUI>();
+
+        bool isEquipped = characterData.equippedSkills.Contains(availableSkill);
+        label.text = skillInstance.skillName + (isEquipped ? " [Equipped]" : "");
+
+        Button button = buttonGO.GetComponent<Button>();
+        button.onClick.AddListener(() => ToggleEquipSkill(characterData, availableSkill));
+    }
+}
+
+public void ToggleEquipSkill(CharacterData characterData, SkillType skillType)
+{
+    if (characterData.equippedSkills.Contains(skillType))
+    {
+        characterData.equippedSkills.Remove(skillType);
+        Debug.Log("Unequipped: " + skillType);
+    }
+    else
+    {
+        if (characterData.equippedSkills.Count >= characterData.maxEquippedSkills)
+        {
+            Debug.Log("Cannot equip more than " + characterData.maxEquippedSkills + " skills.");
+            return;
+        }
+
+        characterData.equippedSkills.Add(skillType);
+        Debug.Log("Equipped: " + skillType);
+    }
+
+    characterData.SaveData();
+    PopulateAvailableSkills(characterData); // Refresh display
+}
+
+
+public void OnAvailableSkillClicked(Skill skill)
+{
+    Debug.Log("Clicked available skill: " + skill.skillName);
+    OnSkillButtonClick(skill); // Reuse your existing skill preview panel
+}
+
+
+
     public GameObject skillInfoPanel;
     public void OnSkillButtonClick(Skill skill)
 {
@@ -768,6 +858,7 @@ public void PopulateInventoryList() {
     }
 }
 
+/*
 
 public void UpdateSkillButtonImages(Companion companion)
 {
@@ -817,6 +908,7 @@ private void SetupSkillButton(string buttonName, SkillType skillType, Companion 
         Debug.LogError(buttonName + " GameObject not found.");
     }
 }
+*/
 
 
 

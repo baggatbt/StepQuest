@@ -93,28 +93,23 @@ public void PopulateSkillPanelWithCompanionSkills()
         return;
     }
 
-    // Clear existing buttons
     foreach (Transform child in companionSkillSelectionPanel.transform)
         Destroy(child.gameObject);
-    
-    skillButtons.Clear();
-    Debug.Log($"Populating skills for {activeCompanion.heroID}. Number of available skills: {activeCompanion.AvailableSkills.Count}");
 
-    foreach (SkillType skillType in activeCompanion.characterData.AvailableSkills)  // Changed to property access
+    skillButtons.Clear();
+
+    Debug.Log($"Populating skills for {activeCompanion.heroID}. Equipped: {activeCompanion.characterData.equippedSkills.Count}");
+
+    foreach (SkillType skillType in activeCompanion.characterData.equippedSkills)
     {
         Skill currentSkill = activeCompanion.GetSkillInstance(skillType);
-        if (currentSkill == null)
-        {
-            Debug.LogError("Skill instance is null for " + skillType);
-            continue;
-        }
-
-        Debug.Log($"Skill loaded: {currentSkill.skillName}, Active: {currentSkill.isActiveSkill}");
+        if (currentSkill == null) continue;
 
         if (currentSkill.isActiveSkill)
         {
             GameObject newButtonObj = Instantiate(skillButtonPrefab, companionSkillSelectionPanel.transform);
             Button buttonComponent = newButtonObj.GetComponent<Button>();
+
             if (buttonComponent != null)
             {
                 buttonComponent.onClick.AddListener(() => SelectAndUseSkill(currentSkill));
@@ -125,11 +120,13 @@ public void PopulateSkillPanelWithCompanionSkills()
                     Image buttonImage = newButtonObj.GetComponent<Image>();
                     buttonImage.sprite = currentSkill.iconImage;
                 }
-                Debug.Log("Button created for " + currentSkill.skillName);
+
+                Debug.Log("Button created for: " + currentSkill.skillName);
             }
         }
     }
 }
+
 
 
 
