@@ -647,6 +647,10 @@ public void PopulateInventoryList() {
     
      public void GoToBattle(String stageID)
 {
+    foreach (var companion in GameManager.Instance.currentParty)
+{
+    Debug.Log($"[GoToBattle] Companion: {companion.heroID}");
+}
     // Find the first stage (stage 1.1)
     StageData selectedStage = GameManager.Instance.allStagesData.Find(stage => stage.stageID == stageID);
 

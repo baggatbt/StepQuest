@@ -19,6 +19,8 @@ public class GameManager : MonoBehaviour
     public GameObject knightPrefab; 
     public GameObject archerPrefab; 
     public GameObject wizardPrefab;
+    public GameObject tamedGoblinPrefab;
+
     public GameObject characterSelectionPanel;
     public BattleConfig CurrentBattleConfig; 
     public Stage CurrentStage; // Track the current stage
@@ -154,6 +156,9 @@ public class GameManager : MonoBehaviour
             return knightPrefab;
         case "Archer":
             return archerPrefab;
+        case "TamedGoblin":
+            return tamedGoblinPrefab;
+    
         // Add cases for other characters
         default:
             return null;
@@ -210,12 +215,15 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Attempting to save party");
         List<string> companionDataList = new List<string>();
-        foreach (var companion in currentParty)
-        {
-            string json = SerializationHelper.SerializeCompanion(companion);
-            companionDataList.Add(json);
-            Debug.Log("Saved companion: " + companion);
-        }
+       foreach (var companion in currentParty)
+{
+    if (string.IsNullOrEmpty(companion.heroID))
+        Debug.LogError("Companion has missing heroID!");
+
+    string json = SerializationHelper.SerializeCompanion(companion);
+    companionDataList.Add(json);
+}
+
         string jsonList = JsonUtility.ToJson(new SerializableList<string>(companionDataList));
         PlayerPrefs.SetString("CurrentParty", jsonList);
         PlayerPrefs.Save();
@@ -243,36 +251,30 @@ public class GameManager : MonoBehaviour
     }
 
     private Companion InstantiateCompanion(CompanionData data)
+{
+    GameObject prefab = null;
+    
+    if (data.heroID == "Knight")
+        prefab = Instantiate(knightPrefab);
+    else if (data.heroID == "Archer")
+        prefab = Instantiate(archerPrefab);
+    else if (data.heroID == "TamedGoblin") // ✅ ← You are missing this
+        prefab = Instantiate(tamedGoblinPrefab);
+
+    if (prefab != null)
     {
-        GameObject prefab = null;
-        if (data.heroID == "Knight")
-        {
-            prefab = Instantiate(knightPrefab);  // Assign your Knight prefab here
-        }
-        if (data.heroID == "Archer")
-        {
-            prefab = Instantiate(archerPrefab);  // Assign your Knight prefab here
-        }
-        // Handle other heroID cases...
+        var companion = prefab.GetComponent<Companion>();
+        companion.heroID = data.heroID;
+        companion.heroLevel = data.heroLevel;
+        // Optionally set other fields
 
-        if (prefab != null)
-        {
-            var companion = prefab.GetComponent<Companion>();
-            companion.heroID = data.heroID;
-            companion.heroLevel = data.heroLevel;
-            // Set other properties...
-
-            if (data is KnightData knightData && companion is Knight knight)
-            {
-                
-                // Set other Knight-specific properties...
-            }
-
-            return companion;
-        }
-
-        return null;
+        return companion;
     }
+
+    Debug.LogError($"[InstantiateCompanion] Could not instantiate prefab for {data.heroID}");
+    return null;
+}
+
 
     [Serializable]
     private class SerializableList<T>
@@ -310,8 +312,10 @@ public class GameManager : MonoBehaviour
     {
         ReassignInventoryComponent();
         LoadAllCompanionData();
-        ClearCurrentParty();
-        LoadDefaultPartyCharacter();
+       // ClearCurrentParty();
+       // LoadDefaultPartyCharacter();  
+        LoadCurrentParty();
+       
     }
 
     public void LoadDefaultPartyCharacter()
@@ -551,6 +555,9 @@ public class GameManager : MonoBehaviour
             break;
         case "Wizard":
             companionObject = Instantiate(wizardPrefab);
+            break;
+        case "TamedGoblin":
+            companionObject = Instantiate(tamedGoblinPrefab);
             break;
         // Add cases for other companions
     }
