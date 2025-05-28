@@ -1,11 +1,10 @@
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
+using UnityEngine;
 
 public class MissionManager : MonoBehaviour
 {
     public static MissionManager Instance { get; private set; }
-
     [SerializeField] private MissionDefinition[] missionDefinitions;
 
     // Runtime data (id → state)
@@ -52,10 +51,8 @@ public class MissionManager : MonoBehaviour
 
     #region Public API
 
-    /// <summary>How many missions are currently running.</summary>
     public int ActiveMissionCount => missions.Values.Count(m => m.isActive);
 
-    /// <summary>Start mission if a slot is free (max 2 for now). Returns true on success.</summary>
     public bool StartMission(string id)
     {
         if (!missions.TryGetValue(id, out var m))
@@ -64,7 +61,7 @@ public class MissionManager : MonoBehaviour
             return false;
         }
 
-        const int maxActive = 2; // TODO: make this upgradable
+        const int maxActive = 2;
         if (m.isActive || ActiveMissionCount >= maxActive)
             return false;
 
@@ -75,14 +72,6 @@ public class MissionManager : MonoBehaviour
         return true;
     }
 
-    /// <summary>Maximum number of stored rewards for this mission.</summary>
-public int GetRewardCapacity(string id)
-    => missions.TryGetValue(id, out var m)
-       ? m.definition.rewardCapacity
-       : 0;
-
-
-    /// <summary>Claim all accumulated rewards; returns false if none available.</summary>
     public bool ClaimMission(string id)
     {
         if (!missions.TryGetValue(id, out var m) || !m.HasRewards)
@@ -92,26 +81,21 @@ public int GetRewardCapacity(string id)
         foreach (var item in items)
             GameManager.Instance.AddItem(item);
 
-        // If you want to stop the mission on claim, uncomment:
-        // m.isActive = false;
-        // m.Save();
-
         return true;
     }
 
-    /// <summary>0–1 fill of how full the reward buffer is.</summary>
     public float GetProgress01(string id)
         => missions.TryGetValue(id, out var m) ? m.ProgressNormalized : 0f;
 
-    /// <summary>How many whole rewards are waiting to be claimed.</summary>
     public int GetPendingRewardCount(string id)
         => missions.TryGetValue(id, out var m) ? m.pendingRewards : 0;
 
-    /// <summary>Is this mission currently running?</summary>
+    public int GetRewardCapacity(string id)
+        => missions.TryGetValue(id, out var m) ? m.definition.rewardCapacity : 0;
+
     public bool IsActive(string id)
         => missions.TryGetValue(id, out var m) && m.isActive;
 
-    /// <summary>Has this mission generated any rewards?</summary>
     public bool HasRewards(string id)
         => missions.TryGetValue(id, out var m) && m.HasRewards;
 
@@ -121,10 +105,14 @@ public int GetRewardCapacity(string id)
 [System.Serializable]
 public struct MissionDefinition
 {
-    public string            id;               // unique key, e.g. "LoggingOne"
-    public int               stepsPerReward;   // e.g. 100 steps → 1 wood
-    public int               rewardCapacity;   // max stored rewards before you must claim
-    public MissionDropTable  dropTable;        // what items to roll per reward
+    public string           id;               // "LoggingOne"
+    public string           skillID;          // e.g. "Woodcutting"
+    public int              capacityPerLevel; // extra storage per skill level
+    public float            efficiencyPerLevel; // speed bonus per level
+    public int              stepsPerReward;   // base steps → 1 reward
+    public int              rewardCapacity;   // base storage capacity
+    public int              xpPerReward;      // NEW: XP to award per reward claimed
+    public MissionDropTable dropTable;
 }
 
 [System.Serializable]
@@ -137,12 +125,17 @@ public class MissionState
     public int    pendingRewards;
     public int    leftoverSteps;
 
-    /// <summary>True if there’s anything to claim.</summary>
     public bool HasRewards => pendingRewards > 0;
 
-    /// <summary>Fraction of rewardCapacity filled (0–1).</summary>
     public float ProgressNormalized
-        => Mathf.Clamp01((float)pendingRewards / definition.rewardCapacity);
+    {
+        get
+        {
+            int lvl    = TaskSkillManager.Instance.GetLevel(definition.skillID);
+            int maxCap = definition.rewardCapacity + lvl * definition.capacityPerLevel;
+            return Mathf.Clamp01((float)pendingRewards / maxCap);
+        }
+    }
 
     private string Key(string suffix) => $"Mission_{id}_{suffix}";
 
@@ -152,12 +145,14 @@ public class MissionState
         {
             definition      = def,
             id              = def.id,
+            isActive        = PlayerPrefs.GetInt(msKey(def.id, "Active"),  0) == 1,
+            pendingRewards  = PlayerPrefs.GetInt(msKey(def.id, "Pending"), 0),
+            leftoverSteps   = PlayerPrefs.GetInt(msKey(def.id, "Leftover"),0)
         };
-        ms.isActive       = PlayerPrefs.GetInt(ms.Key("Active"),  0) == 1;
-        ms.pendingRewards = PlayerPrefs.GetInt(ms.Key("Pending"), 0);
-        ms.leftoverSteps  = PlayerPrefs.GetInt(ms.Key("Leftover"),0);
         return ms;
     }
+
+    private static string msKey(string id, string suffix) => $"Mission_{id}_{suffix}";
 
     public void Save()
     {
@@ -167,39 +162,37 @@ public class MissionState
         PlayerPrefs.Save();
     }
 
-    /// <summary>
-    /// Add step progress, convert into whole rewards up to capacity,
-    /// and carry over any leftover steps.
-    /// </summary>
     public void AddProgress(int steps)
     {
         if (!isActive) return;
 
-        leftoverSteps += steps;
+        int lvl       = TaskSkillManager.Instance.GetLevel(definition.skillID);
+        int maxCap    = definition.rewardCapacity + lvl * definition.capacityPerLevel;
+        float scale   = 1f - lvl * definition.efficiencyPerLevel;
+        int effSPR    = Mathf.Max(1, Mathf.RoundToInt(definition.stepsPerReward * scale));
 
-        int produced = leftoverSteps / definition.stepsPerReward;
+        leftoverSteps += steps;
+        int produced  = leftoverSteps / effSPR;
         if (produced > 0)
         {
-            int space = definition.rewardCapacity - pendingRewards;
+            int space = maxCap - pendingRewards;
             int toAdd = Mathf.Min(produced, space);
             pendingRewards += toAdd;
-            leftoverSteps  -= toAdd * definition.stepsPerReward;
+            leftoverSteps  -= toAdd * effSPR;
         }
-
         Save();
     }
 
-    /// <summary>
-    /// Roll dropTable once per pendingReward, reset buffer, but keep leftoverSteps.
-    /// </summary>
     public List<Item> ClaimAllRewards()
     {
+        // — Award XP before clearing pendingRewards —
+        int totalXP = pendingRewards * definition.xpPerReward;
+        TaskSkillManager.Instance.AddXP(definition.skillID, totalXP);
+
+        // — Roll items —
         var allItems = new List<Item>();
         for (int i = 0; i < pendingRewards; i++)
-        {
-            var rewards = definition.dropTable.RollRewards();
-            allItems.AddRange(rewards);
-        }
+            allItems.AddRange(definition.dropTable.RollRewards());
 
         pendingRewards = 0;
         Save();
