@@ -325,6 +325,69 @@ private Vector2 collisionContactPoint = Vector2.zero;
 
 */
 
+public IEnumerator HitStop(float freezeDuration)
+{
+    // Pause everything
+    Time.timeScale = 0f;
+    // Wait in real time (ignores timeScale)
+    yield return new WaitForSecondsRealtime(freezeDuration);
+    // Resume normal time
+    Time.timeScale = 1f;
+}
+
+public IEnumerator KnockbackVisual2D(Transform enemy, Vector2 impactDirectionXY, float distance, float duration)
+{
+    // 1) Record the enemy’s exact start position (so we can snap it right back later)
+    Vector3 originalPos = enemy.position;
+
+    // 2) Compute the target “knockback” position in X/Y (leave Z unchanged)
+    Vector3 targetPos = originalPos + new Vector3(impactDirectionXY.x, impactDirectionXY.y, 0f) * distance;
+
+    float half = duration * 0.5f;
+    float t = 0f;
+
+    // 3) Lerp OUT from original → target over half the duration
+    while (t < half)
+    {
+        t += Time.deltaTime;
+        float pct = Mathf.SmoothStep(0f, 1f, t / half);
+        enemy.position = Vector3.Lerp(originalPos, targetPos, pct);
+        yield return null;
+    }
+
+    // 4) Lerp BACK from target → original over the other half
+    t = 0f;
+    while (t < half)
+    {
+        t += Time.deltaTime;
+        float pct = Mathf.SmoothStep(0f, 1f, t / half);
+        enemy.position = Vector3.Lerp(targetPos, originalPos, pct);
+        yield return null;
+    }
+
+    // 5) Force it exactly back (in case of any tiny float drift)
+    enemy.position = originalPos;
+}
+
+/// <summary>
+/// Call this from TakeDamage(…) instead of using transform.forward.
+/// </summary>
+private void DoKnockback(Transform enemyTransform, Transform attackerTransform)
+{
+    // Compute a 2D direction in X/Y from attacker → enemy
+    Vector3 diff = enemyTransform.position - attackerTransform.position;
+    Vector2 dir2D = new Vector2(diff.x, diff.y).normalized;
+
+    // Tweak these to taste:
+    float pushDistance = .25f;   // how far (units) the enemy jolts
+    float totalTime    = .3f;  // how long “out-and-back” lasts
+
+    StartCoroutine(KnockbackVisual2D(enemyTransform, dir2D, pushDistance, totalTime));
+}
+
+
+
+
 
     
 
@@ -372,6 +435,9 @@ private Vector2 collisionContactPoint = Vector2.zero;
         Debug.Log("did block from character" + this.didBlock);
         if (!this.didBlock){
         this.animator.SetTrigger("IsHurtTrigger");
+        // Replace attacker.transform.forward * -1 with a proper 2D direction:
+    //DISABLED WHILE TESTING ANIMATIONS DoKnockback(this.transform, attacker.transform);
+        
         StartCoroutine(TintRed());
         }
         // Trigger hit reaction, damage popup, etc.
