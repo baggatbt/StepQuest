@@ -123,20 +123,40 @@ public class PlayerData : MonoBehaviour
 
     public static event Action<int> OnStepsAdded;
 
+    public int GetCurrentStepCap()
+    {
+        if (TownCore.Instance == null)
+        {
+            // If TownCore hasn’t initialized yet, fall back to a default (level 1 cap):
+            return 1000;
+        }
+        return TownCore.Instance.GetCurrentStepCap();
+    }
+
     private void UpdateSteps()
     {
         newSensorTotal = stepCounterController.GetTotalSteps();
-        newSteps       = newSensorTotal - currentSensorTotal;
+        newSteps = newSensorTotal - currentSensorTotal;
 
         if (newSteps > 0)
         {
-            inGameSteps        += newSteps;
+            inGameSteps += newSteps;
+
+            // ─── CLAMP to **TownCore** cap ─────────────────────────────────────────
+            int cap = GetCurrentStepCap();
+            if (inGameSteps > cap)
+                inGameSteps = cap;
+            // ───────────────────────────────────────────────────────────────────────
+
             currentSensorTotal = newSensorTotal;
+
             OnStepsAdded?.Invoke(newSteps);
 
-            foreach (var b in buildings)
-                if (b.IsProducing())
-                    b.AccumulateProduction(newSteps);
+            foreach (Building building in buildings)
+            {
+                if (building.IsProducing())
+                    building.AccumulateProduction(newSteps);
+            }
 
             SavePlayerData();
         }
