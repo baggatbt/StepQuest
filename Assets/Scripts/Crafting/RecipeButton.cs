@@ -1,8 +1,7 @@
 using UnityEngine;
-using UnityEngine.UI;  // needed for Button
+using UnityEngine.UI;  // <— needed for Button
 
-[RequireComponent(typeof(Button))]
-public class CraftButton : MonoBehaviour
+public class RecipeButton : MonoBehaviour
 {
     [Tooltip("Drag your CraftingManager here")]
     public CraftingManager craftingManager;
@@ -14,12 +13,14 @@ public class CraftButton : MonoBehaviour
 
     private void Awake()
     {
+        // Cache the Button component (requires UnityEngine.UI)
         _button = GetComponent<Button>();
         if (_button == null)
         {
-            Debug.LogError("CraftButton requires a Button component on the same GameObject.");
+            Debug.LogError("RecipeButton requires a Button component on the same GameObject.");
             return;
         }
+
         _button.onClick.AddListener(OnClicked);
     }
 
@@ -33,11 +34,10 @@ public class CraftButton : MonoBehaviour
     {
         if (craftingManager == null || recipe == null)
         {
-            Debug.LogWarning("CraftingManager or Recipe is not assigned on CraftButton.");
+            Debug.LogWarning("CraftingManager or Recipe is not assigned on RecipeButton.");
             return;
         }
 
-        // Call the new StartCrafting(...) method
         craftingManager.StartCrafting(recipe);
     }
 }
