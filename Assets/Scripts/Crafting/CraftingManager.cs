@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using System;       
 
 /// <summary>
 /// A step-driven crafting system that:
@@ -17,6 +18,8 @@ public class CraftingManager : MonoBehaviour
     [Header("References")]
     [Tooltip("Drag your GameManager (with AddItem/HasItem/RemoveItem) here")]
     public GameManager gameManager;
+
+    public event Action OnCraftingLevelChanged;
 
     // ─────────────────────────────────────────────────────────────────────────
     // Internals
@@ -194,6 +197,9 @@ public class CraftingManager : MonoBehaviour
         craftingLevel = Mathf.Max(0, craftingLevel + delta);
         SaveCraftingLevel();
         Debug.Log($"[Crafting] Crafting level is now {craftingLevel}.");
+
+        // 2) Fire the event here:
+        OnCraftingLevelChanged?.Invoke();
     }
 
     /// <summary>
