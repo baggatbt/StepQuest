@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
+using TMPro;
 
 /// <summary>
 /// Dynamically shows only those recipes whose requiredCraftingLevel
@@ -73,10 +73,10 @@ public class CraftingUIManager : MonoBehaviour
                     Debug.LogError("recipeButtonPrefab is missing a RecipeButton component!");
                 }
 
-                // Optionally set the button’s visual text/icon:
-                // TextMeshProUGUI nameText = go.GetComponentInChildren<TextMeshProUGUI>();
-                // if (nameText != null)
-                //     nameText.text = recipe.outputItem.itemName;
+                // set the button’s visual text/icon:
+                 TextMeshProUGUI nameText = go.GetComponentInChildren<TextMeshProUGUI>();
+                 if (nameText != null)
+                     nameText.text = recipe.outputItem.itemName;
             }
         }
     }
