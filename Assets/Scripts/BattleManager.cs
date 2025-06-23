@@ -905,15 +905,15 @@ public class BattleManager : MonoBehaviour
     public void EndOfBattleRewards(List<Character> enemies)
     {
         int totalExp = 0;
-        int totalGold = 0;
+        int totalCopper = 0;
 
         foreach (Enemy enemy in enemies)
         {
             totalExp += enemy.expReward;
-            totalGold += enemy.goldReward;
+            totalCopper += enemy.goldReward;
         }
 
-       // PlayerData.Instance.gold += totalGold;
+        PlayerData.Instance.totalCopper += totalCopper;
         PlayerData.Instance.SavePlayerData();
 
         foreach (Character character in playerParty)
@@ -930,7 +930,7 @@ public class BattleManager : MonoBehaviour
         expGainedTextComponent.text = totalExp.ToString();
 
         TextMeshProUGUI goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
-        goldGainedTextComponent.text = totalGold.ToString();
+        goldGainedTextComponent.text = totalCopper.ToString();
 
         DisplayExpToLevel(playerParty);
     }

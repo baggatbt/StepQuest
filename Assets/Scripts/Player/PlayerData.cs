@@ -24,61 +24,69 @@ public class PlayerData : MonoBehaviour
     private int newSensorTotal;       // fresh sensor total each tick
 
     private void Awake()
+{
+    if (_instance == null)
     {
-        if (_instance == null)
+        _instance = this;
+        DontDestroyOnLoad(gameObject);
+
+        InitializeStepCounter();
+        LoadPlayerData();
+        buildings = FindObjectsOfType<Building>();
+
+        if (firstTimeLogin)
         {
-            _instance = this;
-            DontDestroyOnLoad(gameObject);
-
-            InitializeStepCounter();
-            LoadPlayerData();
-            buildings = FindObjectsOfType<Building>();
-
-            if (firstTimeLogin)
-            {
-                HandleFirstLogin();
-            }
-            else
-            {
-                // 1) grab fresh cumulative total
-                int totalSensorSteps = stepCounterController.GetTotalSteps();
-
-                // 2) compute “offline” delta with reset-detection (Option A)
-                int offlineSteps;
-                if (totalSensorSteps >= baselineSteps)
-                {
-                    // normal case: just diff
-                    offlineSteps = totalSensorSteps - baselineSteps;
-                }
-                else
-                {
-                    // sensor reset detected: credit everything since boot
-                    offlineSteps = totalSensorSteps;
-                }
-
-                if (offlineSteps > 0)
-                {
-                    inGameSteps           += offlineSteps;
-                    currentSensorTotal     = totalSensorSteps;
-                    baselineSteps          = totalSensorSteps;
-                    SavePlayerData();
-                    OnStepsAdded?.Invoke(offlineSteps);
-
-                    // immediately produce resources for each building
-                    foreach (var b in buildings)
-                        if (b.IsProducing())
-                            b.AccumulateProduction(offlineSteps);
-                }
-
-                // 3) now start live updates
-                stepCoroutine = StartCoroutine(RunStepRelatedFunctions());
-            }
+            HandleFirstLogin();
         }
         else
         {
-            Destroy(gameObject);
+            // 1) grab fresh cumulative total
+            int totalSensorSteps = stepCounterController.GetTotalSteps();
+
+            // 2) compute “offline” delta with reset-detection
+            int offlineSteps;
+            if (totalSensorSteps >= baselineSteps)
+            {
+                // normal case: just diff
+                offlineSteps = totalSensorSteps - baselineSteps;
+            }
+            else
+            {
+                // sensor reset detected: credit everything since boot
+                offlineSteps = totalSensorSteps;
+            }
+
+            if (offlineSteps > 0)
+            {
+                inGameSteps += offlineSteps;
+
+                // ─── CLAMP to TownCore step cap ─────────────────────────────
+                int cap = GetCurrentStepCap();
+                if (inGameSteps > cap)
+                    inGameSteps = cap;
+                // ───────────────────────────────────────────────────────────
+
+                currentSensorTotal = totalSensorSteps;
+                baselineSteps = totalSensorSteps;
+                SavePlayerData();
+                OnStepsAdded?.Invoke(offlineSteps);
+
+                // immediately produce resources for each building
+                foreach (var b in buildings)
+                    if (b.IsProducing())
+                        b.AccumulateProduction(offlineSteps);
+            }
+
+            // 3) now start live updates
+            stepCoroutine = StartCoroutine(RunStepRelatedFunctions());
         }
     }
+    else
+    {
+        Destroy(gameObject);
+    }
+}
+
 
     // Persist on pause/quit so baselineSteps is always up-to-date
     private void OnApplicationPause(bool pauseStatus)

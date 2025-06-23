@@ -313,7 +313,7 @@ public class GameManager : MonoBehaviour
         ReassignInventoryComponent();
         LoadAllCompanionData();
        // ClearCurrentParty();
-       // LoadDefaultPartyCharacter();  
+        LoadDefaultPartyCharacter();  
         LoadCurrentParty();
        
     }
