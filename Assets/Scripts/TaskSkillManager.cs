@@ -108,6 +108,9 @@ public class TaskSkillManager : MonoBehaviour
         xps[skillID] += gain;
         int lvl    = GetLevel(skillID);
         int needed = GetXPThreshold(skillID, lvl);
+        Debug.Log($"Woodcutting XP TOTAL: " +
+          TaskSkillManager.Instance.GetCurrentXP("Woodcutting"));
+
 
         // level up while we have enough XP
         while (xps[skillID] >= needed)
