@@ -230,20 +230,35 @@ public class GameManager : MonoBehaviour
     }
 
     public void LoadCurrentParty()
+{
+    // Do we even have saved party data?
+    if (!PlayerPrefs.HasKey("CurrentParty"))
     {
-        currentParty.Clear();
-        string jsonList = PlayerPrefs.GetString("CurrentParty", "{}");
-        var companionDataList = JsonUtility.FromJson<SerializableList<string>>(jsonList);
-        Debug.Log("Attempting to load party");
-
-        foreach (var json in companionDataList.Items)
-        {
-            CompanionData data = SerializationHelper.DeserializeCompanionData(json);
-            Companion companion = InstantiateCompanion(data);
-            currentParty.Add(companion);
-            Debug.Log("Added" + companion + "to party");
-        }
+        Debug.Log("No saved party; keeping whatever is already in currentParty.");
+        return;
     }
+
+    string jsonList = PlayerPrefs.GetString("CurrentParty", "");
+    if (string.IsNullOrEmpty(jsonList))
+    {
+        Debug.Log("Saved party string empty; skipping load.");
+        return;
+    }
+
+    Debug.Log("Loading saved party from PlayerPrefs…");
+    // Now clear only because we know we're about to overwrite
+    currentParty.Clear();
+
+    var companionDataList = JsonUtility.FromJson<SerializableList<string>>(jsonList);
+    foreach (var json in companionDataList.Items)
+    {
+        var data = SerializationHelper.DeserializeCompanionData(json);
+        var companion = InstantiateCompanion(data);
+        currentParty.Add(companion);
+        Debug.Log($"Loaded and added to party: {data.heroID}");
+    }
+}
+
 
     public void ClearCurrentParty()
     {
