@@ -1,5 +1,7 @@
 using UnityEngine;
-using UnityEngine.UI;  // <— needed for Button
+using UnityEngine.UI;
+using TMPro;
+using System.Linq;
 
 public class RecipeButton : MonoBehaviour
 {
@@ -9,19 +11,32 @@ public class RecipeButton : MonoBehaviour
     [Tooltip("Drag the Recipe asset you want this button to trigger")]
     public Recipe recipe;
 
+    [Header("UI References")]
+    public TextMeshProUGUI nameText;
+    public TextMeshProUGUI requirementsText;        // <-- assign in Inspector
+    
+     public Transform requirementsContainer;
+     public GameObject materialRequirementPrefab; 
+
     private Button _button;
 
     private void Awake()
     {
-        // Cache the Button component (requires UnityEngine.UI)
         _button = GetComponent<Button>();
         if (_button == null)
-        {
-            Debug.LogError("RecipeButton requires a Button component on the same GameObject.");
-            return;
-        }
+            Debug.LogError("RecipeButton requires a Button component!");
 
         _button.onClick.AddListener(OnClicked);
+
+        // Populate UI immediately
+        if (nameText != null)
+            nameText.text = recipe.outputItem.itemName;
+
+        if (requirementsText != null)
+            requirementsText.text = BuildRequirementsString(recipe);
+
+        
+         PopulateRequirementsIcons(recipe);
     }
 
     private void OnDestroy()
@@ -34,10 +49,32 @@ public class RecipeButton : MonoBehaviour
     {
         if (craftingManager == null || recipe == null)
         {
-            Debug.LogWarning("CraftingManager or Recipe is not assigned on RecipeButton.");
+            Debug.LogWarning("Missing CraftingManager or Recipe on RecipeButton.");
             return;
         }
-
         craftingManager.StartCrafting(recipe);
     }
+
+    private string BuildRequirementsString(Recipe recipe)
+    {
+        // e.g. "2 × Wood\n1 × Iron Ore"
+        return string.Join("\n",
+            recipe.materialRequirements
+                  .Select(r => $"{r.quantity} × {r.material.itemName}")
+        );
+    }
+
+    
+    private void PopulateRequirementsIcons(Recipe recipe)
+    {
+        foreach (var req in recipe.materialRequirements)
+        {
+            var go = Instantiate(materialRequirementPrefab, requirementsContainer);
+            var img = go.GetComponentInChildren<Image>();
+            var txt = go.GetComponentInChildren<TextMeshProUGUI>();
+            img.sprite = req.material.itemIcon;    // assuming MaterialItem has an icon
+            txt.text       = req.quantity.ToString();
+        }
+    }
+    
 }
