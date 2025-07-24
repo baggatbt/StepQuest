@@ -436,7 +436,7 @@ private void DoKnockback(Transform enemyTransform, Transform attackerTransform)
         if (!this.didBlock){
         this.animator.SetTrigger("IsHurtTrigger");
         // Replace attacker.transform.forward * -1 with a proper 2D direction:
-    //DISABLED WHILE TESTING ANIMATIONS DoKnockback(this.transform, attacker.transform);
+    DoKnockback(this.transform, attacker.transform);
         
         StartCoroutine(TintRed());
         }
