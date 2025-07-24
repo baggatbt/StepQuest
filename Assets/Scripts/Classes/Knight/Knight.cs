@@ -44,16 +44,22 @@ public class Knight : Companion
     }
 
     public void UpdateStats()
-    {
-        this.maxHealth = BASE_HEALTH + (this.level - 1) * HEALTH_GROWTH;
-        this.health = this.maxHealth;
+{
+    int lvl = heroLevel;  // use the Companion’s heroLevel, not Character.level
 
-        this.attackPower = BASE_ATTACK + (this.level - 1) * ATTACK_GROWTH;
-        this.speed = BASE_SPEED + Mathf.FloorToInt((this.level - 1) / 3);
-        this.defensePower = BASE_DEFENSE + Mathf.FloorToInt((this.level - 1) / 4);
-        this.maxEnergy = BASE_ENERGY + Mathf.FloorToInt((this.level - 1) / 2);
-        this.energy = this.maxEnergy;
-    }
+    maxHealth   = BASE_HEALTH + (lvl - 1) * HEALTH_GROWTH;
+    health      = maxHealth;
+
+    attackPower = BASE_ATTACK + (lvl - 1) * ATTACK_GROWTH;
+
+    // force float division so your growth works correctly
+    speed       = BASE_SPEED + Mathf.FloorToInt((lvl - 1) / 3f);
+    defensePower= BASE_DEFENSE + Mathf.FloorToInt((lvl - 1) / 4f);
+
+    maxEnergy   = BASE_ENERGY + Mathf.FloorToInt((lvl - 1) / 2f);
+    energy      = maxEnergy;
+}
+
 
     public override void LevelUp()
     {
