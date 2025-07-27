@@ -67,7 +67,8 @@ public class Inventory : MonoBehaviour
 
             Image itemImage = slot.transform.Find("ItemContainer")?.GetComponent<Image>();
             TextMeshProUGUI itemCountText = slot.transform.Find("ItemCountText")?.GetComponent<TextMeshProUGUI>();
-            Button equipButton = slot.GetComponent<Button>();
+            Button equipButton = slot.transform.Find("UseButton")?.GetComponent<Button>();
+
 
             if (i < items.Count)
             {
@@ -95,13 +96,15 @@ public class Inventory : MonoBehaviour
 
                         if (isCorrectSlot)
                         {
+                            Equipment localEquipment = equipment; // ← This prevents closure issues
                             equipButton.onClick.AddListener(() =>
                             {
-                                Debug.Log($"Clicked to equip {equipment.itemName} into {pendingEquipSlot} slot");
-                                equipmentManager.Equip(equipment);
+                                Debug.Log($"Clicked to equip {localEquipment.itemName} into {pendingEquipSlot} slot");
+                                equipmentManager.Equip(localEquipment);
                                 inventoryUI.SetActive(false);
                             });
                         }
+
                     }
                     else
                     {
