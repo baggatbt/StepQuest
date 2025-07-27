@@ -38,35 +38,22 @@ public class EquipSlotContainer : MonoBehaviour
 
     //────────────────────────────────────────────────────────────────
     private void OnEquipSlotClicked(EquipmentType slotType)
+{
+    Debug.Log($"Equip slot clicked: {slotType}");
+
+    CharacterData cd = GameManager.Instance.currentCompanionData;
+    if (cd == null)
     {
-        Debug.Log($"Equip slot clicked: {slotType}");
-
-        CharacterData cd = GameManager.Instance.currentCompanionData;
-        if (cd == null)
-        {
-            Debug.LogWarning("No CharacterData selected – can’t modify equipment.");
-            return;
-        }
-
-        // If something is already equipped → Unequip
-        if (cd.GetEquipped(slotType) != null)
-        {
-            Debug.Log($"Unequipping item from {slotType}");
-            equipmentManager.Unequip(slotType);
-        }
-        else
-        {
-            // Try to fetch a matching item from the player’s inventory
-            Equipment equip = GameManager.Instance.GetItemForSlot(slotType);
-            if (equip != null)
-            {
-                Debug.Log($"Equipping {equip.itemName}");
-                equipmentManager.Equip(equip);
-            }
-            else
-            {
-                Debug.LogWarning($"No item available for slot {slotType}");
-            }
-        }
+        Debug.LogWarning("No CharacterData selected – can’t modify equipment.");
+        return;
     }
+
+    // NEW: Just open inventory and store selected slot
+    Inventory inventory = GameManager.Instance.inventory;
+    if (inventory != null)
+    {
+        inventory.OpenInventoryForEquip(slotType);
+    }
+}
+
 }

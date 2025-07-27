@@ -241,6 +241,7 @@ public class CraftingManager : MonoBehaviour
                 for (int i = 0; i < job.recipe.outputQuantity; i++)
                 {
                     gameManager.AddItem(job.recipe.outputItem);
+                    TaskSkillManager.Instance.AddXP("Crafting", job.recipe.expForCraft);//TODO HARD CODED 1XP, SHOULD COME FROM RECIPE
                 }
 
                 Debug.Log($"[Crafting] Completed '{job.recipe.outputItem.itemName}' ×{job.recipe.outputQuantity}.");

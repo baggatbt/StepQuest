@@ -88,6 +88,7 @@ public class Knight : Companion
         SkillType.TripleHit,
         SkillType.Taunt,
         SkillType.SpeedBreak,
+        SkillType.SwordWave
     };
 
     private List<SkillType> mainSkills = new List<SkillType>
@@ -95,7 +96,8 @@ public class Knight : Companion
         SkillType.Slash,
         SkillType.TripleHit,
         SkillType.Taunt,
-        SkillType.SpeedBreak
+        SkillType.SpeedBreak,
+        SkillType.SwordWave
     };
 
     public override List<SkillType> MainSkills => mainSkills;
@@ -114,6 +116,8 @@ public class Knight : Companion
                 return new ReflectDamagePassive();
             case SkillType.SpeedBreak:
                 return new SpeedBreak();
+            case SkillType.SwordWave:
+                return new SwordWave();
             default:
                 Debug.LogError("Unknown skill type for Knight: " + skillType);
                 return null;

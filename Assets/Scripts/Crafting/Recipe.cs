@@ -10,6 +10,7 @@ public class Recipe : ScriptableObject
     [Header("Output (can be MaterialItem, Equipment, etc.)")]
     public Item outputItem;
     public int outputQuantity = 1;
+    public int expForCraft;
 
     [Header("Crafting Duration (in steps)")]
     [Tooltip("How many steps this recipe takes before it finishes")]

@@ -55,6 +55,9 @@ public class SwordWave : Skill
        
         yield return new WaitUntil(() => projectileScript.isColliding == true);
         user.isAttacking = false;
+        user.isAnimationDone = false;
+        
+        bonusGained = false;
         
     }
 }
