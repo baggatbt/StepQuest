@@ -29,58 +29,45 @@ public class ShootArrow : Skill
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
 {
     user.isAttacking = true;
-    Projectile projectileScript = null;  
+    Projectile projectileScript = null;
     int baseDamage = CalculateBaseDamage(user);
     user.animator.SetBool("isHoldOver", false);
     user.animator.SetTrigger("IsHolding");
-    
 
-    // Find the ArrowSpawnLocation in the user's hierarchy
     Transform arrowSpawnTransform = user.transform.Find("ArrowSpawnLocation");
     if (arrowSpawnTransform == null)
     {
         Debug.LogError("ArrowSpawnLocation not found in user's hierarchy");
-        yield break; // Exit the coroutine if the transform is not found
+        yield break;
     }
 
     yield return battleManager.PlayerHoldReleaseTimeEvent(0.0f, 1.0f, (result) =>
     {
         user.animator.SetBool("isHoldOver", true);
-        // Use the position and rotation of the ArrowSpawnLocation
-        Vector3 spawnPosition = arrowSpawnTransform.position;
-        Vector2 direction = (target.transform.position - spawnPosition).normalized;
+        Vector3 spawnPos = arrowSpawnTransform.position;
+        Vector2 direction = (target.transform.position - spawnPos).normalized;
         Quaternion rotation = Quaternion.Euler(0, 0, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);
-        GameObject arrow = UnityEngine.Object.Instantiate(arrowProjectile, spawnPosition, rotation);
-        
 
-        // Set the value of the projectile
+        GameObject arrow = Object.Instantiate(arrowProjectile, spawnPos, rotation);
         projectileScript = arrow.GetComponent<Projectile>();
+
         if (projectileScript != null)
         {
             projectileScript.damage = baseDamage;
-            projectileScript.speed = 40.0f;
-            projectileScript.Spawner = user;  // Set the spawner
-        }
-    
-          // Modify the projectile's damage based on the timing result
-           projectileScript.Target = target;  // Set the target of the projectile
-           
+            projectileScript.Spawner = user;
+            projectileScript.Target = target;
+            projectileScript.speed = 40f;
+            projectileScript.Initialize(direction, user);
+
             HandlePlayerRangedAttack(user, projectileScript, result);
-            
-            
-            
-      
+        }
     });
-        
-        Debug.Log("waiting on animation to finish");
-    
-        yield return new WaitUntil(() => user.isAnimationDone == true);
-        //user.GainEnergy(energyGain);
-        user.animationDamageTime = false;
-        user.isAnimationDone = false;
-        user.isAttacking = false;
-        
-     
-    
+
+    yield return new WaitUntil(() => user.isAnimationDone);
+    user.animationDamageTime = false;
+    user.isAnimationDone = false;
+    user.isAttacking = false;
+
 }
+
 }

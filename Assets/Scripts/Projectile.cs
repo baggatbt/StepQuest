@@ -1,37 +1,41 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
     public float speed;
     public Character Spawner { get; set; }
-    public Character Target { get; set; }  // Add a target property
+    public Character Target { get; set; }
     public int damage;
     public bool isColliding;
 
-    void Update()
+    private Vector2 moveDirection;
+
+    // Optional: call this if you're not setting transform.rotation manually
+    public void Initialize(Vector2 direction, Character spawner)
     {
-        // Moves the projectile in the direction it's facing
-        transform.Translate(Vector2.right * speed * Time.deltaTime, Space.Self);
+        moveDirection = direction.normalized;
+        Spawner = spawner;
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    private void Update()
+    {
+        if (moveDirection == Vector2.zero)
+            moveDirection = transform.right; // fallback to facing direction
+
+        transform.Translate(moveDirection * speed * Time.deltaTime, Space.World);
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
     {
         Debug.Log("Projectile collided");
-        if (!isColliding && other.GetComponent<Character>() == Target)  // Check if the collided object is the target
+
+        Character hit = other.GetComponent<Character>();
+        if (!isColliding && hit != null && hit == Target)
         {
             isColliding = true;
-            Target.TakeDamage(damage, Spawner);  // Pass Spawner as the attacker
+            Target.TakeDamage(damage, Spawner);
             Target.CheckForDeath();
-            Destroy(gameObject);  // Destroy the projectile on hit
+            Destroy(gameObject);
         }
     }
-
-
-
-
-     
 }
-
-

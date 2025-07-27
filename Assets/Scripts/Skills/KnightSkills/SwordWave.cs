@@ -5,69 +5,40 @@ using UnityEngine.UI;
 
 public class SwordWave : Skill
 {
-    
-    GameObject swordWaveProjectile = Resources.Load<GameObject>("PreFab/SwordWaveProjectile");
-
+    private GameObject projectilePrefab;
 
     public SwordWave()
     {
-        skillName = "SwordWave";
-        description = "Release a powerful wave from your sword.";
+        skillName = "Sword Wave";
+        description = "A ranged slash of energy.";
+        energyCost = 3;
+        energyGain = 1;
+        energyGainBonus = 1;
         requiresMovement = false;
-        energyCost = 2;
-    }
-
-    // Override the default base damage calculation.
-    protected override int CalculateBaseDamage(Character user)
-    {
-        return (int)(user.attackPower * 1.5);  // 150% of the character's attack.
+        noZoom = false;
+        skillDamageModifier = 1.2f;
+        projectilePrefab = Resources.Load<GameObject>("Prefab/Projectiles/SwordWaveProjectile");
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
-        user.isAttacking = true;
-        Projectile projectileScript = null;  // Declare projectileScript here
-        int baseDamage = CalculateBaseDamage(user);
+        Vector2 direction = (target.transform.position - user.transform.position).normalized;
+        int baseDamage = Mathf.CeilToInt(user.attackPower * skillDamageModifier);
 
-        
-
-        yield return battleManager.PlayerHoldReleaseTimeEvent(0.0f, 1.0f, (result) =>
-        {
-            
-            Vector3 spawnPosition = user.transform.position;
-            Vector2 direction = (target.transform.position - user.transform.position).normalized;
-            Quaternion rotation = Quaternion.Euler(0, 0, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);
-            GameObject swordWave = UnityEngine.Object.Instantiate(swordWaveProjectile, spawnPosition, rotation);
-
-            // Set the value of the projectile
-            projectileScript = swordWave.GetComponent<Projectile>();
-            if (projectileScript != null)
+        yield return battleManager.StartCoroutine(
+            battleManager.PlayerHoldReleaseTimeEvent(0.5f, 1.2f, (TimingEventResult result) =>
             {
-                projectileScript.damage = baseDamage;
-                projectileScript.speed = 7.5f;
-                projectileScript.Spawner = user;  // Set the spawner
-            }
+                GameObject proj = Object.Instantiate(projectilePrefab, user.transform.position, Quaternion.identity);
+                Projectile projectile = proj.GetComponent<Projectile>();
+                projectile.damage = baseDamage;
+                projectile.Spawner = user;
+                projectile.Target = target;
+                projectile.Initialize(direction, user);
 
+                HandlePlayerRangedAttack(user, projectile, result);
+            })
+        );
 
-            HandleAoeAttack(user, battleManager.enemies, result, baseDamage);
-          
-        });
-       
-        yield return new WaitUntil(() => projectileScript.isColliding == true);
-        user.isAttacking = false;
-        user.isAnimationDone = false;
-        
-        bonusGained = false;
-        
+        yield return new WaitForSeconds(0.3f);
     }
 }
-
-
-       
-      
-        
-
-
-
-
-
