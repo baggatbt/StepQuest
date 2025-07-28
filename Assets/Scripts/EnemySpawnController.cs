@@ -19,15 +19,26 @@ public class EnemySpawnController : MonoBehaviour
     public class EnemyPool
     {
         public string poolName;
-        public List<GameObject> enemies;
+        public List<WeightedEnemy> enemies;
+    }
+
+
+    [System.Serializable]
+    public class WeightedEnemy
+    {
+        public GameObject enemyPrefab;
+        [Range(0, 100)]
+        public int spawnWeight = 1; // Higher = more likely
     }
 
     public List<EnemyPool> enemyPools;
-    private Dictionary<string, List<GameObject>> poolDictionary;
+    private Dictionary<string, List<WeightedEnemy>> poolDictionary;
+
 
     private void Awake()
     {
-        poolDictionary = new Dictionary<string, List<GameObject>>();
+        poolDictionary = new Dictionary<string, List<WeightedEnemy>>();
+
         
         foreach (var pool in enemyPools)
         {
@@ -41,6 +52,29 @@ public class EnemySpawnController : MonoBehaviour
         mainCamera = Camera.main;
     }
 
+    private WeightedEnemy GetWeightedRandomEnemy(List<WeightedEnemy> enemies)
+{
+    int totalWeight = 0;
+    foreach (var enemy in enemies)
+    {
+        totalWeight += enemy.spawnWeight;
+    }
+
+    int randomValue = Random.Range(0, totalWeight);
+    int runningTotal = 0;
+
+    foreach (var enemy in enemies)
+    {
+        runningTotal += enemy.spawnWeight;
+        if (randomValue < runningTotal)
+        {
+            return enemy;
+        }
+    }
+
+    return enemies[0]; // fallback
+}
+
     public Character SpawnEnemiesFromPool(string poolName, Transform spawnPoint, Slider associatedHealthBarSlider, Slider associatedEnergyBarSlider, int healthTextIndex, int level, GameObject enemyHealthUI)
 {
     if (!poolDictionary.ContainsKey(poolName))
@@ -50,7 +84,8 @@ public class EnemySpawnController : MonoBehaviour
     }
 
     // Spawn one enemy only
-    GameObject enemyToSpawn = poolDictionary[poolName][Random.Range(0, poolDictionary[poolName].Count)];
+    WeightedEnemy selected = GetWeightedRandomEnemy(poolDictionary[poolName]);
+    GameObject enemyToSpawn = selected.enemyPrefab;
     float yOffset = 0.4f; // Offset for enemy spawn position above the spawn point
     GameObject spawnedEnemy = Instantiate(enemyToSpawn, new Vector3(spawnPoint.position.x, spawnPoint.position.y + yOffset, spawnPoint.position.z), spawnPoint.rotation);
 
