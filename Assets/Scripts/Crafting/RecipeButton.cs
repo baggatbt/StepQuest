@@ -5,15 +5,13 @@ using System.Linq;
 
 public class RecipeButton : MonoBehaviour
 {
-    [Tooltip("Drag your CraftingManager here")]
     public CraftingManager craftingManager;
-
-    [Tooltip("Drag the Recipe asset you want this button to trigger")]
     public Recipe recipe;
 
     [Header("UI References")]
-    public Image outputItemIcon; // <-- Drag your icon Image here
-    public TextMeshProUGUI quantityText; // <-- Shows how many can be crafted
+    public Image outputItemIcon;
+    public TextMeshProUGUI outputQuantityText;
+    public TextMeshProUGUI titleText;
     public Transform requirementsContainer;
     public GameObject materialRequirementPrefab;
 
@@ -26,7 +24,6 @@ public class RecipeButton : MonoBehaviour
             Debug.LogError("RecipeButton requires a Button component!");
 
         _button.onClick.AddListener(OnClicked);
-
         UpdateDisplay();
     }
 
@@ -43,69 +40,48 @@ public class RecipeButton : MonoBehaviour
             Debug.LogWarning("Missing CraftingManager or Recipe on RecipeButton.");
             return;
         }
+
         craftingManager.StartCrafting(recipe);
-        UpdateDisplay(); // Update UI after crafting
+        UpdateDisplay(); // Refresh UI after crafting
     }
 
     private void UpdateDisplay()
-{
-    if (recipe == null)
     {
-        Debug.LogError("[RecipeButton] No recipe assigned.");
-        return;
-    }
+        if (recipe == null || recipe.outputItem == null) return;
 
-    if (recipe.outputItem == null)
-    {
-        Debug.LogWarning($"[RecipeButton] Recipe {recipe.name} has no outputItem assigned.");
-        return;
-    }
+        if (titleText != null)
+            titleText.text = recipe.outputItem.itemName;
 
-    if (outputItemIcon == null)
-    {
-        Debug.LogError("[RecipeButton] OutputItemIcon is not assigned.");
-    }
-    else
-    {
-        if (recipe.outputItem.itemIcon == null)
-            Debug.LogWarning($"[RecipeButton] Item {recipe.outputItem.itemName} has no icon assigned.");
-        else
+        if (outputItemIcon != null && recipe.outputItem.itemIcon != null)
             outputItemIcon.sprite = recipe.outputItem.itemIcon;
-    }
 
-    int craftableCount = GetCraftableCount(recipe);
-    if (quantityText != null)
-    {
-        quantityText.text = $"x{craftableCount}";
-    }
+        int craftableCount = GetCraftableCount(recipe);
+        if (outputQuantityText != null)
+            outputQuantityText.text = $"x{craftableCount * recipe.outputQuantity}";
 
-    if (requirementsContainer == null || materialRequirementPrefab == null)
-    {
-        Debug.LogError("[RecipeButton] RequirementsContainer or MaterialRequirementPrefab not assigned.");
-        return;
-    }
-
-    foreach (Transform child in requirementsContainer)
-    {
-        Destroy(child.gameObject);
-    }
-
-    foreach (var req in recipe.materialRequirements)
-    {
-        if (req.material == null)
+        if (requirementsContainer == null || materialRequirementPrefab == null)
         {
-            Debug.LogWarning($"[RecipeButton] One of the recipe's materials is null in {recipe.name}.");
-            continue;
+            Debug.LogError("[RecipeButton] RequirementsContainer or MaterialRequirementPrefab not assigned.");
+            return;
         }
 
-        var go = Instantiate(materialRequirementPrefab, requirementsContainer);
-        var img = go.GetComponentInChildren<Image>();
-        var txt = go.GetComponentInChildren<TextMeshProUGUI>();
-        if (img != null) img.sprite = req.material.itemIcon;
-        if (txt != null) txt.text = req.quantity.ToString();
-    }
-}
+        foreach (Transform child in requirementsContainer)
+        {
+            Destroy(child.gameObject);
+        }
 
+        foreach (var req in recipe.materialRequirements)
+        {
+            if (req.material == null) continue;
+
+            GameObject go = Instantiate(materialRequirementPrefab, requirementsContainer);
+            var img = go.transform.Find("Icon")?.GetComponent<Image>();
+            var txt = go.transform.Find("QuantityText")?.GetComponent<TextMeshProUGUI>();
+
+            if (img != null) img.sprite = req.material.itemIcon;
+            if (txt != null) txt.text = $"x{req.quantity}";
+        }
+    }
 
     private int GetCraftableCount(Recipe recipe)
     {
@@ -122,7 +98,7 @@ public class RecipeButton : MonoBehaviour
             }
             else
             {
-                return 0; // Missing at least one material
+                return 0;
             }
         }
 
