@@ -826,6 +826,8 @@ public class BattleManager : MonoBehaviour
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
+        if (hit.collider == null)
+    Debug.Log("Raycast hit nothing.");
 
         if (hit.collider != null && !playerParty.Any(character => character.isAttacking))
         {
