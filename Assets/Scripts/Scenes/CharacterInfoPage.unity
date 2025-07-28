@@ -7567,6 +7567,7 @@ GameObject:
   - component: {fileID: 173716485}
   - component: {fileID: 173716484}
   - component: {fileID: 173716483}
+  - component: {fileID: 173716486}
   m_Layer: 5
   m_Name: StartBattleButton
   m_TagString: Untagged
@@ -7688,6 +7689,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 173716481}
   m_CullTransparentMesh: 1
+--- !u!114 &173716486
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 173716481}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e780a833e4ca85f459050ec89f7675a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startButton: {fileID: 173716483}
 --- !u!1 &175051599
 GameObject:
   m_ObjectHideFlags: 0
@@ -66613,7 +66627,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.3943615, y: 0.381}
   m_AnchorMax: {x: 0.6038141, y: 0.61350626}
-  m_AnchoredPosition: {x: 426, y: -3047.9968}
+  m_AnchoredPosition: {x: 426, y: -3047.9958}
   m_SizeDelta: {x: 2378.3086, y: 2251.2532}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1077219933
@@ -92164,7 +92178,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1770946113
 RectTransform:
   m_ObjectHideFlags: 0
@@ -92183,7 +92197,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -285, y: -195}
+  m_AnchoredPosition: {x: -232, y: 692}
   m_SizeDelta: {x: 204.94, y: 147}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1770946114

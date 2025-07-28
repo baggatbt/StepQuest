@@ -649,31 +649,37 @@ public void PopulateInventoryList() {
     }
 
     
-     public void GoToBattle(String stageID)
+     public void GoToBattle(string stageID)
 {
+    // Check if all companions have at least 1 stamina
     foreach (var companion in GameManager.Instance.currentParty)
-{
-    Debug.Log($"[GoToBattle] Companion: {companion.heroID}");
-}
-    // Find the first stage (stage 1.1)
+    {
+        Debug.Log($"[GoToBattle] Companion: {companion.heroID} | Stamina: {companion.stamina}");
+
+        if (companion.stamina < 1)
+        {
+            Debug.LogWarning($"Companion {companion.heroID} does not have enough stamina to battle.");
+            // You could also show a popup here instead of just logging
+            return; // Stop execution if any companion lacks stamina
+        }
+    }
+
+    // Find the selected stage
     StageData selectedStage = GameManager.Instance.allStagesData.Find(stage => stage.stageID == stageID);
 
     if (selectedStage != null)
     {
-        // Set the GameManager's CurrentBattleConfig to this stage's battle config
         GameManager.Instance.CurrentBattleConfig = selectedStage.stageBattleConfig;
         GameManager.Instance.currentStage = selectedStage;
-        
+
         Debug.Log($"Going to battle with stage ID: {selectedStage.stageID} and battle scene: {selectedStage.battleSceneName}");
-        
-         GameManager.Instance.SaveCurrentParty();
-        
-        // Load the battle scene associated with this stage
+
+        GameManager.Instance.SaveCurrentParty();
         SceneManager.LoadScene(selectedStage.battleSceneName);
     }
     else
     {
-        Debug.LogError("Stage with ID 1.1 not found.");
+        Debug.LogError($"Stage with ID {stageID} not found.");
     }
 }
 
