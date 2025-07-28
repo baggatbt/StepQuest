@@ -5,52 +5,60 @@ using System;
 
 public class Mushroom : Enemy
 {
+    private const int BASE_HEALTH = 16;
+    private const int HEALTH_GROWTH = 4;
+
+    private const int BASE_ATTACK = 4;
+    private const float ATTACK_GROWTH_FACTOR = 1.5f;
+
+    private const int BASE_GOLD = 5;
+    private const int GOLD_PER_LEVEL = 2;
+
+    private const int BASE_EXP = 12;
+    private const float EXP_GROWTH_FACTOR = 1.1f;
+
     protected override void Awake()
     {
-        base.Awake(); // Calls Enemy.Awake(), ensuring base class initialization, including exp and gold reward calculations
+        base.Awake();
         this.level = 1;
-        this.maxHealth = 11;
-        this.health = this.maxHealth;
-        this.maxEnergy = 3;
+        UpdateStats();
+
         this.speed = 3;
-        this.attackPower = 3;
-        this.defensePower = 0;
+        this.maxEnergy = 1;
         this.energy = 0;
-        this.baseExp = 10; // Base experience points given
-        this.growthFactor = 1.1f; // Growth factor to control the steepness
-        this.multiplier = 0; // Multiplier for the experience calculation
- 
-    }
+        this.defensePower = 1;
+        this.defensePenetration = 0;
+        this.attacksBeforeSpecial = 2;
 
-    protected override void Start()
-    {
-        base.Start(); // Ensure any base class initialization happens
-
-        // Initialize Mushroom-specific skills
         this.skills = new List<Skill>
         {
             new MushroomAttackSkill(),
             new MushroomSpecialAttackSkill()
         };
-        
-        // Skills assignment
-        this.normalSkill = this.skills[0]; // Normal skill
-        this.specialSkill = this.skills[1]; // Special skill
-        this.currentSkill = this.normalSkill;
+
+        this.normalSkill = skills[0];
+        this.specialSkill = skills[1];
+        this.currentSkill = normalSkill;
+
+        this.baseExp = BASE_EXP;
+        this.growthFactor = EXP_GROWTH_FACTOR;
+    }
+
+    protected override void Start()
+    {
+        base.Start();
     }
 
     public override void UpdateStats()
     {
-        base.UpdateStats(); // Ensures that any updates that happen in the base class, including expReward and goldReward updates, are applied
+        base.UpdateStats();
 
-        // Apply any Mushroom-specific stat updates
-      //  this.maxHealth = 18 + (this.level * 5); // Adjusted to match the original pattern
-        this.maxHealth = 11 +(this.level - 1) * 2;
+        this.maxHealth = BASE_HEALTH + (this.level - 1) * HEALTH_GROWTH;
         this.health = this.maxHealth;
-        this.expReward = 10 + (this.level * 2);
-        this.goldReward = 4 + (this.level * 3); // You can keep or modify this if you want specific gold logic for Mushrooms
-        this.attackPower = 6 + (this.level); // Adjusted to match the original pattern
-       // this.defensePower = 15 + (this.level + 3); // Adjusted to match the original pattern
-        this.energy = 0;
+
+        this.attackPower = BASE_ATTACK + Mathf.FloorToInt((this.level - 1) * ATTACK_GROWTH_FACTOR);
+
+        this.goldReward = BASE_GOLD + GOLD_PER_LEVEL * this.level;
+        this.expReward = Mathf.RoundToInt(BASE_EXP * Mathf.Pow(EXP_GROWTH_FACTOR, this.level - 1));
     }
 }

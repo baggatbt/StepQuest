@@ -7,13 +7,13 @@ public class MushroomAttackSkill : Skill
 
     public MushroomAttackSkill()
     {
-        skillName = "Mushroom attack";
-        description = "The enemy attacks the player. The damage can be reduced by timely action.";
+        skillName = "Mushroom Attack";
+        description = "The Mushroom attacks the player. The damage can be reduced by timely action.";
         requiresMovement = true;
         numberOfAttacksPossible = 1;
     }
 
-     // Override the default base damage calculation.
+    // Override the default base damage calculation.
     protected override int CalculateBaseDamage(Character user)
     {
         return (int)(user.attackPower * 1.0f); 
