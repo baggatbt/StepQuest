@@ -12,11 +12,10 @@ public class RecipeButton : MonoBehaviour
     public Recipe recipe;
 
     [Header("UI References")]
-    public TextMeshProUGUI nameText;
-    public TextMeshProUGUI requirementsText;        // <-- assign in Inspector
-    
-     public Transform requirementsContainer;
-     public GameObject materialRequirementPrefab; 
+    public Image outputItemIcon; // <-- Drag your icon Image here
+    public TextMeshProUGUI quantityText; // <-- Shows how many can be crafted
+    public Transform requirementsContainer;
+    public GameObject materialRequirementPrefab;
 
     private Button _button;
 
@@ -28,15 +27,7 @@ public class RecipeButton : MonoBehaviour
 
         _button.onClick.AddListener(OnClicked);
 
-        // Populate UI immediately
-        if (nameText != null)
-            nameText.text = recipe.outputItem.itemName;
-
-        if (requirementsText != null)
-            requirementsText.text = BuildRequirementsString(recipe);
-
-        
-         PopulateRequirementsIcons(recipe);
+        UpdateDisplay();
     }
 
     private void OnDestroy()
@@ -53,28 +44,88 @@ public class RecipeButton : MonoBehaviour
             return;
         }
         craftingManager.StartCrafting(recipe);
+        UpdateDisplay(); // Update UI after crafting
     }
 
-    private string BuildRequirementsString(Recipe recipe)
+    private void UpdateDisplay()
+{
+    if (recipe == null)
     {
-        // e.g. "2 × Wood\n1 × Iron Ore"
-        return string.Join("\n",
-            recipe.materialRequirements
-                  .Select(r => $"{r.quantity} × {r.material.itemName}")
-        );
+        Debug.LogError("[RecipeButton] No recipe assigned.");
+        return;
     }
 
-    
-    private void PopulateRequirementsIcons(Recipe recipe)
+    if (recipe.outputItem == null)
     {
+        Debug.LogWarning($"[RecipeButton] Recipe {recipe.name} has no outputItem assigned.");
+        return;
+    }
+
+    if (outputItemIcon == null)
+    {
+        Debug.LogError("[RecipeButton] OutputItemIcon is not assigned.");
+    }
+    else
+    {
+        if (recipe.outputItem.itemIcon == null)
+            Debug.LogWarning($"[RecipeButton] Item {recipe.outputItem.itemName} has no icon assigned.");
+        else
+            outputItemIcon.sprite = recipe.outputItem.itemIcon;
+    }
+
+    int craftableCount = GetCraftableCount(recipe);
+    if (quantityText != null)
+    {
+        quantityText.text = $"x{craftableCount}";
+    }
+
+    if (requirementsContainer == null || materialRequirementPrefab == null)
+    {
+        Debug.LogError("[RecipeButton] RequirementsContainer or MaterialRequirementPrefab not assigned.");
+        return;
+    }
+
+    foreach (Transform child in requirementsContainer)
+    {
+        Destroy(child.gameObject);
+    }
+
+    foreach (var req in recipe.materialRequirements)
+    {
+        if (req.material == null)
+        {
+            Debug.LogWarning($"[RecipeButton] One of the recipe's materials is null in {recipe.name}.");
+            continue;
+        }
+
+        var go = Instantiate(materialRequirementPrefab, requirementsContainer);
+        var img = go.GetComponentInChildren<Image>();
+        var txt = go.GetComponentInChildren<TextMeshProUGUI>();
+        if (img != null) img.sprite = req.material.itemIcon;
+        if (txt != null) txt.text = req.quantity.ToString();
+    }
+}
+
+
+    private int GetCraftableCount(Recipe recipe)
+    {
+        int minCount = int.MaxValue;
+
         foreach (var req in recipe.materialRequirements)
         {
-            var go = Instantiate(materialRequirementPrefab, requirementsContainer);
-            var img = go.GetComponentInChildren<Image>();
-            var txt = go.GetComponentInChildren<TextMeshProUGUI>();
-            img.sprite = req.material.itemIcon;    // assuming MaterialItem has an icon
-            txt.text       = req.quantity.ToString();
+            var foundItem = GameManager.Instance.itemList.Find(i => i.itemID == req.material.itemID);
+            if (foundItem != null)
+            {
+                int possible = foundItem.quantity / req.quantity;
+                if (possible < minCount)
+                    minCount = possible;
+            }
+            else
+            {
+                return 0; // Missing at least one material
+            }
         }
+
+        return minCount;
     }
-    
 }
