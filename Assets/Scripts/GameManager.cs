@@ -423,6 +423,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public static event Action OnInventoryChanged;
+
     public void AddItem(Item newItem)
     {
         Debug.Log("[GameManager] Adding item to inventory: " + (newItem != null ? newItem.itemName : "null"));
@@ -458,6 +460,8 @@ public class GameManager : MonoBehaviour
         Debug.Log("[GameManager] Adding item to inventory: " + (newItem != null ? newItem.itemName : "null"));
 
         SaveInventory();
+        OnInventoryChanged?.Invoke();
+
         inventory.UpdateInventoryUI();
     }
 
@@ -484,7 +488,9 @@ public class GameManager : MonoBehaviour
         }
 
         SaveInventory();
+        OnInventoryChanged?.Invoke();
         inventory.UpdateInventoryUI();
+        
     }
 }
 
@@ -531,6 +537,8 @@ public class GameManager : MonoBehaviour
                         itemList.Add(item); // Add to the player's inventory
                     }
                 }
+                OnInventoryChanged?.Invoke();
+
                 inventory.UpdateInventoryUI(); // Update UI to reflect the loaded inventory
             }
             else

@@ -24,6 +24,8 @@ public class RecipeButton : MonoBehaviour
             Debug.LogError("RecipeButton requires a Button component!");
 
         _button.onClick.AddListener(OnClicked);
+        GameManager.OnInventoryChanged += UpdateDisplay;
+
         UpdateDisplay();
     }
 
@@ -31,6 +33,8 @@ public class RecipeButton : MonoBehaviour
     {
         if (_button != null)
             _button.onClick.RemoveListener(OnClicked);
+            GameManager.OnInventoryChanged -= UpdateDisplay;
+
     }
 
     private void OnClicked()
