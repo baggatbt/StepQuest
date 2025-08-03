@@ -177,16 +177,36 @@ public int maxEquippedSkills = 3; // Optional limit
     }
 
     public void LoadData()
+{
+    Sprite savedHeroIcon      = heroIcon;
+    Sprite savedFullHeroImage = fullHeroImage;
+
+    string jsonData = PlayerPrefs.GetString("CharacterData_" + heroID, null);
+    if (!string.IsNullOrEmpty(jsonData))
     {
-        Sprite savedHeroIcon      = heroIcon;
-        Sprite savedFullHeroImage = fullHeroImage;
-
-        string jsonData = PlayerPrefs.GetString("CharacterData_" + heroID, "{}");
-        if (jsonData != "{}") JsonUtility.FromJsonOverwrite(jsonData, this);
-
-        heroIcon       = savedHeroIcon;
-        fullHeroImage  = savedFullHeroImage;
+        JsonUtility.FromJsonOverwrite(jsonData, this);
     }
+
+    // restore anything you don’t want overwritten by saved JSON
+    heroIcon      = savedHeroIcon;
+    fullHeroImage = savedFullHeroImage;
+
+    // enforce minimum sane defaults
+    EnsureValidLevel();
+}
+
+
+    public void EnsureValidLevel()
+{
+    if (heroLevel < 1)
+    {
+        heroLevel = 1;
+        heroExp = 0;
+        heroSkillPoints = 0;
+        heroStatPoints = 0;
+    }
+}
+
 
     #endregion
     //────────────────────────────────────────────────────────────────

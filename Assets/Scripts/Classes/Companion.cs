@@ -65,34 +65,28 @@ public abstract class Companion : Character
     }
 
     protected override void Awake()
+{
+    base.Awake();
+
+    if (characterData != null)
     {
-        base.Awake();
-        
-        if (characterData != null)
-        {
-            SetCharacterData(characterData);
-        }
-        else
-        {
-            Debug.LogError("Character data is not assigned.");
-        }
+        characterData.LoadData();           // load from prefs (or fallback)
+        characterData.EnsureValidLevel();   // redundant if LoadData already does it, but safe
+        SetCharacterData(characterData);    // apply into this instance
     }
+    else
+    {
+        Debug.LogError("Character data is not assigned.");
+    }
+}
+
 
     public void SetCharacterData(CharacterData data)
 {
     characterData = data;
-
-    if (characterData.heroLevel == 0)
-    {
-        characterData.heroLevel = 1;
-        characterData.heroExp = 0;
-        characterData.heroSkillPoints = 0;
-        characterData.heroStatPoints = 0;
-    }
-    
-   // characterData.LoadData();
     InitializeCharacterStats();
 }
+
 
 public void InitializeCharacterStats()
 {

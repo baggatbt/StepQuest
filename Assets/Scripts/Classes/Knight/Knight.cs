@@ -45,20 +45,35 @@ public class Knight : Companion
 
     public void UpdateStats()
 {
-    int lvl = heroLevel;  // use the Companion’s heroLevel, not Character.level
+    int lvl = Mathf.Max(heroLevel, 1);
 
     maxHealth   = BASE_HEALTH + (lvl - 1) * HEALTH_GROWTH;
     health      = maxHealth;
 
     attackPower = BASE_ATTACK + (lvl - 1) * ATTACK_GROWTH;
-
-    // force float division so your growth works correctly
     speed       = BASE_SPEED + Mathf.FloorToInt((lvl - 1) / 3f);
     defensePower= BASE_DEFENSE + Mathf.FloorToInt((lvl - 1) / 4f);
-
     maxEnergy   = BASE_ENERGY + Mathf.FloorToInt((lvl - 1) / 2f);
     energy      = maxEnergy;
+
+    // Sync back to the characterData if the UI or inspector reads from it
+    if (characterData != null)
+    {
+        characterData.maxHealth = maxHealth;
+        characterData.health = health;
+        characterData.attackPower = attackPower;
+        characterData.defensePower = defensePower;
+        characterData.speed = speed;
+        characterData.maxEnergy = maxEnergy;
+        characterData.energy = energy;
+        characterData.heroLevel = heroLevel;
+        characterData.heroStatPoints = heroStatPoints;
+        characterData.heroSkillPoints = heroSkillPoints;
+    }
+    SaveCharacterData();
 }
+
+
 
 
     public override void LevelUp()
