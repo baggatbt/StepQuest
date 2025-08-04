@@ -90,7 +90,7 @@ public class MissionManager : MonoBehaviour
     public int GetPendingRewardCount(string id)
         => missions.TryGetValue(id, out var m) ? m.pendingRewards : 0;
 
-    // MissionManager.cs
+    
 public int GetRewardCapacity(string id)
 {
     if (!missions.TryGetValue(id, out var m))

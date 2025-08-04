@@ -20,6 +20,22 @@ public class CraftingManager : MonoBehaviour
     public GameManager gameManager;
 
     public event Action OnCraftingLevelChanged;
+    public event Action OnActiveJobsChanged;
+
+        // after your existing public API:
+
+   
+
+    /// <summary>
+    /// The recipe of the i-th active job.
+    /// </summary>
+    public Recipe GetActiveRecipe(int i) => activeCrafts[i].recipe;
+
+    /// <summary>
+    /// How many steps this job has accumulated so far.
+    /// </summary>
+    public float GetActiveJobProgress(int i) => activeCrafts[i].stepProgress;
+
 
     // ─────────────────────────────────────────────────────────────────────────
     // Internals
@@ -183,6 +199,7 @@ public class CraftingManager : MonoBehaviour
 
         // 5) Persist updated job list
         SaveActiveJobs();
+        OnActiveJobsChanged?.Invoke();
 
         Debug.Log($"[Crafting] Started '{recipe.outputItem.itemName}'. " +
                   $"Needs {GetStepsRequired(recipe)} steps. (Slots used: {activeCrafts.Count}/{GetMaxActiveSlots()})");
@@ -258,6 +275,8 @@ public class CraftingManager : MonoBehaviour
         // If any jobs finished, persist the new job list
         if (completedJobs.Count > 0)
             SaveActiveJobs();
+            // ← notify UI
+            OnActiveJobsChanged?.Invoke();
     }
 
     // ─────────────────────────────────────────────────────────────────────────

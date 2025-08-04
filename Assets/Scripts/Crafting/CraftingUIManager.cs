@@ -21,22 +21,59 @@ public class CraftingUIManager : MonoBehaviour
     [Tooltip("A prefab with a Button + RecipeButton script on it.")]
     public GameObject recipeButtonPrefab;
 
+    [Header("Queue UI")]
+    public Transform craftSlotContainer;  // assign a UI panel/grid LayoutGroup
+    public GameObject  craftSlotPrefab;
+
     private void Start()
     {
         // Build the UI once at start.
         RefreshRecipeList();
+        RefreshQueueUI();
     }
     private void OnEnable()
     {
         // Subscribe to the event
         craftingManager.OnCraftingLevelChanged += RefreshRecipeList;
+        craftingManager.OnActiveJobsChanged   += RefreshQueueUI;
     }
 
     private void OnDisable()
     {
         // Unsubscribe to avoid memory leaks
         craftingManager.OnCraftingLevelChanged -= RefreshRecipeList;
+        craftingManager.OnActiveJobsChanged   -= RefreshQueueUI;
     }
+    
+    public void RefreshQueueUI()
+{
+    // 1) clear old slots
+    foreach (Transform child in craftSlotContainer)
+        Destroy(child.gameObject);
+
+    int maxSlots = craftingManager.GetMaxActiveSlots();
+    int used     = craftingManager.GetUsedSlots();
+
+    // 2) rebuild each slot
+    for (int i = 0; i < maxSlots; i++)
+    {
+        GameObject go = Instantiate(craftSlotPrefab, craftSlotContainer);
+        var cs = go.GetComponent<CraftSlotUI>();
+
+        if (i < used)
+        {
+            var recipe   = craftingManager.GetActiveRecipe(i);
+            float progress = craftingManager.GetActiveJobProgress(i);
+            float required = craftingManager.GetStepsRequired(recipe);
+
+            cs.Setup(recipe.outputItem.itemIcon, progress, required);
+        }
+        else
+        {
+            cs.SetEmpty();
+        }
+    }
+}
 
 
     /// <summary>
@@ -74,9 +111,9 @@ public class CraftingUIManager : MonoBehaviour
                 }
 
                 // set the button’s visual text/icon:
-                 TextMeshProUGUI nameText = go.GetComponentInChildren<TextMeshProUGUI>();
-                 if (nameText != null)
-                     nameText.text = recipe.outputItem.itemName;
+                TextMeshProUGUI nameText = go.GetComponentInChildren<TextMeshProUGUI>();
+                if (nameText != null)
+                    nameText.text = recipe.outputItem.itemName;
             }
         }
     }
