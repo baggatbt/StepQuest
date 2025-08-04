@@ -55,11 +55,10 @@ public class RecipeButton : MonoBehaviour
         worldPositionStays: false
     );
     dlg.Initialize(recipe, craftingManager, (r, count) =>
-    {
-        // for each count, queue the craft
-        for (int i = 0; i < count; i++)
-            craftingManager.StartCrafting(r);
-    });
+{
+    // ✅ this queues one batch of 'count' items into one slot:
+    craftingManager.StartCrafting(r, count);
+});
         UpdateDisplay(); // Refresh UI after crafting
     }
 
