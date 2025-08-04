@@ -90,8 +90,23 @@ public class MissionManager : MonoBehaviour
     public int GetPendingRewardCount(string id)
         => missions.TryGetValue(id, out var m) ? m.pendingRewards : 0;
 
-    public int GetRewardCapacity(string id)
-        => missions.TryGetValue(id, out var m) ? m.definition.rewardCapacity : 0;
+    // MissionManager.cs
+public int GetRewardCapacity(string id)
+{
+    if (!missions.TryGetValue(id, out var m))
+    {
+        Debug.LogWarning($"Mission '{id}' not found");
+        return 0;
+    }
+
+    // figure out what level the player is at for this skill
+    int lvl = TaskSkillManager.Instance.GetLevel(m.definition.skillID);
+
+    // base capacity + per-level bonus
+    return m.definition.rewardCapacity
+         + lvl * m.definition.capacityPerLevel;
+}
+
 
     public bool IsActive(string id)
         => missions.TryGetValue(id, out var m) && m.isActive;
@@ -139,20 +154,19 @@ public class MissionState
 
     private string Key(string suffix) => $"Mission_{id}_{suffix}";
 
+    private static string KeyStatic(string id, string suffix) => $"Mission_{id}_{suffix}";
+
     public static MissionState Load(MissionDefinition def)
     {
-        var ms = new MissionState
+        return new MissionState
         {
-            definition      = def,
-            id              = def.id,
-            isActive        = PlayerPrefs.GetInt(msKey(def.id, "Active"),  0) == 1,
-            pendingRewards  = PlayerPrefs.GetInt(msKey(def.id, "Pending"), 0),
-            leftoverSteps   = PlayerPrefs.GetInt(msKey(def.id, "Leftover"),0)
+            definition     = def,
+            id             = def.id,
+            isActive       = PlayerPrefs.GetInt(KeyStatic(def.id, "Active"),   0) == 1,
+            pendingRewards = PlayerPrefs.GetInt(KeyStatic(def.id, "Pending"),  0),
+            leftoverSteps  = PlayerPrefs.GetInt(KeyStatic(def.id, "Leftover"), 0)
         };
-        return ms;
     }
-
-    private static string msKey(string id, string suffix) => $"Mission_{id}_{suffix}";
 
     public void Save()
     {
@@ -166,36 +180,41 @@ public class MissionState
     {
         if (!isActive) return;
 
-        int lvl       = TaskSkillManager.Instance.GetLevel(definition.skillID);
-        int maxCap    = definition.rewardCapacity + lvl * definition.capacityPerLevel;
-        float scale   = 1f - lvl * definition.efficiencyPerLevel;
-        int effSPR    = Mathf.Max(1, Mathf.RoundToInt(definition.stepsPerReward * scale));
+        // 1) calculate how many steps are needed per reward at this level
+        int lvl = TaskSkillManager.Instance.GetLevel(definition.skillID);
+        float bonus  = 1f + lvl * definition.efficiencyPerLevel;
+        int effSPR   = Mathf.Max(1, Mathf.RoundToInt(definition.stepsPerReward / bonus));
 
+        // 2) accumulate steps and convert into rewards (up to capacity)
         leftoverSteps += steps;
         int produced  = leftoverSteps / effSPR;
         if (produced > 0)
         {
-            int space = maxCap - pendingRewards;
-            int toAdd = Mathf.Min(produced, space);
+            int maxCap = definition.rewardCapacity + lvl * definition.capacityPerLevel;
+            int space  = maxCap - pendingRewards;
+            int toAdd  = Mathf.Min(produced, space);
+
             pendingRewards += toAdd;
             leftoverSteps  -= toAdd * effSPR;
+            Save();
         }
-        Save();
     }
 
     public List<Item> ClaimAllRewards()
     {
-        // — Award XP before clearing pendingRewards —
+        // award XP
         int totalXP = pendingRewards * definition.xpPerReward;
         TaskSkillManager.Instance.AddXP(definition.skillID, totalXP);
 
-        // — Roll items —
+        // roll drops
         var allItems = new List<Item>();
         for (int i = 0; i < pendingRewards; i++)
             allItems.AddRange(definition.dropTable.RollRewards());
 
+        // clear
         pendingRewards = 0;
         Save();
         return allItems;
     }
 }
+

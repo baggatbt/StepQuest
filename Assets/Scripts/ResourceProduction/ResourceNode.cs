@@ -5,8 +5,10 @@ using TMPro;
 [RequireComponent(typeof(Button))]
 public class ResourceNode : MonoBehaviour
 {
+    public DamagePopup damagePopupPrefab;  // your prefab with DamagePopup + TMP
+    public Canvas      uiCanvas;           // the Canvas to parent under
     //───────────────────────────────── Config
-    public ResourceType type           = ResourceType.Wood;
+    public ResourceType type = ResourceType.Wood;
     public int          maxHP          = 20;
     public Item         payoutItem;
     public int          payoutMin      = 3;
@@ -72,6 +74,22 @@ public class ResourceNode : MonoBehaviour
 
         if (hpSlider) hpSlider.value = currentHP;
         if (hpText)   hpText.text   = $"{currentHP}/{maxHP}";
+        var popup = Instantiate(
+            damagePopupPrefab, 
+            uiCanvas.transform,        // parent under your UI canvas
+            worldPositionStays: false  // we’ll set its position in screen-space
+        );
+
+        // 3) position it (screen space)
+        Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position);
+        // If your Canvas is Screen Space – Overlay, you can do:
+        popup.GetComponent<RectTransform>().anchoredPosition 
+            = screenPos 
+              - new Vector3(Screen.width, Screen.height) * 0.5f;
+        // (or simply `popup.transform.position = screenPos;` for many setups)
+
+        // 4) initialize it
+        popup.Setup(dmg);
 
         // Break?
         if (currentHP == 0)
