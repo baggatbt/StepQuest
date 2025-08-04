@@ -1,105 +1,94 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using System;       
 
 /// <summary>
 /// A step-driven crafting system that:
-///  • Queues recipes as ActiveCraftJob objects (up to ‘MaxActiveSlots’ at once).
+///  • Queues recipes as ActiveCraftJob batches (up to ‘MaxActiveSlots’ at once).
 ///  • Listens to PlayerData.OnStepsAdded to advance each job’s progress.
-///  • Automatically grants output when sufficient steps accumulate (even offline).
-///  • Persists all active jobs + crafting level + slot upgrades in PlayerPrefs (via JSON).
-///  • Supports a “crafting level” that reduces required steps, and a “slots level” that increases max concurrent jobs.
+///  • Automatically grants output when sufficient steps accumulate, handling batch quantities.
+///  • Persists active jobs + crafting level + slot upgrades via PlayerPrefs (JSON).
+///  • Supports a "crafting level" that reduces required steps, and a "slots level" that increases max concurrent slots.
 /// </summary>
 public class CraftingManager : MonoBehaviour
 {
-    [Header("All Recipe assets (drag all your Recipe ScriptableObjects here)")]
+    [Header("All Recipe assets (drag your Recipe ScriptableObjects here)")]
     public List<Recipe> allRecipes = new List<Recipe>();
 
     [Header("References")]
     [Tooltip("Drag your GameManager (with AddItem/HasItem/RemoveItem) here")]
     public GameManager gameManager;
 
+    // Events
     public event Action OnCraftingLevelChanged;
     public event Action OnActiveJobsChanged;
 
-        // after your existing public API:
+    // Public API for UI
+    /// <summary>Current crafting level (for display).</summary>
+    public int GetCraftingLevel()       => craftingLevel;
+    /// <summary>Current slots-upgrade level (for display).</summary>
+    public int GetSlotsUpgradeLevel()   => slotsUpgradeLevel;
+    /// <summary>Current number of active slots in use.</summary>
+    public int GetUsedSlots()           => activeCrafts.Count;
+    /// <summary>Maximum concurrent slots allowed.</summary>
+    public int GetMaxActiveSlots()      => baseActiveSlots + slotsUpgradeLevel * slotsPerUpgrade;
+    /// <summary>Returns how many steps this recipe requires at current craftingLevel.</summary>
+    public float GetStepsRequired(Recipe recipe)
+    {
+        float baseRequired = recipe.craftDuration;
+        float factor       = Mathf.Pow(1f - reductionPerLevel, craftingLevel);
+        return baseRequired * factor;
+    }
 
-   
-
-    /// <summary>
-    /// The recipe of the i-th active job.
-    /// </summary>
-    public Recipe GetActiveRecipe(int i) => activeCrafts[i].recipe;
-
-    /// <summary>
-    /// How many steps this job has accumulated so far.
-    /// </summary>
-    public float GetActiveJobProgress(int i) => activeCrafts[i].stepProgress;
-
+    /// <summary>Recipe for slot #i.</summary>
+    public Recipe GetActiveRecipe(int i)          => activeCrafts[i].recipe;
+    /// <summary>Quantity remaining in batch for slot #i.</summary>
+    public int    GetActiveJobQuantity(int i)     => activeCrafts[i].quantity;
+    /// <summary>Progress toward next item in slot #i.</summary>
+    public float  GetActiveJobProgress(int i)     => activeCrafts[i].stepProgress;
 
     // ─────────────────────────────────────────────────────────────────────────
     // Internals
     // ─────────────────────────────────────────────────────────────────────────
 
-    /// <summary>
-    /// Represents one active crafting job.
-    /// </summary>
+    [Serializable]
     private class ActiveCraftJob
     {
-        public Recipe recipe;      // which Recipe we’re working on
-        public float stepProgress; // how many steps have been applied so far
+        public Recipe recipe;
+        public int    quantity;
+        public float  stepProgress;
 
-        /// <summary>
-        /// Constructor from serialized data.
-        /// </summary>
-        public ActiveCraftJob(Recipe r, float progress)
+        public ActiveCraftJob(Recipe recipe, int quantity, float initialProgress)
         {
-            recipe = r;
-            stepProgress = progress;
+            this.recipe       = recipe;
+            this.quantity     = quantity;
+            this.stepProgress = initialProgress;
         }
     }
 
-    // In-memory list of all jobs currently in progress
     private List<ActiveCraftJob> activeCrafts = new List<ActiveCraftJob>();
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Configurable “base” values (you can tweak these in Inspector or serialize)
-    // ─────────────────────────────────────────────────────────────────────────
-
     [Header("Crafting Level Settings (reduces step cost)")]
-    [Tooltip("Each level reduces required steps by this fraction. 0.1 = 10% reduction per level")]
+    [Tooltip("Each level reduces required steps by this fraction. 0.1 = 10% per level")]
     [Range(0f, 0.5f)]
     public float reductionPerLevel = 0.10f;
 
-    [Header("Crafting Slots Settings (limits concurrent jobs)")]
-    [Tooltip("How many active slots you get at level 0 (unupgraded).")]
+    [Header("Crafting Slots Settings (limits concurrent batches)")]
+    [Tooltip("Base number of slots at level 0.")]
     public int baseActiveSlots = 1;
-
-    [Tooltip("Each slots‐level increases max slots by this amount.")]
+    [Tooltip("Additional slots per upgrade level.")]
     public int slotsPerUpgrade = 1;
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Persistence Keys
-    // ─────────────────────────────────────────────────────────────────────────
-
+    // Persistence keys
     private const string PREFS_JOBS_KEY      = "CraftJobsData";
     private const string PREFS_CRAFT_LVL_KEY = "CraftingLevel";
     private const string PREFS_SLOT_LVL_KEY  = "CraftingSlotsLevel";
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Current “levels” (saved in PlayerPrefs)
-    // ─────────────────────────────────────────────────────────────────────────
-
-    [SerializeField] private int craftingLevel   = 0;  // affects step‐cost reduction
-    [SerializeField] private int slotsUpgradeLevel = 0; // affects max concurrent slots
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Unity Lifecycle
-    // ─────────────────────────────────────────────────────────────────────────
+    [SerializeField] private int craftingLevel     = 0;
+    [SerializeField] private int slotsUpgradeLevel = 0;
 
     private void Awake()
     {
-        // 1) Load crafting‐level and slots‐level, then load any saved active jobs
         LoadCraftingLevel();
         LoadSlotsUpgradeLevel();
         LoadActiveJobs();
@@ -107,8 +96,6 @@ public class CraftingManager : MonoBehaviour
 
     private void OnEnable()
     {
-        // Subscribe so that whenever steps are added (in‐app or offline),
-        // we advance each active job’s progress.
         PlayerData.OnStepsAdded += OnSteps;
     }
 
@@ -118,192 +105,112 @@ public class CraftingManager : MonoBehaviour
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Public API
+    // Starting a batch
     // ─────────────────────────────────────────────────────────────────────────
 
     /// <summary>
-    /// Returns how many steps this recipe actually requires after factoring in craftingLevel.
+    /// Begin crafting 'quantity' copies of this recipe in one slot.
+    /// Consumes all materials up front.
     /// </summary>
-    public float GetStepsRequired(Recipe recipe)
+    public void StartCrafting(Recipe recipe, int quantity)
     {
-        float baseRequired = recipe.craftDuration;
-        float factor = Mathf.Pow(1f - reductionPerLevel, craftingLevel);
-        return baseRequired * factor;
-    }
-
-    /// <summary>
-    /// Returns the current maximum number of active craft jobs allowed.
-    /// </summary>
-    public int GetMaxActiveSlots()
-    {
-        return baseActiveSlots + (slotsUpgradeLevel * slotsPerUpgrade);
-    }
-
-    /// <summary>
-    /// Returns the number of slots currently in use.
-    /// </summary>
-    public int GetUsedSlots()
-    {
-        return activeCrafts.Count;
-    }
-
-    /// <summary>
-    /// Returns the current crafting level (for UI display).
-    /// </summary>
-    public int GetCraftingLevel()
-    {
-        return craftingLevel;
-    }
-
-    /// <summary>
-    /// Returns the current slots‐upgrade level (for UI display).
-    /// </summary>
-    public int GetSlotsUpgradeLevel()
-    {
-        return slotsUpgradeLevel;
-    }
-
-    /// <summary>
-    /// Attempts to start a new crafting job for the given recipe.
-    /// Immediately consumes materials if there’s an open slot; otherwise warns.
-    /// Call this from your UI button.
-    /// </summary>
-    public void StartCrafting(Recipe recipe)
-    {
-        if (recipe == null)
-        {
-            Debug.LogError("StartCrafting called with a null Recipe.");
-            return;
-        }
-
-        // 1) Check for an available slot
         if (activeCrafts.Count >= GetMaxActiveSlots())
         {
-            Debug.LogWarning($"[Crafting] All {GetMaxActiveSlots()} slots are in use. Upgrade slots to queue more crafts.");
+            Debug.LogWarning($"[Crafting] All {GetMaxActiveSlots()} slots in use.");
             return;
         }
 
-        // 2) Check if player has all required materials
-        if (!HasAllMaterials(recipe))
+        // 1) check materials
+        foreach (var req in recipe.materialRequirements)
         {
-            Debug.LogWarning($"[Crafting] Not enough materials to craft: {recipe.outputItem.itemName}");
-            return;
+            int have = gameManager.GetItemCount(req.material);
+            int need = req.quantity * quantity;
+            if (have < need)
+            {
+                Debug.LogWarning($"[Crafting] Not enough {req.material.itemName}. Need {need}, have {have}.");
+                return;
+            }
         }
+        // 2) consume materials
+        foreach (var req in recipe.materialRequirements)
+            gameManager.RemoveItem(req.material, req.quantity * quantity);
 
-        // 3) Consume those materials up front
-        ConsumeMaterials(recipe);
-
-        // 4) Enqueue a new ActiveCraftJob with stepProgress = 0
-        var newJob = new ActiveCraftJob(recipe, 0f);
-        activeCrafts.Add(newJob);
-
-        // 5) Persist updated job list
+        // 3) enqueue batch
+        activeCrafts.Add(new ActiveCraftJob(recipe, quantity, 0f));
         SaveActiveJobs();
         OnActiveJobsChanged?.Invoke();
 
-        Debug.Log($"[Crafting] Started '{recipe.outputItem.itemName}'. " +
-                  $"Needs {GetStepsRequired(recipe)} steps. (Slots used: {activeCrafts.Count}/{GetMaxActiveSlots()})");
+        Debug.Log($"[Crafting] Started '{recipe.outputItem.itemName}' ×{quantity} in 1 slot.");
     }
 
-    /// <summary>
-    /// Attempts to raise craftingLevel by ‘delta’. Player must handle resource cost separately.
-    /// Example: if player has enough IronBars, they call RemoveItem(ironBar, cost) then IncreaseCraftingLevel(1).
-    /// </summary>
+    /// <summary>Convenience: queue 1 if you only call single-arg.</summary>
+    public void StartCrafting(Recipe recipe) => StartCrafting(recipe, 1);
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Leveling and Slots Upgrades
+    // ─────────────────────────────────────────────────────────────────────────
+
     public void IncreaseCraftingLevel(int delta = 1)
     {
         craftingLevel = Mathf.Max(0, craftingLevel + delta);
         SaveCraftingLevel();
-        Debug.Log($"[Crafting] Crafting level is now {craftingLevel}.");
-
-        // 2) Fire the event here:
         OnCraftingLevelChanged?.Invoke();
+        Debug.Log($"[Crafting] Level now {craftingLevel}.");
     }
 
-    /// <summary>
-    /// Attempts to raise slotsUpgradeLevel by ‘delta’. Player must handle resource cost separately.
-    /// </summary>
     public void IncreaseSlotsUpgradeLevel(int delta = 1)
     {
         slotsUpgradeLevel = Mathf.Max(0, slotsUpgradeLevel + delta);
         SaveSlotsUpgradeLevel();
-        Debug.Log($"[Crafting] Slots‐upgrade level is now {slotsUpgradeLevel} (MaxSlots = {GetMaxActiveSlots()}).");
+        OnCraftingLevelChanged?.Invoke();
+        Debug.Log($"[Crafting] Slots-level now {slotsUpgradeLevel} (Max={GetMaxActiveSlots()}).");
     }
 
     // ─────────────────────────────────────────────────────────────────────────
     // Step Tick Handler
     // ─────────────────────────────────────────────────────────────────────────
 
-    /// <summary>
-    /// Called by PlayerData whenever steps are added (in-app or offline catch-up).
-    /// Distributes 'added' steps to every active craft job. If a job crosses its
-    /// required‐steps threshold, we grant output and remove it.
-    /// </summary>
     private void OnSteps(int added)
     {
-        if (added <= 0 || activeCrafts.Count == 0)
-            return;
+        if (added <= 0 || activeCrafts.Count == 0) return;
 
-        // Collect any jobs that finish this tick so we can remove them afterward
-        List<ActiveCraftJob> completedJobs = new List<ActiveCraftJob>();
-
-        foreach (var job in activeCrafts)
+        bool changed = false;
+        
+        // iterate backwards for safe removal
+        for (int i = activeCrafts.Count - 1; i >= 0; i--)
         {
+            var job = activeCrafts[i];
             job.stepProgress += added;
             float needed = GetStepsRequired(job.recipe);
 
-            // If we've reached or exceeded needed steps, complete the craft
-            if (job.stepProgress >= needed)
+            // how many items completed this tick?
+            int done = Mathf.FloorToInt(job.stepProgress / needed);
+            if (done > 0)
             {
-                // 1) Grant the output items
-                for (int i = 0; i < job.recipe.outputQuantity; i++)
+                int take = Mathf.Min(done, job.quantity);
+                for (int k = 0; k < take; k++)
                 {
                     gameManager.AddItem(job.recipe.outputItem);
-                    TaskSkillManager.Instance.AddXP("Crafting", job.recipe.expForCraft);//TODO HARD CODED 1XP, SHOULD COME FROM RECIPE
+                    TaskSkillManager.Instance.AddXP(
+                        job.recipe.skillID, job.recipe.expForCraft
+                    );
                 }
+                job.quantity     -= take;
+                job.stepProgress -= take * needed;
+                changed = true;
+            }
 
-                Debug.Log($"[Crafting] Completed '{job.recipe.outputItem.itemName}' ×{job.recipe.outputQuantity}.");
-
-                // 2) Mark for removal
-                completedJobs.Add(job);
+            if (job.quantity <= 0)
+            {
+                activeCrafts.RemoveAt(i);
+                changed = true;
             }
         }
 
-        // Remove completed jobs from activeCrafts
-        foreach (var job in completedJobs)
-            activeCrafts.Remove(job);
-
-        // If any jobs finished, persist the new job list
-        if (completedJobs.Count > 0)
+        if (changed)
+        {
             SaveActiveJobs();
-            // ← notify UI
             OnActiveJobsChanged?.Invoke();
-    }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Helpers
-    // ─────────────────────────────────────────────────────────────────────────
-
-    /// <summary>
-    /// Checks inventory for all MaterialItem requirements of this recipe.
-    /// </summary>
-    private bool HasAllMaterials(Recipe recipe)
-    {
-        foreach (var req in recipe.materialRequirements)
-        {
-            if (!gameManager.HasItem(req.material, req.quantity))
-                return false;
-        }
-        return true;
-    }
-
-    /// <summary>
-    /// Removes each required MaterialItem from inventory.
-    /// </summary>
-    private void ConsumeMaterials(Recipe recipe)
-    {
-        foreach (var req in recipe.materialRequirements)
-        {
-            gameManager.RemoveItem(req.material, req.quantity);
         }
     }
 
@@ -311,81 +218,57 @@ public class CraftingManager : MonoBehaviour
     // Persistence: Active Jobs
     // ─────────────────────────────────────────────────────────────────────────
 
-    /// <summary>
-    /// A serializable data container for saving/loading ActiveCraftJob.
-    /// </summary>
-    [System.Serializable]
+    [Serializable]
     private class ActiveCraftJobData
     {
         public string recipeName;
-        public float stepProgress;
+        public int    quantity;
+        public float  stepProgress;
     }
+    
+    [Serializable]
+    private class ActiveCraftJobDataList { public List<ActiveCraftJobData> jobs = new List<ActiveCraftJobData>(); }
 
-    /// <summary>
-    /// Wrapper to allow List<ActiveCraftJobData> to be JSON‐serialized by JsonUtility.
-    /// </summary>
-    [System.Serializable]
-    private class ActiveCraftJobDataList
-    {
-        public List<ActiveCraftJobData> jobs = new List<ActiveCraftJobData>();
-    }
-
-    /// <summary>
-    /// Saves the current activeCrafts list into PlayerPrefs as JSON.
-    /// </summary>
     private void SaveActiveJobs()
     {
         var wrapper = new ActiveCraftJobDataList();
-
         foreach (var job in activeCrafts)
         {
             wrapper.jobs.Add(new ActiveCraftJobData
             {
-                recipeName = job.recipe.name,   // use asset name as unique identifier
+                recipeName   = job.recipe.name,
+                quantity     = job.quantity,
                 stepProgress = job.stepProgress
             });
         }
-
         string json = JsonUtility.ToJson(wrapper);
         PlayerPrefs.SetString(PREFS_JOBS_KEY, json);
         PlayerPrefs.Save();
     }
 
-    /// <summary>
-    /// Loads activeCrafts from PlayerPrefs. If no data exists, does nothing.
-    /// </summary>
     private void LoadActiveJobs()
     {
         activeCrafts.Clear();
-
-        if (!PlayerPrefs.HasKey(PREFS_JOBS_KEY))
-            return;
+        if (!PlayerPrefs.HasKey(PREFS_JOBS_KEY)) return;
 
         string json = PlayerPrefs.GetString(PREFS_JOBS_KEY);
-        if (string.IsNullOrEmpty(json))
-            return;
+        if (string.IsNullOrEmpty(json)) return;
 
-        ActiveCraftJobDataList wrapper = JsonUtility.FromJson<ActiveCraftJobDataList>(json);
-        if (wrapper == null || wrapper.jobs == null)
-            return;
+        var wrapper = JsonUtility.FromJson<ActiveCraftJobDataList>(json);
+        if (wrapper?.jobs == null) return;
 
-        foreach (var data in wrapper.jobs)
+        foreach (var d in wrapper.jobs)
         {
-            // Find the matching Recipe asset by name
-            Recipe found = allRecipes.Find(r => r.name == data.recipeName);
+            var found = allRecipes.Find(r => r.name == d.recipeName);
             if (found != null)
-            {
-                activeCrafts.Add(new ActiveCraftJob(found, data.stepProgress));
-            }
+                activeCrafts.Add(new ActiveCraftJob(found, d.quantity, d.stepProgress));
             else
-            {
-                Debug.LogWarning($"[Crafting] Could not find Recipe named '{data.recipeName}' when loading saved jobs.");
-            }
+                Debug.LogWarning($"[Crafting] Missing recipe '{d.recipeName}' on load.");
         }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Persistence: Crafting Level
+    // Persistence: Levels
     // ─────────────────────────────────────────────────────────────────────────
 
     private void SaveCraftingLevel()
@@ -393,22 +276,16 @@ public class CraftingManager : MonoBehaviour
         PlayerPrefs.SetInt(PREFS_CRAFT_LVL_KEY, craftingLevel);
         PlayerPrefs.Save();
     }
-
     private void LoadCraftingLevel()
     {
         craftingLevel = PlayerPrefs.GetInt(PREFS_CRAFT_LVL_KEY, 0);
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Persistence: Slots Upgrade Level
-    // ─────────────────────────────────────────────────────────────────────────
 
     private void SaveSlotsUpgradeLevel()
     {
         PlayerPrefs.SetInt(PREFS_SLOT_LVL_KEY, slotsUpgradeLevel);
         PlayerPrefs.Save();
     }
-
     private void LoadSlotsUpgradeLevel()
     {
         slotsUpgradeLevel = PlayerPrefs.GetInt(PREFS_SLOT_LVL_KEY, 0);

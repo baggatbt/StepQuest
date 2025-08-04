@@ -11,6 +11,7 @@ public class Recipe : ScriptableObject
     public Item outputItem;
     public int outputQuantity = 1;
     public int expForCraft;
+    public string skillID;
 
     [Header("Crafting Duration (in steps)")]
     [Tooltip("How many steps this recipe takes before it finishes")]

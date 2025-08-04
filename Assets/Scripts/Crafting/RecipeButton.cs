@@ -15,10 +15,19 @@ public class RecipeButton : MonoBehaviour
     public Transform requirementsContainer;
     public GameObject materialRequirementPrefab;
 
+    public CraftQuantityDialog quantityDialogPrefab;
+    public Canvas _uiCanvas;  // Screen-Space Overlay canvas
+
+
     private Button _button;
 
     private void Awake()
     {
+         // Finds the first enabled Canvas in the scene
+        _uiCanvas = FindObjectOfType<Canvas>();
+        if (_uiCanvas == null)
+            Debug.LogError("No Canvas found in scene!");
+
         _button = GetComponent<Button>();
         if (_button == null)
             Debug.LogError("RecipeButton requires a Button component!");
@@ -39,13 +48,18 @@ public class RecipeButton : MonoBehaviour
 
     private void OnClicked()
     {
-        if (craftingManager == null || recipe == null)
-        {
-            Debug.LogWarning("Missing CraftingManager or Recipe on RecipeButton.");
-            return;
-        }
-
-        craftingManager.StartCrafting(recipe);
+         // instead of immediately crafting 1:
+    var dlg = Instantiate(
+        quantityDialogPrefab,
+        _uiCanvas.transform,
+        worldPositionStays: false
+    );
+    dlg.Initialize(recipe, craftingManager, (r, count) =>
+    {
+        // for each count, queue the craft
+        for (int i = 0; i < count; i++)
+            craftingManager.StartCrafting(r);
+    });
         UpdateDisplay(); // Refresh UI after crafting
     }
 

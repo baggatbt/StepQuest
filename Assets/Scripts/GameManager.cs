@@ -563,38 +563,46 @@ public class GameManager : MonoBehaviour
     {
         AddItem(testItem);
     }
+    
+    /// <summary>Return how many of this item the player has.</summary>
+public int GetItemCount(Item item)
+{
+    var invItem = itemList.Find(i => i.itemID == item.itemID);
+    return invItem != null ? invItem.quantity : 0;
+}
+
 
     public Character InstantiateSelectedCompanion(string heroID)
     {
         GameObject companionObject = null;
 
-    switch (heroID)
-    {
-        case "Knight":
-            companionObject = Instantiate(knightPrefab);
-            break;
-        case "Archer":
-            companionObject = Instantiate(archerPrefab);
-            break;
-        case "Wizard":
-            companionObject = Instantiate(wizardPrefab);
-            break;
-        case "TamedGoblin":
-            companionObject = Instantiate(tamedGoblinPrefab);
-            break;
-        // Add cases for other companions
-    }
-    if (companionObject != null)
-    {
-        Companion companion = companionObject.GetComponent<Companion>();
-        if (characterDataDictionary.TryGetValue(heroID, out CharacterData characterData))
+        switch (heroID)
         {
-            companion.SetCharacterData(characterData);
+            case "Knight":
+                companionObject = Instantiate(knightPrefab);
+                break;
+            case "Archer":
+                companionObject = Instantiate(archerPrefab);
+                break;
+            case "Wizard":
+                companionObject = Instantiate(wizardPrefab);
+                break;
+            case "TamedGoblin":
+                companionObject = Instantiate(tamedGoblinPrefab);
+                break;
+                // Add cases for other companions
         }
-        return companion;
-    }
+        if (companionObject != null)
+        {
+            Companion companion = companionObject.GetComponent<Companion>();
+            if (characterDataDictionary.TryGetValue(heroID, out CharacterData characterData))
+            {
+                companion.SetCharacterData(characterData);
+            }
+            return companion;
+        }
 
-    return null;
+        return null;
     }
 
     private void CreateAndLoadCompanion(GameObject prefab, string heroID)
