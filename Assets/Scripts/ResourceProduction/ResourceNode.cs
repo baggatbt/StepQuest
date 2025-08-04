@@ -5,8 +5,16 @@ using TMPro;
 [RequireComponent(typeof(Button))]
 public class ResourceNode : MonoBehaviour
 {
-    public DamagePopup damagePopupPrefab;  // your prefab with DamagePopup + TMP
-    public Canvas      uiCanvas;           // the Canvas to parent under
+        [Header("UI Popups")]
+    public DamagePopup       damagePopupPrefab;   // already present
+    public FloatingItemPopup itemPopupPrefab;     // already present
+    public Canvas            uiCanvas;            // already present
+
+    [Header("Drop UI")]
+    public Sprite            itemIcon;            // new: assign your payoutItem’s icon here
+
+
+
     //───────────────────────────────── Config
     public ResourceType type = ResourceType.Wood;
     public int          maxHP          = 20;
@@ -67,15 +75,17 @@ public class ResourceNode : MonoBehaviour
 
         ApplyDamage(dmg);
     }
+    
+    
 
     private void ApplyDamage(int dmg)
     {
         currentHP = Mathf.Max(0, currentHP - dmg);
 
         if (hpSlider) hpSlider.value = currentHP;
-        if (hpText)   hpText.text   = $"{currentHP}/{maxHP}";
+        if (hpText) hpText.text = $"{currentHP}/{maxHP}";
         var popup = Instantiate(
-            damagePopupPrefab, 
+            damagePopupPrefab,
             uiCanvas.transform,        // parent under your UI canvas
             worldPositionStays: false  // we’ll set its position in screen-space
         );
@@ -83,8 +93,8 @@ public class ResourceNode : MonoBehaviour
         // 3) position it (screen space)
         Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position);
         // If your Canvas is Screen Space – Overlay, you can do:
-        popup.GetComponent<RectTransform>().anchoredPosition 
-            = screenPos 
+        popup.GetComponent<RectTransform>().anchoredPosition
+            = screenPos
               - new Vector3(Screen.width, Screen.height) * 0.5f;
         // (or simply `popup.transform.position = screenPos;` for many setups)
 
@@ -102,11 +112,33 @@ public class ResourceNode : MonoBehaviour
     }
 
     private void GiveLoot()
+{
+    // decide how many items to drop
+    int qty = Random.Range(payoutMin, payoutMax + 1);
+
+    // cache the screen‐space position once
+    Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position);
+    // if using Screen-Space Overlay:
+    screenPos -= new Vector3(Screen.width, Screen.height) * 0.5f;
+
+    for (int i = 0; i < qty; i++)
     {
-        int qty = Random.Range(payoutMin, payoutMax + 1);
-        for (int i = 0; i < qty; i++)
-            GameManager.Instance.AddItem(payoutItem);
+        // 1) actually give the item
+        GameManager.Instance.AddItem(payoutItem);
+
+        // 2) spawn one floating icon
+        var popup = Instantiate(
+            itemPopupPrefab,
+            uiCanvas.transform,
+            worldPositionStays: false
+        );
+        // position it
+        popup.GetComponent<RectTransform>().anchoredPosition = screenPos;
+        // set the sprite & start anim
+        popup.Initialize(itemIcon);
     }
+}
+
 
     private void Respawn()
     {
