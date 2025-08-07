@@ -22,7 +22,7 @@ MonoBehaviour:
   heroSkillPoints: 0
   attackPower: 10
   defensePower: 2
-  stamina: 5
+  stamina: 6
   maxStamina: 10
   maxHealth: 20
   health: 20
@@ -30,18 +30,20 @@ MonoBehaviour:
   energy: 2
   speed: 4
   isUnlocked: 1
-  expToLevel: 0
+  expToLevel: 30
   damageReflectionPercentage: 0.25
   skillOne: 2
-  skillTwo: 3
-  skillThree: 3
+  skillTwo: 13
+  skillThree: 13
   skillFour: 0
   skillFive: 0
   skillSix: 0
-  AvailableSkills: 0100000002000000030000000d00000009000000
+  AvailableSkills: 01000000020000000d00000009000000
   LockedSkills: 
-  equippedSkills: 0100000000000000
+  equippedSkills: 01000000020000000d000000
   maxEquippedSkills: 3
-  equipped: []
+  equipped:
+  - slot: 1
+    item: {fileID: 0}
   baseExp: 30
   growthFactor: 1.1

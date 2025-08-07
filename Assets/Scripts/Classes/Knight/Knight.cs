@@ -7,15 +7,15 @@ using System;
 public class Knight : Companion
 {
     // Base stats and growth
-    private const int BASE_HEALTH = 20;
+    private const int BASE_HEALTH = 18;
     private const int HEALTH_GROWTH = 5;
 
-    private const int BASE_ATTACK = 10;
+    private const int BASE_ATTACK = 7;
     private const int ATTACK_GROWTH = 2;
 
     private const int BASE_SPEED = 4;
 
-    private const int BASE_DEFENSE = 2;
+    private const int BASE_DEFENSE = 1;
     private const int DEFENSE_GROWTH = 1;
 
     private const int BASE_ENERGY = 2;

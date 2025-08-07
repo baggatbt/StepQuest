@@ -5,7 +5,7 @@ using System;
 
 public class Mushroom : Enemy
 {
-    private const int BASE_HEALTH = 16;
+    private const int BASE_HEALTH = 20;
     private const int HEALTH_GROWTH = 4;
 
     private const int BASE_ATTACK = 4;
