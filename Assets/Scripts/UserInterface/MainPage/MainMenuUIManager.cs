@@ -660,7 +660,7 @@ public void PopulateInventoryList() {
         {
             Debug.LogWarning($"Companion {companion.heroID} does not have enough stamina to battle.");
             // You could also show a popup here instead of just logging
-            return; // Stop execution if any companion lacks stamina
+          //TODO temp removed stamina for testing  return; // Stop execution if any companion lacks stamina
         }
     }
 
