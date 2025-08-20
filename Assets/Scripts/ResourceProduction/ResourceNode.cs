@@ -5,23 +5,22 @@ using TMPro;
 [RequireComponent(typeof(Button))]
 public class ResourceNode : MonoBehaviour
 {
-        [Header("UI Popups")]
-    public DamagePopup       damagePopupPrefab;   // already present
-    public FloatingItemPopup itemPopupPrefab;     // already present
-    public Canvas            uiCanvas;            // already present
+    [Header("UI Popups")]
+    public DamagePopup       damagePopupPrefab;
+    public FloatingItemPopup itemPopupPrefab;
+    public Canvas            uiCanvas;
 
     [Header("Drop UI")]
-    public Sprite            itemIcon;            // new: assign your payoutItem’s icon here
+    public Sprite            itemIcon;
 
-
-
-    //───────────────────────────────── Config
+    //────────── Node config
     public ResourceType type = ResourceType.Wood;
     public int          maxHP          = 20;
     public Item         payoutItem;
     public int          payoutMin      = 3;
     public int          payoutMax      = 6;
-    [Min(0)] public int stepCost       = 0;     // 0 = free (for testing)
+
+    [Min(0)] public int stepCost = 0;       // steps to start minigame
 
     private string skillID => type switch
     {
@@ -30,78 +29,127 @@ public class ResourceNode : MonoBehaviour
         _                 => "Unknown"
     };
 
-    [SerializeField] private int xpPerTap  = 5;
-    [SerializeField] private int xpOnBreak = 20;
+    [SerializeField] private int xpPerPlay   = 5;   // XP for attempting (awarded on non-miss)
+    [SerializeField] private int xpOnBreak   = 20;
     [SerializeField] private int requiredSkillLevel = 1;
 
-    //───────────────────────────────── UI
-    public Slider         hpSlider;
-    public TextMeshProUGUI hpText;
+    [Header("HP UI")]
+    public Slider           hpSlider;
+    public TextMeshProUGUI  hpText;
 
-    //───────────────────────────────── Runtime
+    [Header("Minigame & Prompt")]
+    public HarvestPrompt     promptPanel;     // same as before
+    public TimingBarController minigame;      // <— use the new script
+
+
+    [Header("Minigame Damage Multipliers")]
+    public float okMultiplier   = 1.0f;
+    public float goodMultiplier = 1.5f;
+    public float missMultiplier = 0.0f;
+
+    //────────── Runtime
     private int currentHP;
 
-    // ───────────────────────────────────────────────────────────────
-    private void Start()
+    void Start()
     {
         currentHP = maxHP;
-
-        if (hpSlider)
-        {
-            hpSlider.maxValue = maxHP;
-            hpSlider.value    = currentHP;
-        }
+        if (hpSlider) { hpSlider.maxValue = maxHP; hpSlider.value = currentHP; }
+        if (hpText)   hpText.text = $"{currentHP}/{maxHP}";
 
         GetComponent<Button>().onClick.AddListener(OnTapped);
     }
 
-    private void OnTapped()
+    void OnTapped()
     {
-        // 1) Skill-level gate
+        // 1) Skill gate
         if (TaskSkillManager.Instance.GetLevel(skillID) < requiredSkillLevel)
         {
-            Debug.Log($"Need {requiredSkillLevel}+ {skillID} to tap this node.");
+            Debug.Log($"Need {requiredSkillLevel}+ {skillID} to attempt this node.");
             return;
         }
 
-        // 2) Pay step cost (if any)
-        if (stepCost > 0 && !PlayerData.Instance.UseSteps(stepCost))
+        // 2) Open confirm prompt (we do NOT apply damage yet)
+        if (promptPanel == null)
+        {
+            Debug.LogWarning("HarvestPrompt is not wired in the inspector.");
             return;
+        }
 
-        // 3) Deal damage & grant per-tap XP
-        int dmg = PlayerHarvestStats.Instance.GetTapDamage(type);
-        TaskSkillManager.Instance.AddXP(skillID, xpPerTap);
-        Debug.Log($"+{xpPerTap} {skillID} XP (tap)");
+        string body = (stepCost <= 0)
+            ? "Play a timing minigame to harvest?"
+            : $"Pay {stepCost:N0} steps to play a timing minigame and harvest?";
 
-        ApplyDamage(dmg);
+        promptPanel.Open(
+            "Harvest",
+            body,
+            confirm: TryStartMinigame,
+            cancel: null
+        );
     }
-    
-    
 
-    private void ApplyDamage(int dmg)
+    void TryStartMinigame()
+{
+    if (stepCost > 0 && !PlayerData.Instance.UseSteps(stepCost))
+    {
+        Debug.Log("Not enough steps to play minigame.");
+        return;
+    }
+
+    if (!minigame)
+    {
+        Debug.LogWarning("TimingBarController is not wired in the inspector.");
+        return;
+    }
+
+    // subscribe once per run
+    minigame.OnFinished = OnMinigameFinished;
+    minigame.OpenAndStart();
+}
+
+void OnMinigameFinished(TimingResult result)
+{
+    float mult = result switch
+    {
+        TimingResult.Good => goodMultiplier,
+        TimingResult.Okay => okMultiplier,
+        _                 => missMultiplier
+    };
+
+    int baseDmg = PlayerHarvestStats.Instance.GetTapDamage(type);
+    int finalDmg = Mathf.Max(0, Mathf.RoundToInt(baseDmg * mult));
+
+    if (result != TimingResult.Miss)
+    {
+        TaskSkillManager.Instance.AddXP(skillID, xpPerPlay);
+        Debug.Log($"+{xpPerPlay} {skillID} XP (minigame)");
+    }
+
+    if (finalDmg > 0) ApplyDamage(finalDmg);
+    else              ShowZeroPopup();
+}
+
+    void ShowZeroPopup()
+    {
+        if (!damagePopupPrefab || !uiCanvas) return;
+
+        var popup = Instantiate(damagePopupPrefab, uiCanvas.transform, false);
+        Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position);
+        popup.GetComponent<RectTransform>().anchoredPosition = screenPos - new Vector3(Screen.width, Screen.height) * 0.5f;
+        popup.Setup(0);
+    }
+
+    void ApplyDamage(int dmg)
     {
         currentHP = Mathf.Max(0, currentHP - dmg);
 
         if (hpSlider) hpSlider.value = currentHP;
-        if (hpText) hpText.text = $"{currentHP}/{maxHP}";
-        var popup = Instantiate(
-            damagePopupPrefab,
-            uiCanvas.transform,        // parent under your UI canvas
-            worldPositionStays: false  // we’ll set its position in screen-space
-        );
+        if (hpText)   hpText.text    = $"{currentHP}/{maxHP}";
 
-        // 3) position it (screen space)
+        var popup = Instantiate(damagePopupPrefab, uiCanvas.transform, false);
         Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position);
-        // If your Canvas is Screen Space – Overlay, you can do:
-        popup.GetComponent<RectTransform>().anchoredPosition
-            = screenPos
-              - new Vector3(Screen.width, Screen.height) * 0.5f;
-        // (or simply `popup.transform.position = screenPos;` for many setups)
-
-        // 4) initialize it
+        popup.GetComponent<RectTransform>().anchoredPosition = screenPos - new Vector3(Screen.width, Screen.height) * 0.5f;
         popup.Setup(dmg);
 
-        // Break?
         if (currentHP == 0)
         {
             TaskSkillManager.Instance.AddXP(skillID, xpOnBreak);
@@ -111,39 +159,26 @@ public class ResourceNode : MonoBehaviour
         }
     }
 
-    private void GiveLoot()
-{
-    // decide how many items to drop
-    int qty = Random.Range(payoutMin, payoutMax + 1);
-
-    // cache the screen‐space position once
-    Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position);
-    // if using Screen-Space Overlay:
-    screenPos -= new Vector3(Screen.width, Screen.height) * 0.5f;
-
-    for (int i = 0; i < qty; i++)
+    void GiveLoot()
     {
-        // 1) actually give the item
-        GameManager.Instance.AddItem(payoutItem);
+        int qty = Random.Range(payoutMin, payoutMax + 1);
+        Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position);
+        screenPos -= new Vector3(Screen.width, Screen.height) * 0.5f;
 
-        // 2) spawn one floating icon
-        var popup = Instantiate(
-            itemPopupPrefab,
-            uiCanvas.transform,
-            worldPositionStays: false
-        );
-        // position it
-        popup.GetComponent<RectTransform>().anchoredPosition = screenPos;
-        // set the sprite & start anim
-        popup.Initialize(itemIcon);
+        for (int i = 0; i < qty; i++)
+        {
+            GameManager.Instance.AddItem(payoutItem);
+
+            var popup = Instantiate(itemPopupPrefab, uiCanvas.transform, false);
+            popup.GetComponent<RectTransform>().anchoredPosition = screenPos;
+            popup.Initialize(itemIcon);
+        }
     }
-}
 
-
-    private void Respawn()
+    void Respawn()
     {
         currentHP = maxHP;
         if (hpSlider) hpSlider.value = currentHP;
-        if (hpText)   hpText.text   = $"{currentHP}/{maxHP}";
+        if (hpText)   hpText.text    = $"{currentHP}/{maxHP}";
     }
 }
