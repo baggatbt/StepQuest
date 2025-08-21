@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 public enum TimingResult { Miss, Okay, Good }
 
@@ -17,33 +18,51 @@ public class TimingBarController : MonoBehaviour
     public RectTransform indicator;    // moving pill (Image)
     public RectTransform targetZone;   // colored window (Image)
 
-    [Header("Tuning")]
+    [Header("Movement")]
     public float sweepSeconds = 1.2f;
-    public float edgePadding  = 0f;      // extra gap inside travelArea
-    public float innerLeftInset = 0f, innerRightInset = 0f; // if bar sprite has fat borders
-    public Vector2 targetWidthPct = new Vector2(0.15f, 0.30f);
     public bool recomputeEveryFrame = true;
 
-    [Header("Indicator Size (fixes your issue)")]
+    [Header("Bounds / Insets")]
+    public float edgePadding  = 0f;                     // gap inside travelArea
+    public float innerLeftInset = 0f, innerRightInset = 0f; // if the bar sprite has borders
+
+    [Header("Target Window")]
+    [Tooltip("Initial target width as % of travelArea width (min..max).")]
+    public Vector2 targetWidthPct = new Vector2(0.15f, 0.30f);
+    [Tooltip("Minimum allowed target width as % of travelArea width.")]
+    public float minTargetWidthPct = 0.06f;
+    [Tooltip("If the player hits Okay/Good, next attempt width *= this.")]
+    [Range(0.3f, 0.95f)] public float successShrinkFactor = 0.6f;
+
+    [Header("Indicator Sizing")]
     public bool forceIndicatorSize = true;
-    public float indicatorWidthPx  = 24f;   // ← set what you want (e.g., 16–32)
-    public float indicatorHeightPx = 0f;    // 0 = keep current; >0 = force; -1 = match travelArea height
+    public float indicatorWidthPx  = 24f;
+    public float indicatorHeightPx = -1f;   // -1 = match travelArea height, 0 = keep, >0 = px
+
+    [Header("Series (multi-attempt)")]
+    [Min(1)] public int attemptsPerSeries = 3;
 
     [Header("Debug")]
-    public bool logOnChange = true;
-    public RectTransform leftMarker, rightMarker; // optional endpoint markers
+    public bool logOnChange = false;
+    public RectTransform leftMarker, rightMarker;
 
-    public Action<TimingResult> OnFinished;
+    // Callbacks
+    public Action<TimingResult[]> OnSeriesFinished;   // <-- use this
+    public Action<TimingResult>   OnFinished;         // (legacy single attempt)
 
+    // runtime
     float t, leftX, rightX;
     bool running;
     float _lastTAW=-1, _lastIndW=-1, _lastPad=-1, _lastL=-1, _lastR=-1;
+
+    // series state
+    readonly List<TimingResult> _results = new();
+    float _currentTargetWidthPx;
 
     void Awake()
     {
         if (tapAnywhereButton) tapAnywhereButton.onClick.AddListener(HandleTap);
 
-        // Ensure hierarchy
         if (!travelArea)
         {
             travelArea = new GameObject("TravelArea", typeof(RectTransform)).GetComponent<RectTransform>();
@@ -54,11 +73,9 @@ public class TimingBarController : MonoBehaviour
         if (indicator && indicator.parent != travelArea) indicator.SetParent(travelArea, false);
         if (targetZone && targetZone.parent != travelArea) targetZone.SetParent(travelArea, false);
 
-        // Clip (optional)
         if (track && !track.GetComponent<Mask>() && !track.GetComponent<RectMask2D>())
             track.gameObject.AddComponent<RectMask2D>();
 
-        // Left-anchored children + ignore layout + sit on the rail
         PrepChild(indicator);
         PrepChild(targetZone);
     }
@@ -69,7 +86,8 @@ public class TimingBarController : MonoBehaviour
         travelArea.anchorMax = new Vector2(1f, 0.5f);
         travelArea.pivot     = new Vector2(0.5f, 0.5f);
         travelArea.anchoredPosition = Vector2.zero;
-        travelArea.sizeDelta = Vector2.zero;                // Left/Right = 0
+        travelArea.sizeDelta = Vector2.zero;
+
         var le = travelArea.GetComponent<LayoutElement>() ?? travelArea.gameObject.AddComponent<LayoutElement>();
         le.ignoreLayout = true;
         travelArea.localScale = Vector3.one;
@@ -104,19 +122,25 @@ public class TimingBarController : MonoBehaviour
     }
 
     // ─────────── Public API ───────────
-    public void OpenAndStart()
+    public void OpenAndStart() => OpenAndStartSeries(1);
+
+    public void OpenAndStartSeries(int attempts)
     {
+        attemptsPerSeries = Mathf.Max(1, attempts);
+
         gameObject.SetActive(true);
         Show(true);
 
         Canvas.ForceUpdateCanvases();
         NormalizeTravelArea();
-        EnsureIndicatorSize();     // <<< enforce sane width BEFORE measuring
+        EnsureIndicatorSize();
         RecalcTravel();
-        RandomizeTarget();
-        SnapLeft();
-        running = true;
 
+        _results.Clear();
+        SetupInitialTarget();
+        SnapLeft();
+
+        running = true;
         StartCoroutine(RecalcNextFrame());
     }
 
@@ -125,7 +149,7 @@ public class TimingBarController : MonoBehaviour
         yield return null;
         Canvas.ForceUpdateCanvases();
         NormalizeTravelArea();
-        EnsureIndicatorSize();     // <<< enforce again after any late layout
+        EnsureIndicatorSize();
         RecalcTravel();
         SnapLeft();
     }
@@ -143,24 +167,18 @@ public class TimingBarController : MonoBehaviour
         gameObject.SetActive(on);
     }
 
-    // ─────────── Calc helpers ───────────
+    // ─────────── Sizing & travel ───────────
     void EnsureIndicatorSize()
     {
         if (!indicator || !forceIndicatorSize) return;
 
-        // Width: fixed pixels (prevents “stretched to parent” leftovers like your 829px)
         float w = Mathf.Max(1f, indicatorWidthPx);
         indicator.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, w);
 
-        // Height: keep, or force, or match travelArea height
         if (indicatorHeightPx > 0f)
-        {
             indicator.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, indicatorHeightPx);
-        }
-        else if (indicatorHeightPx < 0f && travelArea) // -1 → match travel height
-        {
-            indicator.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, travelArea.rect.height);
-        }
+        else if (indicatorHeightPx < 0f && travelArea)
+            indicator.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Mathf.Max(1f, travelArea.rect.height));
     }
 
     void TryRecalcIfChanged()
@@ -195,38 +213,79 @@ public class TimingBarController : MonoBehaviour
         _lastTAW = taw; _lastIndW = indicator.rect.width; _lastPad = edgePadding; _lastL = innerLeftInset; _lastR = innerRightInset;
     }
 
-    void RandomizeTarget()
+    void SnapLeft() { indicator.anchoredPosition = new Vector2(leftX, 0f); t = 0f; }
+
+    // ─────────── Target placement & shrinking ───────────
+    void SetupInitialTarget()
     {
         float taw = travelArea.rect.width;
         float pct = Mathf.Clamp01(UnityEngine.Random.Range(targetWidthPct.x, targetWidthPct.y));
-        float w   = pct * taw;
-        targetZone.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, w);
+        _currentTargetWidthPx = Mathf.Max(taw * minTargetWidthPct, taw * pct);
+        PlaceTargetAtRandomX();
+    }
 
-        float halfTZ = w * 0.5f;
-        float minCx  = leftX + halfTZ;
-        float maxCx  = rightX - halfTZ;
-        float cx     = (minCx <= maxCx) ? UnityEngine.Random.Range(minCx, maxCx) : taw * 0.5f;
+    void ShrinkTargetForSuccess()
+    {
+        float taw = travelArea.rect.width;
+        float minPx = taw * minTargetWidthPct;
+        _currentTargetWidthPx = Mathf.Max(minPx, _currentTargetWidthPx * successShrinkFactor);
+        PlaceTargetAtRandomX();
+    }
 
+    void PlaceTargetAtRandomX()
+    {
+        targetZone.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, _currentTargetWidthPx);
+
+        float half = _currentTargetWidthPx * 0.5f;
+        float minCx = leftX + half;
+        float maxCx = rightX - half;
+        float cx = (minCx <= maxCx) ? UnityEngine.Random.Range(minCx, maxCx) : (leftX + rightX) * 0.5f;
         targetZone.anchoredPosition = new Vector2(cx, 0f);
     }
 
-    void SnapLeft() { indicator.anchoredPosition = new Vector2(leftX, 0f); t = 0f; }
-
+    // ─────────── Input ───────────
     void HandleTap()
     {
         if (!running) return;
-        running = false;
 
+        // grade
         float ix = indicator.anchoredPosition.x;
         float cx = targetZone.anchoredPosition.x;
         float halfTZ = targetZone.rect.width * 0.5f;
+        float d = Mathf.Abs(ix - cx);
 
-        var result =
-            (Mathf.Abs(ix - cx) <= halfTZ * 0.33f) ? TimingResult.Good :
-            (Mathf.Abs(ix - cx) <= halfTZ)         ? TimingResult.Okay :
-                                                     TimingResult.Miss;
+        TimingResult result =
+            (d <= halfTZ * 0.33f) ? TimingResult.Good :
+            (d <= halfTZ)         ? TimingResult.Okay :
+                                    TimingResult.Miss;
 
+        _results.Add(result);
+
+        bool success = (result != TimingResult.Miss);
+        bool more    = _results.Count < attemptsPerSeries;
+
+        if (success && more)
+        {
+            // make next one harder and keep going
+            ShrinkTargetForSuccess();
+            SnapLeft();
+            return;
+        }
+
+        if (more)
+        {
+            // miss → same width, just reroll position
+            PlaceTargetAtRandomX();
+            SnapLeft();
+            return;
+        }
+
+        // finished the series
+        running = false;
+        OnSeriesFinished?.Invoke(_results.ToArray());
+        // legacy single-attempt callback (report last)
         OnFinished?.Invoke(result);
+
         Close();
     }
 }

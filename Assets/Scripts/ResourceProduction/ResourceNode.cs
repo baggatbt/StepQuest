@@ -101,9 +101,41 @@ public class ResourceNode : MonoBehaviour
         return;
     }
 
-    // subscribe once per run
-    minigame.OnFinished = OnMinigameFinished;
-    minigame.OpenAndStart();
+    // one session → 3 attempts
+    minigame.attemptsPerSeries = 3;
+    minigame.OnSeriesFinished  = OnSeriesFinished;
+    minigame.OpenAndStartSeries(minigame.attemptsPerSeries);
+}
+
+void OnSeriesFinished(TimingResult[] results)
+{
+    // aggregate multiplier across the 3 tries (reward at end)
+    float totalMult = 0f;
+    int successes = 0;
+
+    foreach (var r in results)
+    {
+        switch (r)
+        {
+            case TimingResult.Good: totalMult += goodMultiplier; successes++; break;
+            case TimingResult.Okay: totalMult += okMultiplier;   successes++; break;
+            case TimingResult.Miss: totalMult += missMultiplier; break;
+        }
+    }
+
+    int baseDmg  = PlayerHarvestStats.Instance.GetTapDamage(type);
+    int finalDmg = Mathf.Max(0, Mathf.RoundToInt(baseDmg * totalMult)); // sum of per-attempt multipliers
+
+    // XP: award per successful attempt
+    if (successes > 0)
+    {
+        int xpGain = xpPerPlay * successes;
+        TaskSkillManager.Instance.AddXP(skillID, xpGain);
+        Debug.Log($"+{xpGain} {skillID} XP (minigame x{successes})");
+    }
+
+    if (finalDmg > 0) ApplyDamage(finalDmg);
+    else              ShowZeroPopup();
 }
 
 void OnMinigameFinished(TimingResult result)
