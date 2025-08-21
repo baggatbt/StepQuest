@@ -70,8 +70,9 @@ public class TimingBarController : MonoBehaviour
         }
         NormalizeTravelArea();
 
-        if (indicator && indicator.parent != travelArea) indicator.SetParent(travelArea, false);
         if (targetZone && targetZone.parent != travelArea) targetZone.SetParent(travelArea, false);
+        if (indicator && indicator.parent != travelArea) indicator.SetParent(travelArea, false);
+        
 
         if (track && !track.GetComponent<Mask>() && !track.GetComponent<RectMask2D>())
             track.gameObject.AddComponent<RectMask2D>();
