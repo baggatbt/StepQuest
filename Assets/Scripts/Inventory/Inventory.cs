@@ -5,23 +5,65 @@ using TMPro;
 public class Inventory : MonoBehaviour
 {
     [Header("Inventory UI")]
-    public GameObject inventoryUI;
+    public GameObject inventoryUI;               // the root panel GameObject
+    public CanvasGroup inventoryCanvasGroup;     // ASSIGN in Inspector (on the same root)
     public GameObject slotPrefab;
-    public GameObject unequipButtonPrefab; // <-- Assign a prefab with a Button + Label in Inspector
+    public GameObject unequipButtonPrefab;
     public EquipmentManager equipmentManager;
 
     private EquipmentType pendingEquipSlot;
 
+    private void Awake()
+    {
+        // Optional: ensure GameManager can find us
+        if (GameManager.Instance) GameManager.Instance.inventory = this;
+    }
+
     private void Start()
     {
         GameManager.Instance.LoadInventory();
+        // Optional: ensure hidden state at start
+        HideInventory();
     }
+
+    // --- PUBLIC API ---
 
     public void OpenInventoryForEquip(EquipmentType slot)
     {
         pendingEquipSlot = slot;
-        inventoryUI.SetActive(true);
+        ShowInventory();         // ← ensure CG is visible and clickable
         UpdateInventoryUI();
+    }
+
+    public void CloseInventory()
+    {
+        HideInventory();
+    }
+
+    // --- INTERNAL ---
+
+    private void ShowInventory()
+    {
+        if (inventoryUI != null) inventoryUI.SetActive(true);
+
+        if (inventoryCanvasGroup != null)
+        {
+            inventoryCanvasGroup.alpha = 1f;
+            inventoryCanvasGroup.interactable = true;
+            inventoryCanvasGroup.blocksRaycasts = true;
+        }
+    }
+
+    private void HideInventory()
+    {
+        if (inventoryUI != null) inventoryUI.SetActive(true); // keep active so layout stays; CG will gate input
+
+        if (inventoryCanvasGroup != null)
+        {
+            inventoryCanvasGroup.alpha = 0f;
+            inventoryCanvasGroup.interactable = false;
+            inventoryCanvasGroup.blocksRaycasts = false;
+        }
     }
 
     public void UpdateInventoryUI()
@@ -29,34 +71,28 @@ public class Inventory : MonoBehaviour
         if (inventoryUI == null) return;
 
         foreach (Transform child in inventoryUI.transform)
-        {
             Destroy(child.gameObject);
-        }
 
-        // ───── Add Unequip Button if item is equipped ─────
+        // Unequip button
         Equipment equippedItem = GameManager.Instance.currentCompanionData?.GetEquipped(pendingEquipSlot);
         if (equippedItem != null && unequipButtonPrefab != null)
         {
             GameObject unequipSlot = Instantiate(unequipButtonPrefab, inventoryUI.transform);
             Button unequipBtn = unequipSlot.GetComponent<Button>();
             TextMeshProUGUI label = unequipSlot.GetComponentInChildren<TextMeshProUGUI>();
-
-            if (label != null)
-                label.text = $"Unequip {equippedItem.itemName}";
-
-            if (unequipBtn != null)
+            if (label) label.text = $"Unequip {equippedItem.itemName}";
+            if (unequipBtn)
             {
                 unequipBtn.onClick.RemoveAllListeners();
                 unequipBtn.onClick.AddListener(() =>
                 {
-                    Debug.Log($"Clicked to unequip {equippedItem.itemName} from {pendingEquipSlot}");
                     equipmentManager.Unequip(pendingEquipSlot);
-                    inventoryUI.SetActive(false);
+                    HideInventory();
                 });
             }
         }
 
-        // ───── Render Inventory Slots ─────
+        // Render inventory slots...
         var items = GameManager.Instance.itemList;
         int totalSlots = GameManager.Instance.maxInventorySlots;
 
@@ -69,42 +105,35 @@ public class Inventory : MonoBehaviour
             TextMeshProUGUI itemCountText = slot.transform.Find("ItemCountText")?.GetComponent<TextMeshProUGUI>();
             Button equipButton = slot.transform.Find("UseButton")?.GetComponent<Button>();
 
-
             if (i < items.Count)
             {
                 Item item = items[i];
 
-                if (itemImage != null)
+                if (itemImage)
                 {
                     itemImage.enabled = true;
                     itemImage.sprite = item.itemIcon;
                 }
+                if (itemCountText) itemCountText.text = item.quantity.ToString();
 
-                if (itemCountText != null)
-                {
-                    itemCountText.text = item.quantity.ToString();
-                }
-
-                if (equipButton != null)
+                if (equipButton)
                 {
                     equipButton.onClick.RemoveAllListeners();
 
-                    if (item is Equipment equipment)
+                    if (item is Equipment eq)
                     {
-                        bool isCorrectSlot = equipment.equipmentType == pendingEquipSlot;
+                        bool isCorrectSlot = eq.equipmentType == pendingEquipSlot;
                         equipButton.interactable = isCorrectSlot;
 
                         if (isCorrectSlot)
                         {
-                            Equipment localEquipment = equipment; // ← This prevents closure issues
+                            Equipment localEq = eq;
                             equipButton.onClick.AddListener(() =>
                             {
-                                Debug.Log($"Clicked to equip {localEquipment.itemName} into {pendingEquipSlot} slot");
-                                equipmentManager.Equip(localEquipment);
-                                inventoryUI.SetActive(false);
+                                equipmentManager.Equip(localEq);
+                                HideInventory();
                             });
                         }
-
                     }
                     else
                     {
@@ -114,22 +143,9 @@ public class Inventory : MonoBehaviour
             }
             else
             {
-                if (itemImage != null)
-                {
-                    itemImage.enabled = false;
-                    itemImage.sprite = null;
-                }
-
-                if (itemCountText != null)
-                {
-                    itemCountText.text = "";
-                }
-
-                if (equipButton != null)
-                {
-                    equipButton.interactable = false;
-                    equipButton.onClick.RemoveAllListeners();
-                }
+                if (itemImage) { itemImage.enabled = false; itemImage.sprite = null; }
+                if (itemCountText) itemCountText.text = "";
+                if (equipButton) { equipButton.interactable = false; equipButton.onClick.RemoveAllListeners(); }
             }
         }
     }
