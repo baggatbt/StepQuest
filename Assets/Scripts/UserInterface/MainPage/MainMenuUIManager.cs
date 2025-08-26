@@ -1106,10 +1106,21 @@ public void UnlockSkillTwoForHero()
 
         void OnEnable() {
             TimerManager.Instance.OnTimerCompleted += HandleTimerCompletion;
+             EquipmentManager.OnEquipmentChanged += HandleEquipmentChanged;
+  
         }
 
         void OnDisable() {
             TimerManager.Instance.OnTimerCompleted -= HandleTimerCompletion;
+            EquipmentManager.OnEquipmentChanged -= HandleEquipmentChanged;
+    
+        }
+
+        private void HandleEquipmentChanged(CharacterData changed)
+        {
+            
+            
+            UpdateCompanionStatsDisplay(changed);
         }
 
         private void HandleTimerCompletion(string timerId) {

@@ -16,6 +16,10 @@ public class EquipmentManager : MonoBehaviour
     // Shortcut to whichever CharacterData the UI is showing
     private CharacterData Current => GameManager.Instance?.currentCompanionData;
 
+    public static event System.Action<CharacterData> OnEquipmentChanged;
+
+
+
     //────────────────────────────────────────────────────────────────
     private void Start()
     {
@@ -42,6 +46,7 @@ public class EquipmentManager : MonoBehaviour
         Current.EquipItem(equipment);                     // NEW: goes straight to CharacterData
         GameManager.Instance.itemList.Remove(equipment); // remove from inventory
         UpdateUI();
+        OnEquipmentChanged?.Invoke(Current); //Updates hero stats right away
     }
 
     public void Unequip(EquipmentType slot)
@@ -55,6 +60,7 @@ public class EquipmentManager : MonoBehaviour
         Current.UnequipItem(slot);
         GameManager.Instance.AddItem(toUnequip);          // back to inventory
         UpdateUI();
+        OnEquipmentChanged?.Invoke(Current);
     }
 
     #endregion
