@@ -9,6 +9,7 @@ public class StageData
     public string battleSceneName;
     public bool isUnlocked;
     public bool isBossBattle;
+    public int stepCost;
     public BattleConfig stageBattleConfig;
     public List<string> connectedStageIDs;      // List of stage IDs connected to this stage
 

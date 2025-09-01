@@ -839,6 +839,22 @@ public int GetItemCount(Item item)
        // CreateAndLoadCompanion(wizardPrefab, "Wizard");
     }
 
+    public int GetBattleStepCost(StageData stage)
+    {
+        if (stage != null && stage.stepCost > 0) return stage.stepCost;
+        return 200; // fallback default if unset
+    }
+
+    public bool TryPaySteps(int amount)
+    {
+        if (amount <= 0) return true;
+        if (PlayerData.Instance.inGameSteps < amount) return false;
+        PlayerData.Instance.inGameSteps -= amount;
+        // If you persist steps somewhere else, call save here.
+        return true;
+    }
+
+
     void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
