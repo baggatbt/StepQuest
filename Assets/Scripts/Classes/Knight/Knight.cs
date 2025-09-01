@@ -18,7 +18,7 @@ public class Knight : Companion
     private const int BASE_DEFENSE = 1;
     private const int DEFENSE_GROWTH = 1;
 
-    private const int BASE_ENERGY = 2;
+    private const int BASE_ENERGY = 5;
 
     protected override void Awake()
     {
