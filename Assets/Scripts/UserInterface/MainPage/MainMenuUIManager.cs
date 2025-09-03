@@ -654,35 +654,44 @@ public void PopulateInventoryList() {
     
      public void GoToBattle(string stageID)
 {
-    // 1) Stamina checks (keep yours)
+    // 1) (Optional) Stamina checks – keep/remove per your design
     foreach (var companion in GameManager.Instance.currentParty)
     {
         if (companion.stamina < 1)
         {
             Debug.LogWarning($"Companion {companion.heroID} does not have enough stamina to battle.");
-            // return; // (you had this temporarily disabled for testing)
+            // return; // re-enable if you bring stamina back
         }
     }
 
     // 2) Find stage
-    StageData selectedStage = GameManager.Instance.allStagesData.Find(stage => stage.stageID == stageID);
+    StageData selectedStage = GameManager.Instance.allStagesData.Find(s => s.stageID == stageID);
     if (selectedStage == null)
     {
         Debug.LogError($"Stage with ID {stageID} not found.");
         return;
     }
 
-    // 3) Calculate & charge step cost
+    // 3) BLOCK if stage is locked
+    if (!selectedStage.isUnlocked)
+    {
+        Debug.Log($"Stage '{selectedStage.stageID}' is locked. Cannot enter.");
+        // Optional: show a popup/toast here instead of just logging:
+        // ShowNodeInfo($"Stage locked. Complete prior stages or requirements to unlock.");
+        return;
+    }
+
+    // 4) Calculate & charge step cost
     int stepCost = GameManager.Instance.GetBattleStepCost(selectedStage);
     if (!GameManager.Instance.TryPaySteps(stepCost))
     {
         Debug.Log($"Not enough steps. Need {stepCost}, have {PlayerData.Instance.inGameSteps}.");
-        // Optional: open a popup instead of just logging:
+        // Optional popup:
         // ShowNodeInfo($"Need {stepCost} steps to enter.");
         return;
     }
 
-    // 4) Proceed to battle
+    // 5) Proceed to battle
     GameManager.Instance.CurrentBattleConfig = selectedStage.stageBattleConfig;
     GameManager.Instance.currentStage = selectedStage;
     Debug.Log($"Going to battle {selectedStage.stageID} (cost {stepCost} steps)");
@@ -690,6 +699,7 @@ public void PopulateInventoryList() {
     GameManager.Instance.SaveCurrentParty();
     SceneManager.LoadScene(selectedStage.battleSceneName);
 }
+
 
 
 
