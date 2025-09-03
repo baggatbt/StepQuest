@@ -943,7 +943,6 @@ public class BattleManager : MonoBehaviour
         Debug.Log("Battle won");
 
         Stage completedStage = GameManager.Instance.CurrentBattleConfig.stage;
-        GameEvents.RaiseStageCleared(GameManager.Instance.currentStage.stageID);
        // GameManager.Instance.UnlockConnectedStages(completedStage);
        // if (completedStage.isBossBattle)
        // {

@@ -699,7 +699,6 @@ private IEnumerator TintRed()
             enemy.enemyDeathEffect.TriggerExplosion();
             StartCoroutine(enemy.FadeOutSprite());
             enemy.DropMaterial(); // Call DropMaterial on the enemy instance
-            GameEvents.RaiseEnemyDefeated(enemy); //Increments for objectives
             // Add any additional logic here for when an enemy dies.
         }
         else if (this.gameObject.tag == "Companion")

@@ -850,7 +850,6 @@ public int GetItemCount(Item item)
         if (amount <= 0) return true;
         if (PlayerData.Instance.inGameSteps < amount) return false;
         PlayerData.Instance.inGameSteps -= amount;
-        GameEvents.RaiseStepsSpent(amount); //For objective tracking
         // If you persist steps somewhere else, call save here.
         return true;
     }
@@ -934,77 +933,6 @@ public int GetItemCount(Item item)
         transform.position = destinationNode.position; // Update the player's position
         Debug.Log($"Moved to {destinationNode.nodeName}");
     }
-
-    // === Simple reward helpers for Objectives ===
-
-// Add “gold” (uses your existing PlayerData currency; here I map to totalCopper)
-public void AddGold(int amount)
-{
-    if (amount <= 0) return;
-    if (PlayerData.Instance == null)
-    {
-        Debug.LogWarning("[GameManager] AddGold: PlayerData.Instance is null");
-        return;
-    }
-
-    PlayerData.Instance.totalCopper += amount;
-
-    // Optional: refresh any gold text if you show it
-    var ui = FindObjectOfType<MainMenuUIManager>();
-    if (ui != null && ui.goldText != null)
-        ui.goldText.text = PlayerData.Instance.totalCopper.ToString();
-}
-
-// Add an item by id or name (looks up in your allItemsMasterList)
-public void AddItemById(string idOrName, int count = 1)
-{
-    if (string.IsNullOrEmpty(idOrName) || count <= 0)
-        return;
-
-    // Try numeric id first
-    Item master = null;
-    if (int.TryParse(idOrName, out var numericId))
-    {
-        master = FindItemInMasterList(numericId);
-    }
-
-    // Fallback: find by itemName (case-insensitive)
-    if (master == null)
-    {
-        foreach (var it in allItemsMasterList)
-        {
-            if (it != null && string.Equals(it.itemName, idOrName, StringComparison.OrdinalIgnoreCase))
-            {
-                master = it;
-                break;
-            }
-        }
-    }
-
-    if (master == null)
-    {
-        Debug.LogWarning($"[GameManager] AddItemById: '{idOrName}' not found in allItemsMasterList.");
-        return;
-    }
-
-    if (itemList == null) itemList = new List<Item>();
-
-    // Increase quantity if already owned; otherwise add the master asset reference
-    var existing = itemList.Find(i => i != null && i.itemID == master.itemID);
-    if (existing != null)
-    {
-        existing.quantity += count;
-    }
-    else
-    {
-        master.quantity = count; // quantity is stored on the SO in your setup
-        itemList.Add(master);
-    }
-
-    SaveInventory();
-    if (inventory != null) inventory.UpdateInventoryUI();
-}
-
 
     
 }
