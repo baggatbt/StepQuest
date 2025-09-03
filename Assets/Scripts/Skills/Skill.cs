@@ -14,24 +14,24 @@ public struct AttackStage
 }
 
 public enum SkillType
-    {
-        None,
-        Slash,
-        TripleHit,
-        SwordWave,
-        GuardSkill,
-        ShieldSlam,
-        SlimeCompanionBasicAttack,
-        WizardBasicAttack,
-        FirePillar,
-        Taunt,
-        ShootArrow,
-        ArrowRain,
-        MeleeCombo,
-        ReflectDamagePassive,
-        SpeedBreak,
-        TamedGoblinAttackSkill
-    }
+{
+    None,
+    Slash,
+    TripleHit,
+    SwordWave,
+    GuardSkill,
+    ShieldSlam,
+    SlimeCompanionBasicAttack,
+    WizardBasicAttack,
+    FirePillar,
+    Taunt,
+    ShootArrow,
+    ArrowRain,
+    MeleeCombo,
+    ReflectDamagePassive,
+    SpeedBreak,
+    TamedGoblinAttackSkill
+}
 
 
 
@@ -41,7 +41,7 @@ public abstract class Skill
     public string description;
     public bool skillExecutionComplete; // Flag to track the completion of skill execution
     public bool requiresMovement; // Indicates if the attack requires movement towards the target
-//got rid of can hit behind
+    //got rid of can hit behind
     public int energyCost;
     public int energyGain;
     public int energyGainBonus;
@@ -49,15 +49,19 @@ public abstract class Skill
     public bool bonusGained;
     public int skillLevel;
     public bool noZoom; //Allows zoom to be disabled
-     public bool isActiveSkill = true; //Determines whether the skill as active or passive
+    public bool isActiveSkill = true; //Determines whether the skill as active or passive
     public int requiredLevel;  // New field\
     public Sprite iconImage; // Field to store the icon image associated with the skill
     public float skillDamageModifier;
     public int skillPointCost;
-    
+
+    // Section C additions
+    public SkillType Type { get; set; }                 // Which enum this instance represents
+    public TimingEventResult LastTimingResult { get; private set; }  // Most recent timing result
+
     protected TimingEventResult result; 
 
-      // New virtual function for calculating base damage.
+    // New virtual function for calculating base damage.
     protected virtual int CalculateBaseDamage(Character user)
     {
         return 5;
@@ -66,11 +70,6 @@ public abstract class Skill
     {
         return Resources.Load<Sprite>(path);
     }
-
-    
-
-
-    
 
     public abstract IEnumerator Execute(Character user, Character target, BattleManager battleManager);
 
@@ -81,59 +80,56 @@ public abstract class Skill
     
 
     public void HandleAoeAttack(Character user, List<Character> enemies, TimingEventResult timingResult, int baseDamage)
-{
-    float damageTimingMultiplier = 1.0f;
-    
-    result = timingResult;
-    int skillBaseDamage = baseDamage;
-
-    foreach (Character target in enemies)
     {
-        if (result == TimingEventResult.Good)
+        float damageTimingMultiplier = 1.0f;
+        
+        result = timingResult;
+        LastTimingResult = timingResult;   // <-- added
+        int skillBaseDamage = baseDamage;
+
+        foreach (Character target in enemies)
         {
-             target.animator.SetTrigger("IsHurtTrigger");
-             damageTimingMultiplier = 1.25f;  // Boost damage by 25%                      
-             target.TakeDamage((int)(skillBaseDamage * damageTimingMultiplier),user); // Apply damage boost
-             user.PlayCriticalHitSound(); // Play critical hit sound
+            if (result == TimingEventResult.Good)
+            {
+                target.animator.SetTrigger("IsHurtTrigger");
+                damageTimingMultiplier = 1.25f;  // Boost damage by 25%                      
+                target.TakeDamage((int)(skillBaseDamage * damageTimingMultiplier), user); // Apply damage boost
+                user.PlayCriticalHitSound(); // Play critical hit sound
+            }
+            else 
+            {                         
+                target.TakeDamage((int)skillBaseDamage, user); // Apply damage boost
+            }
         }
-        else 
-        {
-                                  
-            target.TakeDamage((int)skillBaseDamage,user); // Apply damage boost
-        }
-       
     }
-}
 
 
-
-
-     public void HandleTimingResultForEnemyAttack(Character user, Character target, TimingEventResult timingResult, int baseDamage)
+    public void HandleTimingResultForEnemyAttack(Character user, Character target, TimingEventResult timingResult, int baseDamage)
     {
-
         if (user.damageApplied)
-    {
-        // If damage has already been applied, skip further processing
-        return;
-    }
+        {
+            // If damage has already been applied, skip further processing
+            return;
+        }
 
         float damageTimingMultiplier = 1.0f;
         int skillBaseDamage = baseDamage;
         int finalDamage;
         
         result = timingResult;
+        LastTimingResult = timingResult;   // <-- already present
         
         //finalDamage = Math.Max(finalDamage, 1);
         // Gain energy and set animations based on the result
-       // user.GainEnergy(1);
+        // user.GainEnergy(1);
         
         if (result == TimingEventResult.Good)
         {
             target.didBlock = true;
             damageTimingMultiplier = 0.75f;
             finalDamage = (int)(skillBaseDamage * damageTimingMultiplier);
-            target.TakeDamage(finalDamage,user);
-             
+            target.TakeDamage(finalDamage, user);
+            
             target.animator.SetTrigger("BlockTrigger");
             AudioManager.instance.PlayBlockSound();
 
@@ -142,7 +138,7 @@ public abstract class Skill
             Debug.Log(finalReflectedDamage);
             if (finalReflectedDamage > 0)
             {
-            user.TakeDamage(finalReflectedDamage, target);
+                user.TakeDamage(finalReflectedDamage, target);
             }
             target.didBlock = false;
             
@@ -153,80 +149,79 @@ public abstract class Skill
             damageTimingMultiplier = 1.0f;
             finalDamage = skillBaseDamage;
             
-            target.TakeDamage((int)skillBaseDamage,user); 
+            target.TakeDamage((int)skillBaseDamage, user); 
             user.PlayHitSound();
-            
-           // AudioManager.instance.PlayBlockSound();
         }
 
         // Mark that damage has been applied to prevent further instances
-    user.damageApplied = true;
+        user.damageApplied = true;
     }
 
     private int CalculateReflectDamage(Character user, int damage)
-{
-    double reflectedDamage = user.damageReflectionPercentage * damage;
-    int finalReflectedDamage = Convert.ToInt32(Math.Round(reflectedDamage));
-    return finalReflectedDamage; // Return the calculated damage to reflect
-}
+    {
+        double reflectedDamage = user.damageReflectionPercentage * damage;
+        int finalReflectedDamage = System.Convert.ToInt32(System.Math.Round(reflectedDamage));
+        return finalReflectedDamage; // Return the calculated damage to reflect
+    }
 
-
-
-    
 
     public void HandleTimingResultForPlayerAttack(Character user, Character target, TimingEventResult timingResult, int baseDamage)
-{
-    if (user.damageApplied)
     {
-        // If damage has already been applied, skip further processing
-        return;
-    }
-
-    float damageTimingMultiplier = 1.0f;
-    float skillBaseDamage = baseDamage; // Use float for baseDamage to allow for fractional multipliers
-    int finalDamage;
-
-    if (timingResult == TimingEventResult.Good)
-    {
-        Debug.Log("Good Hit!");
-        damageTimingMultiplier = 1.25f;  // Boost damage by 25%
-
-        // Calculate final damage and round up
-        finalDamage = Mathf.CeilToInt(skillBaseDamage * damageTimingMultiplier);
-        target.TakeDamage(finalDamage, user);
-        if (!bonusGained)
-        {   
-            bonusGained = true;
-            user.GainEnergy(energyGainBonus); // Bonus energy for a good hit
-            Debug.Log("Gaining energybonus" + bonusGained);
+        if (user.damageApplied)
+        {
+            // If damage has already been applied, skip further processing
+            return;
         }
-        user.PlayCriticalHitSound(); // Play critical hit sound
+
+        // Section C: record timing result for mastery
+        result = timingResult;                 // <-- added
+        LastTimingResult = timingResult;       // <-- added
+
+        float damageTimingMultiplier = 1.0f;
+        float skillBaseDamage = baseDamage; // Use float for baseDamage to allow for fractional multipliers
+        int finalDamage;
+
+        if (timingResult == TimingEventResult.Good)
+        {
+            Debug.Log("Good Hit!");
+            damageTimingMultiplier = 1.25f;  // Boost damage by 25%
+
+            // Calculate final damage and round up
+            finalDamage = Mathf.CeilToInt(skillBaseDamage * damageTimingMultiplier);
+            target.TakeDamage(finalDamage, user);
+            if (!bonusGained)
+            {   
+                bonusGained = true;
+                user.GainEnergy(energyGainBonus); // Bonus energy for a good hit
+                Debug.Log("Gaining energybonus" + bonusGained);
+            }
+            user.PlayCriticalHitSound(); // Play critical hit sound
+        }
+        else
+        {
+            damageTimingMultiplier = 1.0f;  // Base damage
+            finalDamage = baseDamage; // No need to round since no multiplier
+            target.TakeDamage(finalDamage, user);
+            user.PlayHitSound(); // Play hit sound
+        }
+
+        // Mark that damage has been applied to prevent further instances
+        user.damageApplied = true;
     }
-    else
+
+
+    public void HandlePlayerRangedAttack(Character user, Projectile projectile, TimingEventResult result)
     {
-        damageTimingMultiplier = 1.0f;  // Base damage
-        finalDamage = baseDamage; // No need to round since no multiplier
-        target.TakeDamage(finalDamage, user);
-        user.PlayHitSound(); // Play hit sound
-    }
+        // Avoid shadowing issues: also store on the instance
+        this.result = result;                 // <-- added
+        LastTimingResult = result;            // <-- added
 
-    // Mark that damage has been applied to prevent further instances
-    user.damageApplied = true;
-}
-
-
-
-
-
-public void HandlePlayerRangedAttack(Character user, Projectile projectile, TimingEventResult result)
-    {
         float damageMultiplier = 1.0f;
         
         if (result == TimingEventResult.Good)
         {
-            
-                damageMultiplier = 1.25f; // Boost damage by 25%
-                user.PlayHitSound();   
+            damageMultiplier = 1.25f; // Boost damage by 25%
+            user.PlayHitSound();   
         }
         else 
         {
@@ -235,8 +230,4 @@ public void HandlePlayerRangedAttack(Character user, Projectile projectile, Timi
 
         projectile.damage = Mathf.CeilToInt(projectile.damage * damageMultiplier);
     }
-
-
-
-   
 }

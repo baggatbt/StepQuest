@@ -469,7 +469,17 @@ public class BattleManager : MonoBehaviour
         {
             
             yield return activePlayer.currentSkill.Execute(activePlayer, targetEnemy, this);
-            
+        // Award Knight mastery/progression (Section C)
+        if (activePlayer is Companion c && c.heroID == "Knight")
+        {
+            var usedSkill = activePlayer.currentSkill;
+            // Safety: if Type wasn't set for some reason, do nothing
+            if (usedSkill != null && usedSkill.Type != SkillType.None)
+            {
+                // LastTimingResult was set inside the Skill timing handlers
+                ProgressionEvents.OnKnightSkillUsed(activePlayer, usedSkill.Type, usedSkill.LastTimingResult);
+            }
+        }
            // CheckBattleEnd();
         }
         if (activePlayer.currentSkill.requiresMovement == true)
@@ -940,6 +950,8 @@ public class BattleManager : MonoBehaviour
     private void ProcessVictory()
     {
         EndOfBattleRewards(enemies);
+        KnightProgressionService.TryApply(GameManager.Instance.currentCompanionData);
+
         Debug.Log("Battle won");
 
         Stage completedStage = GameManager.Instance.CurrentBattleConfig.stage;

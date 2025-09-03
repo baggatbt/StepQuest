@@ -27,6 +27,7 @@ public class MainMenuUIManager : MonoBehaviour
     public CircleShrinkAndCheck circleShrinkAndCheck;
     public GameObject consumablesPanel;  // Assign in inspector
     public Transform consumableListContent;  // Assign the content transform of your scroll view in the consumables panel
+    public MasteryBarUI masteryBarUI; // assign MasteryBarPanel in Inspector
 
     // References to stat UI Text elements
     public TextMeshProUGUI levelText,atkText, hpText, spText, expText, spdText, defText; 
@@ -199,6 +200,8 @@ public class MainMenuUIManager : MonoBehaviour
 private void OpenCompanionDetails(CharacterData characterData)
 {
     GameManager.Instance.currentCompanionData = characterData;
+    if (masteryBarUI != null)
+    masteryBarUI.SetData(GameManager.Instance.currentCompanionData);
     UpdateCompanionStatsDisplay(characterData);
     companionStatsPanel.SetActive(true);
     UpdateHeroImage(characterData);
@@ -697,6 +700,10 @@ public void PopulateInventoryList() {
 {
     GameManager.Instance.currentCompanion = companion;
     companion.InitializeSkillsBasedOnLevel();
+    // In OnCompanionSelected(Companion companion)
+if (masteryBarUI != null && companion != null && companion.characterData != null)
+    masteryBarUI.SetData(companion.characterData);
+
 
 
     // Update companion's stats display and make sure the stats panel is visible

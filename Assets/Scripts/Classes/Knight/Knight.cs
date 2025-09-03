@@ -118,24 +118,49 @@ public class Knight : Companion
     public override List<SkillType> MainSkills => mainSkills;
 
     public override Skill GetSkillInstance(SkillType skillType)
+{
+    switch (skillType)
     {
-        switch (skillType)
+        case SkillType.Slash:
         {
-            case SkillType.Slash:
-                return new Slash();
-            case SkillType.TripleHit:
-                return new TripleHitSkill();
-            case SkillType.Taunt:
-                return new Taunt();
-            case SkillType.ReflectDamagePassive:
-                return new ReflectDamagePassive();
-            case SkillType.SpeedBreak:
-                return new SpeedBreak();
-            case SkillType.SwordWave:
-                return new SwordWave();
-            default:
-                Debug.LogError("Unknown skill type for Knight: " + skillType);
-                return null;
+            var s = new Slash();
+            s.Type = SkillType.Slash;
+            return s;
         }
+        case SkillType.TripleHit:
+        {
+            var s = new TripleHitSkill();
+            s.Type = SkillType.TripleHit;
+            return s;
+        }
+        case SkillType.Taunt:
+        {
+            var s = new Taunt();
+            s.Type = SkillType.Taunt;
+            return s;
+        }
+        case SkillType.ReflectDamagePassive:
+        {
+            var s = new ReflectDamagePassive();
+            s.Type = SkillType.ReflectDamagePassive;
+            return s;
+        }
+        case SkillType.SpeedBreak:
+        {
+            var s = new SpeedBreak();
+            s.Type = SkillType.SpeedBreak;
+            return s;
+        }
+        case SkillType.SwordWave:
+        {
+            var s = new SwordWave();
+            s.Type = SkillType.SwordWave;
+            return s;
+        }
+        default:
+            Debug.LogError("Unknown skill type for Knight: " + skillType);
+            return null;
     }
+}
+
 }
