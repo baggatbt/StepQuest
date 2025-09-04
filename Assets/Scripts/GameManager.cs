@@ -770,7 +770,7 @@ public int GetItemCount(Item item)
         companion.energy = companion.maxEnergy;
     }
 
-    private void RecoverCompanion()
+    public void RecoverCompanion()
     {
         currentCompanion.health = currentCompanion.maxHealth;
         currentCompanion.energy = currentCompanion.maxEnergy;

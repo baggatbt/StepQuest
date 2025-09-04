@@ -907,8 +907,8 @@ public class BattleManager : MonoBehaviour
             if (companion.stamina > 0)
             {
                 companion.stamina -= 1;
-                companion.health = companion.maxHealth;
-                companion.energy = companion.maxEnergy;
+               // companion.health = companion.maxHealth;
+                //companion.energy = companion.maxEnergy;
             }
             companion.SaveCharacterData();
         }
@@ -955,7 +955,7 @@ public class BattleManager : MonoBehaviour
         Debug.Log("Battle won");
 
         Stage completedStage = GameManager.Instance.CurrentBattleConfig.stage;
-       // GameManager.Instance.UnlockConnectedStages(completedStage);
+       //TODO FIX UNLOCKING GameManager.Instance.UnlockConnectedStages(completedStage);
        // if (completedStage.isBossBattle)
        // {
        //     GameManager.Instance.ResetStagesOnBossDefeat();

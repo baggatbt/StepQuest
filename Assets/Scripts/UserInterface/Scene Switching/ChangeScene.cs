@@ -11,7 +11,7 @@ public class ChangeScene : MonoBehaviour
 
      public void GoToMainMenuScene()
     {
-        
+        GameManager.Instance.RecoverCompanion();
         SceneManager.LoadScene("CharacterInfoPage");
     }
 
