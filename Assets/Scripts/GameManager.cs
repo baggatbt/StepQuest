@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using TMPro;
 using System;
 using System.Linq;
+using UnityEngine.EventSystems;
 
 
 //Storing and managing game states across scenes
@@ -14,7 +15,13 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
      public List<StageData> allStagesData = new List<StageData>(); // List of all stages
     private Dictionary<string, StageData> stageDictionary = new Dictionary<string, StageData>();
-    
+    // Ephemeral "run" state stages reset on loss
+    public bool InDungeonRun { get; private set; }
+    private HashSet<string> runUnlockedStageIDs = new HashSet<string>();
+    public event Action OnRunUnlocksChanged;
+
+
+
     public StageData currentStage; // The current stage being played
     public GameObject knightPrefab; 
     public GameObject archerPrefab; 
@@ -183,7 +190,7 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-
+    /*
     public void GetNextStage(int nextIndex)
     {
         if (currentStage != null && nextIndex < currentStage.connectedStageIDs.Count)
@@ -209,7 +216,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    
+    */
 
     public void SaveCurrentParty()
     {
@@ -246,18 +253,32 @@ public class GameManager : MonoBehaviour
     }
 
     Debug.Log("Loading saved party from PlayerPrefs…");
-    // Now clear only because we know we're about to overwrite
     currentParty.Clear();
 
     var companionDataList = JsonUtility.FromJson<SerializableList<string>>(jsonList);
     foreach (var json in companionDataList.Items)
     {
         var data = SerializationHelper.DeserializeCompanionData(json);
-        var companion = InstantiateCompanion(data);
+        // Prefer the authoritative ScriptableObject so we keep saved HP/EN/etc.
+        var companion = InstantiateSelectedCompanion(data.heroID) as Companion;
+        if (companion == null)
+        {
+            Debug.LogError($"Failed to instantiate companion for {data.heroID}");
+            continue;
+        }
+
+        // If you persist level in your serialized snapshot, align it (HP/EN stay as in SO)
+        if (data.heroLevel > 0)
+            companion.heroLevel = data.heroLevel;
+
+        // Persist any alignment back to SO
+        companion.SaveCharacterData();
+
         currentParty.Add(companion);
-        Debug.Log($"Loaded and added to party: {data.heroID}");
+        Debug.Log($"Loaded and added to party: {data.heroID} (HP {companion.health}/{companion.maxHealth})");
     }
 }
+
 
 
     public void ClearCurrentParty()
@@ -267,28 +288,48 @@ public class GameManager : MonoBehaviour
 
     private Companion InstantiateCompanion(CompanionData data)
 {
-    GameObject prefab = null;
-    
-    if (data.heroID == "Knight")
-        prefab = Instantiate(knightPrefab);
-    else if (data.heroID == "Archer")
-        prefab = Instantiate(archerPrefab);
-    else if (data.heroID == "TamedGoblin") // ✅ ← You are missing this
-        prefab = Instantiate(tamedGoblinPrefab);
-
-    if (prefab != null)
+    GameObject prefab = GetCharacterPrefab(data.heroID);
+    if (prefab == null)
     {
-        var companion = prefab.GetComponent<Companion>();
-        companion.heroID = data.heroID;
-        companion.heroLevel = data.heroLevel;
-        // Optionally set other fields
-
-        return companion;
+        Debug.LogError($"[InstantiateCompanion] No prefab for {data.heroID}");
+        return null;
     }
 
-    Debug.LogError($"[InstantiateCompanion] Could not instantiate prefab for {data.heroID}");
-    return null;
+    var go = Instantiate(prefab);
+    var companion = go.GetComponent<Companion>();
+
+    // Use the ScriptableObject to pull the saved HP/EN/etc.
+    if (characterDataDictionary.TryGetValue(data.heroID, out var so))
+    {
+        so.LoadData();                 // make sure we have freshest saved values
+        companion.SetCharacterData(so); // applies saved health/energy into runtime instance
+
+        // If your serialized snapshot stores level, align it (optional)
+        if (data.heroLevel > 0)
+            companion.heroLevel = data.heroLevel;
+
+        companion.SaveCharacterData();
+    }
+    else
+    {
+        // Fallback: copy whatever the serialized data contains (only if you store these in CompanionData)
+        Debug.LogWarning($"[InstantiateCompanion] No CharacterData SO found for {data.heroID}; using serialized snapshot.");
+        companion.heroID    = data.heroID;
+        companion.heroLevel = data.heroLevel;
+
+        // Only do these if your CompanionData actually has them; otherwise omit.
+        // companion.maxHealth = data.maxHealth;
+        // companion.health    = Mathf.Clamp(data.health, 1, data.maxHealth);
+        // companion.maxEnergy = data.maxEnergy;
+        // companion.energy    = Mathf.Clamp(data.energy, 0, data.maxEnergy);
+        // companion.attackPower  = data.attackPower;
+        // companion.defensePower = data.defensePower;
+        // companion.speed        = data.speed;
+    }
+
+    return companion;
 }
+
 
 
     [Serializable]
@@ -327,11 +368,14 @@ public class GameManager : MonoBehaviour
     {
         ReassignInventoryComponent();
         LoadAllCompanionData();
-       // ClearCurrentParty();
-        LoadDefaultPartyCharacter();  
-        LoadCurrentParty();
-       
+
+        if (PlayerPrefs.HasKey("CurrentParty"))
+            LoadCurrentParty();      // Load saved party with saved HP/EN from CharacterData
+        else
+            LoadDefaultPartyCharacter(); // First time: spawn default Knight using knightData
     }
+
+
 
     public void LoadDefaultPartyCharacter()
     {
@@ -750,6 +794,8 @@ public int GetItemCount(Item item)
         }
     }
 
+    /* removing stam
+
     public void UpdateCompanionStamina(string heroID)
     {
         foreach (var companion in companions)
@@ -763,17 +809,18 @@ public int GetItemCount(Item item)
             }
         }
     }
+    */
 
     public void RestoreHealthAndEnergyForCompanion(Companion companion)
     {
-        companion.health = companion.maxHealth;
-        companion.energy = companion.maxEnergy;
+       // companion.health = companion.maxHealth;
+        //companion.energy = companion.maxEnergy;
     }
 
     public void RecoverCompanion()
     {
-        currentCompanion.health = currentCompanion.maxHealth;
-        currentCompanion.energy = currentCompanion.maxEnergy;
+       // currentCompanion.health = currentCompanion.maxHealth;
+        //currentCompanion.energy = currentCompanion.maxEnergy;
         currentCompanion.stamina = currentCompanion.maxStamina;
         Debug.Log("Current Companion " + currentCompanion);
         currentCompanion.SaveCharacterData();
@@ -934,5 +981,291 @@ public int GetItemCount(Item item)
         Debug.Log($"Moved to {destinationNode.nodeName}");
     }
 
+    //STAGE REWORK METHODS
     
+    public StageData GetStageData(string stageID)
+{
+    if (string.IsNullOrEmpty(stageID)) return null;
+    if (stageDictionary.TryGetValue(stageID, out var sd)) return sd;
+    Debug.LogError($"[GetStageData] No StageData for id: {stageID}");
+    return null;
+}
+
+public void ClearAllStageUnlockedFlags()
+{
+    foreach (var sd in allStagesData) sd.isUnlocked = false;
+}
+public void StartDungeonRun(string startingStageID)
+{
+    InDungeonRun = true;
+    runUnlockedStageIDs.Clear();
+    ClearAllStageUnlockedFlags();
+
+    var start = GetStageData(startingStageID);
+    if (start == null) { Debug.LogError($"[Run] Missing StageData for {startingStageID}"); return; }
+
+    currentStage = start;
+    runUnlockedStageIDs.Add(start.stageID);
+    start.isUnlocked = true;                     // for UI gating during this run
+    CurrentBattleConfig = start.stageBattleConfig;
+
+    Debug.Log($"[Run] Started at {start.stageID}");
+    OnRunUnlocksChanged?.Invoke();
+}
+
+public void EndDungeonRun()
+{
+    InDungeonRun = false;
+    runUnlockedStageIDs.Clear();
+    ClearAllStageUnlockedFlags();
+    currentStage = null;
+    CurrentBattleConfig = null;
+
+    Debug.Log("[Run] Ended");
+    OnRunUnlocksChanged?.Invoke();
+}
+public void UnlockConnectedStagesForRun(StageData completedStage)
+{
+    if (!InDungeonRun) { Debug.LogWarning("[Run] Not in a run; unlock ignored."); return; }
+    if (completedStage == null) { Debug.LogError("[Run] completedStage is null"); return; }
+
+    var list = completedStage.connectedStageIDs;
+    if (list == null || list.Count == 0)
+    {
+        Debug.LogWarning($"[Run] StageData {completedStage.stageID} has no connectedStageIDs.");
+        return;
+    }
+
+    foreach (var nextId in list)
+    {
+        var next = GetStageData(nextId);
+        if (next == null) { Debug.LogError($"[Run] Missing StageData for neighbor {nextId}"); continue; }
+
+        if (runUnlockedStageIDs.Add(next.stageID))
+        {
+            next.isUnlocked = true; // UI flag for THIS RUN only
+            Debug.Log($"[Run] Unlocked {next.stageID} from {completedStage.stageID}");
+        }
+    }
+
+    OnRunUnlocksChanged?.Invoke();
+}
+public bool IsStageUnlockedForRun(string stageID)
+{
+    if (!InDungeonRun) return true; // outside a run, don't gate
+    return runUnlockedStageIDs.Contains(stageID);
+}
+
+// GameManager.cs
+public void EnterStageByID(string stageID)
+{
+    var next = GetStageData(stageID);
+    if (next == null) return;
+
+    // auto-start or gate the run (your existing logic)
+    if (!InDungeonRun)
+    {
+        InDungeonRun = true;
+        runUnlockedStageIDs.Clear();
+        ClearAllStageUnlockedFlags();
+
+        runUnlockedStageIDs.Add(next.stageID);
+        next.isUnlocked = true;
+        Debug.Log($"[Run] Auto-started at {next.stageID}");
+        OnRunUnlocksChanged?.Invoke();
+    }
+    else if (!runUnlockedStageIDs.Contains(next.stageID))
+    {
+        Debug.LogWarning($"[Run] Stage {stageID} is not unlocked yet.");
+        return;
+    }
+
+    currentStage = next;
+    CurrentBattleConfig = next.stageBattleConfig;
+
+    // IMPORTANT: load battle additively and make it the active scene
+    StartCoroutine(LoadBattleAdditive(next.battleSceneName));
+}
+
+// GameManager.cs
+private IEnumerator LoadBattleAdditive(string battleScene)
+{
+    var op = SceneManager.LoadSceneAsync(battleScene, LoadSceneMode.Additive);
+    yield return op;
+
+    var b = SceneManager.GetSceneByName(battleScene);
+    SceneManager.SetActiveScene(b);
+
+    // Turn OFF Town raycasters (your existing helper)
+    SetUIRaycastsForScene("CharacterInfoPage", false);
+
+    PromoteBattleCamera(b);       // <— new
+    EnsureSingleEventSystem();    // <— new
+}
+
+private void PromoteBattleCamera(Scene battleScene)
+{
+    // Remove MainCamera tag from all other cameras
+    foreach (var cam in Camera.allCameras)
+        cam.tag = "Untagged";
+
+    // Tag the first camera we find in the battle scene as MainCamera and bring it on top
+    foreach (var root in battleScene.GetRootGameObjects())
+    {
+        var cam = root.GetComponentInChildren<Camera>(true);
+        if (cam)
+        {
+            cam.tag = "MainCamera";
+            cam.depth = 10;    // above Town camera
+            cam.enabled = true;
+            Debug.Log($"[BattleLoad] Promoted camera '{cam.name}' as MainCamera (scene {battleScene.name}).");
+            break;
+        }
+    }
+}
+
+
+private void EnsureSingleEventSystem()
+{
+    var all = GameObject.FindObjectsOfType<EventSystem>(true);
+    bool keptOne = false;
+    foreach (var es in all)
+    {
+        bool enable = !keptOne;
+        es.gameObject.SetActive(enable);
+        if (enable) keptOne = true;
+    }
+    if (keptOne) return;
+
+    // Create legacy module since you're on StandaloneInputModule
+    new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+}
+
+private void EnableOnlyEventSystemIn(Scene target)
+{
+    var all = GameObject.FindObjectsOfType<EventSystem>(true);
+    bool anyEnabled = false;
+    foreach (var es in all)
+    {
+        bool enable = es.gameObject.scene == target;
+        es.gameObject.SetActive(enable);
+        anyEnabled |= enable;
+    }
+
+    if (!anyEnabled)
+    {
+        var go = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+        SceneManager.MoveGameObjectToScene(go, target);
+    }
+}
+
+public static void Show(CanvasGroup cg, bool show)
+{
+    cg.alpha = show ? 1 : 0;
+    cg.interactable   = show;
+    cg.blocksRaycasts = show;
+}
+
+
+
+
+
+public void GetNextStage(int nextIndex)
+{
+    if (currentStage == null)
+    {
+        Debug.LogError("[Nav] currentStage is null"); 
+        return;
+    }
+    var list = currentStage.connectedStageIDs;
+    if (list == null || nextIndex < 0 || nextIndex >= list.Count)
+    {
+        Debug.LogWarning("[Nav] Invalid stage transition index.");
+        return;
+    }
+
+    string nextId = list[nextIndex];
+    EnterStageByID(nextId); // <- this now handles auto-run start + gating
+}
+
+// GameManager.cs
+public void SetUIRaycastsForScene(string sceneName, bool enable)
+{
+    for (int i = 0; i < SceneManager.sceneCount; i++)
+    {
+        var s = SceneManager.GetSceneAt(i);
+        if (!s.IsValid() || s.name != sceneName) continue;
+
+        foreach (var root in s.GetRootGameObjects())
+        {
+            foreach (var gr in root.GetComponentsInChildren<UnityEngine.UI.GraphicRaycaster>(true))
+                gr.enabled = enable;
+
+            foreach (var cg in root.GetComponentsInChildren<CanvasGroup>(true))
+                cg.blocksRaycasts = enable;
+        }
+    }
+}
+
+public void ReturnToTownFromBattle()
+{
+    StartCoroutine(ReturnTownRoutine());
+}
+
+private IEnumerator ReturnTownRoutine()
+{
+    var battle = SceneManager.GetActiveScene();
+    var town   = SceneManager.GetSceneByName("CharacterInfoPage");
+    if (town.IsValid()) SceneManager.SetActiveScene(town);
+
+    SetUIRaycastsForScene(town.name, true);
+    SetCanvasGroupInteractable(town, true);   // <-- add this
+
+    PromoteSceneCamera(town, 0);
+    EnableOnlyEventSystemIn(town);
+
+    Cursor.lockState = CursorLockMode.None;   // safety
+    Cursor.visible   = true;
+    Time.timeScale   = 1f;
+
+    yield return SceneManager.UnloadSceneAsync(battle);
+    Debug.Log("[BattleExit] Back in town.");
+}
+
+
+private void PromoteSceneCamera(Scene target, float depth)
+{
+    // clear MainCamera tag everywhere
+    foreach (var cam in Camera.allCameras) cam.tag = "Untagged";
+
+    // tag Town camera as MainCamera and enable it
+    foreach (var root in target.GetRootGameObjects())
+    {
+        var cam = root.GetComponentInChildren<Camera>(true);
+        if (!cam) continue;
+        cam.tag = "MainCamera";
+        cam.depth = depth;
+        cam.enabled = true;
+        Debug.Log($"[Camera] Promoted '{cam.name}' as MainCamera for scene {target.name}");
+        break;
+    }
+}
+
+
+
+
+private void SetCanvasGroupInteractable(Scene scene, bool enable)
+{
+    foreach (var root in scene.GetRootGameObjects())
+    {
+        foreach (var cg in root.GetComponentsInChildren<CanvasGroup>(true))
+        {
+            cg.interactable   = enable;  // <-- makes Buttons/etc. respond again
+            cg.blocksRaycasts = enable;  // you already set this elsewhere; keep in sync here
+        }
+    }
+}
+
+
+
 }

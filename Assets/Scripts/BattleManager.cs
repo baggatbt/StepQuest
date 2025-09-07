@@ -95,10 +95,27 @@ public class BattleManager : MonoBehaviour
          //visualAid = FindObjectOfType<TimingVisualAid>(); // Find the visual aid in the scene
     }
 
+private Camera FindBattleCamera()
+{
+    // 1) Any camera in this scene?
+    var thisScene = gameObject.scene;
+    foreach (var cam in Camera.allCameras)
+        if (cam != null && cam.gameObject.scene == thisScene)
+            return cam;
+
+    // 2) Fallback to Camera.main if tagged correctly by PromoteBattleCamera
+    return Camera.main;
+}
+
+
     private void Start()
 {
     outerCircleInitialScale = outerCircle.transform.localScale;
     innerCircleInitialScale = innerCircle.transform.localScale;
+    // Prefer a camera from THIS scene
+    mainCamera = FindBattleCamera();
+    Debug.Log($"[Battle] Using camera: {mainCamera?.name} (scene {mainCamera?.gameObject.scene.name})");
+
 
     outerCircle.SetActive(false);
     activePlayerIndicator.SetActive(false);
@@ -107,6 +124,7 @@ public class BattleManager : MonoBehaviour
     expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
     goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
     mainCamera = Camera.main;
+    
 
     BattleConfig config = GameManager.Instance.CurrentBattleConfig;
     if (config != null)
@@ -200,8 +218,8 @@ public class BattleManager : MonoBehaviour
     {
         foreach (var companion in playerParty.OfType<Companion>())
         {
-            companion.energy = companion.maxEnergy;
-            companion.health = companion.maxHealth;
+           // companion.energy = companion.maxEnergy;
+           // companion.health = companion.maxHealth;
         }
     }
 
@@ -948,22 +966,25 @@ public class BattleManager : MonoBehaviour
     }
 
     private void ProcessVictory()
+{
+    EndOfBattleRewards(enemies);
+    KnightProgressionService.TryApply(GameManager.Instance.currentCompanionData);
+
+    var sd = GameManager.Instance.currentStage;   // StageData of the battle you just won
+    if (sd != null)
     {
-        EndOfBattleRewards(enemies);
-        KnightProgressionService.TryApply(GameManager.Instance.currentCompanionData);
-
-        Debug.Log("Battle won");
-
-        Stage completedStage = GameManager.Instance.CurrentBattleConfig.stage;
-       //TODO FIX UNLOCKING GameManager.Instance.UnlockConnectedStages(completedStage);
-       // if (completedStage.isBossBattle)
-       // {
-       //     GameManager.Instance.ResetStagesOnBossDefeat();
-       // }
-
-        endOfBattlePanel.SetActive(true);
-        DisplayExpToLevel(playerParty);
+        GameManager.Instance.UnlockConnectedStagesForRun(sd);  // <-- unlock neighbors for this RUN
     }
+    else
+    {
+        Debug.LogError("[ProcessVictory] GameManager.currentStage is null; cannot unlock neighbors.");
+    }
+
+    endOfBattlePanel.SetActive(true);
+    DisplayExpToLevel(playerParty);
+}
+
+
 
     public void GoToNextStage()
     {
@@ -973,19 +994,37 @@ public class BattleManager : MonoBehaviour
     }
 
     private void ProcessDefeat()
-    {
-        foreach (Character character in playerParty)
-        {
-            if (character is Companion companion)
-            {
-                companion.health = companion.maxHealth;
-                companion.SaveCharacterData();
-            }
-        }
+{
+    foreach (Character character in playerParty)
+        if (character is Companion companion)
+            companion.SaveCharacterData();
 
-        Debug.Log("Battle lost");
-        StopAllCoroutines();
-        battleLost = true;
-        endOfBattleLossPanel.SetActive(true);
-    }
+    Debug.Log("Battle lost");
+    StopAllCoroutines();
+    battleLost = true;
+
+    // End run on defeat
+    GameManager.Instance.EndDungeonRun();
+    GameManager.Instance.ReturnToTownFromBattle();
+    endOfBattleLossPanel.SetActive(true);
+}
+
+// BattleManager.cs
+public void ReturnToMapAfterVictory()
+{
+    // neighbors already unlocked in ProcessVictory()
+    StartCoroutine(ExitBattleRoutine());
+}
+
+private IEnumerator ExitBattleRoutine()
+{
+    var battleSceneName = SceneManager.GetActiveScene().name;
+    GameManager.Instance.ReturnToTownFromBattle();
+    // re-enable town raycasts BEFORE unloading battle
+    GameManager.Instance.SetUIRaycastsForScene("CharacterInfoPage", true);
+
+    yield return SceneManager.UnloadSceneAsync(battleSceneName);
+}
+
+
 }

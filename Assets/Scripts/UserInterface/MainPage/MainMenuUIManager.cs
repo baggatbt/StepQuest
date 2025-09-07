@@ -654,6 +654,7 @@ public void PopulateInventoryList() {
     
      public void GoToBattle(string stageID)
 {
+    
     // 1) (Optional) Stamina checks – keep/remove per your design
     foreach (var companion in GameManager.Instance.currentParty)
     {
@@ -690,14 +691,17 @@ public void PopulateInventoryList() {
         // ShowNodeInfo($"Need {stepCost} steps to enter.");
         return;
     }
-
+/*
     // 5) Proceed to battle
     GameManager.Instance.CurrentBattleConfig = selectedStage.stageBattleConfig;
     GameManager.Instance.currentStage = selectedStage;
     Debug.Log($"Going to battle {selectedStage.stageID} (cost {stepCost} steps)");
 
     GameManager.Instance.SaveCurrentParty();
+    GameManager.Instance.StartDungeonRun(selectedStage.stageID);
     SceneManager.LoadScene(selectedStage.battleSceneName);
+*/
+    GameManager.Instance.EnterStageByID(stageID);
 }
 
 

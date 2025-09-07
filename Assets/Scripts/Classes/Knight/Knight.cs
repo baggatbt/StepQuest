@@ -48,13 +48,13 @@ public class Knight : Companion
     int lvl = Mathf.Max(heroLevel, 1);
 
     maxHealth   = BASE_HEALTH + (lvl - 1) * HEALTH_GROWTH;
-    health      = maxHealth;
+    //health      = maxHealth;
 
     attackPower = BASE_ATTACK + (lvl - 1) * ATTACK_GROWTH;
     speed       = BASE_SPEED + Mathf.FloorToInt((lvl - 1) / 3f);
     defensePower= BASE_DEFENSE + Mathf.FloorToInt((lvl - 1) / 4f);
     maxEnergy   = BASE_ENERGY + Mathf.FloorToInt((lvl - 1) / 2f);
-    energy      = maxEnergy;
+    //energy      = maxEnergy;
 
     // Sync back to the characterData if the UI or inspector reads from it
     if (characterData != null)
