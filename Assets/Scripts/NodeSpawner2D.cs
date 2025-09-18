@@ -200,9 +200,9 @@ public class NodeSpawner2D : MonoBehaviour
         bm.latitude = plat;
         bm.longitude = plon;
         bm.interactRadiusMeters = 25;
-        bm.battleSceneName = "BattleScene";
+        bm.battleSceneName = "TestPortraitBattle";
         bm.poolName = "Forest";
-        bm.enemiesToSpawn = 2;
+        bm.enemiesToSpawn = 1;
         bm.enemyLevel = 1;
 
         PlaceNode(go.transform, plat, plon);

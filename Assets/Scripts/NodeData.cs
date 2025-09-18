@@ -10,8 +10,8 @@ public class NodeData
     public float interactRadiusMeters = 25f;
 
     // Battle-only quick fields
-    public string battleSceneName = "BattleScene";
+    public string battleSceneName = "TestPortraitBattle";
     public string poolName = "Forest";
-    public int enemiesToSpawn = 2;
+    public int enemiesToSpawn = 1;
     public int enemyLevel = 1;
 }

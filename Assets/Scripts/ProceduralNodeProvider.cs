@@ -62,7 +62,7 @@ public class ProceduralNodeProvider : MonoBehaviour, INodeProvider
                 interactRadiusMeters = 25f,
 
                 // quick battle fields
-                battleSceneName = "BattleScene",
+                battleSceneName = "TestPortraitBattle",
                 poolName = "Forest",
                 enemiesToSpawn = 1 + (idx % 3),
                 enemyLevel = 1 + (idx % 2)

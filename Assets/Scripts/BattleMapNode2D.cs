@@ -4,9 +4,9 @@ using UnityEngine.SceneManagement;
 public class BattleMapNode2D : MapNode2D
 {
     [Header("Quick Battle Setup")]
-    public string battleSceneName = "BattleScene"; // <-- set this to your battle scene
+    public string battleSceneName = "TestPortraitBattle"; // <-- set this to your battle scene
     public string poolName = "Forest";             // <-- enemy pool used by your spawner
-    public int enemiesToSpawn = 2;
+    public int enemiesToSpawn = 1;
     public int enemyLevel = 1;
 
     // call when within range or after step-travel
