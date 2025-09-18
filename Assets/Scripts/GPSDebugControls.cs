@@ -7,10 +7,8 @@ public class GPSDebugControls : MonoBehaviour
     public double degStep = 0.00005; // ~5-6 meters at mid-lats
 
     void Reset() { gps = FindObjectOfType<GPSService>(); }
-
-    void Update()
-    {
-#if UNITY_EDITOR
+    /*#if UNITY_EDITOR Place back in update
+/*
         if (gps == null || gps.FakeProvider == null) return;
         double dLat = 0, dLon = 0;
         if (Input.GetKey(KeyCode.W)) dLat += degStep;
@@ -19,5 +17,9 @@ public class GPSDebugControls : MonoBehaviour
         if (Input.GetKey(KeyCode.A)) dLon -= degStep;
         if (dLat != 0 || dLon != 0) gps.FakeProvider.Nudge(dLat, dLon);
 #endif
+    void Update()
+    {
+
     }
+    */
 }

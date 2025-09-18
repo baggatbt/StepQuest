@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class StepTravelController : MonoBehaviour
 {
@@ -33,25 +33,28 @@ public class StepTravelController : MonoBehaviour
     public bool TravelToNode(MapNode2D node)
     {
         int cost = GetStepCostToNode(node);
-        // Uses your existing PlayerData.UseSteps(int)
-        if (PlayerData.Instance.UseSteps(cost))  // <-- your project already has this
+        if (PlayerData.Instance.UseSteps(cost))  // uses your PlayerData step system
         {
-            // Snap fake GPS to that node (works in Editor); on device, we just move the icon directly:
-            if (gps.FakeProvider != null) // Editor fake mode
+#if UNITY_EDITOR
+            // Editor fake GPS nudge
+            if (gps.IsUsingEditorFake)
             {
-                gps.FakeProvider.Nudge(node.latitude - gps.FakeProvider.Latitude,
-                                        node.longitude - gps.FakeProvider.Longitude);
+                var meters = GeoUtils.LatLonToLocalMeters(node.latitude, node.longitude, map.originLatitude, map.originLongitude);
+                gps.NudgeEditorMeters(meters); 
             }
             else
+#endif
             {
-                // Optional: directly warp the icon (visual only)
+                // On device: just warp the player icon visually
                 var meters = GeoUtils.LatLonToLocalMeters(node.latitude, node.longitude, map.originLatitude, map.originLongitude);
                 var world = new Vector3(meters.x * map.unitsPerMeter, meters.y * map.unitsPerMeter, 0f);
-                map.transform.position = world; // or map.playerIcon.position = world;
+                map.transform.position = world; // or map.playerIcon.position if you keep a separate icon
             }
+
             Debug.Log($"Traveled to {node.nodeID} using {cost} steps.");
             return true;
         }
+
         Debug.Log("Not enough steps to travel.");
         return false;
     }
