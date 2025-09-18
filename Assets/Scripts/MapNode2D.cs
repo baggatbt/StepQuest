@@ -7,18 +7,10 @@ public class MapNode2D : MonoBehaviour
     [Header("Node Data")]
     public string nodeID = "Node_001";
     public NodeKind kind = NodeKind.Battle;
+    [Tooltip("Meters radius the player must be within to Interact (E).")]
+    public float interactRadiusMeters = 25f;
 
     [Header("Geo")]
     public double latitude;
     public double longitude;
-
-    [Header("Interaction")]
-    public float interactRadiusMeters = 20f;
-
-    // Visual testing aid
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.yellow;
-        // approximate ring in world units is drawn by a helper if needed (requires calibration)
-    }
 }

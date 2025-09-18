@@ -3,25 +3,33 @@ using UnityEngine.SceneManagement;
 
 public class BattleMapNode2D : MapNode2D
 {
-    [Header("Battle")]
-    public BattleConfig battleConfig;     // assign in Inspector
-    public string battleSceneName;        // optional override
+    [Header("Quick Battle Setup")]
+    public string battleSceneName = "BattleScene"; // <-- set this to your battle scene
+    public string poolName = "Forest";             // <-- enemy pool used by your spawner
+    public int enemiesToSpawn = 2;
+    public int enemyLevel = 1;
 
+    // call when within range or after step-travel
     public void EnterBattle()
     {
-        if (battleConfig == null) { Debug.LogError("No BattleConfig set on node " + nodeID); return; }
-
-        GameManager.Instance.CurrentBattleConfig = battleConfig;
-        var sceneToLoad = string.IsNullOrEmpty(battleSceneName)
-            ? battleConfig.stage?.battleSceneName
-            : battleSceneName;
-
-        if (string.IsNullOrEmpty(sceneToLoad))
+        // Build a minimal BattleConfig at runtime
+        var cfg = new BattleConfig
         {
-            Debug.LogError("No battle scene specified for node " + nodeID);
+            poolName = poolName,
+            maxEnemiesToSpawn = Mathf.Max(1, enemiesToSpawn),
+            levelOfEnemies = Mathf.Max(1, enemyLevel),
+            currentParty = GameManager.Instance.currentParty // use your current party
+        };
+
+        GameManager.Instance.CurrentBattleConfig = cfg;
+
+        if (string.IsNullOrWhiteSpace(battleSceneName))
+        {
+            Debug.LogError($"[{nodeID}] No battleSceneName set.");
             return;
         }
 
-        SceneManager.LoadScene(sceneToLoad);
+        Debug.Log($"[{nodeID}] Loading battle: scene={battleSceneName}, pool={poolName}, count={enemiesToSpawn}, level={enemyLevel}");
+        SceneManager.LoadScene(battleSceneName);
     }
 }
