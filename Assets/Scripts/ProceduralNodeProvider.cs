@@ -64,7 +64,7 @@ public class ProceduralNodeProvider : MonoBehaviour, INodeProvider
                 // quick battle fields
                 battleSceneName = "TestPortraitBattle",
                 poolName = "Forest",
-                enemiesToSpawn = 1 + (idx % 3),
+                enemiesToSpawn = 1 + (idx % 2),
                 enemyLevel = 1 + (idx % 2)
             });
 
