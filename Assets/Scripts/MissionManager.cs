@@ -8,13 +8,16 @@ public class MissionManager : MonoBehaviour
 {
     public static MissionManager Instance { get; private set; }
 
+    [Header("Config")]
     [SerializeField] private MissionDefinition[] missionDefinitions;
+
+    // Make the cap editable in the Inspector. Set to 1 if you want "auto-swap" behavior.
+    [SerializeField] private int maxActiveMissions = 1;
 
     // Runtime data (id → state)
     private readonly Dictionary<string, MissionState> missions = new();
 
-    // We snapshot the platform step counter (or your own cumulative counter) to award offline gains next launch.
-    // IMPORTANT: Ensure PlayerData (or your step layer) writes the running sensor total to "CurrentSensorTotal".
+    // Snapshot key for offline step catch-up
     private const string kLastSensorKey = "Mission_LastSensorTotal";
 
     #region Unity lifecycle
@@ -35,10 +38,7 @@ public class MissionManager : MonoBehaviour
         foreach (var def in missionDefinitions)
             missions[def.id] = MissionState.Load(def);
 
-        // ─────────────────────────────────────────────────────────────
-        // OFFLINE GAINS: catch up using step-diff since last snapshot.
-        // If your PlayerData writes a cumulative pedometer value to "CurrentSensorTotal",
-        // we diff that here and award steps to ACTIVE missions immediately on startup.
+        // OFFLINE GAINS: diff cumulative sensor total and apply to ACTIVE missions
         int currentSensor = PlayerPrefs.GetInt("CurrentSensorTotal", 0);
         int lastSensor    = PlayerPrefs.GetInt(kLastSensorKey, currentSensor);
         int offlineSteps  = Mathf.Max(0, currentSensor - lastSensor);
@@ -46,14 +46,12 @@ public class MissionManager : MonoBehaviour
         if (offlineSteps > 0)
         {
             foreach (var m in missions.Values)
-                m.AddProgress(offlineSteps); // only applies if mission isActive
+                m.AddProgress(offlineSteps);
         }
 
         PlayerPrefs.SetInt(kLastSensorKey, currentSensor);
         PlayerPrefs.Save();
-        // ─────────────────────────────────────────────────────────────
 
-        // Live updates
         PlayerData.OnStepsAdded += OnStepsAdded;
     }
 
@@ -96,6 +94,9 @@ public class MissionManager : MonoBehaviour
 
     public int ActiveMissionCount => missions.Values.Count(m => m.isActive);
 
+    /// <summary>
+    /// Start a mission if capacity allows. Returns true if started, false otherwise.
+    /// </summary>
     public bool StartMission(string id)
     {
         if (!missions.TryGetValue(id, out var m))
@@ -104,17 +105,82 @@ public class MissionManager : MonoBehaviour
             return false;
         }
 
-        const int maxActive = 2; // your current cap
-        if (m.isActive || ActiveMissionCount >= maxActive)
-            return false;
+        if (m.isActive) return true; // already running
+
+        if (ActiveMissionCount >= maxActiveMissions)
+            return false; // capacity full
 
         m.isActive       = true;
-        m.pendingRewards = 0;
-        m.leftoverSteps  = 0;
+        m.pendingRewards = m.pendingRewards; // keep
+        m.leftoverSteps  = m.leftoverSteps;  // keep
         m.Save();
         return true;
     }
 
+    /// <summary>
+    /// Stop a mission if active. Returns true if stopped, false if not active/not found.
+    /// </summary>
+    public bool StopMission(string id)
+    {
+        if (!missions.TryGetValue(id, out var m) || !m.isActive)
+            return false;
+
+        m.isActive = false;
+        m.Save();
+        return true;
+    }
+
+    /// <summary>
+    /// Start a mission; if capacity is full, stop one currently active mission (swap) and start the new one.
+    /// Returns the id of any mission that was stopped (for UI), or null if none stopped.
+    /// </summary>
+    public string StartOrSwapMission(string id)
+    {
+        if (!missions.TryGetValue(id, out var target))
+        {
+            Debug.LogWarning($"Mission '{id}' not found");
+            return null;
+        }
+
+        // If already running, nothing to do.
+        if (target.isActive) return null;
+
+        // If there is room, just start it.
+        if (ActiveMissionCount < maxActiveMissions)
+        {
+            StartMission(id);
+            return null;
+        }
+
+        // Otherwise swap: stop one active mission (choose a deterministic one)
+        var activeId = GetFirstActiveMissionId(excludeId: id);
+        if (activeId != null)
+        {
+            StopMission(activeId);
+            StartMission(id);
+            return activeId;
+        }
+
+        // Shouldn't hit here, but safe fallback.
+        return null;
+    }
+
+    /// <summary>
+    /// Returns the first active mission id (optionally excluding a specific id), or null.
+    /// </summary>
+    public string GetFirstActiveMissionId(string excludeId = null)
+    {
+        foreach (var kvp in missions)
+        {
+            if (kvp.Key == excludeId) continue;
+            if (kvp.Value.isActive) return kvp.Key;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Claim pending rewards (keeps the mission's active state unchanged).
+    /// </summary>
     public bool ClaimMission(string id)
     {
         if (!missions.TryGetValue(id, out var m) || !m.HasRewards)
@@ -150,7 +216,7 @@ public class MissionManager : MonoBehaviour
         return m.definition.rewardCapacity + lvl * m.definition.capacityPerLevel;
     }
 
-    // ── Extra getters for the Activity Tracker UI ───────────────────
+    // ── Extra getters for Activity Tracker ──────────────────────────
     public int GetStepsToNextReward(string id)
         => missions.TryGetValue(id, out var m) ? m.StepsToNextReward() : 0;
 
@@ -198,12 +264,12 @@ public class MissionState
     public int    pendingRewards;
     public int    leftoverSteps;
 
-    // OPTIONAL: show lifetime steps for this mission in the tracker
+    // Lifetime stat (optional UI)
     public int    totalStepsAccumulated;
 
     public bool HasRewards => pendingRewards > 0;
 
-    // ── Helpers for UI ───────────────────────────────────────────────
+    // Helpers
     public int EffectiveStepsPerReward()
     {
         int lvl   = TaskSkillManager.Instance.GetLevel(definition.skillID);
@@ -282,16 +348,13 @@ public class MissionState
 
     public List<Item> ClaimAllRewards()
     {
-        // award XP
         int totalXP = pendingRewards * definition.xpPerReward;
         TaskSkillManager.Instance.AddXP(definition.skillID, totalXP);
 
-        // roll drops
         var allItems = new List<Item>();
         for (int i = 0; i < pendingRewards; i++)
             allItems.AddRange(definition.dropTable.RollRewards());
 
-        // clear
         pendingRewards = 0;
         Save();
         return allItems;

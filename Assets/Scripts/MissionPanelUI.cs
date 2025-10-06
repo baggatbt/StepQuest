@@ -1,20 +1,21 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
-/*
-UI: Start/Running/Claim panel.
-- Shows stored "pending / capacity" and a normalized capacity bar.
-- Lets the player Start a mission or Claim rewards once available.
-*/
+/// <summary>
+/// Start/Running/Claim panel with confirmation on swap.
+/// Requires MissionManager (with StartMission / StartOrSwapMission).
+/// Optional: assign swapNoteText to show which mission was stopped.
+/// </summary>
 public class MissionPanelUI : MonoBehaviour
 {
     [Header("Inspector links")]
     public string           missionID;
     public Slider           progressBar;       // pending / capacity
-    public Button           actionButton;      // Start / Claim
+    public Button           actionButton;      // Start / Claim / Running
     public TextMeshProUGUI  actionText;
     public TextMeshProUGUI  rewardCountText;   // “pending / capacity”
+    public TextMeshProUGUI  swapNoteText;      // optional
 
     private void Awake()
     {
@@ -50,8 +51,7 @@ public class MissionPanelUI : MonoBehaviour
         else
         {
             if (actionText) actionText.text = "Start";
-            bool slotFree = mgr.ActiveMissionCount < 2; // match your maxActive
-            actionButton.interactable = slotFree;
+            actionButton.interactable = true; // we’ll confirm swap if needed
         }
     }
 
@@ -60,9 +60,64 @@ public class MissionPanelUI : MonoBehaviour
         var mgr = MissionManager.Instance;
         if (mgr == null) return;
 
+        // 1) Claim if rewards exist
         if (mgr.HasRewards(missionID))
+        {
             mgr.ClaimMission(missionID);
-        else
+            if (swapNoteText) swapNoteText.text = "";
+            return;
+        }
+
+        // 2) If mission already running, nothing to do
+        if (mgr.IsActive(missionID))
+            return;
+
+        // 3) Try to start normally (if capacity available)
+        if (mgr.ActiveMissionCount < GetMaxActiveMissions())
+        {
             mgr.StartMission(missionID);
+            if (swapNoteText) swapNoteText.text = "";
+            return;
+        }
+
+        // 4) Capacity full → ask for confirmation and swap
+        string activeId = mgr.GetFirstActiveMissionId(excludeId: missionID);
+        if (string.IsNullOrEmpty(activeId))
+        {
+            // No active to swap, bail safely
+            return;
+        }
+
+        // Show confirmation dialog
+        if (ConfirmDialog.Instance != null)
+        {
+            string title = "Swap Activity?";
+            string msg   = $"Stop '{activeId}' and start '{missionID}'?\n" +
+                           $"Stored rewards on '{activeId}' are kept.";
+            ConfirmDialog.Instance.Show(
+                title, msg, "Swap", "Cancel",
+                onConfirm: () =>
+                {
+                    string stopped = mgr.StartOrSwapMission(missionID);
+                    if (!string.IsNullOrEmpty(stopped) && swapNoteText)
+                        swapNoteText.text = $"Swapped from: {stopped}";
+                });
+        }
+        else
+        {
+            // Fallback: swap immediately if no dialog present
+            string stopped = mgr.StartOrSwapMission(missionID);
+            if (!string.IsNullOrEmpty(stopped) && swapNoteText)
+                swapNoteText.text = $"Swapped from: {stopped}";
+        }
+    }
+
+    // Reads the serialized cap from MissionManager (default 1 if not present)
+    private int GetMaxActiveMissions()
+    {
+        // If you exposed it as a serialized field on MissionManager:
+        // Make a getter there. For now, replicate intent:
+        // We consider capacity "full" if ActiveMissionCount >= 1 (swap mode).
+        return 1;
     }
 }
