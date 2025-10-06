@@ -1,14 +1,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class MissionManager : MonoBehaviour
 {
     public static MissionManager Instance { get; private set; }
+
     [SerializeField] private MissionDefinition[] missionDefinitions;
 
     // Runtime data (id → state)
     private readonly Dictionary<string, MissionState> missions = new();
+
+    // We snapshot the platform step counter (or your own cumulative counter) to award offline gains next launch.
+    // IMPORTANT: Ensure PlayerData (or your step layer) writes the running sensor total to "CurrentSensorTotal".
+    private const string kLastSensorKey = "Mission_LastSensorTotal";
 
     #region Unity lifecycle
 
@@ -28,7 +35,43 @@ public class MissionManager : MonoBehaviour
         foreach (var def in missionDefinitions)
             missions[def.id] = MissionState.Load(def);
 
+        // ─────────────────────────────────────────────────────────────
+        // OFFLINE GAINS: catch up using step-diff since last snapshot.
+        // If your PlayerData writes a cumulative pedometer value to "CurrentSensorTotal",
+        // we diff that here and award steps to ACTIVE missions immediately on startup.
+        int currentSensor = PlayerPrefs.GetInt("CurrentSensorTotal", 0);
+        int lastSensor    = PlayerPrefs.GetInt(kLastSensorKey, currentSensor);
+        int offlineSteps  = Mathf.Max(0, currentSensor - lastSensor);
+
+        if (offlineSteps > 0)
+        {
+            foreach (var m in missions.Values)
+                m.AddProgress(offlineSteps); // only applies if mission isActive
+        }
+
+        PlayerPrefs.SetInt(kLastSensorKey, currentSensor);
+        PlayerPrefs.Save();
+        // ─────────────────────────────────────────────────────────────
+
+        // Live updates
         PlayerData.OnStepsAdded += OnStepsAdded;
+    }
+
+    private void OnApplicationPause(bool pause)
+    {
+        if (pause) SnapshotSensor();
+    }
+
+    private void OnApplicationQuit()
+    {
+        SnapshotSensor();
+    }
+
+    private void SnapshotSensor()
+    {
+        int currentSensor = PlayerPrefs.GetInt("CurrentSensorTotal", 0);
+        PlayerPrefs.SetInt(kLastSensorKey, currentSensor);
+        PlayerPrefs.Save();
     }
 
     private void OnDestroy()
@@ -61,7 +104,7 @@ public class MissionManager : MonoBehaviour
             return false;
         }
 
-        const int maxActive = 2;
+        const int maxActive = 2; // your current cap
         if (m.isActive || ActiveMissionCount >= maxActive)
             return false;
 
@@ -84,35 +127,50 @@ public class MissionManager : MonoBehaviour
         return true;
     }
 
+    public bool IsActive(string id)
+        => missions.TryGetValue(id, out var m) && m.isActive;
+
+    public bool HasRewards(string id)
+        => missions.TryGetValue(id, out var m) && m.HasRewards;
+
     public float GetProgress01(string id)
         => missions.TryGetValue(id, out var m) ? m.ProgressNormalized : 0f;
 
     public int GetPendingRewardCount(string id)
         => missions.TryGetValue(id, out var m) ? m.pendingRewards : 0;
 
-    
-public int GetRewardCapacity(string id)
-{
-    if (!missions.TryGetValue(id, out var m))
+    public int GetRewardCapacity(string id)
     {
-        Debug.LogWarning($"Mission '{id}' not found");
-        return 0;
+        if (!missions.TryGetValue(id, out var m))
+        {
+            Debug.LogWarning($"Mission '{id}' not found");
+            return 0;
+        }
+        int lvl = TaskSkillManager.Instance.GetLevel(m.definition.skillID);
+        return m.definition.rewardCapacity + lvl * m.definition.capacityPerLevel;
     }
 
-    // figure out what level the player is at for this skill
-    int lvl = TaskSkillManager.Instance.GetLevel(m.definition.skillID);
+    // ── Extra getters for the Activity Tracker UI ───────────────────
+    public int GetStepsToNextReward(string id)
+        => missions.TryGetValue(id, out var m) ? m.StepsToNextReward() : 0;
 
-    // base capacity + per-level bonus
-    return m.definition.rewardCapacity
-         + lvl * m.definition.capacityPerLevel;
-}
+    public int GetEffectiveStepsPerReward(string id)
+        => missions.TryGetValue(id, out var m) ? m.EffectiveStepsPerReward() : 0;
 
+    public int GetLeftoverSteps(string id)
+        => missions.TryGetValue(id, out var m) ? m.leftoverSteps : 0;
 
-    public bool IsActive(string id)
-        => missions.TryGetValue(id, out var m) && m.isActive;
+    public int GetTotalStepsAccumulated(string id)
+        => missions.TryGetValue(id, out var m) ? m.totalStepsAccumulated : 0;
 
-    public bool HasRewards(string id)
-        => missions.TryGetValue(id, out var m) && m.HasRewards;
+    public int GetPendingUnclaimedXP(string id)
+        => missions.TryGetValue(id, out var m) ? m.PendingUnclaimedXP() : 0;
+
+    public string GetSkillID(string id)
+        => missions.TryGetValue(id, out var m) ? m.definition.skillID : string.Empty;
+
+    public MissionDefinition GetDefinition(string id)
+        => missions.TryGetValue(id, out var m) ? m.definition : default;
 
     #endregion
 }
@@ -120,13 +178,13 @@ public int GetRewardCapacity(string id)
 [System.Serializable]
 public struct MissionDefinition
 {
-    public string           id;               // "LoggingOne"
-    public string           skillID;          // e.g. "Woodcutting"
-    public int              capacityPerLevel; // extra storage per skill level
+    public string           id;                 // "LoggingOne"
+    public string           skillID;            // e.g. "Woodcutting"
+    public int              capacityPerLevel;   // extra storage per skill level
     public float            efficiencyPerLevel; // speed bonus per level
-    public int              stepsPerReward;   // base steps → 1 reward
-    public int              rewardCapacity;   // base storage capacity
-    public int              xpPerReward;      // NEW: XP to award per reward claimed
+    public int              stepsPerReward;     // base steps → 1 reward
+    public int              rewardCapacity;     // base storage capacity
+    public int              xpPerReward;        // XP per claimed reward
     public MissionDropTable dropTable;
 }
 
@@ -140,7 +198,28 @@ public class MissionState
     public int    pendingRewards;
     public int    leftoverSteps;
 
+    // OPTIONAL: show lifetime steps for this mission in the tracker
+    public int    totalStepsAccumulated;
+
     public bool HasRewards => pendingRewards > 0;
+
+    // ── Helpers for UI ───────────────────────────────────────────────
+    public int EffectiveStepsPerReward()
+    {
+        int lvl   = TaskSkillManager.Instance.GetLevel(definition.skillID);
+        float eff = 1f + lvl * definition.efficiencyPerLevel;
+        return Mathf.Max(1, Mathf.RoundToInt(definition.stepsPerReward / eff));
+    }
+
+    public int StepsToNextReward()
+    {
+        int spr = EffectiveStepsPerReward();
+        int rem = spr - leftoverSteps;
+        return Mathf.Clamp(rem, 0, spr);
+    }
+
+    public int PendingUnclaimedXP()
+        => pendingRewards * definition.xpPerReward;
 
     public float ProgressNormalized
     {
@@ -148,23 +227,23 @@ public class MissionState
         {
             int lvl    = TaskSkillManager.Instance.GetLevel(definition.skillID);
             int maxCap = definition.rewardCapacity + lvl * definition.capacityPerLevel;
-            return Mathf.Clamp01((float)pendingRewards / maxCap);
+            return maxCap <= 0 ? 0f : Mathf.Clamp01((float)pendingRewards / maxCap);
         }
     }
 
     private string Key(string suffix) => $"Mission_{id}_{suffix}";
-
     private static string KeyStatic(string id, string suffix) => $"Mission_{id}_{suffix}";
 
     public static MissionState Load(MissionDefinition def)
     {
         return new MissionState
         {
-            definition     = def,
-            id             = def.id,
-            isActive       = PlayerPrefs.GetInt(KeyStatic(def.id, "Active"),   0) == 1,
-            pendingRewards = PlayerPrefs.GetInt(KeyStatic(def.id, "Pending"),  0),
-            leftoverSteps  = PlayerPrefs.GetInt(KeyStatic(def.id, "Leftover"), 0)
+            definition            = def,
+            id                    = def.id,
+            isActive              = PlayerPrefs.GetInt(KeyStatic(def.id, "Active"),   0) == 1,
+            pendingRewards        = PlayerPrefs.GetInt(KeyStatic(def.id, "Pending"),  0),
+            leftoverSteps         = PlayerPrefs.GetInt(KeyStatic(def.id, "Leftover"), 0),
+            totalStepsAccumulated = PlayerPrefs.GetInt(KeyStatic(def.id, "Total"),    0),
         };
     }
 
@@ -173,31 +252,32 @@ public class MissionState
         PlayerPrefs.SetInt(Key("Active"),   isActive   ? 1 : 0);
         PlayerPrefs.SetInt(Key("Pending"),  pendingRewards);
         PlayerPrefs.SetInt(Key("Leftover"), leftoverSteps);
+        PlayerPrefs.SetInt(Key("Total"),    totalStepsAccumulated);
         PlayerPrefs.Save();
     }
 
     public void AddProgress(int steps)
     {
-        if (!isActive) return;
+        if (!isActive || steps <= 0) return;
 
-        // 1) calculate how many steps are needed per reward at this level
-        int lvl = TaskSkillManager.Instance.GetLevel(definition.skillID);
-        float bonus  = 1f + lvl * definition.efficiencyPerLevel;
-        int effSPR   = Mathf.Max(1, Mathf.RoundToInt(definition.stepsPerReward / bonus));
+        int spr = EffectiveStepsPerReward();
 
-        // 2) accumulate steps and convert into rewards (up to capacity)
-        leftoverSteps += steps;
-        int produced  = leftoverSteps / effSPR;
+        leftoverSteps         += steps;
+        totalStepsAccumulated += steps;
+
+        int produced = leftoverSteps / spr;
         if (produced > 0)
         {
+            int lvl    = TaskSkillManager.Instance.GetLevel(definition.skillID);
             int maxCap = definition.rewardCapacity + lvl * definition.capacityPerLevel;
             int space  = maxCap - pendingRewards;
-            int toAdd  = Mathf.Min(produced, space);
+            int toAdd  = Mathf.Min(produced, Mathf.Max(space, 0));
 
             pendingRewards += toAdd;
-            leftoverSteps  -= toAdd * effSPR;
-            Save();
+            leftoverSteps  -= toAdd * spr;
         }
+
+        Save();
     }
 
     public List<Item> ClaimAllRewards()
@@ -217,4 +297,5 @@ public class MissionState
         return allItems;
     }
 }
+
 

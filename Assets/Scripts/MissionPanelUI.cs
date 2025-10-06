@@ -3,63 +3,54 @@ using UnityEngine.UI;
 using TMPro;
 
 /*
-Step accumulation
-• Each time OnStepsAdded(n) fires, we add those steps into leftoverSteps.
-• Whenever leftoverSteps ≥ stepsPerReward, we convert one “block” of stepsPerReward into a single pending reward (up to your rewardCapacity) and subtract that many steps from leftoverSteps.
-
-Drop‐table rolls
-• Those pending rewards aren’t immediately granted—you just see them accumulate as a count (pendingRewards).
-• When you hit Claim, we loop over each pending reward, roll your dropTable once per reward, and hand you the resulting items.
-
-UI control
-• Your slider shows how full pendingRewards / rewardCapacity is.
-• Your text shows “X / Y” pending rewards.
-• The Claim button only becomes interactable once you’ve generated at least one pending reward.
-
-Partial steps carry‐over
-• Any leftover steps that didn’t fill a whole block remain in leftoverSteps, so you never “lose” partial progress toward the next reward.
+UI: Start/Running/Claim panel.
+- Shows stored "pending / capacity" and a normalized capacity bar.
+- Lets the player Start a mission or Claim rewards once available.
 */
 public class MissionPanelUI : MonoBehaviour
 {
     [Header("Inspector links")]
     public string           missionID;
-    public Slider           progressBar;
-    public Button           actionButton;
+    public Slider           progressBar;       // pending / capacity
+    public Button           actionButton;      // Start / Claim
     public TextMeshProUGUI  actionText;
-    public TextMeshProUGUI  rewardCountText;    // shows “pending / capacity”
+    public TextMeshProUGUI  rewardCountText;   // “pending / capacity”
 
     private void Awake()
     {
-        actionButton.onClick.AddListener(OnActionPressed);
+        if (actionButton != null)
+            actionButton.onClick.AddListener(OnActionPressed);
     }
 
     private void Update()
     {
         var mgr = MissionManager.Instance;
+        if (mgr == null) return;
 
-        // update stored‐rewards text
         int pending  = mgr.GetPendingRewardCount(missionID);
         int capacity = mgr.GetRewardCapacity(missionID);
-        rewardCountText.text = $"{pending} / {capacity}";
 
-        // update progress bar fill
-        progressBar.value = mgr.GetProgress01(missionID);
+        if (rewardCountText) rewardCountText.text = $"{pending} / {capacity}";
+        if (progressBar)
+        {
+            progressBar.maxValue = Mathf.Max(1, capacity);
+            progressBar.value    = Mathf.Clamp(pending, 0, progressBar.maxValue);
+        }
 
-        // choose button state
         if (mgr.HasRewards(missionID))
         {
-            actionText.text        = "Claim";
+            if (actionText) actionText.text = "Claim";
             actionButton.interactable = true;
         }
         else if (mgr.IsActive(missionID))
         {
-            actionText.text        = "Running";
+            if (actionText) actionText.text = "Running";
             actionButton.interactable = false;
         }
         else
         {
-            actionText.text        = "Start";
-            bool slotFree          = mgr.ActiveMissionCount < 2; // match your maxActive
+            if (actionText) actionText.text = "Start";
+            bool slotFree = mgr.ActiveMissionCount < 2; // match your maxActive
             actionButton.interactable = slotFree;
         }
     }
@@ -67,6 +58,7 @@ public class MissionPanelUI : MonoBehaviour
     private void OnActionPressed()
     {
         var mgr = MissionManager.Instance;
+        if (mgr == null) return;
 
         if (mgr.HasRewards(missionID))
             mgr.ClaimMission(missionID);
