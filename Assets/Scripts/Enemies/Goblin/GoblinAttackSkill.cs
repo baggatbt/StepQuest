@@ -49,7 +49,7 @@ public class GoblinAttackSkill : Skill
         yield return new WaitUntil(() => user.isAnimationDone);
 
         // Safety: ensure visual returns to idle anchor even if an event was missed
-        if (motionCtrl != null) motionCtrl.ResetVisual(); // NEW
+       // if (motionCtrl != null) motionCtrl.ResetVisual(); // NEW
 
         // Reset flags (unchanged)
         user.isAnimationDone = false;
