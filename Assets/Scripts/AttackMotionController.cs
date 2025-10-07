@@ -6,7 +6,7 @@ public class AttackMotionController : MonoBehaviour
     [Header("Assign the child that holds SpriteRenderer/Animator")]
     public Transform visual;
 
-    [Header("Ease for motion")]
+    [Header("Ease")]
     public AnimationCurve ease = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
     Vector3 baseLocal;
@@ -21,43 +21,48 @@ public class AttackMotionController : MonoBehaviour
         if (visual != null) visual.localPosition = baseLocal;
     }
 
-    // Quick straight-line nudge
-    public IEnumerator DashLocal(Vector2 deltaLocal, float duration)
+    public IEnumerator ReturnToBase(float duration)
     {
         if (visual == null) yield break;
-
-        Vector3 start = visual.localPosition;
-        Vector3 end   = start + (Vector3)deltaLocal;
-        float t = 0f;
-
+        Vector3 s = visual.localPosition, e = baseLocal; float t = 0f;
         while (t < 1f)
         {
             t += Time.deltaTime / Mathf.Max(0.0001f, duration);
-            visual.localPosition = Vector3.LerpUnclamped(start, end, ease.Evaluate(t));
+            visual.localPosition = Vector3.LerpUnclamped(s, e, ease.Evaluate(t));
             yield return null;
         }
-        visual.localPosition = end;
+        visual.localPosition = e;
     }
 
-    // Small hop arc for “jump into” feel
+    // Straight dash in local space
+    public IEnumerator DashLocal(Vector2 deltaLocal, float duration)
+    {
+        if (!visual) yield break;
+        Vector3 s = visual.localPosition, e = s + (Vector3)deltaLocal; float t = 0f;
+        while (t < 1f)
+        {
+            t += Time.deltaTime / Mathf.Max(0.0001f, duration);
+            visual.localPosition = Vector3.LerpUnclamped(s, e, ease.Evaluate(t));
+            yield return null;
+        }
+        visual.localPosition = e;
+    }
+
+    // Parabolic hop in local space
     public IEnumerator HopLocal(Vector2 deltaLocal, float peakHeight, float duration)
     {
-        if (visual == null) yield break;
-
-        Vector3 start = visual.localPosition;
-        Vector3 end   = start + (Vector3)deltaLocal;
-        float t = 0f;
-
+        if (!visual) yield break;
+        Vector3 s = visual.localPosition, e = s + (Vector3)deltaLocal; float t = 0f;
         while (t < 1f)
         {
             t += Time.deltaTime / Mathf.Max(0.0001f, duration);
             float u = Mathf.Clamp01(t);
-            float y = 4f * peakHeight * u * (1f - u); // 0→peak→0 parabola
-            Vector3 p = Vector3.LerpUnclamped(start, end, ease.Evaluate(u));
+            float y = 4f * peakHeight * u * (1f - u); // 0→peak→0
+            Vector3 p = Vector3.LerpUnclamped(s, e, ease.Evaluate(u));
             p.y += y;
             visual.localPosition = p;
             yield return null;
         }
-        visual.localPosition = end;
+        visual.localPosition = e;
     }
 }

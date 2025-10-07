@@ -3,54 +3,59 @@ using UnityEngine;
 
 public class SlimeAttackSkill : Skill
 {
-    private int numberOfAttacksPossible;
-
     public SlimeAttackSkill()
     {
-        skillName = "Slime Attack";
-        description = "The slime attacks the player. The damage can be reduced by timely action.";
-        requiresMovement = true;
-        numberOfAttacksPossible = 1;
+        skillName = "Slime Pounce";
+        description = "Pounces onto the target. Damage can be reduced by a timely action.";
+        requiresMovement = false; // we handle motion ourselves
     }
 
-    // Override the default base damage calculation.
     protected override int CalculateBaseDamage(Character user)
     {
-        return (int)(user.attackPower * 1.0f); 
+        // tweak as desired
+        return Mathf.RoundToInt(user.attackPower * 1.0f);
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
         user.isAttacking = true;
-        user.isAnimationDone = false;  
+        user.isAnimationDone = false;
 
         int baseDamage = CalculateBaseDamage(user);
 
-        user.animator.SetTrigger("Attack1Trigger");
+        var motionBinder = user.GetComponent<SlimePounceMotion>();
+        var mover        = user.GetComponent<AttackMotionController>();
 
-        for (int i = 0; i < numberOfAttacksPossible; i++)
-    {
-       
+        if (motionBinder != null) motionBinder.target = target.transform;
 
-        // Use TimingManager to handle the timing and damage
-        yield return TimingManager.Instance.HandleTimingWindow(user, target, baseDamage, (TimingEventResult result) =>
-        {
-            // Call the centralized damage handling method
-            HandleTimingResultForEnemyAttack(user, target, result, baseDamage);
-            battleManager.CameraShakeMagnitude(result);
-            
-        });
+        // Play your slime's pounce animation (in-place hop frames)
+        // Either a trigger or direct state name works; match your Animator
+        //user.animator.ResetTrigger("GoblinAttack1Trigger"); // if you reuse anim params, clear them
+        user.animator.SetTrigger("SlimeAttack1Trigger");     // <-- create this trigger in Animator
+        // Alternatively: user.animator.Play("Pounce");
 
-        
+        // Wait exactly until the landing/impact event fires
+        if (motionBinder != null)
+            yield return motionBinder.WaitForLanding();
+
+        // Timing window + damage (same flow you already use)
+        yield return TimingManager.Instance.HandleTimingWindow(
+            user, target, baseDamage,
+            (TimingEventResult result) =>
+            {
+                HandleTimingResultForEnemyAttack(user, target, result, baseDamage);
+                battleManager.CameraShakeMagnitude(result);
+            });
+
+        // Let the animation finish recovery; or gently return visual to base
+        if (mover != null)
+            yield return mover.ReturnToBase(0.12f);
+
+        // Wait for anim end if you set user.isAnimationDone in an event
+        yield return new WaitUntil(() => user.isAnimationDone);
+
+        user.isAnimationDone = false;
+        user.isAttacking = false;
+        target.CheckForDeath();
     }
-
-      // Wait for the animation to finish
-    yield return new WaitUntil(() => user.isAnimationDone);
-    
-
-    // Reset flags
-    user.isAnimationDone = false;
-    user.isAttacking = false;
-    target.CheckForDeath();
-}
 }
