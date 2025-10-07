@@ -4886,6 +4886,8 @@ GameObject:
   - component: {fileID: 3124176227126577940}
   - component: {fileID: 6853849219187960353}
   - component: {fileID: 9159376447715170841}
+  - component: {fileID: 8653185536468968009}
+  - component: {fileID: 914715906993836897}
   m_Layer: 0
   m_Name: Goblin
   m_TagString: Enemy
@@ -5196,3 +5198,56 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &8653185536468968009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6178202463525426479}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79004e50013d9f146ae3f7f0389f1399, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  visual: {fileID: 6178202463525426466}
+  ease:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &914715906993836897
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6178202463525426479}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5313dce714f1db5468c239bc14b14c82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  lungeDistance: 0.6
+  lungeTime: 0.12
+  hopPeak: 0.15
