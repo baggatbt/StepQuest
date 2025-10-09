@@ -611,6 +611,14 @@ private Camera FindBattleCamera()
                 enemyUIPanel.SetActive(false);
                 DisableAllButtons();
                 yield return currentEnemy.MoveToTarget();
+                // After MoveToTarget() finishes and *before* playing the attack animation:
+var motion = activePlayer.GetComponent<AttackMotionController>();
+if (motion != null)
+{
+    motion.currentTarget = currentTarget.transform;
+    motion.SetContactAnchorFromCurrent();
+}
+
             }
 
             Character targetCharacter = enemyTargetTransform.GetComponent<Character>();

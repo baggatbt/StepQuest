@@ -76,7 +76,8 @@ public class Character : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();  // Ensure the Rigidbody2D component is attached.
         originalPosition = transform.position;
         
-        animator = GetComponent<Animator>();
+        if (animator == null)
+        animator = GetComponentInChildren<Animator>(true);
         statusEffectController = GetComponent<StatusEffectController>();
         enemyDeathEffect = GetComponent<EnemyDeathEffect>();
         // Ensure originalPosition is set to the character's initial position if not already set
@@ -180,6 +181,7 @@ public class Character : MonoBehaviour
     animator.ResetTrigger("MovementAnimationTrigger");
     animator.SetTrigger("StopMovementAnimationTrigger");
     isMoving = false;
+    
     yield return null;
 }
 

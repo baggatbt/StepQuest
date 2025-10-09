@@ -26,9 +26,9 @@ public class GoblinAttackSkill : Skill
         int baseDamage = CalculateBaseDamage(user);
 
         // NEW: hand the motion script the current target so BeginLunge knows direction
-        var motionBinder = user.GetComponent<GoblinAttackMotion>();     // NEW
-        var motionCtrl   = user.GetComponent<AttackMotionController>();  // NEW
-        if (motionBinder != null) motionBinder.target = target.transform; // NEW
+       // var motionBinder = user.GetComponent<GoblinAttackMotion>();     // NEW
+       // var motionCtrl   = user.GetComponent<AttackMotionController>();  // NEW
+      //  if (motionBinder != null) motionBinder.target = target.transform; // NEW
 
         // Fire the normal goblin attack animation
         user.animator.SetTrigger("GoblinAttack1Trigger");
