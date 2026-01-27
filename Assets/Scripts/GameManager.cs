@@ -1081,10 +1081,30 @@ public void EnterStageByID(string stageID)
     }
 
     currentStage = next;
-    CurrentBattleConfig = next.stageBattleConfig;
+CurrentBattleConfig = next.stageBattleConfig;
 
-    // IMPORTANT: load battle additively and make it the active scene
+if (IsSceneLoaded(next.battleSceneName))
+{
+    // Scene already loaded -> just reset the existing battle
+    var bm = FindBattleManagerInScene(next.battleSceneName);
+    if (bm != null)
+    {
+        SceneManager.SetActiveScene(SceneManager.GetSceneByName(next.battleSceneName));
+        PromoteBattleCamera(SceneManager.GetSceneByName(next.battleSceneName));
+        EnsureSingleEventSystem();
+
+        bm.ResetAndSetupForStage(CurrentBattleConfig);
+    }
+    else
+    {
+        Debug.LogError("[Nav] Battle scene is loaded but no BattleManager found.");
+    }
+}
+else
+{
     StartCoroutine(LoadBattleAdditive(next.battleSceneName));
+}
+
 }
 
 // GameManager.cs
@@ -1206,6 +1226,30 @@ public void SetUIRaycastsForScene(string sceneName, bool enable)
         }
     }
 }
+
+private bool IsSceneLoaded(string sceneName)
+{
+    for (int i = 0; i < SceneManager.sceneCount; i++)
+    {
+        var s = SceneManager.GetSceneAt(i);
+        if (s.IsValid() && s.isLoaded && s.name == sceneName) return true;
+    }
+    return false;
+}
+
+private BattleManager FindBattleManagerInScene(string sceneName)
+{
+    var scene = SceneManager.GetSceneByName(sceneName);
+    if (!scene.IsValid() || !scene.isLoaded) return null;
+
+    foreach (var root in scene.GetRootGameObjects())
+    {
+        var bm = root.GetComponentInChildren<BattleManager>(true);
+        if (bm != null) return bm;
+    }
+    return null;
+}
+
 
 public void ReturnToTownFromBattle()
 {

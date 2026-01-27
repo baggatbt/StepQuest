@@ -123,7 +123,7 @@ private Camera FindBattleCamera()
 
     expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
     goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
-    mainCamera = Camera.main;
+    
     
 
     BattleConfig config = GameManager.Instance.CurrentBattleConfig;
@@ -165,6 +165,121 @@ private Camera FindBattleCamera()
     // Uncomment to start the battle after enemies are spawned
     // StartBattle(config);
 }
+
+public void ResetAndSetupForStage(BattleConfig config)
+{
+    if (config == null)
+    {
+        Debug.LogError("[Battle] Reset called with null config.");
+        return;
+    }
+
+    Debug.Log($"[Battle] Resetting for new stage config: {config.poolName}");
+
+    // Stop battle coroutines
+    StopAllCoroutines();
+
+    // IMPORTANT: reset all party members runtime flags (they persist across stages)
+    foreach (var p in playerParty)
+        ResetCharacterRuntime(p);
+
+    // reset list/state
+    battleLost = false;
+    isBattleStarted = false;
+    state = BattleState.PlayerTurn;
+    currentTarget = null;
+    isSkillSelected = false;
+
+    skillQueue.Clear();
+    requestedSkill = null;
+
+    turnOrderList.Clear();
+
+    // Destroy old enemies + reset their runtime first
+    for (int i = enemies.Count - 1; i >= 0; i--)
+    {
+        var e = enemies[i];
+        if (e != null) ResetCharacterRuntime(e);
+        if (e != null) Destroy(e.gameObject);
+    }
+    enemies.Clear();
+
+    // UI reset
+    if (outerCircle) outerCircle.SetActive(false);
+    if (innerCircle) innerCircle.SetActive(false);
+    if (activePlayerIndicator) activePlayerIndicator.SetActive(false);
+
+    if (endOfBattlePanel) endOfBattlePanel.SetActive(false);
+    if (endOfBattleLossPanel) endOfBattleLossPanel.SetActive(false);
+    if (heroSelectionPanel) heroSelectionPanel.SetActive(true);
+    if (battleStartButton) battleStartButton.SetActive(true);
+
+    // Clear turn order bar icons
+    if (turnOrderBarPanel)
+        foreach (Transform child in turnOrderBarPanel.transform)
+            Destroy(child.gameObject);
+
+    // Re-acquire camera AFTER scene switch (don’t overwrite with Camera.main elsewhere)
+    mainCamera = FindBattleCamera();
+
+    // Respawn enemies for the new config
+    for (int i = 0; i < config.maxEnemiesToSpawn; i++)
+    {
+        if (i >= enemySpawnPoints.Length || i >= healthBars.Length || i >= energyBars.Length || i >= enemyHealthUI.Length)
+        {
+            Debug.LogWarning("[Battle] Not enough UI/spawn slots for maxEnemiesToSpawn.");
+            break;
+        }
+
+        enemySpawnPoints[i].gameObject.SetActive(true);
+
+        Character spawnedEnemy = enemySpawnController.SpawnEnemiesFromPool(
+            config.poolName,
+            enemySpawnPoints[i],
+            healthBars[i],
+            energyBars[i],
+            i,
+            config.levelOfEnemies,
+            enemyHealthUI[i]
+        );
+
+        if (spawnedEnemy != null)
+        {
+            ResetCharacterRuntime(spawnedEnemy);   // <-- KEY: ensure clean flags
+            enemies.Add(spawnedEnemy);
+        }
+    }
+
+    Debug.Log("[Battle] Reset complete.");
+}
+
+
+private void ResetCharacterRuntime(Character c)
+{
+    if (c == null) return;
+
+    // Character is a MonoBehaviour in your project, so this is valid
+    c.StopAllCoroutines();
+
+    c.isAttacking = false;
+    c.isMoving = false;
+
+    c.hasNotGone = true;          // your turn gating flag
+    c.currentSkill = null;
+    c.attackTarget = null;
+
+    // Optional safety if you use Animator booleans/triggers
+    var anim = c.GetComponent<Animator>();
+    if (anim != null)
+    {
+        anim.ResetTrigger("Attack");
+        anim.ResetTrigger("Hit");
+        anim.ResetTrigger("Die");
+        anim.Play(0, 0, 0f);      // restart base state
+    }
+}
+
+
 
 
     public GameObject knightPrefab;
@@ -997,7 +1112,7 @@ if (motion != null)
     public void GoToNextStage()
     {
         
-         GameManager.Instance.LoadCurrentParty();    
+          
          GameManager.Instance.GetNextStage(0); // Transitions to the first connected stage
     }
 
