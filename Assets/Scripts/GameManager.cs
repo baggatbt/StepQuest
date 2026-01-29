@@ -1139,14 +1139,13 @@ public void EnterStageByID(string stageID)
     var next = GetStageData(stageID);
     if (next == null) return;
 
-    // auto-start or gate the run (your existing logic)
+    // Auto-start or gate the run
     if (!InDungeonRun)
     {
         InDungeonRun = true;
         runUnlockedStageIDs.Clear();
         ClearAllStageUnlockedFlags();
         ClearRunLoot();
-
 
         runUnlockedStageIDs.Add(next.stageID);
         next.isUnlocked = true;
@@ -1159,32 +1158,14 @@ public void EnterStageByID(string stageID)
         return;
     }
 
+    // Set current stage + config BEFORE switching scenes
     currentStage = next;
-CurrentBattleConfig = next.stageBattleConfig;
+    CurrentBattleConfig = next.stageBattleConfig;
 
-if (IsSceneLoaded(next.battleSceneName))
-{
-    // Scene already loaded -> just reset the existing battle
-    var bm = FindBattleManagerInScene(next.battleSceneName);
-    if (bm != null)
-    {
-        SceneManager.SetActiveScene(SceneManager.GetSceneByName(next.battleSceneName));
-        PromoteBattleCamera(SceneManager.GetSceneByName(next.battleSceneName));
-        EnsureSingleEventSystem();
-
-        bm.ResetAndSetupForStage(CurrentBattleConfig);
-    }
-    else
-    {
-        Debug.LogError("[Nav] Battle scene is loaded but no BattleManager found.");
-    }
-}
-else
-{
-    StartCoroutine(LoadBattleAdditive(next.battleSceneName));
+    Debug.Log($"[Nav] Loading battle scene SINGLE: {next.battleSceneName} (stage {next.stageID})");
+    SceneManager.LoadScene(next.battleSceneName, LoadSceneMode.Single);
 }
 
-}
 
 // GameManager.cs
 private IEnumerator LoadBattleAdditive(string battleScene)
@@ -1332,8 +1313,9 @@ private BattleManager FindBattleManagerInScene(string sceneName)
 
 public void ReturnToTownFromBattle()
 {
-    StartCoroutine(ReturnTownRoutine());
+    SceneManager.LoadScene("CharacterInfoPage", LoadSceneMode.Single);
 }
+
 
 private IEnumerator ReturnTownRoutine()
 {

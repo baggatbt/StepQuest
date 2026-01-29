@@ -753,34 +753,54 @@ if (motion != null)
 
         EndTurn();
     }
+    [Header("Popups")]
+[SerializeField] private RectTransform popupParent;   // assign in inspector
+[SerializeField] private Canvas popupCanvas;          // assign in inspector (same canvas as parent)
 
     public CameraShake cameraShake;
 
     public void ShowTimingResult(string message)
+{
+    Debug.Log($"[Popup] BattleManager instance: {name} id={GetInstanceID()} scene={gameObject.scene.name}");
+Debug.Log($"[Popup] popupParent: {popupParent.name} id={popupParent.GetInstanceID()} scene={popupParent.gameObject.scene.name}");
+Debug.Log($"[Popup] popupCanvas: {popupCanvas.name} id={popupCanvas.GetInstanceID()} scene={popupCanvas.gameObject.scene.name}");
+
+    if (currentTarget == null) return;
+
+    if (popupParent == null || popupCanvas == null)
     {
-        if (currentTarget == null)
-        {
-            Debug.LogError("No current target set for timing result popup.");
-        }
-
-        Vector3 targetPosition = currentTarget.transform.position;
-        float yOffset = 3.0f;
-        Vector3 popupPosition = new Vector3(targetPosition.x, targetPosition.y + yOffset, targetPosition.z);
-
-        GameObject damagePopupPrefab = Resources.Load<GameObject>("Prefab/UI Elements/TimingResultPopup");
-        Transform canvasTransform = GameObject.Find("EndOfBattleRewardsCanvas").transform;
-
-        if (damagePopupPrefab != null)
-        {
-            GameObject damagePopupInstance = Instantiate(damagePopupPrefab, popupPosition, Quaternion.identity, canvasTransform);
-            DamagePopup damagePopupScript = damagePopupInstance.GetComponent<DamagePopup>();
-            damagePopupScript.SetupTimingEventResult(message);
-        }
-        else
-        {
-            Debug.LogError("Failed to load DamagePopup prefab for timing result.");
-        }
+        Debug.LogError("[Battle] popupParent/popupCanvas not assigned on BattleManager.");
+        return;
     }
+
+    var prefab = Resources.Load<GameObject>("Prefab/UI Elements/TimingResultPopup");
+    if (prefab == null)
+    {
+        Debug.LogError("[Battle] Failed to load TimingResultPopup prefab.");
+        return;
+    }
+
+    // Convert enemy world pos -> UI local pos
+    Vector3 world = currentTarget.transform.position + Vector3.up * 3f;
+    Vector2 screen = RectTransformUtility.WorldToScreenPoint(mainCamera, world);
+
+    Camera uiCam = (popupCanvas.renderMode == RenderMode.ScreenSpaceOverlay) ? null : popupCanvas.worldCamera;
+
+    RectTransformUtility.ScreenPointToLocalPointInRectangle(
+        popupParent, screen, uiCam, out Vector2 localPoint
+    );
+
+    var go = Instantiate(prefab, popupParent);
+    Debug.Log($"[Popup] spawned parent: {go.transform.parent.name} scene={go.scene.name}");
+
+    var rt = go.GetComponent<RectTransform>();
+    rt.anchoredPosition = localPoint;
+    go.transform.SetAsLastSibling();
+
+    var dmg = go.GetComponent<DamagePopup>();
+    if (dmg != null) dmg.SetupTimingEventResult(message);
+}
+
 
     public IEnumerator PlayerActiveTimeEvent(float windowStart, float windowEnd, System.Action<TimingEventResult> callback)
     {

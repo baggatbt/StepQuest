@@ -446,7 +446,7 @@ private void DoKnockback(Transform enemyTransform, Transform attackerTransform)
         int damageToReflect = (int)Math.Ceiling(damageReflectionPercentage * totalDamageAfterDefense);
         attacker.health -= damageToReflect;
         GameObject damagePopupPrefab = Resources.Load<GameObject>("PreFab/DamagePopup");
-        Transform endOfBattleRewardsTransform = GameObject.Find("EndOfBattleRewardsCanvas").transform;
+        Transform endOfBattleRewardsTransform = GameObject.Find("Canvas").transform;
         if(damagePopupPrefab != null)
         {
             GameObject damagePopupInstance = Instantiate(damagePopupPrefab, transform.position, Quaternion.identity, endOfBattleRewardsTransform);
