@@ -1104,6 +1104,8 @@ if (motion != null)
     }
 
     endOfBattlePanel.SetActive(true);
+    FindObjectOfType<RunLootPanelUI>(true).Show();
+
     DisplayExpToLevel(playerParty);
 }
 
@@ -1127,7 +1129,9 @@ if (motion != null)
     battleLost = true;
 
     // End run on defeat
-    GameManager.Instance.EndDungeonRun();
+    GameManager.Instance.EndDungeonRun(false);
+
+    
     GameManager.Instance.ReturnToTownFromBattle();
     endOfBattleLossPanel.SetActive(true);
 }
@@ -1136,6 +1140,9 @@ if (motion != null)
 public void ReturnToMapAfterVictory()
 {
     // neighbors already unlocked in ProcessVictory()
+    //Scoop up rewards
+    GameManager.Instance.EndDungeonRun(true);
+
     StartCoroutine(ExitBattleRoutine());
 }
 

@@ -57,15 +57,19 @@ public class Enemy : Character
 
     // Call this method when the enemy is defeated.
     public void DropMaterial()
-    {
-        if (Random.Range(0, 100) < dropChancePercentage)
-        {
-            int dropIndex = Random.Range(0, possibleDrops.Length);
-            MaterialItem droppedMaterial = possibleDrops[dropIndex];
+{
+    if (possibleDrops == null || possibleDrops.Length == 0) return;
 
-            Debug.Log("Dropped material: " + droppedMaterial.itemName);
-            // Add the dropped material to the player's inventory via GameManager
-            GameManager.Instance.AddItem(droppedMaterial);
-        }
+    if (Random.Range(0, 100) < dropChancePercentage)
+    {
+        int dropIndex = Random.Range(0, possibleDrops.Length);
+        MaterialItem droppedMaterial = possibleDrops[dropIndex];
+
+        Debug.Log("Dropped material: " + droppedMaterial.itemName);
+
+        // ✅ Route depending on run state
+        GameManager.Instance.AddLootItem(droppedMaterial, 1);
     }
+}
+
 }

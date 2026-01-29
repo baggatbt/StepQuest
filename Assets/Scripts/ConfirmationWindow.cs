@@ -17,7 +17,7 @@ public class ConfirmationWindow : MonoBehaviour
         // Example: go back to main menu
         mainMenuUI.closeOverworldMapInterface();  // Replace with your actual method
         confirmationPanel.SetActive(false);
-        GameManager.Instance.EndDungeonRun();
+        GameManager.Instance.EndDungeonRun(true);
 
         
     }

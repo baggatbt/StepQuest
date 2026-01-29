@@ -364,6 +364,75 @@ public class GameManager : MonoBehaviour
         }
     }
 
+     
+
+   
+
+   [Header("Run Loot (Unsecured)")]
+public RunLootBucket currentRunLoot = new RunLootBucket();
+
+// Fires whenever the run loot changes (UI can listen)
+public event Action OnRunLootChanged;
+
+
+   
+
+    public void AddLootItem(Item item, int amount = 1)
+{
+    if (item == null)
+    {
+        Debug.LogError("[GameManager] AddLootItem called with null item.");
+        return;
+    }
+
+    // During a run → bucket
+    if (InDungeonRun)
+    {
+        currentRunLoot.AddItem(item, amount);
+        Debug.Log($"[RunLoot] +{amount} {item.itemName} (unsecured)");
+        OnRunLootChanged?.Invoke();
+        return;
+    }
+
+    // Outside a run → normal inventory
+    for (int i = 0; i < amount; i++)
+        AddItem(item); // uses your existing stacking logic + save + UI refresh
+}
+
+
+    // Backwards-compatible: if old code calls EndDungeonRun(), treat it as a failure (lose loot)
+public void EndDungeonRun()
+{
+    EndDungeonRun(false);
+}
+
+    public void ClearRunLoot()
+{
+    currentRunLoot.Clear();
+    OnRunLootChanged?.Invoke();
+}
+
+public void CommitRunLootToInventory()
+{
+    // Items
+    foreach (var stack in currentRunLoot.items)
+    {
+        if (stack.item == null) continue;
+
+        for (int i = 0; i < stack.quantity; i++)
+            AddItem(stack.item); // uses your existing inventory pipeline (save + UI)
+    }
+
+    // If/when you add gold/xp to your actual player economy, do it here.
+    // Example placeholders (only if you actually have these):
+    // PlayerData.Instance.gold += currentRunLoot.gold;
+    // GameManager.Instance.UpdateCompanionExp(currentCompanion.heroID, currentRunLoot.xp);
+
+    currentRunLoot.Clear();
+    OnRunLootChanged?.Invoke();
+}
+
+
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         ReassignInventoryComponent();
@@ -1000,6 +1069,8 @@ public void StartDungeonRun(string startingStageID)
     InDungeonRun = true;
     runUnlockedStageIDs.Clear();
     ClearAllStageUnlockedFlags();
+    ClearRunLoot();
+
 
     var start = GetStageData(startingStageID);
     if (start == null) { Debug.LogError($"[Run] Missing StageData for {startingStageID}"); return; }
@@ -1013,17 +1084,23 @@ public void StartDungeonRun(string startingStageID)
     OnRunUnlocksChanged?.Invoke();
 }
 
-public void EndDungeonRun()
+public void EndDungeonRun(bool success)
 {
+    if (success)
+        CommitRunLootToInventory();
+    else
+        ClearRunLoot();
+
     InDungeonRun = false;
     runUnlockedStageIDs.Clear();
     ClearAllStageUnlockedFlags();
     currentStage = null;
     CurrentBattleConfig = null;
 
-    Debug.Log("[Run] Ended");
+    Debug.Log($"[Run] Ended (success={success})");
     OnRunUnlocksChanged?.Invoke();
 }
+
 public void UnlockConnectedStagesForRun(StageData completedStage)
 {
     if (!InDungeonRun) { Debug.LogWarning("[Run] Not in a run; unlock ignored."); return; }
@@ -1068,6 +1145,8 @@ public void EnterStageByID(string stageID)
         InDungeonRun = true;
         runUnlockedStageIDs.Clear();
         ClearAllStageUnlockedFlags();
+        ClearRunLoot();
+
 
         runUnlockedStageIDs.Add(next.stageID);
         next.isUnlocked = true;
