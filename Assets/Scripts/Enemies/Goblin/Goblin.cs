@@ -3,16 +3,18 @@ using UnityEngine;
 
 public class Goblin : Enemy
 {
-    private const int BASE_HEALTH = 12;
+    // ✅ Baseline test stats (Level 1)
+    private const int BASE_HEALTH = 20;
     private const int HEALTH_GROWTH = 3;
 
-    private const int BASE_ATTACK = 6;
+    private const int BASE_ATTACK = 8;
     private const float ATTACK_GROWTH_FACTOR = 1.5f;
 
-    private const int BASE_DEFENSE = 0;
+    private const int BASE_DEFENSE = 2;
     private const int DEFENSE_GROWTH = 0;
 
-    private const int BASE_SPEED = 7;
+    // Goblin slightly faster than Knight
+    private const int BASE_SPEED = 10;
 
     private const int BASE_GOLD = 5;
     private const int GOLD_PER_LEVEL = 2;
@@ -64,6 +66,9 @@ public class Goblin : Enemy
         attackPower = BASE_ATTACK + Mathf.FloorToInt((level - 1) * ATTACK_GROWTH_FACTOR);
 
         defensePower = BASE_DEFENSE + (level - 1) * DEFENSE_GROWTH;
+
+        // Keep speed locked to baseline + (optional growth later if you want)
+        speed = BASE_SPEED;
 
         goldReward = BASE_GOLD + GOLD_PER_LEVEL * level;
         expReward = Mathf.RoundToInt(BASE_EXP * Mathf.Pow(EXP_GROWTH_FACTOR, level - 1));

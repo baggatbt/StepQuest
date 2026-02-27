@@ -6,16 +6,17 @@ using System;
 [Serializable]
 public class Knight : Companion
 {
-    // Base stats and growth
-    private const int BASE_HEALTH = 18;
+    // ✅ Baseline test stats (Level 1)
+    private const int BASE_HEALTH = 24;
     private const int HEALTH_GROWTH = 5;
 
-    private const int BASE_ATTACK = 7;
+    private const int BASE_ATTACK = 10;
     private const int ATTACK_GROWTH = 2;
 
-    private const int BASE_SPEED = 4;
+    // Knight slightly slower than Goblin
+    private const int BASE_SPEED = 9;
 
-    private const int BASE_DEFENSE = 1;
+    private const int BASE_DEFENSE = 3;
     private const int DEFENSE_GROWTH = 1;
 
     private const int BASE_ENERGY = 5;
@@ -25,12 +26,6 @@ public class Knight : Companion
         base.Awake();
         skillOne = SkillType.TripleHit;
         skillTwo = SkillType.Taunt;
-
-        if (characterData != null)
-        {
-            // characterData.heroIconPath = "Assets/Resources/Sprites/GUI/knightIcon.png";
-            // characterData.fullHeroImagePath = "Path/To/KnightFullImage";
-        }
 
         InitializeSkillsBasedOnLevel();
         UpdateStats();
@@ -44,37 +39,44 @@ public class Knight : Companion
     }
 
     public void UpdateStats()
-{
-    int lvl = Mathf.Max(heroLevel, 1);
-
-    maxHealth   = BASE_HEALTH + (lvl - 1) * HEALTH_GROWTH;
-    //health      = maxHealth;
-
-    attackPower = BASE_ATTACK + (lvl - 1) * ATTACK_GROWTH;
-    speed       = BASE_SPEED + Mathf.FloorToInt((lvl - 1) / 3f);
-    defensePower= BASE_DEFENSE + Mathf.FloorToInt((lvl - 1) / 4f);
-    maxEnergy   = BASE_ENERGY + Mathf.FloorToInt((lvl - 1) / 2f);
-    //energy      = maxEnergy;
-
-    // Sync back to the characterData if the UI or inspector reads from it
-    if (characterData != null)
     {
-        characterData.maxHealth = maxHealth;
-        characterData.health = health;
-        characterData.attackPower = attackPower;
-        characterData.defensePower = defensePower;
-        characterData.speed = speed;
-        characterData.maxEnergy = maxEnergy;
-        characterData.energy = energy;
-        characterData.heroLevel = heroLevel;
-        characterData.heroStatPoints = heroStatPoints;
-        characterData.heroSkillPoints = heroSkillPoints;
+        int lvl = Mathf.Max(heroLevel, 1);
+
+        maxHealth = BASE_HEALTH + (lvl - 1) * HEALTH_GROWTH;
+
+        attackPower = BASE_ATTACK + (lvl - 1) * ATTACK_GROWTH;
+
+        // Keeping slightly below average speed as baseline
+        speed = BASE_SPEED + Mathf.FloorToInt((lvl - 1) / 3f);
+
+        defensePower = BASE_DEFENSE + Mathf.FloorToInt((lvl - 1) / 4f);
+
+        maxEnergy = BASE_ENERGY + Mathf.FloorToInt((lvl - 1) / 2f);
+
+        // ✅ Ensure current values never exceed max
+        health = Mathf.Clamp(health, 0, maxHealth);
+        energy = Mathf.Clamp(energy, 0, maxEnergy);
+
+        // Sync back to the characterData if the UI or inspector reads from it
+        if (characterData != null)
+        {
+            characterData.maxHealth = maxHealth;
+            characterData.health = health;
+
+            characterData.attackPower = attackPower;
+            characterData.defensePower = defensePower;
+            characterData.speed = speed;
+
+            characterData.maxEnergy = maxEnergy;
+            characterData.energy = energy;
+
+            characterData.heroLevel = heroLevel;
+            characterData.heroStatPoints = heroStatPoints;
+            characterData.heroSkillPoints = heroSkillPoints;
+        }
+
+        SaveCharacterData();
     }
-    SaveCharacterData();
-}
-
-
-
 
     public override void LevelUp()
     {
@@ -118,49 +120,48 @@ public class Knight : Companion
     public override List<SkillType> MainSkills => mainSkills;
 
     public override Skill GetSkillInstance(SkillType skillType)
-{
-    switch (skillType)
     {
-        case SkillType.Slash:
+        switch (skillType)
         {
-            var s = new Slash();
-            s.Type = SkillType.Slash;
-            return s;
+            case SkillType.Slash:
+            {
+                var s = new Slash();
+                s.Type = SkillType.Slash;
+                return s;
+            }
+            case SkillType.TripleHit:
+            {
+                var s = new TripleHitSkill();
+                s.Type = SkillType.TripleHit;
+                return s;
+            }
+            case SkillType.Taunt:
+            {
+                var s = new Taunt();
+                s.Type = SkillType.Taunt;
+                return s;
+            }
+            case SkillType.ReflectDamagePassive:
+            {
+                var s = new ReflectDamagePassive();
+                s.Type = SkillType.ReflectDamagePassive;
+                return s;
+            }
+            case SkillType.SpeedBreak:
+            {
+                var s = new SpeedBreak();
+                s.Type = SkillType.SpeedBreak;
+                return s;
+            }
+            case SkillType.SwordWave:
+            {
+                var s = new SwordWave();
+                s.Type = SkillType.SwordWave;
+                return s;
+            }
+            default:
+                Debug.LogError("Unknown skill type for Knight: " + skillType);
+                return null;
         }
-        case SkillType.TripleHit:
-        {
-            var s = new TripleHitSkill();
-            s.Type = SkillType.TripleHit;
-            return s;
-        }
-        case SkillType.Taunt:
-        {
-            var s = new Taunt();
-            s.Type = SkillType.Taunt;
-            return s;
-        }
-        case SkillType.ReflectDamagePassive:
-        {
-            var s = new ReflectDamagePassive();
-            s.Type = SkillType.ReflectDamagePassive;
-            return s;
-        }
-        case SkillType.SpeedBreak:
-        {
-            var s = new SpeedBreak();
-            s.Type = SkillType.SpeedBreak;
-            return s;
-        }
-        case SkillType.SwordWave:
-        {
-            var s = new SwordWave();
-            s.Type = SkillType.SwordWave;
-            return s;
-        }
-        default:
-            Debug.LogError("Unknown skill type for Knight: " + skillType);
-            return null;
     }
-}
-
 }

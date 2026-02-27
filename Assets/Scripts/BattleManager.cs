@@ -644,17 +644,37 @@ private class PlannedAction
     public GameObject companionSkillsPanel;
     public GameObject SkillsPanel;
 
+    private bool ShouldShowCombatUI()
+{
+    // Only show UI when the player is actively PLANNING a move.
+    return isBattleStarted
+        && !battleLost
+        && planningPhase
+        && !resolvingPhase
+        && state == BattleState.PlayerTurn
+        && activePlayer != null
+        && activePlayer.hasNotGone;   // still needs to plan
+}
     public IEnumerator EnableAllButtons()
+{
+    yield return new WaitForSeconds(0.25f);
+
+    if (!ShouldShowCombatUI())
     {
-        yield return new WaitForSeconds(0.25f);
-        if (state == BattleState.PlayerTurn)
-        {
-            companionSkillsPanel.SetActive(true);
-        }
-        SkillsPanel.SetActive(true);
-        enemyUIPanel.SetActive(true);
-        heroUIPanels.SetActive(true);
+        // Keep everything hidden during resolution
+        companionSkillsPanel.SetActive(false);
+        SkillsPanel.SetActive(false);
+        enemyUIPanel.SetActive(false);
+        heroUIPanels.SetActive(false);
+        yield break;
     }
+
+    // Planning UI
+    companionSkillsPanel.SetActive(true);
+    SkillsPanel.SetActive(true);
+    enemyUIPanel.SetActive(true);
+    heroUIPanels.SetActive(true);
+}
 
     public void MoveCursorToTarget()
     {
@@ -829,7 +849,8 @@ private class PlannedAction
             StartCoroutine(zoomEffect.ZoomOutEffect());
         }
         
-        StartCoroutine(EnableAllButtons());
+        if (ShouldShowCombatUI())
+    StartCoroutine(EnableAllButtons());
 
        
         yield return activePlayer.ReturnToPosition();
@@ -965,7 +986,8 @@ if (motion != null && currentTarget != null)
             {
                 StartCoroutine(zoomEffect.ZoomOutEffect());
                 yield return currentEnemy.ReturnToPosition();
-                StartCoroutine(EnableAllButtons());
+                if (ShouldShowCombatUI())
+    StartCoroutine(EnableAllButtons());
             }
         }
         else
