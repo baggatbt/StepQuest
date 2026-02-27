@@ -136,27 +136,28 @@ public abstract class Skill
     ///
     /// You can call this from each skill if you have atk/def/level available.
     /// </summary>
-    protected virtual int CalculateBaseDamage(int userAttack, int targetDefense, int userLevel)
-    {
-        // Safe guards
-        float atk = Mathf.Max(1, userAttack);
-        float def = Mathf.Max(1, targetDefense);
+   protected virtual int CalculateBaseDamage(int userAttack, int targetDefense, int userLevel)
+{
+    // NOTE: We intentionally IGNORE targetDefense here.
+    // Defense is applied exactly once in Character.TakeDamage().
 
-        // Gentle level scaling that won't explode numbers:
-        // Level 1 -> 1.00, Level 50 -> 1.49, Level 100 -> 1.99
-        float levelFactor = 1.0f + (Mathf.Clamp(userLevel, 1, 100) - 1) * 0.01f;
+    float atk = Mathf.Max(1, userAttack);
 
-        float ratio = atk / def;
-        float raw = ratio * power * levelFactor * skillDamageModifier;
+    // Gentle level scaling (won't explode)
+    float levelFactor = 1.0f + (Mathf.Clamp(userLevel, 1, 100) - 1) * 0.01f;
 
-        // Keep small numbers readable:
-        int dmg = Mathf.Max(1, Mathf.RoundToInt(raw * 0.10f)); // 0.10f is your global tuning knob
+    // Raw incoming damage BEFORE defense.
+    // "power" becomes the main knob; tune the globalScalar to hit your desired ranges.
+    const float globalScalar = 0.03f;  // <-- start here (0.02–0.05 range)
+    float raw = atk * power * levelFactor * skillDamageModifier * globalScalar;
 
-        if (useVariance)
-            dmg = ApplyVariance(dmg);
+    int dmg = Mathf.Max(1, Mathf.RoundToInt(raw));
 
-        return dmg;
-    }
+    if (useVariance)
+        dmg = ApplyVariance(dmg);
+
+    return dmg;
+}
 
     /// <summary>
     /// Keep your old hook for skills that still want "just return 5" etc.
