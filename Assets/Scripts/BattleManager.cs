@@ -379,15 +379,21 @@ private int GetEffectiveSpeedForTurnOrder(Character c)
     // Otherwise use raw speed
     return c.speed;
 }
-
+[SerializeField] private bool resolvingPhase = false;
 private void BeginPlanningPhase()
 {
     if (battleLost) return;
 
     planningPhase = true;
-    plannedActions.Clear();
+    resolvingPhase = false;
 
-    // Reset "hasNotGone" so players can plan again
+    plannedActions.Clear();
+    skillQueue.Clear();
+    requestedSkill = null;
+    currentTarget = null;
+    isSkillSelected = false;
+
+    // Reset so players can plan again
     foreach (var p in playerParty)
         if (p != null && p.health > 0)
             p.hasNotGone = true;
@@ -397,10 +403,8 @@ private void BeginPlanningPhase()
     {
         if (e == null || e.health <= 0) continue;
 
-        // choose their move for this round (simple: normalSkill)
         e.currentSkill = e.normalSkill != null ? e.normalSkill : e.currentSkill;
 
-        // choose their target for this round
         var t = SelectTargetForEnemy();
         e.attackTarget = t;
 
@@ -414,10 +418,18 @@ private void BeginPlanningPhase()
 
     // Set activePlayer to first living companion that still needs to plan
     activePlayer = GetNextPlanningPlayer();
-    ChangeState(BattleState.PlayerTurn);
 
-    // UI on
-    StartCoroutine(EnableAllButtons());
+    // Only show player UI if there IS someone to plan
+    if (activePlayer != null)
+    {
+        ChangeState(BattleState.PlayerTurn);
+        StartCoroutine(EnableAllButtons());
+    }
+    else
+    {
+        // No players alive to plan -> go straight to resolution (enemies only)
+        FinalizePlansAndBuildTurnOrder();
+    }
 
     Debug.Log("[OptionB] Planning phase started.");
 }
@@ -437,8 +449,8 @@ private Character GetNextPlanningPlayer()
 private void FinalizePlansAndBuildTurnOrder()
 {
     planningPhase = false;
+    resolvingPhase = true;
 
-    // Build turnOrderList from plannedActions (NOT from raw speed)
     turnOrderList.Clear();
 
     foreach (var kv in plannedActions)
@@ -449,22 +461,21 @@ private void FinalizePlansAndBuildTurnOrder()
         if (actor == null || actor.health <= 0) continue;
         if (plan == null || plan.skill == null) continue;
 
-        // ensure actor has the planned skill/target assigned
         actor.currentSkill = plan.skill;
         actor.attackTarget = plan.target;
 
         turnOrderList.Add(actor);
     }
 
-    // Clear existing icons from TurnOrderBarPanel
+    // Clear existing icons
     if (turnOrderBarPanel != null)
         foreach (Transform child in turnOrderBarPanel.transform)
             Destroy(child.gameObject);
 
-    // Sort by skill priority first, then effective speed
+    // Sort by priority then effective speed
     turnOrderList = turnOrderList
         .OrderByDescending(c => (c != null && c.currentSkill != null) ? c.currentSkill.priority : 0)
-        .ThenByDescending(c => GetEffectiveSpeedForTurnOrder(c)) // you already have this helper
+        .ThenByDescending(c => GetEffectiveSpeedForTurnOrder(c))
         .ToList();
 
     // Rebuild icons
@@ -481,8 +492,42 @@ private void FinalizePlansAndBuildTurnOrder()
             iconImage.sprite = (character as Enemy).enemyIcon;
     }
 
+    DisableAllButtons(); // resolution should not allow choosing new moves
+
     Debug.Log("[OptionB] Plans locked. Turn order built.");
     StartTurn();
+}
+
+private IEnumerator ResolvePlannedPlayerTurn(Character playerActor)
+{
+    // Wait until nobody is mid-attack/move
+    yield return new WaitUntil(() =>
+        !playerParty.Any(p => p != null && p.isAttacking) &&
+        !enemies.Any(e => e != null && e.isAttacking)
+    );
+
+    activePlayer = playerActor;
+
+    // Planned target from plan
+    var t = playerActor.attackTarget;
+    currentTarget = (t != null) ? t.gameObject : null;
+
+    if (playerActor.currentSkill == null || currentTarget == null)
+    {
+        Debug.LogWarning($"[OptionB] Missing planned skill/target for {playerActor?.name}. Skipping turn.");
+        EndTurn();
+        yield break;
+    }
+
+    // IMPORTANT: do NOT prompt the player again during resolution
+    DisableAllButtons();
+
+    // Run the same execution pipeline you already use
+    yield return StartCoroutine(PlayerAction());
+
+    // PlayerAction/Attack coroutines usually end without calling EndTurn in OptionB
+    // so we end the turn here.
+    EndTurn();
 }
 
     // --------------------
@@ -530,18 +575,34 @@ private class PlannedAction
 }
 
     private void ExecuteTurn(Character character)
+{
+    if (character == null || character.health <= 0)
     {
-        if (character == companion1 || character == companion2)
-        {
-            activePlayer = character;
-            ChangeState(BattleState.PlayerTurn);
-        }
-        else
-        {
-            ChangeState(BattleState.EnemyTurn);
-            EnemyAttack(character);
-        }
+        EndTurn();
+        return;
     }
+
+    // During resolution: players auto-execute their planned action
+    if (resolvingPhase && (character == companion1 || character == companion2))
+    {
+        // Set battle state without re-enabling UI
+        state = BattleState.PlayerTurn; // intentionally NOT ChangeState()
+        StartCoroutine(ResolvePlannedPlayerTurn(character));
+        return;
+    }
+
+    // Normal enemy turn resolution
+    if (character != companion1 && character != companion2)
+    {
+        ChangeState(BattleState.EnemyTurn);
+        EnemyAttack(character);
+        return;
+    }
+
+    // Planning phase: allow choosing a move
+    activePlayer = character;
+    ChangeState(BattleState.PlayerTurn);
+}
 
     public void EndTurn()
 {
@@ -1149,9 +1210,15 @@ Debug.Log($"[Popup] popupCanvas: {popupCanvas.name} id={popupCanvas.GetInstanceI
 
     private void Update()
 {
-    
-    if (isBattleStarted){
-        MoveRadialMenuToActivePlayer();
+    if (!isBattleStarted) return;
+
+    MoveRadialMenuToActivePlayer();
+
+    // ✅ Only allow taps during planning, not during resolution
+    if (!planningPhase) return;
+    if (state != BattleState.PlayerTurn) return;
+    if (activePlayer == null) return;
+    if (!activePlayer.hasNotGone) return;
     if (!playerParty.Any(character => character.isAttacking) && !enemies.Any(character => character.isAttacking))
     {
     if (Input.GetMouseButtonDown(0))
@@ -1198,7 +1265,7 @@ Debug.Log($"[Popup] popupCanvas: {popupCanvas.name} id={popupCanvas.GetInstanceI
         }
     }
     }
-    }
+    
     //ChangeColorAfterTurnTaken();
 }
 
