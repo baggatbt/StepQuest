@@ -362,59 +362,152 @@ private void ResetCharacterRuntime(Character c)
 
     public GameObject turnOrderBarPanel;
     public GameObject iconPrefab; //Has an image attached so it can be used for enemy or hero
+    private int GetSortPriority(Character c)
+{
+    // Higher = earlier
+    return (c != null && c.currentSkill != null) ? c.currentSkill.priority : 0;
+}
 
+private int GetEffectiveSpeedForTurnOrder(Character c)
+{
+    if (c == null) return 0;
 
-    public void InitializeTurnOrder()
+    // If a skill is selected for this turn, it modifies speed
+    if (c.currentSkill != null)
+        return c.currentSkill.GetEffectiveSpeed(c.speed);
+
+    // Otherwise use raw speed
+    return c.speed;
+}
+
+private void BeginPlanningPhase()
+{
+    if (battleLost) return;
+
+    planningPhase = true;
+    plannedActions.Clear();
+
+    // Reset "hasNotGone" so players can plan again
+    foreach (var p in playerParty)
+        if (p != null && p.health > 0)
+            p.hasNotGone = true;
+
+    // Enemies pre-plan now (skill + target)
+    foreach (var e in enemies)
     {
-        if (!battleLost)
+        if (e == null || e.health <= 0) continue;
+
+        // choose their move for this round (simple: normalSkill)
+        e.currentSkill = e.normalSkill != null ? e.normalSkill : e.currentSkill;
+
+        // choose their target for this round
+        var t = SelectTargetForEnemy();
+        e.attackTarget = t;
+
+        plannedActions[e] = new PlannedAction
         {
-            turnOrderList.Clear();
-            
-            // Clear existing icons from the TurnOrderBarPanel
-            foreach (Transform child in turnOrderBarPanel.transform)
-            {
-                Destroy(child.gameObject);
-            }
-
-            if (companion1 != null) turnOrderList.Add(companion1);
-            if (companion2 != null) turnOrderList.Add(companion2);
-
-            foreach (var enemy in enemies)
-            {
-                if (enemy != null)
-                {
-                    turnOrderList.Add(enemy);
-                    enemy.attackTarget = SelectTargetForEnemy();
-                    Debug.Log("Enemy added to turn order: " + enemy.name);
-                }
-            }
-
-            // Order by speed descending
-            turnOrderList = turnOrderList.OrderByDescending(character => character.speed).ToList();
-
-            // Create icons for each character in the turn order list
-            foreach (var character in turnOrderList)
-            {
-                GameObject icon = Instantiate(iconPrefab, turnOrderBarPanel.transform);
-                Image iconImage = icon.GetComponent<Image>();
-                
-                if (character is Companion)
-                {
-                    iconImage.sprite = (character as Companion).heroIcon;
-                }
-                else if (character is Enemy)
-                {
-                    iconImage.sprite = (character as Enemy).enemyIcon;
-                }
-            }
-
-            StartTurn();
-        }
-        else
-        {
-            Debug.Log("The battle is over");
-        }
+            actor = e,
+            skill = e.currentSkill,
+            target = t
+        };
     }
+
+    // Set activePlayer to first living companion that still needs to plan
+    activePlayer = GetNextPlanningPlayer();
+    ChangeState(BattleState.PlayerTurn);
+
+    // UI on
+    StartCoroutine(EnableAllButtons());
+
+    Debug.Log("[OptionB] Planning phase started.");
+}
+
+private Character GetNextPlanningPlayer()
+{
+    // pick next companion in party that is alive and hasNotGone == true
+    foreach (var p in playerParty)
+    {
+        if (p == null) continue;
+        if (p.health <= 0) continue;
+        if (p.hasNotGone) return p;
+    }
+    return null;
+}
+
+private void FinalizePlansAndBuildTurnOrder()
+{
+    planningPhase = false;
+
+    // Build turnOrderList from plannedActions (NOT from raw speed)
+    turnOrderList.Clear();
+
+    foreach (var kv in plannedActions)
+    {
+        var actor = kv.Key;
+        var plan = kv.Value;
+
+        if (actor == null || actor.health <= 0) continue;
+        if (plan == null || plan.skill == null) continue;
+
+        // ensure actor has the planned skill/target assigned
+        actor.currentSkill = plan.skill;
+        actor.attackTarget = plan.target;
+
+        turnOrderList.Add(actor);
+    }
+
+    // Clear existing icons from TurnOrderBarPanel
+    if (turnOrderBarPanel != null)
+        foreach (Transform child in turnOrderBarPanel.transform)
+            Destroy(child.gameObject);
+
+    // Sort by skill priority first, then effective speed
+    turnOrderList = turnOrderList
+        .OrderByDescending(c => (c != null && c.currentSkill != null) ? c.currentSkill.priority : 0)
+        .ThenByDescending(c => GetEffectiveSpeedForTurnOrder(c)) // you already have this helper
+        .ToList();
+
+    // Rebuild icons
+    foreach (var character in turnOrderList)
+    {
+        if (character == null) continue;
+
+        GameObject icon = Instantiate(iconPrefab, turnOrderBarPanel.transform);
+        Image iconImage = icon.GetComponent<Image>();
+
+        if (character is Companion)
+            iconImage.sprite = (character as Companion).heroIcon;
+        else if (character is Enemy)
+            iconImage.sprite = (character as Enemy).enemyIcon;
+    }
+
+    Debug.Log("[OptionB] Plans locked. Turn order built.");
+    StartTurn();
+}
+
+    // --------------------
+// Option B: Planning phase
+// --------------------
+[Header("Option B Planning")]
+[SerializeField] private bool planningPhase = false;
+
+// Planned action per character for the upcoming resolution
+private readonly Dictionary<Character, PlannedAction> plannedActions = new Dictionary<Character, PlannedAction>();
+
+[Serializable]
+private class PlannedAction
+{
+    public Character actor;
+    public Skill skill;
+    public Transform target;   // can be null until chosen
+}
+    public void InitializeTurnOrder()
+{
+    // Option B: this should only happen after planning
+    // If someone calls it by accident, push into planning instead of sorting raw speed.
+    Debug.LogWarning("[OptionB] InitializeTurnOrder called. Redirecting to BeginPlanningPhase().");
+    BeginPlanningPhase();
+}
 
     public void StartTurn()
 {
@@ -431,7 +524,7 @@ private void ResetCharacterRuntime(Character c)
     else
     {
         // If no characters are left, re-initialize the turn order
-        InitializeTurnOrder();
+        BeginPlanningPhase();
     }
     }
 }
@@ -451,19 +544,25 @@ private void ResetCharacterRuntime(Character c)
     }
 
     public void EndTurn()
-    {
+{
+    if (turnOrderList.Count > 0)
         turnOrderList.RemoveAt(0);
-        turnOrderList.RemoveAll(character => character.health <= 0);
-        if (turnOrderList.Count == 0)
-        {
+
+    turnOrderList.RemoveAll(character => character == null || character.health <= 0);
+
+    if (turnOrderList.Count == 0)
+    {
+        // End of resolution round
+        if (statusEffectController != null)
             statusEffectController.ProcessEffects();
-            InitializeTurnOrder();
-        }
-        else
-        {
-            StartTurn();
-        }
+
+        BeginPlanningPhase(); // start next round planning
     }
+    else
+    {
+        StartTurn();
+    }
+}
 
     private void DisableSkillSelection()
     {
@@ -511,18 +610,63 @@ private void ResetCharacterRuntime(Character c)
     }
 
     public void ExecuteQueuedSkills()
+{
+    if (currentTarget == null || state != BattleState.PlayerTurn)
     {
-        if (currentTarget != null && (state == BattleState.PlayerTurn))
+        Debug.Log("No target selected / not player turn.");
+        return;
+    }
+
+    // OPTION B: If we're in planning phase, committing a plan replaces immediate execution
+    if (planningPhase)
     {
-        Debug.Log("Executing queued skills on target: " + currentTarget.transform.position);
+        if (skillQueue.Count == 0)
+        {
+            Debug.Log("[OptionB] No skill queued to commit.");
+            return;
+        }
+
+        Skill skill = skillQueue.Dequeue();
+        activePlayer.currentSkill = skill;
+        activePlayer.attackTarget = currentTarget.transform;
+
+        // Spend energy NOW to lock the choice (matches your current behavior)
+        activePlayer.SpendEnergy(skill.energyCost);
+
+        plannedActions[activePlayer] = new PlannedAction
+        {
+            actor = activePlayer,
+            skill = skill,
+            target = currentTarget.transform
+        };
+
+        activePlayer.hasNotGone = false; // finished planning
+        isSkillSelected = false;
+        skillDescriptionPanel.SetActive(false);
+
+        Debug.Log($"[OptionB] Planned: {activePlayer.name} uses {skill.skillName} on {currentTarget.name}");
+
+        // Move to next planner
+        activePlayer = GetNextPlanningPlayer();
+
+        if (activePlayer != null)
+        {
+            // Still planning another companion
+            StartCoroutine(EnableAllButtons());
+            return;
+        }
+
+        // Everyone planned -> lock plans and compute order
         DisableAllButtons();
-        StartCoroutine(ExecuteAllSkillsCoroutine());
+        FinalizePlansAndBuildTurnOrder();
+        return;
     }
-    else
-    {
-        Debug.Log("No target selected");
-    }
-    }
+
+    // ORIGINAL behavior (if you ever turn planningPhase off manually)
+    Debug.Log("Executing queued skills on target: " + currentTarget.transform.position);
+    DisableAllButtons();
+    StartCoroutine(ExecuteAllSkillsCoroutine());
+}
 
     public int skillsExecuted = 0;
     private IEnumerator ExecuteAllSkillsCoroutine()
@@ -711,12 +855,29 @@ private void ResetCharacterRuntime(Character c)
 
     public IEnumerator EnemyAttackCoroutine(Character currentEnemy)
     {
-        yield return new WaitUntil(() => activePlayer.isAttacking == false);
+        // Option B: activePlayer can be null (enemy may go first)
+yield return new WaitUntil(() =>
+    !playerParty.Any(p => p != null && p.isAttacking) &&
+    !enemies.Any(e => e != null && e.isAttacking)
+);
         yield return new WaitForSeconds(1.0f);
 
-        Transform enemyTargetTransform = SelectTargetForEnemy();
-        currentEnemy.attackTarget = enemyTargetTransform;
-        currentTarget = enemyTargetTransform.gameObject;
+       Transform enemyTargetTransform = currentEnemy.attackTarget;
+
+// If target died or was null, pick a new one (fallback safety)
+if (enemyTargetTransform == null || enemyTargetTransform.GetComponent<Character>() == null || enemyTargetTransform.GetComponent<Character>().health <= 0)
+{
+    enemyTargetTransform = SelectTargetForEnemy();
+    currentEnemy.attackTarget = enemyTargetTransform;
+}
+
+currentTarget = enemyTargetTransform != null ? enemyTargetTransform.gameObject : null;
+if (currentTarget == null)
+{
+    Debug.LogWarning("[OptionB] Enemy had no valid target.");
+    EndTurn();
+    yield break;
+}
 
         if (currentEnemy.currentSkill != null)
         {
@@ -727,8 +888,8 @@ private void ResetCharacterRuntime(Character c)
                 DisableAllButtons();
                 yield return currentEnemy.MoveToTarget();
                 // After MoveToTarget() finishes and *before* playing the attack animation:
-var motion = activePlayer.GetComponent<AttackMotionController>();
-if (motion != null)
+var motion = currentEnemy.GetComponent<AttackMotionController>();
+if (motion != null && currentTarget != null)
 {
     motion.currentTarget = currentTarget.transform;
     motion.SetContactAnchorFromCurrent();

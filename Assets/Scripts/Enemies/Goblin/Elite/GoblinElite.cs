@@ -15,7 +15,7 @@ public class GoblinElite : Enemy
         this.health = this.maxHealth;
         this.maxEnergy = 3;
         this.speed = 9;
-        this.defensePenetration = 0;
+        
         this.attacksBeforeSpecial = 2;
         this.attackPower = 6;
         this.defensePower = 0;

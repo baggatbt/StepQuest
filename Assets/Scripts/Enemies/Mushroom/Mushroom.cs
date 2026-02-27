@@ -27,7 +27,7 @@ public class Mushroom : Enemy
         this.maxEnergy = 1;
         this.energy = 0;
         this.defensePower = 1;
-        this.defensePenetration = 0;
+        
         this.attacksBeforeSpecial = 2;
 
         this.skills = new List<Skill>

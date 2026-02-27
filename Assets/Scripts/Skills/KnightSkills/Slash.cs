@@ -51,7 +51,7 @@ public class Slash : Skill
     // Total damage budget from Power system (60 total)
     int totalDamageBudget = CalculateBaseDamage(
         userAttack: user.attackPower,
-        targetDefense: target.defense,
+        targetDefense: target.defensePower,
         userLevel: user.level
     );
 

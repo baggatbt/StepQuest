@@ -1,7 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
 
 public class Goblin : Enemy
 {
@@ -11,6 +9,11 @@ public class Goblin : Enemy
     private const int BASE_ATTACK = 6;
     private const float ATTACK_GROWTH_FACTOR = 1.5f;
 
+    private const int BASE_DEFENSE = 0;
+    private const int DEFENSE_GROWTH = 0;
+
+    private const int BASE_SPEED = 7;
+
     private const int BASE_GOLD = 5;
     private const int GOLD_PER_LEVEL = 2;
 
@@ -19,46 +22,53 @@ public class Goblin : Enemy
 
     protected override void Awake()
     {
+        // ✅ Set level BEFORE base.Awake() so reward calcs don't run at default/old value
+        level = 1;
+
+        // Setup exp curve vars before Awake reward calc too (optional but nice)
+        baseExp = BASE_EXP;
+        growthFactor = EXP_GROWTH_FACTOR;
+
         base.Awake();
-        this.level = 1;
-        UpdateStats();
 
-        this.speed = 7;
-        this.maxEnergy = 1;
-        this.energy = 0;
-        this.defensePower = 0;
-        this.defensePenetration = 0;
-        this.attacksBeforeSpecial = 2;
+        // Core combat setup
+        speed = BASE_SPEED;
 
-        this.skills = new List<Skill>
+        maxEnergy = 1;
+        energy = 0;
+
+        attacksBeforeSpecial = 2;
+
+        // Skills
+        skills = new List<Skill>
         {
             new GoblinAttackSkill(),
             new GoblinSpecialAttackSkill()
         };
 
-        this.normalSkill = skills[0];
-        this.specialSkill = skills[1];
-        this.currentSkill = normalSkill;
+        normalSkill = skills[0];
+        specialSkill = skills[1];
+        currentSkill = normalSkill;
 
-        this.baseExp = BASE_EXP;
-        this.growthFactor = EXP_GROWTH_FACTOR;
-    }
-
-    protected override void Start()
-    {
-        base.Start();
+        // Apply stats now
+        UpdateStats();
     }
 
     public override void UpdateStats()
     {
         base.UpdateStats();
 
-        this.maxHealth = BASE_HEALTH + (this.level - 1) * HEALTH_GROWTH;
-        this.health = this.maxHealth;
+        maxHealth = BASE_HEALTH + (level - 1) * HEALTH_GROWTH;
+        health = maxHealth;
 
-        this.attackPower = BASE_ATTACK + Mathf.FloorToInt((this.level - 1) * ATTACK_GROWTH_FACTOR);
+        attackPower = BASE_ATTACK + Mathf.FloorToInt((level - 1) * ATTACK_GROWTH_FACTOR);
 
-        this.goldReward = BASE_GOLD + GOLD_PER_LEVEL * this.level;
-        this.expReward = Mathf.RoundToInt(BASE_EXP * Mathf.Pow(EXP_GROWTH_FACTOR, this.level - 1));
+        defensePower = BASE_DEFENSE + (level - 1) * DEFENSE_GROWTH;
+
+        goldReward = BASE_GOLD + GOLD_PER_LEVEL * level;
+        expReward = Mathf.RoundToInt(BASE_EXP * Mathf.Pow(EXP_GROWTH_FACTOR, level - 1));
+
+        // Keep energy within bounds (in case maxEnergy changes later)
+        energy = Mathf.Clamp(energy, 0, maxEnergy);
     }
 }

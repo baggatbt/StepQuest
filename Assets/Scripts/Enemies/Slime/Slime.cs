@@ -24,7 +24,7 @@ public class Slime : Enemy
 
         speed = 5;
         maxEnergy = 1; energy = 0;
-        defensePower = 0; defensePenetration = 0;
+        defensePower = 0; 
         attacksBeforeSpecial = 3;
 
         var pounce = new MeleeContactSkill

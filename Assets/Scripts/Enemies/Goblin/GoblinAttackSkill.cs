@@ -7,15 +7,27 @@ public class GoblinAttackSkill : Skill
 
     public GoblinAttackSkill()
     {
+        // Identity (optional but nice)
+        // If you added this enum value, set it; otherwise you can remove this line.
+        // Type = SkillType.GoblinAttack; 
         skillName = "Goblin Attack";
         description = "The Goblin attacks the player. The damage can be reduced by timely action.";
+
         requiresMovement = true;
         numberOfAttacksPossible = 1;
-    }
 
-    protected override int CalculateBaseDamage(Character user)
-    {
-        return (int)(user.attackPower * 1.0f);
+        // NEW: power + speed
+        // For a basic enemy poke, keep it near your "basic" power.
+        power = 60;
+
+        // Goblin basic attack is fairly quick but not crazy.
+        speedMultiplier = 1.05f;
+
+        // Optional
+        priority = 0;
+
+        // Optional variance (usually off since you already have timing)
+        useVariance = false;
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
@@ -23,21 +35,22 @@ public class GoblinAttackSkill : Skill
         user.isAttacking = true;
         user.isAnimationDone = false;
 
-        int baseDamage = CalculateBaseDamage(user);
+        // NEW: power-based damage
+        int baseDamage = CalculateBaseDamage(
+            userAttack: user.attackPower,
+            targetDefense: target.defensePower,
+            userLevel: user.level
+        );
 
-        // NEW: hand the motion script the current target so BeginLunge knows direction
-       // var motionBinder = user.GetComponent<GoblinAttackMotion>();     // NEW
-       // var motionCtrl   = user.GetComponent<AttackMotionController>();  // NEW
-      //  if (motionBinder != null) motionBinder.target = target.transform; // NEW
-
-        // Fire the normal goblin attack animation
+        // Goblin attack animation
         user.animator.SetTrigger("GoblinAttack1Trigger");
 
         for (int i = 0; i < numberOfAttacksPossible; i++)
         {
-            // Your existing timing/damage flow
             yield return TimingManager.Instance.HandleTimingWindow(
-                user, target, baseDamage,
+                user,
+                target,
+                baseDamage,
                 (TimingEventResult result) =>
                 {
                     HandleTimingResultForEnemyAttack(user, target, result, baseDamage);
@@ -45,15 +58,11 @@ public class GoblinAttackSkill : Skill
                 });
         }
 
-        // Wait for the animation to finish (unchanged)
         yield return new WaitUntil(() => user.isAnimationDone);
 
-        // Safety: ensure visual returns to idle anchor even if an event was missed
-       // if (motionCtrl != null) motionCtrl.ResetVisual(); // NEW
-
-        // Reset flags (unchanged)
         user.isAnimationDone = false;
         user.isAttacking = false;
+
         target.CheckForDeath();
     }
 }

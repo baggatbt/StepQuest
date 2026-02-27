@@ -4,32 +4,38 @@ using UnityEngine;
 
 public class Enemy : Character
 {
+    [Header("Rewards")]
     public int expReward;
     public int goldReward;
-    public int baseExp; // Base experience points given by enemies
-    public float growthFactor = 1.1f; // Growth factor to control the steepness of curve
-    public int multiplier; // Multiplier for the experience calculation
 
+    [Header("EXP Curve (optional)")]
+    public int baseExp;                 // Base experience points given by enemies
+    public float growthFactor = 1.1f;   // Growth factor to control curve steepness
+    public int multiplier;              // Multiplier for experience calculation (if used)
 
-    public int attackGrowth;
-    public int defenseGrowth;
-    public int healthGrowth;
+    [Header("Drops")]
     public Sprite enemyIcon;
-    public MaterialItem[] possibleDrops; // Assign this in the Inspector with your material items.
-    public int dropChancePercentage = 50; // Example drop chance.
+    public MaterialItem[] possibleDrops;     // Assign in Inspector
+    public int dropChancePercentage = 50;    // 0-100
 
     protected override void Awake()
     {
         base.Awake();
-        UpdateExpAndGoldRewards();
+        UpdateRewards();
     }
 
-    protected virtual void UpdateExpAndGoldRewards()
+    /// <summary>
+    /// Call this whenever level changes (or after UpdateStats()).
+    /// </summary>
+    protected virtual void UpdateRewards()
     {
         expReward = CalculateExpReward(level);
         goldReward = CalculateGoldReward(level);
     }
 
+    /// <summary>
+    /// Optional alt exp function you had (kept for experimentation).
+    /// </summary>
     protected virtual int ExpGivenByEnemy(int heroLevel)
     {
         int exp = Mathf.RoundToInt(baseExp + multiplier * Mathf.Pow(heroLevel, growthFactor));
@@ -37,39 +43,46 @@ public class Enemy : Character
         return exp;
     }
 
-
-    protected int CalculateExpReward(int level)
+    // Your original curve (kept)
+    protected int CalculateExpReward(int lvl)
     {
-        if (level < 20)
+        if (lvl < 20)
         {
-            return 100 * level * level; // For levels 1-20, use a quadratic polynomial formula
+            return 100 * lvl * lvl;
         }
         else
         {
-            return (int)(100 * Mathf.Pow(1.5f, level - 19) * 400); // Beyond level 20, exponential model
+            return (int)(100 * Mathf.Pow(1.5f, lvl - 19) * 400);
         }
     }
 
-    protected int CalculateGoldReward(int level)
+    protected int CalculateGoldReward(int lvl)
     {
-        return 3 + (level * 2); // Example gold reward calculation. 
+        return 3 + (lvl * 2);
     }
 
-    // Call this method when the enemy is defeated.
+    // Call when enemy is defeated.
     public void DropMaterial()
-{
-    if (possibleDrops == null || possibleDrops.Length == 0) return;
-
-    if (Random.Range(0, 100) < dropChancePercentage)
     {
-        int dropIndex = Random.Range(0, possibleDrops.Length);
-        MaterialItem droppedMaterial = possibleDrops[dropIndex];
+        if (possibleDrops == null || possibleDrops.Length == 0) return;
 
-        Debug.Log("Dropped material: " + droppedMaterial.itemName);
+        if (Random.Range(0, 100) < dropChancePercentage)
+        {
+            int dropIndex = Random.Range(0, possibleDrops.Length);
+            MaterialItem droppedMaterial = possibleDrops[dropIndex];
 
-        // ✅ Route depending on run state
-        GameManager.Instance.AddLootItem(droppedMaterial, 1);
+            Debug.Log("Dropped material: " + droppedMaterial.itemName);
+
+            // Route depending on run state
+            if (GameManager.Instance != null)
+                GameManager.Instance.AddLootItem(droppedMaterial, 1);
+        }
     }
-}
 
+    public override void UpdateStats()
+    {
+        base.UpdateStats();
+        // Enemies override in derived classes (Goblin, etc.)
+        // but we keep this for the hook.
+    }
 }
