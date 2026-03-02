@@ -180,39 +180,20 @@ public class CharacterData : ScriptableObject
 
     public void LoadData()
 {
-    // Keep these from being overwritten by JSON
-    Sprite savedHeroIcon = heroIcon;
+    Sprite savedHeroIcon      = heroIcon;
     Sprite savedFullHeroImage = fullHeroImage;
 
-    // If heroID isn't set yet, we can't load correctly
-    if (string.IsNullOrWhiteSpace(heroID))
-    {
-        Debug.LogWarning($"[CharacterData] heroID is empty on {name}. Using inspector defaults.");
-        EnsureValidLevel();
-        return;
-    }
-
-    string key = "CharacterData_" + heroID;
-
-    // ✅ If there's no saved data, keep inspector defaults
-    if (!PlayerPrefs.HasKey(key))
-    {
-        Debug.Log($"[CharacterData] No save found for {heroID}. Using inspector defaults.");
-        EnsureValidLevel();
-        return;
-    }
-
-    string jsonData = PlayerPrefs.GetString(key, null);
+    string jsonData = PlayerPrefs.GetString("CharacterData_" + heroID, null);
     if (!string.IsNullOrEmpty(jsonData))
     {
         JsonUtility.FromJsonOverwrite(jsonData, this);
     }
 
-    // Restore anything you don’t want overwritten by saved JSON
-    heroIcon = savedHeroIcon;
+    // restore anything you don’t want overwritten by saved JSON
+    heroIcon      = savedHeroIcon;
     fullHeroImage = savedFullHeroImage;
 
-    // Enforce minimum sane defaults
+    // enforce minimum sane defaults
     EnsureValidLevel();
 }
 
