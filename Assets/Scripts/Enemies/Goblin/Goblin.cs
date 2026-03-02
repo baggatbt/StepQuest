@@ -3,17 +3,16 @@ using UnityEngine;
 
 public class Goblin : Enemy
 {
-    // ✅ Baseline test stats (Level 1)
-    private const int BASE_HEALTH = 20;
+    private const int BASE_HEALTH = 12;
     private const int HEALTH_GROWTH = 3;
 
-    private const int BASE_ATTACK = 8;
+    private const int BASE_ATTACK = 6;
     private const float ATTACK_GROWTH_FACTOR = 1.5f;
 
-    private const int BASE_DEFENSE = 2;
+    private const int BASE_DEFENSE = 0;
     private const int DEFENSE_GROWTH = 0;
 
-    // Goblin slightly faster than Knight
+    // Slightly faster than Knight curve
     private const int BASE_SPEED = 10;
 
     private const int BASE_GOLD = 5;
@@ -24,24 +23,19 @@ public class Goblin : Enemy
 
     protected override void Awake()
     {
-        // ✅ Set level BEFORE base.Awake() so reward calcs don't run at default/old value
+        // ✅ Set level BEFORE base.Awake()
         level = 1;
 
-        // Setup exp curve vars before Awake reward calc too (optional but nice)
         baseExp = BASE_EXP;
         growthFactor = EXP_GROWTH_FACTOR;
 
         base.Awake();
-
-        // Core combat setup
-        speed = BASE_SPEED;
 
         maxEnergy = 1;
         energy = 0;
 
         attacksBeforeSpecial = 2;
 
-        // Skills
         skills = new List<Skill>
         {
             new GoblinAttackSkill(),
@@ -52,7 +46,6 @@ public class Goblin : Enemy
         specialSkill = skills[1];
         currentSkill = normalSkill;
 
-        // Apply stats now
         UpdateStats();
     }
 
@@ -60,20 +53,25 @@ public class Goblin : Enemy
     {
         base.UpdateStats();
 
-        maxHealth = BASE_HEALTH + (level - 1) * HEALTH_GROWTH;
+        int lvl = Mathf.Max(level, 1);
+
+        // HP scaling (weaker than Knight)
+        maxHealth = BASE_HEALTH + (lvl - 1) * HEALTH_GROWTH;
         health = maxHealth;
 
-        attackPower = BASE_ATTACK + Mathf.FloorToInt((level - 1) * ATTACK_GROWTH_FACTOR);
+        // ATK scaling (slightly weaker curve than Knight)
+        attackPower = BASE_ATTACK + Mathf.FloorToInt((lvl - 1) * ATTACK_GROWTH_FACTOR);
 
-        defensePower = BASE_DEFENSE + (level - 1) * DEFENSE_GROWTH;
+        // DEF scaling (currently flat)
+        defensePower = BASE_DEFENSE + (lvl - 1) * DEFENSE_GROWTH;
 
-        // Keep speed locked to baseline + (optional growth later if you want)
-        speed = BASE_SPEED;
+        // SPEED scaling (same growth rhythm as Knight, but starts higher)
+        speed = BASE_SPEED + Mathf.FloorToInt((lvl - 1) / 3f);
 
-        goldReward = BASE_GOLD + GOLD_PER_LEVEL * level;
-        expReward = Mathf.RoundToInt(BASE_EXP * Mathf.Pow(EXP_GROWTH_FACTOR, level - 1));
+        // Rewards
+        goldReward = BASE_GOLD + GOLD_PER_LEVEL * lvl;
+        expReward = Mathf.RoundToInt(BASE_EXP * Mathf.Pow(EXP_GROWTH_FACTOR, lvl - 1));
 
-        // Keep energy within bounds (in case maxEnergy changes later)
         energy = Mathf.Clamp(energy, 0, maxEnergy);
     }
 }

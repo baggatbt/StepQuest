@@ -7,50 +7,57 @@ public class MushroomAttackSkill : Skill
 
     public MushroomAttackSkill()
     {
+        // Identity
         skillName = "Mushroom Attack";
-        description = "The Mushroom attacks the player. The damage can be reduced by timely action.";
+        description = "A heavy swing. Slower, but hits harder.";
         requiresMovement = true;
         numberOfAttacksPossible = 1;
-    }
 
-    // Override the default base damage calculation.
-    protected override int CalculateBaseDamage(Character user)
-    {
-        return (int)(user.attackPower * 1.0f); 
+        // NEW: power + speed
+        // Beefier than the goblin's 60-power poke
+        power = 75;
+
+        // Slower-feeling action speed
+        speedMultiplier = 0.90f;
+
+        // Optional: if you ever want heavy moves to "lose ties"
+        priority = 0;
+
+        // Keep variance off while prototyping timing + balance
+        useVariance = false;
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
         user.isAttacking = true;
-        user.isAnimationDone = false;  
+        user.isAnimationDone = false;
 
-        int baseDamage = CalculateBaseDamage(user);
+        // NEW: power-based incoming damage (defense applied in target.TakeDamage)
+        int baseDamage = CalculateBaseDamage(
+            userAttack: user.attackPower,
+            targetDefense: target.defensePower, // ignored by your current helper (fine)
+            userLevel: user.level
+        );
 
         user.animator.SetTrigger("MushroomAttack1Trigger");
 
         for (int i = 0; i < numberOfAttacksPossible; i++)
-    {
-       
-
-        // Use TimingManager to handle the timing and damage
-        yield return TimingManager.Instance.HandleTimingWindow(user, target, baseDamage, (TimingEventResult result) =>
         {
-            // Call the centralized damage handling method
-            HandleTimingResultForEnemyAttack(user, target, result, baseDamage);
-            battleManager.CameraShakeMagnitude(result);
-            
-        });
+            yield return TimingManager.Instance.HandleTimingWindow(
+                user, target, baseDamage,
+                (TimingEventResult result) =>
+                {
+                    HandleTimingResultForEnemyAttack(user, target, result, baseDamage);
+                    battleManager.CameraShakeMagnitude(result);
+                }
+            );
+        }
 
-        
+        yield return new WaitUntil(() => user.isAnimationDone);
+
+        user.isAnimationDone = false;
+        user.isAttacking = false;
+
+        target.CheckForDeath();
     }
-
-      // Wait for the animation to finish
-    yield return new WaitUntil(() => user.isAnimationDone);
-    
-
-    // Reset flags
-    user.isAnimationDone = false;
-    user.isAttacking = false;
-    target.CheckForDeath();
-}
 }
