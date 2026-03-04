@@ -162,42 +162,66 @@ private Camera FindBattleCamera()
             enemyHealthUI[i]          // Health UI for this enemy
         );
 
-        if (spawnedEnemy != null)
-        {
-            enemies.Add(spawnedEnemy);
-            if (spawnedEnemy != null)
+       if (spawnedEnemy != null)
 {
     enemies.Add(spawnedEnemy);
 
-    // Map this enemy -> its UI root so we can toggle it later.
     if (i < enemyHealthUI.Length && enemyHealthUI[i] != null)
     {
         _hpUIRootByEnemy[spawnedEnemy] = enemyHealthUI[i];
-
-        // Start hidden if you want
         enemyHealthUI[i].SetActive(false);
     }
 }
-        }
+
+        
     }
 
     // Uncomment to start the battle after enemies are spawned
     // StartBattle(config);
 }
 
+[SerializeField] private bool freezeEnemyHpUIWhileZooming = true;
+private bool _freezeEnemyHpUI;
+// Cache last known-good slider local position per enemy
+private readonly Dictionary<Character, Vector3> _lastHpSliderLocalPos = new();
+// One-shot reposition jobs so multiple hits don't stack coroutines
+private IEnumerator RepositionEnemyHpBarAfterUIRebuild(Character enemy)
+{
+    // Wait 1 frame so enabling the GameObject doesn't get overridden by layout rebuilds
+    yield return null;
+
+    // If there are LayoutGroups / ContentSizeFitters, they often rebuild at end of frame too
+    yield return new WaitForEndOfFrame();
+
+    // Force UI rebuild to be extra safe
+    Canvas.ForceUpdateCanvases();
+
+    // ✅ Snap ONCE even if we're currently zooming (bypass freeze)
+    SnapEnemyHpUIToEnemy(enemy, ignoreFreeze: true);
+
+    // cleanup
+    _repositionHpCoroutineByEnemy.Remove(enemy);
+}
+private readonly Dictionary<Character, Coroutine> _repositionHpCoroutineByEnemy = new();
 public void PopupEnemyHealthBar(Character enemy)
 {
     if (enemy == null) return;
+    if (enemy.healthBar == null) return;
 
     if (!_hpUIRootByEnemy.TryGetValue(enemy, out var uiRoot) || uiRoot == null)
         return;
 
-    // Show immediately
     uiRoot.SetActive(true);
 
-    // If a hide coroutine is already running for this UI root, restart it
-    if (_hideHpCoroutineByUIRoot.TryGetValue(uiRoot, out var running) && running != null)
+    // ✅ Critical fix: position AFTER UI has had a chance to rebuild
+    if (_repositionHpCoroutineByEnemy.TryGetValue(enemy, out var running) && running != null)
         StopCoroutine(running);
+
+    _repositionHpCoroutineByEnemy[enemy] = StartCoroutine(RepositionEnemyHpBarAfterUIRebuild(enemy));
+
+    // Hide timer (same as before)
+    if (_hideHpCoroutineByUIRoot.TryGetValue(uiRoot, out var hideRunning) && hideRunning != null)
+        StopCoroutine(hideRunning);
 
     _hideHpCoroutineByUIRoot[uiRoot] = StartCoroutine(HideHpAfterDelay(uiRoot, hpBarVisibleTime));
 }
@@ -300,6 +324,51 @@ public void ResetAndSetupForStage(BattleConfig config)
     Debug.Log("[Battle] Reset complete.");
 }
 
+private void SnapEnemyHpUIToEnemy(Character enemy, bool ignoreFreeze = false)
+{
+    if (enemy == null) return;
+    if (enemy.healthBar == null) return;
+
+    if (mainCamera == null) mainCamera = FindBattleCamera();
+    if (mainCamera == null) return;
+
+    // Freeze only blocks continuous snapping — but popup needs a one-shot snap
+    if (!ignoreFreeze && freezeEnemyHpUIWhileZooming && _freezeEnemyHpUI)
+        return;
+
+    var slider = enemy.healthBar;
+    var parentRT = slider.transform.parent as RectTransform;
+    if (parentRT == null) return;
+
+    // World position above enemy
+    Renderer r = enemy.GetComponentInChildren<Renderer>();
+    float topY = (r != null) ? r.bounds.max.y : enemy.transform.position.y;
+    Vector3 worldPos = new Vector3(enemy.transform.position.x, topY + 0.5f, enemy.transform.position.z);
+
+    // World -> screen (battle camera)
+    Vector3 screen = mainCamera.WorldToScreenPoint(worldPos);
+
+    // Screen -> local UI
+    // (If your Canvas is Overlay, uiCam should be null. If ScreenSpaceCamera, use its worldCamera.)
+    Canvas canvas = slider.GetComponentInParent<Canvas>();
+    Camera uiCam = null;
+    if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+        uiCam = canvas.worldCamera != null ? canvas.worldCamera : mainCamera;
+
+    Vector2 localPoint;
+    RectTransformUtility.ScreenPointToLocalPointInRectangle(
+        parentRT,
+        screen,
+        uiCam,
+        out localPoint
+    );
+
+    // ✅ Your "spawner style": move the slider itself
+    slider.transform.localPosition = localPoint;
+
+    // Cache for debugging/optional restores
+    _lastHpSliderLocalPos[enemy] = slider.transform.localPosition;
+}
 
 private void ResetCharacterRuntime(Character c)
 {
@@ -710,27 +779,29 @@ private class PlannedAction
 
 private void SetAllEnemyHpBarsVisible(bool visible)
 {
-    // If you want: only show living enemies
     foreach (var e in enemies)
     {
         if (e == null) continue;
-
-        // Optional: skip dead enemies
         if (e.health <= 0) continue;
 
+        // Snap ONLY when turning on
+        if (visible)
+            SnapEnemyHpUIToEnemy(e);
+
+        // Show/hide whatever container you use (this part can stay your way)
         if (_hpUIRootByEnemy.TryGetValue(e, out var uiRoot) && uiRoot != null)
             uiRoot.SetActive(visible);
         else if (e.enemyHealthUI != null)
-            e.enemyHealthUI.SetActive(visible); // fallback if you set it on Character too
+            e.enemyHealthUI.SetActive(visible);
+        else if (e.healthBar != null)
+            e.healthBar.gameObject.SetActive(visible);
     }
 
-    // If we're turning them ON, cancel any pending hide timers so they don't auto-hide.
     if (visible)
     {
         foreach (var kv in _hideHpCoroutineByUIRoot)
-        {
             if (kv.Value != null) StopCoroutine(kv.Value);
-        }
+
         _hideHpCoroutineByUIRoot.Clear();
     }
 }
@@ -875,26 +946,28 @@ private void SetAllEnemyHpBarsVisible(bool visible)
 }
 
    public IEnumerator PlayerMoveAndAttackCoroutine()
+{
+    // Start zoom effect
+    if (!activePlayer.currentSkill.noZoom)
     {
-        // Start zoom effect
-        if (!activePlayer.currentSkill.noZoom)
-        {
-            StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position));
-        }
-          //  enemyUIPanel.SetActive(false);
-            
-        // Only move if the player is not already at the target
-        if (activePlayer.transform.position != currentTarget.transform.position)
-        {
-            activePlayer.originalPosition = activePlayer.transform.position;
-            Debug.Log("OP set to " + activePlayer.originalPosition);
-            yield return activePlayer.MoveToTarget();
-            
-            
-        }
-//ARROW DOESNT USE MOVE AND ATTACK INVESTIGATE THERE
-        yield return StartCoroutine(PlayerAttackCoroutine(null));
+        if (freezeEnemyHpUIWhileZooming) _freezeEnemyHpUI = true;   // ✅ FREEZE
+        StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position));
     }
+
+    // Only move if the player is not already at the target
+    if (activePlayer.transform.position != currentTarget.transform.position)
+    {
+        activePlayer.originalPosition = activePlayer.transform.position;
+        Debug.Log("OP set to " + activePlayer.originalPosition);
+        yield return activePlayer.MoveToTarget();
+    }
+
+    // Attack
+    yield return StartCoroutine(PlayerAttackCoroutine(null));
+
+    // Note: zoom-out + unfreeze happens in PlayerAttackCoroutine in your code,
+    // so we do NOT duplicate it here.
+}
 
     public IEnumerator PlayerAttackCoroutine(System.Action successCallback)
     {
@@ -924,9 +997,10 @@ private void SetAllEnemyHpBarsVisible(bool visible)
         // Move player back to their original position after all skills executed.
 
         if (!activePlayer.currentSkill.noZoom)
-        {
-            StartCoroutine(zoomEffect.ZoomOutEffect());
-        }
+{
+    StartCoroutine(zoomEffect.ZoomOutEffect());
+    if (freezeEnemyHpUIWhileZooming) _freezeEnemyHpUI = false; // ✅ UNFREEZE
+}
         
         if (ShouldShowCombatUI())
     StartCoroutine(EnableAllButtons());
@@ -1015,67 +1089,75 @@ private void SetAllEnemyHpBarsVisible(bool visible)
     }
 
     public IEnumerator EnemyAttackCoroutine(Character currentEnemy)
+{
+    // Option B: activePlayer can be null (enemy may go first)
+    yield return new WaitUntil(() =>
+        !playerParty.Any(p => p != null && p.isAttacking) &&
+        !enemies.Any(e => e != null && e.isAttacking)
+    );
+
+    yield return new WaitForSeconds(1.0f);
+
+    Transform enemyTargetTransform = currentEnemy.attackTarget;
+
+    // If target died or was null, pick a new one (fallback safety)
+    if (enemyTargetTransform == null ||
+        enemyTargetTransform.GetComponent<Character>() == null ||
+        enemyTargetTransform.GetComponent<Character>().health <= 0)
     {
-        // Option B: activePlayer can be null (enemy may go first)
-yield return new WaitUntil(() =>
-    !playerParty.Any(p => p != null && p.isAttacking) &&
-    !enemies.Any(e => e != null && e.isAttacking)
-);
-        yield return new WaitForSeconds(1.0f);
-
-       Transform enemyTargetTransform = currentEnemy.attackTarget;
-
-// If target died or was null, pick a new one (fallback safety)
-if (enemyTargetTransform == null || enemyTargetTransform.GetComponent<Character>() == null || enemyTargetTransform.GetComponent<Character>().health <= 0)
-{
-    enemyTargetTransform = SelectTargetForEnemy();
-    currentEnemy.attackTarget = enemyTargetTransform;
-}
-
-currentTarget = enemyTargetTransform != null ? enemyTargetTransform.gameObject : null;
-if (currentTarget == null)
-{
-    Debug.LogWarning("[OptionB] Enemy had no valid target.");
-    EndTurn();
-    yield break;
-}
-
-        if (currentEnemy.currentSkill != null)
-        {
-            if (currentEnemy.currentSkill.requiresMovement)
-            {
-                StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position));
-                // enemyUIPanel.SetActive(false);
-                DisableAllButtons();
-                yield return currentEnemy.MoveToTarget();
-                // After MoveToTarget() finishes and *before* playing the attack animation:
-var motion = currentEnemy.GetComponent<AttackMotionController>();
-if (motion != null && currentTarget != null)
-{
-    motion.currentTarget = currentTarget.transform;
-    motion.SetContactAnchorFromCurrent();
-}
-
-            }
-
-            Character targetCharacter = enemyTargetTransform.GetComponent<Character>();
-            yield return currentEnemy.currentSkill.Execute(currentEnemy, targetCharacter, this);
-
-            if (currentEnemy.currentSkill.requiresMovement)
-            {
-                StartCoroutine(zoomEffect.ZoomOutEffect());
-                yield return currentEnemy.ReturnToPosition();
-                if (ShouldShowCombatUI())
-    StartCoroutine(EnableAllButtons());
-            }
-        }
-        else
-        {
-            Debug.Log("Standard Attack Performed - This should not happen");
-        }
-
-        EndTurn();
+        enemyTargetTransform = SelectTargetForEnemy();
+        currentEnemy.attackTarget = enemyTargetTransform;
     }
+
+    currentTarget = enemyTargetTransform != null ? enemyTargetTransform.gameObject : null;
+    if (currentTarget == null)
+    {
+        Debug.LogWarning("[OptionB] Enemy had no valid target.");
+        EndTurn();
+        yield break;
+    }
+
+    if (currentEnemy.currentSkill != null)
+    {
+        if (currentEnemy.currentSkill.requiresMovement)
+        {
+            if (freezeEnemyHpUIWhileZooming) _freezeEnemyHpUI = true; // ✅ FREEZE
+            StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position));
+
+            DisableAllButtons();
+            yield return currentEnemy.MoveToTarget();
+
+            // After MoveToTarget() finishes and *before* playing the attack animation:
+            var motion = currentEnemy.GetComponent<AttackMotionController>();
+            if (motion != null && currentTarget != null)
+            {
+                motion.currentTarget = currentTarget.transform;
+                motion.SetContactAnchorFromCurrent();
+            }
+        }
+
+        Character targetCharacter = enemyTargetTransform.GetComponent<Character>();
+        yield return currentEnemy.currentSkill.Execute(currentEnemy, targetCharacter, this);
+
+        if (currentEnemy.currentSkill.requiresMovement)
+        {
+            StartCoroutine(zoomEffect.ZoomOutEffect());
+
+            if (freezeEnemyHpUIWhileZooming) _freezeEnemyHpUI = false; // ✅ UNFREEZE
+
+            yield return currentEnemy.ReturnToPosition();
+
+            if (ShouldShowCombatUI())
+                StartCoroutine(EnableAllButtons());
+        }
+    }
+    else
+    {
+        Debug.Log("Standard Attack Performed - This should not happen");
+    }
+
+    EndTurn();
+}
     [Header("Popups")]
 [SerializeField] private RectTransform popupParent;   // assign in inspector
 [SerializeField] private Canvas popupCanvas;          // assign in inspector (same canvas as parent)
