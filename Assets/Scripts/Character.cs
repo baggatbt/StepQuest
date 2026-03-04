@@ -173,6 +173,11 @@ public class Character : MonoBehaviour
 
         // Apply health change
         health = Mathf.Max(0, health - finalDamage);
+        BattleManager bm = FindObjectOfType<BattleManager>();
+if (bm != null && this.CompareTag("Enemy"))
+{
+    bm.PopupEnemyHealthBar(this);
+}
 
         // Enemy shared hurt trigger (keep your current behavior)
         EnemyIsHit();

@@ -57,6 +57,12 @@ public class BattleManager : MonoBehaviour
     public bool isBattleStarted;
     private bool battleLost = false;
 
+    [Header("Enemy HP Bar Popup")]
+[SerializeField] private float hpBarVisibleTime = 0.8f;
+
+private readonly Dictionary<Character, GameObject> _hpUIRootByEnemy = new();
+private readonly Dictionary<GameObject, Coroutine> _hideHpCoroutineByUIRoot = new();
+
     public enum BattleState
     {
         PlayerTurn,
@@ -159,11 +165,52 @@ private Camera FindBattleCamera()
         if (spawnedEnemy != null)
         {
             enemies.Add(spawnedEnemy);
+            if (spawnedEnemy != null)
+{
+    enemies.Add(spawnedEnemy);
+
+    // Map this enemy -> its UI root so we can toggle it later.
+    if (i < enemyHealthUI.Length && enemyHealthUI[i] != null)
+    {
+        _hpUIRootByEnemy[spawnedEnemy] = enemyHealthUI[i];
+
+        // Start hidden if you want
+        enemyHealthUI[i].SetActive(false);
+    }
+}
         }
     }
 
     // Uncomment to start the battle after enemies are spawned
     // StartBattle(config);
+}
+
+public void PopupEnemyHealthBar(Character enemy)
+{
+    if (enemy == null) return;
+
+    if (!_hpUIRootByEnemy.TryGetValue(enemy, out var uiRoot) || uiRoot == null)
+        return;
+
+    // Show immediately
+    uiRoot.SetActive(true);
+
+    // If a hide coroutine is already running for this UI root, restart it
+    if (_hideHpCoroutineByUIRoot.TryGetValue(uiRoot, out var running) && running != null)
+        StopCoroutine(running);
+
+    _hideHpCoroutineByUIRoot[uiRoot] = StartCoroutine(HideHpAfterDelay(uiRoot, hpBarVisibleTime));
+}
+
+private IEnumerator HideHpAfterDelay(GameObject uiRoot, float delay)
+{
+    yield return new WaitForSeconds(delay);
+
+    if (uiRoot != null)
+        uiRoot.SetActive(false);
+
+    // Cleanup entry
+    _hideHpCoroutineByUIRoot.Remove(uiRoot);
 }
 
 public void ResetAndSetupForStage(BattleConfig config)
@@ -383,9 +430,10 @@ private int GetEffectiveSpeedForTurnOrder(Character c)
 private void BeginPlanningPhase()
 {
     if (battleLost) return;
-
     planningPhase = true;
     resolvingPhase = false;
+    SetAllEnemyHpBarsVisible(true);
+
 
     plannedActions.Clear();
     skillQueue.Clear();
@@ -446,10 +494,14 @@ private Character GetNextPlanningPlayer()
     return null;
 }
 
+
+
 private void FinalizePlansAndBuildTurnOrder()
 {
     planningPhase = false;
     resolvingPhase = true;
+
+    SetAllEnemyHpBarsVisible(false);
 
     turnOrderList.Clear();
 
@@ -635,7 +687,7 @@ private class PlannedAction
     {
         companionSkillsPanel.SetActive(false);
         SkillsPanel.SetActive(false);
-        enemyUIPanel.SetActive(false);
+       // enemyUIPanel.SetActive(false);
         heroUIPanels.SetActive(false);
     }
 
@@ -655,6 +707,33 @@ private class PlannedAction
         && activePlayer != null
         && activePlayer.hasNotGone;   // still needs to plan
 }
+
+private void SetAllEnemyHpBarsVisible(bool visible)
+{
+    // If you want: only show living enemies
+    foreach (var e in enemies)
+    {
+        if (e == null) continue;
+
+        // Optional: skip dead enemies
+        if (e.health <= 0) continue;
+
+        if (_hpUIRootByEnemy.TryGetValue(e, out var uiRoot) && uiRoot != null)
+            uiRoot.SetActive(visible);
+        else if (e.enemyHealthUI != null)
+            e.enemyHealthUI.SetActive(visible); // fallback if you set it on Character too
+    }
+
+    // If we're turning them ON, cancel any pending hide timers so they don't auto-hide.
+    if (visible)
+    {
+        foreach (var kv in _hideHpCoroutineByUIRoot)
+        {
+            if (kv.Value != null) StopCoroutine(kv.Value);
+        }
+        _hideHpCoroutineByUIRoot.Clear();
+    }
+}
     public IEnumerator EnableAllButtons()
 {
     yield return new WaitForSeconds(0.25f);
@@ -664,7 +743,7 @@ private class PlannedAction
         // Keep everything hidden during resolution
         companionSkillsPanel.SetActive(false);
         SkillsPanel.SetActive(false);
-        enemyUIPanel.SetActive(false);
+       // enemyUIPanel.SetActive(false);
         heroUIPanels.SetActive(false);
         yield break;
     }
@@ -672,7 +751,7 @@ private class PlannedAction
     // Planning UI
     companionSkillsPanel.SetActive(true);
     SkillsPanel.SetActive(true);
-    enemyUIPanel.SetActive(true);
+   // enemyUIPanel.SetActive(true);
     heroUIPanels.SetActive(true);
 }
 
@@ -802,7 +881,7 @@ private class PlannedAction
         {
             StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position));
         }
-            enemyUIPanel.SetActive(false);
+          //  enemyUIPanel.SetActive(false);
             
         // Only move if the player is not already at the target
         if (activePlayer.transform.position != currentTarget.transform.position)
@@ -966,7 +1045,7 @@ if (currentTarget == null)
             if (currentEnemy.currentSkill.requiresMovement)
             {
                 StartCoroutine(zoomEffect.ZoomCameraEffect(currentTarget.transform.position));
-                enemyUIPanel.SetActive(false);
+                // enemyUIPanel.SetActive(false);
                 DisableAllButtons();
                 yield return currentEnemy.MoveToTarget();
                 // After MoveToTarget() finishes and *before* playing the attack animation:
