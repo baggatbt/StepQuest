@@ -2205,11 +2205,10 @@ MonoBehaviour:
   skillButtonPrefab: {fileID: 7913000097658310571, guid: 413fc366d1142e045b5342cce8d6ba9c, type: 3}
   skillDescriptionPanel: {fileID: 1295422132}
   skillDescriptionText: {fileID: 647553936}
-  skillButtons: []
-  activeCompanion: {fileID: 0}
-  radius: 300
   skillSelectionPanel: {fileID: 873669125}
   companionSkillSelectionPanel: {fileID: 97259694}
+  skillButtons: []
+  activeCompanion: {fileID: 0}
 --- !u!224 &250696102
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5814,8 +5813,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.56, y: 2.85}
-  m_SizeDelta: {x: 423.04, y: 178.79}
+  m_AnchoredPosition: {x: -9.07, y: 6}
+  m_SizeDelta: {x: 431.54, y: 187.29}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &647553936
 MonoBehaviour:
@@ -5837,7 +5836,16 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: This is the description of a skill
+  m_text: '<b>Slash</b>
+
+    Tap at the right time for extra damage
+
+    <b>Power:</b>
+    60
+
+    <b>Speed:</b> 10
+
+    <b>Energy Cost:</b> 0'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 2353e11fcac99f744b7e44398cca1b52, type: 2}
   m_sharedMaterial: {fileID: -6775357937180123722, guid: 2353e11fcac99f744b7e44398cca1b52, type: 2}
@@ -5864,11 +5872,11 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 52.55
+  m_fontSize: 32.3
   m_fontSizeBase: 48
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 18
+  m_fontSizeMin: 30
   m_fontSizeMax: 72
   m_fontStyle: 1
   m_HorizontalAlignment: 2
@@ -5886,7 +5894,7 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
-  m_ActiveFontFeatures: 00000000
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
@@ -5902,7 +5910,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 22.11647, y: 0, z: 3.1797943, w: 24.922104}
+  m_margin: {x: 22.11647, y: 0, z: 3.1797943, w: -4.8305364}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -8369,6 +8377,8 @@ MonoBehaviour:
   battleConfigs: []
   currentTarget: {fileID: 0}
   isBattleStarted: 0
+  hpBarVisibleTime: 0.8
+  freezeEnemyHpUIWhileZooming: 1
   knightPrefab: {fileID: 358661848719693019, guid: b4b862f04ff76be49b8874238e0e0f0d, type: 3}
   turnOrderList: []
   turnOrderBarPanel: {fileID: 601781997}
@@ -10511,7 +10521,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1295422133
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10529,7 +10539,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.07031688, y: 0.018555555}
   m_AnchorMax: {x: 0.9504527, y: 0.14277779}
-  m_AnchoredPosition: {x: -7, y: 799.0003}
+  m_AnchoredPosition: {x: -7, y: 836}
   m_SizeDelta: {x: 37.2, y: 107.45}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1295422134
@@ -10545,15 +10555,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 34bd7cdda677fe042a81dceeb38e42dc, type: 3}
-  m_Type: 0
+  m_Sprite: {fileID: -246983978, guid: 4ec7f9f1324b6594b90ab02f4db1a27f, type: 3}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -13228,11 +13238,10 @@ MonoBehaviour:
   skillButtonPrefab: {fileID: 0}
   skillDescriptionPanel: {fileID: 0}
   skillDescriptionText: {fileID: 0}
-  skillButtons: []
-  activeCompanion: {fileID: 0}
-  radius: 100
   skillSelectionPanel: {fileID: 0}
   companionSkillSelectionPanel: {fileID: 0}
+  skillButtons: []
+  activeCompanion: {fileID: 0}
 --- !u!1 &1609319783
 GameObject:
   m_ObjectHideFlags: 0
@@ -16688,11 +16697,10 @@ MonoBehaviour:
   skillButtonPrefab: {fileID: 0}
   skillDescriptionPanel: {fileID: 0}
   skillDescriptionText: {fileID: 0}
-  skillButtons: []
-  activeCompanion: {fileID: 0}
-  radius: 100
   skillSelectionPanel: {fileID: 0}
   companionSkillSelectionPanel: {fileID: 0}
+  skillButtons: []
+  activeCompanion: {fileID: 0}
 --- !u!1 &2011876055
 GameObject:
   m_ObjectHideFlags: 0

@@ -7,7 +7,7 @@ public class ZoomEffect : MonoBehaviour
 {
     public Camera mainCamera;
     public float zoomFactor = 0.6f; // The degree to which the camera zooms in
-    public float zoomDuration = 1.0f; // How long the zoom will last
+    public float zoomDuration = 1.2f; // How long the zoom will last
 
     public float zoomOutDuration = 0.3f;
     private float initialSize;
