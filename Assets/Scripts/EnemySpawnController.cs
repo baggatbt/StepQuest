@@ -152,7 +152,7 @@ public class EnemySpawnController : MonoBehaviour
         out screenPosition
     );
 
-    associatedHealthBarSlider.transform.localPosition = screenPosition;
+   // associatedHealthBarSlider.transform.localPosition = screenPosition;
 
     // Update stats and UI after spawning
     lastSpawnedCharacter.UpdateStats();

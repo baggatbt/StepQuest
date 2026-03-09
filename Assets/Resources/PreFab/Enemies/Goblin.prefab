@@ -4978,8 +4978,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 2095123425
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 4723107735738678597, guid: c1cdd26cc09ad224884556bc4d8296ae, type: 3}
   m_Color: {r: 0.9811321, g: 0.93948025, b: 0.93948025, a: 1}
@@ -5063,58 +5063,51 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e46fcb270f889804f9eec50f1df8138a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  level: 1
-  health: 10
-  maxHealth: 10
   characterIDNumber: 
   isSelected: 0
-  energy: 0
+  level: 1
+  maxHealth: 10
+  health: 10
   maxEnergy: 0
-  teamEnergy: 0
+  energy: 0
   attackPower: 4
   defensePower: 0
-  defensePenetration: 0
-  enemyDamageReductionModifier: 0
   speed: 0
   healthBar: {fileID: 0}
   energyBar: {fileID: 0}
-  isAttacking: 0
-  isFront: 0
-  spriteRenderer: {fileID: 6178202463525426467}
-  animator: {fileID: 6178202463525426478}
   healthText: {fileID: 0}
   energyText: {fileID: 0}
+  enemyHealthUI: {fileID: 0}
+  spriteRenderer: {fileID: 6178202463525426467}
+  animator: {fileID: 6178202463525426478}
+  isAttacking: 0
+  isFront: 0
   hasNotGone: 0
   isMoving: 0
   attackTrigger: 0
   animationEnded: 0
   didBlock: 0
   attacksBeforeSpecial: 0
-  enemyHealthUI: {fileID: 0}
-  damageReflectionPercentage: 0
   statusEffectController: {fileID: 0}
+  currentBarrier: {fileID: 0}
+  damageReflectionPercentage: 0
   movementSpeed: 15
   attackTarget: {fileID: 0}
   originalPosition: {x: 0, y: 0, z: 0}
-  cameraShake: {fileID: 0}
-  tintDuration: 0.1
   isAnimationDone: 0
-  currentBarrier: {fileID: 0}
   animationDamageTime: 0
   isWindowOpen: 0
   damageApplied: 0
-  enemyDeathEffect: {fileID: 0}
   audioSource: {fileID: 6853849219187960353}
   hitSound: {fileID: 8300000, guid: 88fb2c9b7ebc14930aab6648ac112f0d, type: 3}
   criticalHitSound: {fileID: 0}
+  tintDuration: 0.1
+  enemyDeathEffect: {fileID: 0}
   expReward: 0
   goldReward: 0
   baseExp: 0
   growthFactor: 1.1
   multiplier: 0
-  attackGrowth: 0
-  defenseGrowth: 0
-  healthGrowth: 0
   enemyIcon: {fileID: 21300000, guid: f60c7f5a867b8b34db2bc24c718e8632, type: 3}
   possibleDrops:
   - {fileID: 11400000, guid: 12a9ba489cc5c5d4e8b0cc4d0ac36d49, type: 2}

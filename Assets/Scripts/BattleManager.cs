@@ -167,10 +167,11 @@ private Camera FindBattleCamera()
     enemies.Add(spawnedEnemy);
 
     if (i < enemyHealthUI.Length && enemyHealthUI[i] != null)
-    {
-        _hpUIRootByEnemy[spawnedEnemy] = enemyHealthUI[i];
-        enemyHealthUI[i].SetActive(false);
-    }
+{
+    _hpUIRootByEnemy[spawnedEnemy] = enemyHealthUI[i];
+    enemyHealthUI[i].SetActive(true);
+   // SnapEnemyHpUIToEnemy(spawnedEnemy, ignoreFreeze: true);
+}
 }
 
         
@@ -197,7 +198,7 @@ private IEnumerator RepositionEnemyHpBarAfterUIRebuild(Character enemy)
     Canvas.ForceUpdateCanvases();
 
     // ✅ Snap ONCE even if we're currently zooming (bypass freeze)
-    SnapEnemyHpUIToEnemy(enemy, ignoreFreeze: true);
+   // SnapEnemyHpUIToEnemy(enemy, ignoreFreeze: true);
 
     // cleanup
     _repositionHpCoroutineByEnemy.Remove(enemy);
@@ -212,29 +213,11 @@ public void PopupEnemyHealthBar(Character enemy)
         return;
 
     uiRoot.SetActive(true);
-
-    // ✅ Critical fix: position AFTER UI has had a chance to rebuild
-    if (_repositionHpCoroutineByEnemy.TryGetValue(enemy, out var running) && running != null)
-        StopCoroutine(running);
-
-    _repositionHpCoroutineByEnemy[enemy] = StartCoroutine(RepositionEnemyHpBarAfterUIRebuild(enemy));
-
-    // Hide timer (same as before)
-    if (_hideHpCoroutineByUIRoot.TryGetValue(uiRoot, out var hideRunning) && hideRunning != null)
-        StopCoroutine(hideRunning);
-
-    _hideHpCoroutineByUIRoot[uiRoot] = StartCoroutine(HideHpAfterDelay(uiRoot, hpBarVisibleTime));
 }
 
 private IEnumerator HideHpAfterDelay(GameObject uiRoot, float delay)
 {
-    yield return new WaitForSeconds(delay);
-
-    if (uiRoot != null)
-        uiRoot.SetActive(false);
-
-    // Cleanup entry
-    _hideHpCoroutineByUIRoot.Remove(uiRoot);
+    yield break;
 }
 
 public void ResetAndSetupForStage(BattleConfig config)
@@ -757,7 +740,7 @@ private class PlannedAction
         companionSkillsPanel.SetActive(false);
         SkillsPanel.SetActive(false);
        // enemyUIPanel.SetActive(false);
-        heroUIPanels.SetActive(false);
+      //  heroUIPanels.SetActive(false);
     }
 
     public GameObject enemyUIPanel;
@@ -784,26 +767,18 @@ private void SetAllEnemyHpBarsVisible(bool visible)
         if (e == null) continue;
         if (e.health <= 0) continue;
 
-        // Snap ONLY when turning on
-        if (visible)
-            SnapEnemyHpUIToEnemy(e);
-
-        // Show/hide whatever container you use (this part can stay your way)
         if (_hpUIRootByEnemy.TryGetValue(e, out var uiRoot) && uiRoot != null)
-            uiRoot.SetActive(visible);
+            uiRoot.SetActive(true);
         else if (e.enemyHealthUI != null)
-            e.enemyHealthUI.SetActive(visible);
+            e.enemyHealthUI.SetActive(true);
         else if (e.healthBar != null)
-            e.healthBar.gameObject.SetActive(visible);
+            e.healthBar.gameObject.SetActive(true);
     }
 
-    if (visible)
-    {
-        foreach (var kv in _hideHpCoroutineByUIRoot)
-            if (kv.Value != null) StopCoroutine(kv.Value);
+    foreach (var kv in _hideHpCoroutineByUIRoot)
+        if (kv.Value != null) StopCoroutine(kv.Value);
 
-        _hideHpCoroutineByUIRoot.Clear();
-    }
+    _hideHpCoroutineByUIRoot.Clear();
 }
     public IEnumerator EnableAllButtons()
 {
