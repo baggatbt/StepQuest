@@ -11,6 +11,7 @@ public class ButtonController : MonoBehaviour
 
     [Header("Skill Description UI")]
     public GameObject skillDescriptionPanel;
+    public TextMeshProUGUI skillTitleText;
     public TextMeshProUGUI skillDescriptionText;
 
     [Header("Panels")]
@@ -22,16 +23,21 @@ public class ButtonController : MonoBehaviour
     public Companion activeCompanion;
     private Companion previousActiveCompanion;
 
-    private Skill selectedSkill; // currently queued/displayed skill
+    private Skill selectedSkill;
 
     void Start()
     {
         activeCompanion = battleManager != null ? battleManager.activePlayer as Companion : null;
         previousActiveCompanion = activeCompanion;
 
-        // Optional: start hidden
         if (skillDescriptionPanel != null)
             skillDescriptionPanel.SetActive(false);
+
+        if (skillTitleText != null)
+            skillTitleText.text = "";
+
+        if (skillDescriptionText != null)
+            skillDescriptionText.text = "";
     }
 
     void Update()
@@ -40,7 +46,6 @@ public class ButtonController : MonoBehaviour
 
         if (battleManager.isBattleStarted)
         {
-            // Check if the active player has changed
             Companion currentActiveCompanion = battleManager.activePlayer as Companion;
             if (currentActiveCompanion != null && currentActiveCompanion != previousActiveCompanion)
             {
@@ -48,7 +53,6 @@ public class ButtonController : MonoBehaviour
                 UpdateUI();
             }
 
-            // UI panel activation/deactivation
             bool isCompanionActive = battleManager.activePlayer is Companion;
             if (companionSkillSelectionPanel != null) companionSkillSelectionPanel.SetActive(isCompanionActive);
             if (skillSelectionPanel != null) skillSelectionPanel.SetActive(!isCompanionActive);
@@ -99,7 +103,6 @@ public class ButtonController : MonoBehaviour
 
             if (buttonComponent != null)
             {
-                // IMPORTANT: capture local reference to avoid closure issues
                 Skill capturedSkill = skillInstance;
 
                 buttonComponent.onClick.AddListener(() => SelectAndUseSkill(capturedSkill));
@@ -124,18 +127,22 @@ public class ButtonController : MonoBehaviour
             return;
         }
 
-        // Not enough energy? don’t queue and still show info (optional: you can hide)
         bool hasEnergy = (skillToQueue.energyCost <= battleManager.activePlayer.energy);
 
-        // If selecting the same skill again while one is queued, treat as "confirm" (your old behavior)
         if (battleManager.skillQueue.Count > 0 && selectedSkill == skillToQueue)
         {
             if (skillDescriptionPanel != null) skillDescriptionPanel.SetActive(false);
+
+            if (skillTitleText != null)
+                skillTitleText.text = "";
+
+            if (skillDescriptionText != null)
+                skillDescriptionText.text = "";
+
             Debug.Log("Same skill selected again: " + selectedSkill.skillName + " (waiting for target tap)");
             return;
         }
 
-        // Clear any previous queued skill (since your system supports selecting 1 then tapping target)
         if (battleManager.skillQueue.Count > 0)
         {
             battleManager.skillQueue.Clear();
@@ -144,8 +151,11 @@ public class ButtonController : MonoBehaviour
 
         selectedSkill = skillToQueue;
 
-        // Show description panel with full details
         if (skillDescriptionPanel != null) skillDescriptionPanel.SetActive(true);
+
+        if (skillTitleText != null)
+            skillTitleText.text = skillToQueue.skillName;
+
         if (skillDescriptionText != null)
             skillDescriptionText.text = BuildSkillDescription(skillToQueue, battleManager.activePlayer);
 
@@ -153,11 +163,9 @@ public class ButtonController : MonoBehaviour
         {
             Debug.Log("Not enough energy to queue: " + skillToQueue.skillName);
             battleManager.isSkillSelected = false;
-            // Optional: keep panel up so player sees why
             return;
         }
 
-        // Queue it
         battleManager.skillQueue.Enqueue(skillToQueue);
         battleManager.isSkillSelected = true;
 
@@ -165,32 +173,14 @@ public class ButtonController : MonoBehaviour
     }
 
     private string BuildSkillDescription(Skill s, Character user)
-{
-    if (s == null) return "";
-
-    int finalSpeed = user != null ? s.GetEffectiveSpeed(user.speed) : 0;
-
-    string text =
-        $"<b>{s.skillName}</b>\n" +
-        $"{s.description}\n\n" +
-        $"<b>Power:</b> {s.power}\n" +
-        $"<b>Speed:</b> {finalSpeed}\n" +
-        $"<b>Energy Cost:</b> {s.energyCost}";
-
-    return text;
-}
-
-    private string SpeedLabelFromMultiplier(float mult)
     {
-        // Feel free to tweak thresholds
-        if (mult >= 1.25f) return "Very Fast";
-        if (mult >= 1.10f) return "Fast";
-        if (mult >= 0.95f && mult <= 1.05f) return "Normal";
-        if (mult >= 0.80f) return "Slow";
-        return "Very Slow";
+        if (s == null) return "";
+
+        int finalSpeed = user != null ? s.GetEffectiveSpeed(user.speed) : 0;
+
+        return $"POW: {s.power}   SPD: {finalSpeed}   COST: {s.energyCost}";
     }
 
-    // Optional helpers (you had these)
     public void OpenSkillPanel()
     {
         if (skillSelectionPanel != null) skillSelectionPanel.SetActive(true);
