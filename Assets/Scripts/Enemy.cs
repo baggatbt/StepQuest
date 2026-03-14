@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Enemy : Character
 {
+    [Header("Enemy Info")]
+    public string enemyName;
+
     [Header("Rewards")]
     public int expReward;
     public int goldReward;

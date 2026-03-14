@@ -8,6 +8,13 @@ public class EnemySpawnController : MonoBehaviour
     public TextMeshProUGUI healthText;
     public TextMeshProUGUI healthText2;
     public TextMeshProUGUI healthText3;
+
+    public TextMeshProUGUI enemyNameText;
+    public TextMeshProUGUI enemyNameText2;
+    public TextMeshProUGUI enemyNameText3;
+
+    private TextMeshProUGUI[] enemyNameTexts;
+
     public GameObject[] healthUI;
     private Camera mainCamera;
 
@@ -45,8 +52,9 @@ public class EnemySpawnController : MonoBehaviour
             poolDictionary.Add(pool.poolName, pool.enemies);
         }
 
-        // Initialize the health texts array
         healthTexts = new TextMeshProUGUI[] { healthText, healthText2, healthText3 };
+        enemyNameTexts = new TextMeshProUGUI[] { enemyNameText, enemyNameText2, enemyNameText3 };
+
 
         // Initialize the main camera reference
         mainCamera = Camera.main;
@@ -91,6 +99,8 @@ public class EnemySpawnController : MonoBehaviour
 
     // Get the Character component
     Character lastSpawnedCharacter = spawnedEnemy.GetComponent<Character>();
+    Enemy enemyComponent = spawnedEnemy.GetComponent<Enemy>();
+
     if (lastSpawnedCharacter == null)
     {
         Debug.LogWarning("Spawned enemy does not have a Character component!");
@@ -102,6 +112,11 @@ public class EnemySpawnController : MonoBehaviour
     // Ensure each enemy has its own health bar UI and health text
     lastSpawnedCharacter.enemyHealthUI = enemyHealthUI; // Assign unique health UI for this enemy
     lastSpawnedCharacter.healthText = healthTexts[healthTextIndex]; // Assign unique health text
+    if (enemyComponent != null && healthTextIndex < enemyNameTexts.Length)
+{
+    enemyNameTexts[healthTextIndex].text = enemyComponent.enemyName;
+}
+
 
     // Ensure the health UI is active
     if (lastSpawnedCharacter.enemyHealthUI != null && !lastSpawnedCharacter.enemyHealthUI.activeInHierarchy)
