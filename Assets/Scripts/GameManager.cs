@@ -575,7 +575,10 @@ public void CommitRunLootToInventory()
         SaveInventory();
         OnInventoryChanged?.Invoke();
 
+        if (inventory != null){
         inventory.UpdateInventoryUI();
+        
+    }
     }
 
     public Item FindItemInMasterList(int id)

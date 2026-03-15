@@ -427,6 +427,26 @@ private void ResetCharacterRuntime(Character c)
     }
 }
 
+ public void TestStartBattle()
+{
+    const int battleCostPerHero = 0;          // cost to join this battle
+
+    
+    
+
+   
+              
+        battleStartButton.SetActive(false);
+        isBattleStarted = true;
+
+        endOfBattlePanel.SetActive(false);
+        heroSelectionPanel.SetActive(false);
+
+                  // default
+        InitializeTurnOrder();
+    
+}
+
 
     public void RestoreHealthAndEnergy()
     {
@@ -994,22 +1014,23 @@ private void SetAllEnemyHpBarsVisible(bool visible)
     public Character attackingEnemy;
 
     public Transform GetWeightedRandomTarget(List<Transform> targets, List<float> weights)
+{
+    float totalWeight = weights.Sum();
+    float randomNumber = UnityEngine.Random.Range(0, totalWeight);
+    float cumulativeWeight = 0;
+
+    for (int i = 0; i < targets.Count; i++)
     {
-        float totalWeight = weights.Sum();
-        float randomNumber = UnityEngine.Random.Range(0, totalWeight);
-        float cumulativeWeight = 0;
-
-        for (int i = 0; i < targets.Count; i++)
+        cumulativeWeight += weights[i];
+        if (randomNumber <= cumulativeWeight)
         {
-            cumulativeWeight += weights[i];
-            if (randomNumber <= cumulativeWeight)
-            {
-                return targets[i];
-            }
+            return targets[i];
         }
-
-        return null;
     }
+
+    return null;
+}
+
 
 
     public bool IsAnyEnemyAttacking()
@@ -1039,29 +1060,25 @@ private void SetAllEnemyHpBarsVisible(bool visible)
     }
 
     public Transform SelectTargetForEnemy()
+{
+    List<Transform> potentialTargets = new List<Transform>();
+
+    foreach (Character player in playerParty)
     {
-        List<Transform> potentialTargets = new List<Transform>();
-        List<float> targetWeights = new List<float>();
-
-        if (companion1 != null && companion1.health > 0)
-        {
-            potentialTargets.Add(companion1.transform);
-            targetWeights.Add(GameManager.Instance.probabilityCompanion1);
-        }
-        if (companion2 != null && companion2.health > 0)
-        {
-            potentialTargets.Add(companion2.transform);
-            targetWeights.Add(GameManager.Instance.probabilityCompanion2);
-        }
-
-        if (potentialTargets.Count == 0)
-        {
-            Debug.Log("No valid targets available.");
-            return null;
-        }
-
-        return GetWeightedRandomTarget(potentialTargets, targetWeights);
+        if (player != null && player.health > 0)
+            potentialTargets.Add(player.transform);
     }
+
+    if (potentialTargets.Count == 0)
+    {
+        Debug.Log("No valid targets available.");
+        return null;
+    }
+
+    return potentialTargets[UnityEngine.Random.Range(0, potentialTargets.Count)];
+}
+
+
 
     public IEnumerator EnemyAttackCoroutine(Character currentEnemy)
 {

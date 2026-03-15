@@ -38,6 +38,8 @@ public class ButtonController : MonoBehaviour
 
         if (skillDescriptionText != null)
             skillDescriptionText.text = "";
+            UpdateUI();
+
     }
 
     void Update()
