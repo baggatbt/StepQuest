@@ -196,15 +196,19 @@ public class PlayerData : MonoBehaviour
     }
 
     public bool UseSteps(int amountToUse)
+{
+    if (inGameSteps >= amountToUse)
     {
-        if (inGameSteps >= amountToUse)
-        {
-            inGameSteps -= amountToUse;
-            SavePlayerData();
-            return true;
-        }
-        return false;
+        inGameSteps -= amountToUse;
+        SavePlayerData();
+
+        // Positive = gained, negative = spent.
+        OnStepsAdded?.Invoke(-amountToUse);
+
+        return true;
     }
+    return false;
+}
 
     public void ResetSteps()
     {
