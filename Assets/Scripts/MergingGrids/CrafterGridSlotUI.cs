@@ -21,6 +21,6 @@ public class CrafterGridSlotUI : MonoBehaviour, IDropHandler
         if (dragged == null)
             return;
 
-        Owner.TryMoveOrMerge(dragged.SourceIndex, Index);
+        dragged.HandleSuccessfulDrop(Index);
     }
 }

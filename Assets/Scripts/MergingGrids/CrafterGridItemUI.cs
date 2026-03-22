@@ -18,16 +18,16 @@ public class CrafterGridItemUI : MonoBehaviour,
     public int SourceIndex { get; private set; }
 
     private CrafterGridController owner;
-    private CrafterEntityType entityType;
     private CrafterEntityDefinition definition;
     private Canvas rootCanvas;
     private bool canDrag;
-    private RectTransform rectTransform;
+
+    private RectTransform iconRectTransform;
 
     private GameObject dragGhost;
     private RectTransform dragGhostRect;
-    private Image dragGhostImage;
-    private CanvasGroup dragGhostCanvasGroup;
+
+    private bool dropHandled;
 
     public void Setup(
         CrafterGridController gridOwner,
@@ -38,20 +38,21 @@ public class CrafterGridItemUI : MonoBehaviour,
         owner = gridOwner;
         SourceIndex = sourceIndex;
         definition = entityDef;
-        entityType = entityDef != null ? entityDef.entityType : CrafterEntityType.None;
         rootCanvas = canvas;
-        rectTransform = GetComponent<RectTransform>();
+        iconRectTransform = iconImage != null ? iconImage.GetComponent<RectTransform>() : null;
 
         canDrag = definition != null && definition.isMovable && !definition.isGenerator && !definition.isEnemy;
+        dropHandled = false;
 
         if (labelText != null)
-            labelText.text = definition != null ? definition.displayName : entityType.ToString();
+            labelText.text = definition != null ? definition.displayName : "";
 
         if (iconImage != null)
         {
             iconImage.sprite = definition != null ? definition.iconSprite : null;
             iconImage.color = Color.white;
             iconImage.preserveAspect = true;
+            iconImage.raycastTarget = false;
         }
 
         if (canvasGroup != null)
@@ -68,9 +69,10 @@ public class CrafterGridItemUI : MonoBehaviour,
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (!canDrag || rootCanvas == null)
+        if (!canDrag || rootCanvas == null || iconImage == null || iconImage.sprite == null)
             return;
 
+        dropHandled = false;
         CreateDragGhost();
 
         if (canvasGroup != null)
@@ -95,52 +97,98 @@ public class CrafterGridItemUI : MonoBehaviour,
         if (!canDrag)
             return;
 
+        // If a valid drop already happened, do nothing here.
+        // The drop handler already cleaned up and refreshed.
+        if (dropHandled)
+            return;
+
+        DestroyDragGhost();
+
+        // Invalid drop: restore the original visual
         if (canvasGroup != null)
         {
             canvasGroup.blocksRaycasts = true;
             canvasGroup.alpha = 1f;
         }
 
-        if (dragGhost != null)
-            Destroy(dragGhost);
-
         owner.RefreshVisuals();
+    }
+
+    public void HandleSuccessfulDrop(int targetIndex)
+    {
+        if (!canDrag)
+            return;
+
+        dropHandled = true;
+
+        DestroyDragGhost();
+
+        // Keep original hidden so we don't briefly see a duplicate.
+        if (canvasGroup != null)
+        {
+            canvasGroup.blocksRaycasts = false;
+            canvasGroup.alpha = 0f;
+        }
+
+        owner.TryMoveOrMerge(SourceIndex, targetIndex);
+    }
+
+    private void DestroyDragGhost()
+    {
+        if (dragGhost != null)
+        {
+            Destroy(dragGhost);
+            dragGhost = null;
+            dragGhostRect = null;
+        }
     }
 
     private void CreateDragGhost()
     {
-        if (dragGhost != null)
-            Destroy(dragGhost);
+        DestroyDragGhost();
 
-        dragGhost = new GameObject(
-            $"DragGhost_{entityType}",
-            typeof(RectTransform),
-            typeof(CanvasGroup),
-            typeof(Image)
-        );
-
-        dragGhost.transform.SetParent(rootCanvas.transform, false);
+        dragGhost = Instantiate(iconImage.gameObject, rootCanvas.transform);
+        dragGhost.name = $"DragGhost_{definition.displayName}";
         dragGhost.transform.SetAsLastSibling();
 
         dragGhostRect = dragGhost.GetComponent<RectTransform>();
-        dragGhostCanvasGroup = dragGhost.GetComponent<CanvasGroup>();
-        dragGhostImage = dragGhost.GetComponent<Image>();
 
-        dragGhostCanvasGroup.blocksRaycasts = false;
-        dragGhostCanvasGroup.interactable = false;
-        dragGhostCanvasGroup.alpha = 1f;
+        CanvasGroup ghostCanvasGroup = dragGhost.GetComponent<CanvasGroup>();
+        if (ghostCanvasGroup == null)
+            ghostCanvasGroup = dragGhost.AddComponent<CanvasGroup>();
 
-        dragGhostImage.raycastTarget = false;
-        dragGhostImage.sprite = iconImage != null ? iconImage.sprite : null;
-        dragGhostImage.color = Color.white;
-        dragGhostImage.preserveAspect = true;
+        ghostCanvasGroup.blocksRaycasts = false;
+        ghostCanvasGroup.interactable = false;
+        ghostCanvasGroup.alpha = 1f;
 
-        Vector3[] corners = new Vector3[4];
-        rectTransform.GetWorldCorners(corners);
+        Canvas ghostCanvas = dragGhost.GetComponent<Canvas>();
+        if (ghostCanvas == null)
+            ghostCanvas = dragGhost.AddComponent<Canvas>();
 
-        float width = corners[2].x - corners[0].x;
-        float height = corners[2].y - corners[0].y;
+        ghostCanvas.overrideSorting = true;
+        ghostCanvas.sortingOrder = 5000;
 
+        GraphicRaycaster ghostRaycaster = dragGhost.GetComponent<GraphicRaycaster>();
+        if (ghostRaycaster != null)
+            Destroy(ghostRaycaster);
+
+        Image ghostImage = dragGhost.GetComponent<Image>();
+        if (ghostImage != null)
+        {
+            ghostImage.raycastTarget = false;
+            ghostImage.enabled = true;
+            ghostImage.color = iconImage.color;
+            ghostImage.sprite = iconImage.sprite;
+            ghostImage.overrideSprite = iconImage.overrideSprite;
+            ghostImage.type = iconImage.type;
+            ghostImage.preserveAspect = true;
+        }
+
+        Rect pixelRect = RectTransformUtility.PixelAdjustRect(iconRectTransform, rootCanvas);
+        float width = pixelRect.width;
+        float height = pixelRect.height;
+
+        dragGhostRect.SetParent(rootCanvas.transform, false);
         dragGhostRect.anchorMin = new Vector2(0.5f, 0.5f);
         dragGhostRect.anchorMax = new Vector2(0.5f, 0.5f);
         dragGhostRect.pivot = new Vector2(0.5f, 0.5f);
@@ -156,10 +204,10 @@ public class CrafterGridItemUI : MonoBehaviour,
         RectTransform canvasRect = rootCanvas.transform as RectTransform;
 
         if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                canvasRect,
-                eventData.position,
-                eventData.pressEventCamera,
-                out Vector2 localPoint))
+            canvasRect,
+            eventData.position,
+            eventData.pressEventCamera,
+            out Vector2 localPoint))
         {
             dragGhostRect.localPosition = localPoint + dragOffset;
         }
