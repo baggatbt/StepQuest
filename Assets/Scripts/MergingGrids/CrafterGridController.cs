@@ -425,4 +425,33 @@ int cost = generatorDef.stepCost;
     {
         return index >= 0 && index < gridState.Length;
     }
+
+    public void RecycleItemAt(int index)
+{
+    if (!IsValidIndex(index))
+        return;
+
+    CrafterEntityType type = gridState[index];
+    if (type == CrafterEntityType.None)
+        return;
+
+    CrafterEntityDefinition def = entityDatabase.Get(type);
+    if (def == null)
+        return;
+
+    // Only recycle movable crafted items, not generators/enemies.
+    if (!def.isMovable || def.isGenerator || def.isEnemy)
+        return;
+
+    // Award gold based on the item's base value.
+    if (PlayerData.Instance != null)
+        PlayerData.Instance.AddCopper(def.sellValueCopper);
+
+    Debug.Log($"Recycled: {def.displayName} for {def.sellValueCopper} gold");
+
+    gridState[index] = CrafterEntityType.None;
+
+    Save();
+    RefreshVisuals();
+}
 }

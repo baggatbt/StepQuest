@@ -212,4 +212,22 @@ public class CrafterGridItemUI : MonoBehaviour,
             dragGhostRect.localPosition = localPoint + dragOffset;
         }
     }
+
+    public void HandleRecycleDrop()
+{
+    if (!canDrag)
+        return;
+
+    dropHandled = true;
+
+    DestroyDragGhost();
+
+    if (canvasGroup != null)
+    {
+        canvasGroup.blocksRaycasts = false;
+        canvasGroup.alpha = 0f;
+    }
+
+    owner.RecycleItemAt(SourceIndex);
+}
 }

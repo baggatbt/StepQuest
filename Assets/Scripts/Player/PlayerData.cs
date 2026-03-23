@@ -210,12 +210,25 @@ public class PlayerData : MonoBehaviour
     return false;
 }
 
-    public void ResetSteps()
-    {
-        inGameSteps = 0;
-        SavePlayerData();
-        Debug.Log("In-game steps have been reset to 0.");
-    }
+public void AddCopper(long amount)
+{
+    if (amount <= 0)
+        return;
+
+    totalCopper += amount;
+    SavePlayerData();
+
+    Debug.Log($"Added {amount} gold. Total is now {totalCopper}");
+}
+
+public void ResetSteps()
+{
+    inGameSteps = 0;
+    SavePlayerData();
+    Debug.Log("In-game steps have been reset to 0.");
+}
+
+   
 
 #if UNITY_EDITOR
     // Editor-only simulation of steps
