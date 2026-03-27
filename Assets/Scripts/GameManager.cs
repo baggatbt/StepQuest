@@ -48,7 +48,7 @@ public class GameManager : MonoBehaviour
     private List<Item> allItemsMasterList = new List<Item>(); //All items in game
 
     public List<Item> itemList = new List<Item>(); //Items player has
-    public int maxInventorySlots = 16;
+    public int maxInventorySlots = 4;
     public List<Companion> currentParty = new List<Companion>(); //This is getting an instance, NOT the companions data
 
     public int currentStageIndex;
