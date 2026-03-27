@@ -6,6 +6,7 @@ public class CrafterEntityDefinition : ScriptableObject
     [Header("Identity")]
     public CrafterEntityType entityType;
     public string displayName;
+    public int inventoryItemID = -1;
 
     [Header("Visuals")]
     public Sprite iconSprite;

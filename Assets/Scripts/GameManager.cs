@@ -48,9 +48,9 @@ public class GameManager : MonoBehaviour
     private List<Item> allItemsMasterList = new List<Item>(); //All items in game
 
     public List<Item> itemList = new List<Item>(); //Items player has
-    public int maxInventorySlots = 4;
     public List<Companion> currentParty = new List<Companion>(); //This is getting an instance, NOT the companions data
-
+    public List<InventorySlotData> inventorySlots = new List<InventorySlotData>();
+    public int maxInventorySlots = 4;
     public int currentStageIndex;
     private bool isUnlocked;
     //public List<BattleConfig> allStages; // list is populated with all stages in order
@@ -1374,6 +1374,122 @@ private void SetCanvasGroupInteractable(Scene scene, bool enable)
     }
 }
 
+public bool TryAddToInventory(int itemID, int amount = 1)
+{
+    if (amount <= 0) return false;
+
+    // stack first
+    for (int i = 0; i < inventorySlots.Count; i++)
+    {
+        if (!inventorySlots[i].IsEmpty && inventorySlots[i].itemID == itemID)
+        {
+            inventorySlots[i].quantity += amount;
+            SaveInventory();
+            OnInventoryChanged?.Invoke();
+            inventory?.UpdateInventoryUI();
+            return true;
+        }
+    }
+
+    // then empty slot
+    for (int i = 0; i < inventorySlots.Count; i++)
+    {
+        if (inventorySlots[i].IsEmpty)
+        {
+            inventorySlots[i].itemID = itemID;
+            inventorySlots[i].quantity = amount;
+            SaveInventory();
+            OnInventoryChanged?.Invoke();
+            inventory?.UpdateInventoryUI();
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+
+public Item GetItemInInventorySlot(int slotIndex)
+{
+    if (slotIndex < 0 || slotIndex >= inventorySlots.Count) return null;
+    var slot = inventorySlots[slotIndex];
+    if (slot.IsEmpty) return null;
+    return FindItemInMasterList(slot.itemID);
+}
+
+public InventorySlotData GetInventorySlot(int index)
+{
+    if (index < 0 || index >= inventorySlots.Count)
+        return null;
+
+    return inventorySlots[index];
+}
+
+public bool TryAddToInventoryAtSlot(int itemID, int slotIndex, int amount = 1)
+{
+    if (slotIndex < 0 || slotIndex >= inventorySlots.Count)
+        return false;
+
+    if (amount <= 0)
+        return false;
+
+    InventorySlotData slot = inventorySlots[slotIndex];
+
+    // Empty slot
+    if (slot.IsEmpty)
+    {
+        slot.Set(itemID, amount);
+        SaveInventory();
+        inventory?.UpdateInventoryUI();
+        return true;
+    }
+
+    // Matching stack
+    if (slot.itemID == itemID)
+    {
+        slot.quantity += amount;
+        SaveInventory();
+        inventory?.UpdateInventoryUI();
+        return true;
+    }
+
+    return false;
+}
+
+public bool TryRemoveFromInventorySlot(int slotIndex, int amount = 1)
+{
+    if (slotIndex < 0 || slotIndex >= inventorySlots.Count)
+        return false;
+
+    if (amount <= 0)
+        return false;
+
+    InventorySlotData slot = inventorySlots[slotIndex];
+    if (slot.IsEmpty || slot.quantity < amount)
+        return false;
+
+    slot.quantity -= amount;
+
+    if (slot.quantity <= 0)
+        slot.Clear();
+
+    SaveInventory();
+    inventory?.UpdateInventoryUI();
+    return true;
+}
+
+private void EnsureInventorySlots()
+{
+    if (inventorySlots == null)
+        inventorySlots = new List<InventorySlotData>();
+
+    while (inventorySlots.Count < maxInventorySlots)
+        inventorySlots.Add(new InventorySlotData());
+
+    if (inventorySlots.Count > maxInventorySlots)
+        inventorySlots.RemoveRange(maxInventorySlots, inventorySlots.Count - maxInventorySlots);
+}
 
 
 }

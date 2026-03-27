@@ -1,37 +1,44 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-
 public class Inventory : MonoBehaviour
 {
     [Header("Inventory UI")]
-    public GameObject inventoryUI;               // the root panel GameObject
-    public CanvasGroup inventoryCanvasGroup;     // ASSIGN in Inspector (on the same root)
-    public GameObject slotPrefab;
-    public GameObject unequipButtonPrefab;
-    public EquipmentManager equipmentManager;
+    [SerializeField] private Transform inventoryUIRoot;
+    [SerializeField] private GameObject slotPrefab;
+    [SerializeField] private Canvas rootCanvas;
+    [SerializeField] private GameObject inventoryPanel;
 
-    private EquipmentType pendingEquipSlot;
+    [Header("Optional Equip Support")]
+    [SerializeField] private EquipmentManager equipmentManager;
+
+    private EquipmentType? pendingEquipSlot = null;
 
     private void Awake()
     {
-        // Optional: ensure GameManager can find us
-        if (GameManager.Instance) GameManager.Instance.inventory = this;
+        if (GameManager.Instance != null)
+            GameManager.Instance.inventory = this;
     }
 
     private void Start()
     {
-        GameManager.Instance.LoadInventory();
-        // Optional: ensure hidden state at start
+        if (GameManager.Instance != null)
+            GameManager.Instance.LoadInventory();
+
         HideInventory();
+        UpdateInventoryUI();
     }
 
-    // --- PUBLIC API ---
+    public void OpenInventory()
+    {
+        pendingEquipSlot = null;
+        ShowInventory();
+        UpdateInventoryUI();
+    }
 
     public void OpenInventoryForEquip(EquipmentType slot)
     {
         pendingEquipSlot = slot;
-        ShowInventory();         // ← ensure CG is visible and clickable
+        ShowInventory();
         UpdateInventoryUI();
     }
 
@@ -40,113 +47,103 @@ public class Inventory : MonoBehaviour
         HideInventory();
     }
 
-    // --- INTERNAL ---
-
     private void ShowInventory()
     {
-        if (inventoryUI != null) inventoryUI.SetActive(true);
-
-        if (inventoryCanvasGroup != null)
-        {
-            inventoryCanvasGroup.alpha = 1f;
-            inventoryCanvasGroup.interactable = true;
-            inventoryCanvasGroup.blocksRaycasts = true;
-        }
+        if (inventoryPanel != null)
+            inventoryPanel.SetActive(true);
+        else if (inventoryUIRoot != null)
+            inventoryUIRoot.gameObject.SetActive(true);
     }
 
     private void HideInventory()
     {
-        if (inventoryUI != null) inventoryUI.SetActive(true); // keep active so layout stays; CG will gate input
-
-        if (inventoryCanvasGroup != null)
-        {
-            inventoryCanvasGroup.alpha = 0f;
-            inventoryCanvasGroup.interactable = false;
-            inventoryCanvasGroup.blocksRaycasts = false;
-        }
+        /*
+        if (inventoryPanel != null)
+            inventoryPanel.SetActive(false);
+        else if (inventoryUIRoot != null)
+            inventoryUIRoot.gameObject.SetActive(false);
+            */
     }
 
     public void UpdateInventoryUI()
     {
-        if (inventoryUI == null) return;
+        if (inventoryUIRoot == null || GameManager.Instance == null)
+            return;
 
-        foreach (Transform child in inventoryUI.transform)
+        foreach (Transform child in inventoryUIRoot)
             Destroy(child.gameObject);
 
-        // Unequip button
-        Equipment equippedItem = GameManager.Instance.currentCompanionData?.GetEquipped(pendingEquipSlot);
-        if (equippedItem != null && unequipButtonPrefab != null)
-        {
-            GameObject unequipSlot = Instantiate(unequipButtonPrefab, inventoryUI.transform);
-            Button unequipBtn = unequipSlot.GetComponent<Button>();
-            TextMeshProUGUI label = unequipSlot.GetComponentInChildren<TextMeshProUGUI>();
-            if (label) label.text = $"Unequip {equippedItem.itemName}";
-            if (unequipBtn)
-            {
-                unequipBtn.onClick.RemoveAllListeners();
-                unequipBtn.onClick.AddListener(() =>
-                {
-                    equipmentManager.Unequip(pendingEquipSlot);
-                    HideInventory();
-                });
-            }
-        }
-
-        // Render inventory slots...
-        var items = GameManager.Instance.itemList;
         int totalSlots = GameManager.Instance.maxInventorySlots;
 
         for (int i = 0; i < totalSlots; i++)
         {
-            GameObject slot = Instantiate(slotPrefab, inventoryUI.transform);
-            slot.SetActive(true);
+            GameObject slotObj = Instantiate(slotPrefab, inventoryUIRoot);
+            slotObj.SetActive(true);
 
-            Image itemImage = slot.transform.Find("ItemContainer")?.GetComponent<Image>();
-            TextMeshProUGUI itemCountText = slot.transform.Find("ItemCountText")?.GetComponent<TextMeshProUGUI>();
-            Button equipButton = slot.transform.Find("UseButton")?.GetComponent<Button>();
-
-            if (i < items.Count)
+            InventorySlotUI slotUI = slotObj.GetComponent<InventorySlotUI>();
+            if (slotUI == null)
             {
-                Item item = items[i];
-
-                if (itemImage)
-                {
-                    itemImage.enabled = true;
-                    itemImage.sprite = item.itemIcon;
-                }
-                if (itemCountText) itemCountText.text = item.quantity.ToString();
-
-                if (equipButton)
-                {
-                    equipButton.onClick.RemoveAllListeners();
-
-                    if (item is Equipment eq)
-                    {
-                        bool isCorrectSlot = eq.equipmentType == pendingEquipSlot;
-                        equipButton.interactable = isCorrectSlot;
-
-                        if (isCorrectSlot)
-                        {
-                            Equipment localEq = eq;
-                            equipButton.onClick.AddListener(() =>
-                            {
-                                equipmentManager.Equip(localEq);
-                                HideInventory();
-                            });
-                        }
-                    }
-                    else
-                    {
-                        equipButton.interactable = false;
-                    }
-                }
+                Debug.LogError($"Inventory slot prefab missing InventorySlotUI on {slotObj.name}");
+                continue;
             }
-            else
+
+            slotUI.Setup(this, i);
+
+            InventorySlotData slotData = GameManager.Instance.GetInventorySlot(i);
+            if (slotData == null || slotData.IsEmpty)
             {
-                if (itemImage) { itemImage.enabled = false; itemImage.sprite = null; }
-                if (itemCountText) itemCountText.text = "";
-                if (equipButton) { equipButton.interactable = false; equipButton.onClick.RemoveAllListeners(); }
+                slotUI.ClearVisual();
+                continue;
+            }
+
+            Item item = GameManager.Instance.FindItemInMasterList(slotData.itemID);
+            if (item == null)
+            {
+                slotUI.ClearVisual();
+                continue;
+            }
+
+            slotUI.Bind(item, slotData.quantity, rootCanvas);
+
+            // Optional: if inventory slot prefab has a button on the root, let tap equip in equip mode
+            if (pendingEquipSlot.HasValue && equipmentManager != null && item is Equipment eq)
+            {
+                Button button = slotObj.GetComponent<UnityEngine.UI.Button>();
+                if (button != null)
+                {
+                    button.onClick.RemoveAllListeners();
+
+                    if (eq.equipmentType == pendingEquipSlot.Value)
+                    {
+                        button.onClick.AddListener(() =>
+                        {
+                            equipmentManager.Equip(eq);
+                            pendingEquipSlot = null;
+                            HideInventory();
+                        });
+                    }
+                }
             }
         }
+    }
+
+    public bool TryStoreGridItemInInventory(int gridIndex, int inventorySlotIndex)
+    {
+        if (GameManager.Instance == null)
+            return false;
+
+        CrafterGridController crafterGrid = FindObjectOfType<CrafterGridController>();
+        if (crafterGrid == null)
+        {
+            Debug.LogWarning("No CrafterGridController found in scene.");
+            return false;
+        }
+
+        bool success = crafterGrid.TryMoveGridItemToInventory(gridIndex, inventorySlotIndex);
+
+        if (success)
+            UpdateInventoryUI();
+
+        return success;
     }
 }

@@ -454,4 +454,96 @@ int cost = generatorDef.stepCost;
     Save();
     RefreshVisuals();
 }
+
+public bool TryMoveGridItemToInventory(int gridIndex)
+{
+    if (!IsValidIndex(gridIndex)) return false;
+
+    CrafterEntityType type = gridState[gridIndex];
+    if (type == CrafterEntityType.None) return false;
+
+    CrafterEntityDefinition def = entityDatabase.Get(type);
+    if (def == null || !def.isMovable || def.isGenerator || def.isEnemy) return false;
+
+    // You need a link from crafter item -> inventory itemID
+    int inventoryItemID = def.inventoryItemID;
+    if (inventoryItemID < 0) return false;
+
+    bool stored = GameManager.Instance.TryAddToInventory(inventoryItemID, 1);
+    if (!stored) return false;
+
+    gridState[gridIndex] = CrafterEntityType.None;
+    Save();
+    RefreshVisuals();
+    return true;
+}
+
+public bool TryMoveInventoryItemToGrid(int inventorySlotIndex, int targetGridIndex)
+{
+    if (!IsValidIndex(targetGridIndex))
+        return false;
+
+    if (gridState[targetGridIndex] != CrafterEntityType.None)
+        return false;
+
+    Item item = GameManager.Instance.GetItemInInventorySlot(inventorySlotIndex);
+    if (item == null)
+        return false;
+
+    CrafterEntityType type = MapInventoryItemToCrafterType(item.itemID);
+    if (type == CrafterEntityType.None)
+        return false;
+
+    if (!GameManager.Instance.TryRemoveFromInventorySlot(inventorySlotIndex, 1))
+        return false;
+
+    gridState[targetGridIndex] = type;
+    Save();
+    RefreshVisuals();
+    return true;
+}
+
+public bool TryMoveGridItemToInventory(int gridIndex, int inventorySlotIndex)
+{
+    if (!IsValidIndex(gridIndex))
+        return false;
+
+    CrafterEntityType type = gridState[gridIndex];
+    if (type == CrafterEntityType.None)
+        return false;
+
+    CrafterEntityDefinition def = entityDatabase.Get(type);
+    if (def == null || !def.isMovable || def.isGenerator || def.isEnemy)
+        return false;
+
+    // Requires a mapping field on the crafter definition.
+    int inventoryItemID = def.inventoryItemID;
+    if (inventoryItemID < 0)
+        return false;
+
+    bool stored = GameManager.Instance.TryAddToInventoryAtSlot(inventoryItemID, inventorySlotIndex, 1);
+    if (!stored)
+        return false;
+
+    gridState[gridIndex] = CrafterEntityType.None;
+    Save();
+    RefreshVisuals();
+    return true;
+}
+private CrafterEntityType MapInventoryItemToCrafterType(int itemID)
+{
+    if (entityDatabase == null)
+        return CrafterEntityType.None;
+
+    // Loop through all definitions
+    foreach (var def in entityDatabase.GetAll())
+    {
+        if (def.inventoryItemID == itemID)
+            return def.entityType;
+    }
+
+    return CrafterEntityType.None;
+}
+
+
 }

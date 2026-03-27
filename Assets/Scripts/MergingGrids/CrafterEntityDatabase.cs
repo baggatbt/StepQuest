@@ -4,7 +4,7 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "StepQuest/Crafter Entity Database")]
 public class CrafterEntityDatabase : ScriptableObject
 {
-    public List<CrafterEntityDefinition> definitions = new();
+    [SerializeField] private List<CrafterEntityDefinition> definitions = new();
 
     private Dictionary<CrafterEntityType, CrafterEntityDefinition> lookup;
 
@@ -30,5 +30,10 @@ public class CrafterEntityDatabase : ScriptableObject
 
         lookup.TryGetValue(type, out var def);
         return def;
+    }
+
+    public List<CrafterEntityDefinition> GetAll()
+    {
+        return definitions;
     }
 }
