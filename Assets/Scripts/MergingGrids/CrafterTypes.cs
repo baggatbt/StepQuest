@@ -2,22 +2,25 @@ public enum CrafterEntityType
 {
     None = 0,
 
+    // Special placed objects
+    Chest = 1,
+
     // Generators
-    WoodGenerator = 1,
-    OreGenerator = 2,
+    WoodGenerator = 10,
+    OreGenerator = 11,
 
     // Wood chain
-    Wood = 10,
-    Plank = 11,
-    Handle = 12,
+    Wood = 20,
+    Plank = 21,
+    Handle = 22,
 
     // Ore chain
-    Ore = 20,
-    Ingot = 21,
-    Blade = 22,
+    Ore = 30,
+    Ingot = 31,
+    Blade = 32,
 
     // Crafted result
-    IronSword = 30,
+    IronSword = 40,
 
     // Intrusion
     RogueEnemy = 100

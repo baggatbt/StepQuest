@@ -127,8 +127,10 @@ public class Inventory : MonoBehaviour
         }
     }
 
+    /*
     public bool TryStoreGridItemInInventory(int gridIndex, int inventorySlotIndex)
     {
+        
         if (GameManager.Instance == null)
             return false;
 
@@ -145,5 +147,8 @@ public class Inventory : MonoBehaviour
             UpdateInventoryUI();
 
         return success;
+        
     }
+    */
+    
 }

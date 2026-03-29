@@ -26,7 +26,6 @@ public class CrafterGridItemUI : MonoBehaviour,
 
     private GameObject dragGhost;
     private RectTransform dragGhostRect;
-
     private bool dropHandled;
 
     public void Setup(
@@ -97,14 +96,11 @@ public class CrafterGridItemUI : MonoBehaviour,
         if (!canDrag)
             return;
 
-        // If a valid drop already happened, do nothing here.
-        // The drop handler already cleaned up and refreshed.
         if (dropHandled)
             return;
 
         DestroyDragGhost();
 
-        // Invalid drop: restore the original visual
         if (canvasGroup != null)
         {
             canvasGroup.blocksRaycasts = true;
@@ -120,10 +116,8 @@ public class CrafterGridItemUI : MonoBehaviour,
             return;
 
         dropHandled = true;
-
         DestroyDragGhost();
 
-        // Keep original hidden so we don't briefly see a duplicate.
         if (canvasGroup != null)
         {
             canvasGroup.blocksRaycasts = false;
@@ -133,6 +127,40 @@ public class CrafterGridItemUI : MonoBehaviour,
         owner.TryMoveOrMerge(SourceIndex, targetIndex);
     }
 
+    public void HandleSuccessfulChestStore(int chestSlotIndex)
+{
+    if (!canDrag)
+        return;
+
+    dropHandled = true;
+    DestroyDragGhost();
+
+    if (canvasGroup != null)
+    {
+        canvasGroup.blocksRaycasts = false;
+        canvasGroup.alpha = 0f;
+    }
+
+    owner.TryStoreGridItemInChest(SourceIndex, chestSlotIndex);
+}
+
+
+public void HandleSuccessfulChestStoreToFirstOpenSlot()
+{
+    if (!canDrag)
+        return;
+
+    dropHandled = true;
+    DestroyDragGhost();
+
+    if (canvasGroup != null)
+    {
+        canvasGroup.blocksRaycasts = false;
+        canvasGroup.alpha = 0f;
+    }
+
+    owner.TryStoreGridItemInChestFirstOpen(SourceIndex);
+}
     private void DestroyDragGhost()
     {
         if (dragGhost != null)
@@ -185,14 +213,10 @@ public class CrafterGridItemUI : MonoBehaviour,
         }
 
         Rect pixelRect = RectTransformUtility.PixelAdjustRect(iconRectTransform, rootCanvas);
-        float width = pixelRect.width;
-        float height = pixelRect.height;
-
-        dragGhostRect.SetParent(rootCanvas.transform, false);
         dragGhostRect.anchorMin = new Vector2(0.5f, 0.5f);
         dragGhostRect.anchorMax = new Vector2(0.5f, 0.5f);
         dragGhostRect.pivot = new Vector2(0.5f, 0.5f);
-        dragGhostRect.sizeDelta = new Vector2(width, height);
+        dragGhostRect.sizeDelta = new Vector2(pixelRect.width, pixelRect.height);
         dragGhostRect.localScale = Vector3.one * dragGhostScale;
     }
 
@@ -219,7 +243,6 @@ public class CrafterGridItemUI : MonoBehaviour,
         return;
 
     dropHandled = true;
-
     DestroyDragGhost();
 
     if (canvasGroup != null)

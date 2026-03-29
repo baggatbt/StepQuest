@@ -49,6 +49,7 @@ public class InventorySlotUI : MonoBehaviour, IDropHandler
 
     public void OnDrop(PointerEventData eventData)
     {
+        /*
         if (Owner == null || eventData.pointerDrag == null)
             return;
 
@@ -60,5 +61,6 @@ public class InventorySlotUI : MonoBehaviour, IDropHandler
         }
 
         // Inventory-to-inventory stack/swap can go here later.
+        */
     }
 }

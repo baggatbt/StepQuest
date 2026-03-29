@@ -20,18 +20,13 @@ public class CrafterGridSlotUI : MonoBehaviour, IDropHandler
         CrafterGridItemUI draggedGridItem = eventData.pointerDrag.GetComponent<CrafterGridItemUI>();
         if (draggedGridItem != null)
         {
+            if (Owner.IsChestAt(Index))
+            {
+                draggedGridItem.HandleSuccessfulChestStoreToFirstOpenSlot();
+                return;
+            }
+
             draggedGridItem.HandleSuccessfulDrop(Index);
-            return;
-        }
-
-        InventoryItemUI draggedInventoryItem = eventData.pointerDrag.GetComponent<InventoryItemUI>();
-        if (draggedInventoryItem != null)
-        {
-            bool moved = Owner.TryMoveInventoryItemToGrid(draggedInventoryItem.SlotIndex, Index);
-            if (moved)
-                draggedInventoryItem.HandleSuccessfulDropToGrid();
-
-            return;
         }
     }
 }

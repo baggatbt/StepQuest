@@ -17,6 +17,10 @@ public class CrafterGridController : MonoBehaviour
     [SerializeField] private TMP_Text stepText;
     [SerializeField] private Canvas rootCanvas;
 
+    [Header("Chest")]
+    [SerializeField] private CrafterChestPanelUI chestPanelUI;
+    [SerializeField] private int chestSlotCount = 4;
+
     [Header("Start State")]
     [SerializeField] private bool startWithOreGenerator = false;
     [SerializeField] private int mergesPerEnemySpawn = 6;
@@ -32,6 +36,7 @@ public class CrafterGridController : MonoBehaviour
 
     private CrafterEntityType[] gridState;
     private int mergeCounter;
+    private List<CrafterChestSlotData> chestSlots = new();
 
     [Serializable]
     private class CrafterGridSaveData
@@ -40,6 +45,7 @@ public class CrafterGridController : MonoBehaviour
         public int rows;
         public int mergeCounter;
         public int[] occupants;
+        public int[] chestOccupants;
     }
 
     private void OnEnable()
@@ -53,14 +59,19 @@ public class CrafterGridController : MonoBehaviour
     }
 
     private void Start()
-{
-    if (entityDatabase != null)
-        entityDatabase.BuildLookup();
+    {
+        if (entityDatabase != null)
+            entityDatabase.BuildLookup();
+        
+        EnsureChestSlots();
+        BuildSlotObjects();
+        LoadOrCreate();
 
-    BuildSlotObjects();
-    LoadOrCreate();
-    RefreshVisuals();
-}
+        if (chestPanelUI != null)
+            chestPanelUI.Initialize(this);
+
+        RefreshVisuals();
+    }
 
     private void OnApplicationPause(bool pauseStatus)
     {
@@ -76,6 +87,18 @@ public class CrafterGridController : MonoBehaviour
     private void HandleStepsChanged(int amount)
     {
         RefreshStepText();
+    }
+
+    private void EnsureChestSlots()
+    {
+        if (chestSlots == null)
+            chestSlots = new List<CrafterChestSlotData>();
+
+        while (chestSlots.Count < chestSlotCount)
+            chestSlots.Add(new CrafterChestSlotData());
+
+        if (chestSlots.Count > chestSlotCount)
+            chestSlots.RemoveRange(chestSlotCount, chestSlots.Count - chestSlotCount);
     }
 
     private void BuildSlotObjects()
@@ -109,6 +132,14 @@ public class CrafterGridController : MonoBehaviour
                 for (int i = 0; i < data.occupants.Length; i++)
                     gridState[i] = (CrafterEntityType)data.occupants[i];
 
+                EnsureChestSlots();
+
+                if (data.chestOccupants != null)
+                {
+                    for (int i = 0; i < Mathf.Min(data.chestOccupants.Length, chestSlots.Count); i++)
+                        chestSlots[i].storedType = (CrafterEntityType)data.chestOccupants[i];
+                }
+
                 return;
             }
         }
@@ -117,18 +148,43 @@ public class CrafterGridController : MonoBehaviour
     }
 
     private void CreateFreshGrid()
-    {
-        int total = columns * rows;
-        gridState = new CrafterEntityType[total];
-        mergeCounter = 0;
+{
+    int total = columns * rows;
+    gridState = new CrafterEntityType[total];
+    mergeCounter = 0;
 
-        gridState[0] = CrafterEntityType.WoodGenerator;
+    gridState[0] = CrafterEntityType.WoodGenerator;
 
-        if (startWithOreGenerator && total > 1)
-            gridState[1] = CrafterEntityType.OreGenerator;
+    if (total > 1)
+        gridState[1] = CrafterEntityType.Chest;
 
-        Save();
-    }
+    if (startWithOreGenerator && total > 2)
+        gridState[2] = CrafterEntityType.OreGenerator;
+    Debug.Log("Fresh grid created with chest at index 1");
+    EnsureChestSlots();
+    Save();
+}
+
+public bool TryMoveChestItemToFirstEmptyGrid(int chestSlotIndex)
+{
+    if (chestSlotIndex < 0 || chestSlotIndex >= chestSlots.Count)
+        return false;
+
+    int emptyIndex = GetFirstEmptyIndex();
+    if (emptyIndex < 0)
+        return false;
+
+    CrafterEntityType storedType = chestSlots[chestSlotIndex].storedType;
+    if (storedType == CrafterEntityType.None)
+        return false;
+
+    chestSlots[chestSlotIndex].Clear();
+    gridState[emptyIndex] = storedType;
+
+    Save();
+    RefreshVisuals();
+    return true;
+}
 
     public void Save()
     {
@@ -137,60 +193,67 @@ public class CrafterGridController : MonoBehaviour
             columns = columns,
             rows = rows,
             mergeCounter = mergeCounter,
-            occupants = new int[gridState.Length]
+            occupants = new int[gridState.Length],
+            chestOccupants = new int[chestSlots.Count]
         };
 
         for (int i = 0; i < gridState.Length; i++)
             data.occupants[i] = (int)gridState[i];
+
+        for (int i = 0; i < chestSlots.Count; i++)
+            data.chestOccupants[i] = (int)chestSlots[i].storedType;
 
         PlayerPrefs.SetString(SaveKey, JsonUtility.ToJson(data));
         PlayerPrefs.Save();
     }
 
     public void RefreshVisuals()
-{
-    for (int i = 0; i < spawnedVisuals.Count; i++)
     {
-        if (spawnedVisuals[i] != null)
-            Destroy(spawnedVisuals[i].gameObject);
-    }
-    spawnedVisuals.Clear();
-
-    LayoutRebuilder.ForceRebuildLayoutImmediate(gridRoot as RectTransform);
-    Canvas.ForceUpdateCanvases();
-
-    for (int i = 0; i < gridState.Length; i++)
-    {
-        CrafterEntityType type = gridState[i];
-        if (type == CrafterEntityType.None)
-            continue;
-
-        CrafterEntityDefinition def = entityDatabase.Get(type);
-        if (def == null)
+        for (int i = 0; i < spawnedVisuals.Count; i++)
         {
-            Debug.LogWarning($"Missing CrafterEntityDefinition for {type}");
-            continue;
+            if (spawnedVisuals[i] != null)
+                Destroy(spawnedVisuals[i].gameObject);
+        }
+        spawnedVisuals.Clear();
+
+        LayoutRebuilder.ForceRebuildLayoutImmediate(gridRoot as RectTransform);
+        Canvas.ForceUpdateCanvases();
+
+        for (int i = 0; i < gridState.Length; i++)
+        {
+            CrafterEntityType type = gridState[i];
+            if (type == CrafterEntityType.None)
+                continue;
+
+            CrafterEntityDefinition def = entityDatabase.Get(type);
+            if (def == null)
+            {
+                Debug.LogWarning($"Missing CrafterEntityDefinition for {type}");
+                continue;
+            }
+
+            CrafterGridItemUI item = Instantiate(itemPrefab, slots[i].transform);
+
+            RectTransform rt = item.GetComponent<RectTransform>();
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+            rt.localScale = Vector3.one;
+            rt.anchoredPosition = Vector2.zero;
+
+            item.Setup(this, i, def, rootCanvas);
+            spawnedVisuals.Add(item);
         }
 
-        CrafterGridItemUI item = Instantiate(itemPrefab, slots[i].transform);
+        LayoutRebuilder.ForceRebuildLayoutImmediate(gridRoot as RectTransform);
+        Canvas.ForceUpdateCanvases();
 
-        RectTransform rt = item.GetComponent<RectTransform>();
-        rt.anchorMin = Vector2.zero;
-        rt.anchorMax = Vector2.one;
-        rt.offsetMin = Vector2.zero;
-        rt.offsetMax = Vector2.zero;
-        rt.localScale = Vector3.one;
-        rt.anchoredPosition = Vector2.zero;
+        if (chestPanelUI != null)
+            chestPanelUI.RefreshUI();
 
-        item.Setup(this, i, def, rootCanvas);
-        spawnedVisuals.Add(item);
+        RefreshStepText();
     }
-
-    LayoutRebuilder.ForceRebuildLayoutImmediate(gridRoot as RectTransform);
-    Canvas.ForceUpdateCanvases();
-
-    RefreshStepText();
-}
 
     private void RefreshStepText()
     {
@@ -209,32 +272,36 @@ public class CrafterGridController : MonoBehaviour
         if (!IsValidIndex(index))
             return;
 
-       CrafterEntityType type = gridState[index];
-CrafterEntityDefinition def = entityDatabase.Get(type);
+        CrafterEntityType type = gridState[index];
+        CrafterEntityDefinition def = entityDatabase.Get(type);
 
-if (def == null)
-    return;
+        if (def == null)
+            return;
 
-if (def.isGenerator)
-{
-    TryGenerateFrom(index);
-    return;
-}
+        if (type == CrafterEntityType.Chest)
+        {
+            chestPanelUI?.Toggle();
+            return;
+        }
 
-if (def.isEnemy)
-{
-    Debug.Log("Open battle confirmation panel here.");
+        if (def.isGenerator)
+        {
+            TryGenerateFrom(index);
+            return;
+        }
 
-    if (autoDefeatEnemyForNow)
-        DefeatEnemyAt(index);
+        if (def.isEnemy)
+        {
+            Debug.Log("Open battle confirmation panel here.");
 
-    return;
-}
+            if (autoDefeatEnemyForNow)
+                DefeatEnemyAt(index);
 
-if (def.isMovable)
-{
-    Debug.Log($"Clicked item: {def.displayName}. Later open submit / destroy / sell menu here.");
-}
+            return;
+        }
+
+        if (def.isMovable)
+            Debug.Log($"Clicked item: {def.displayName}");
     }
 
     private void TryGenerateFrom(int generatorIndex)
@@ -245,16 +312,16 @@ if (def.isMovable)
             return;
         }
 
-       CrafterEntityType generatorType = gridState[generatorIndex];
-CrafterEntityDefinition generatorDef = entityDatabase.Get(generatorType);
+        CrafterEntityType generatorType = gridState[generatorIndex];
+        CrafterEntityDefinition generatorDef = entityDatabase.Get(generatorType);
 
-if (generatorDef == null || !generatorDef.isGenerator)
-{
-    Debug.LogWarning($"No generator definition found for {generatorType}");
-    return;
-}
+        if (generatorDef == null || !generatorDef.isGenerator)
+        {
+            Debug.LogWarning($"No generator definition found for {generatorType}");
+            return;
+        }
 
-int cost = generatorDef.stepCost;
+        int cost = generatorDef.stepCost;
 
         int emptyIndex = GetFirstEmptyIndex();
         if (emptyIndex < 0)
@@ -300,7 +367,6 @@ int cost = generatorDef.stepCost;
         if (fromDef == null || !fromDef.isMovable || fromDef.isGenerator || fromDef.isEnemy)
             return;
 
-        // move into empty tile
         if (to == CrafterEntityType.None)
         {
             gridState[toIndex] = from;
@@ -311,7 +377,6 @@ int cost = generatorDef.stepCost;
             return;
         }
 
-        // merge
         CrafterEntityType result = CrafterRules.GetMergeResult(from, to);
         if (result != CrafterEntityType.None)
         {
@@ -326,7 +391,6 @@ int cost = generatorDef.stepCost;
             return;
         }
 
-        // swap with another movable item
         if (toDef != null && toDef.isMovable && !toDef.isGenerator && !toDef.isEnemy)
         {
             gridState[toIndex] = from;
@@ -373,32 +437,113 @@ int cost = generatorDef.stepCost;
             return;
 
         gridState[index] = CrafterEntityType.None;
-
-        Debug.Log("Enemy defeated. Later: give battle reward here.");
-
         Save();
         RefreshVisuals();
     }
 
-    public void UnlockOreGeneratorForTesting()
+    public void RecycleItemAt(int index)
     {
-        if (ContainsEntity(CrafterEntityType.OreGenerator))
+        if (!IsValidIndex(index))
             return;
 
-        int empty = GetFirstEmptyIndex();
-        if (empty < 0)
+        CrafterEntityType type = gridState[index];
+        if (type == CrafterEntityType.None)
             return;
 
-        gridState[empty] = CrafterEntityType.OreGenerator;
+        CrafterEntityDefinition def = entityDatabase.Get(type);
+        if (def == null)
+            return;
+
+        if (!def.isMovable || def.isGenerator || def.isEnemy)
+            return;
+
+        if (PlayerData.Instance != null)
+            PlayerData.Instance.AddCopper(def.sellValueCopper);
+
+        gridState[index] = CrafterEntityType.None;
         Save();
         RefreshVisuals();
     }
 
-    public void ResetGrid()
+    public bool TryStoreGridItemInChest(int gridIndex, int chestSlotIndex)
     {
-        PlayerPrefs.DeleteKey(SaveKey);
-        CreateFreshGrid();
+        if (!IsValidIndex(gridIndex))
+            return false;
+
+        if (chestSlotIndex < 0 || chestSlotIndex >= chestSlots.Count)
+            return false;
+
+        CrafterEntityType type = gridState[gridIndex];
+        if (type == CrafterEntityType.None)
+            return false;
+
+        CrafterEntityDefinition def = entityDatabase.Get(type);
+        if (def == null || !def.isMovable || def.isGenerator || def.isEnemy)
+            return false;
+
+        if (!chestSlots[chestSlotIndex].IsEmpty)
+            return false;
+
+        chestSlots[chestSlotIndex].Set(type);
+        gridState[gridIndex] = CrafterEntityType.None;
+
+        Save();
         RefreshVisuals();
+        return true;
+    }
+
+    
+
+    public int GetChestSlotCount() => chestSlots.Count;
+
+    public CrafterEntityType GetChestStoredType(int slotIndex)
+    {
+        if (slotIndex < 0 || slotIndex >= chestSlots.Count)
+            return CrafterEntityType.None;
+
+        return chestSlots[slotIndex].storedType;
+    }
+
+    public bool IsChestAt(int gridIndex)
+{
+    if (!IsValidIndex(gridIndex))
+        return false;
+
+    return gridState[gridIndex] == CrafterEntityType.Chest;
+}
+
+public bool TryStoreGridItemInChestFirstOpen(int gridIndex)
+{
+    if (!IsValidIndex(gridIndex))
+        return false;
+
+    CrafterEntityType type = gridState[gridIndex];
+    if (type == CrafterEntityType.None)
+        return false;
+
+    CrafterEntityDefinition def = entityDatabase.Get(type);
+    if (def == null || !def.isMovable || def.isGenerator || def.isEnemy)
+        return false;
+
+    for (int i = 0; i < chestSlots.Count; i++)
+    {
+        if (chestSlots[i].IsEmpty)
+        {
+            chestSlots[i].Set(type);
+            gridState[gridIndex] = CrafterEntityType.None;
+
+            Save();
+            RefreshVisuals();
+            return true;
+        }
+    }
+
+    return false;
+}
+
+    public CrafterEntityDefinition GetDefinition(CrafterEntityType type)
+    {
+        return entityDatabase != null ? entityDatabase.Get(type) : null;
     }
 
     private bool ContainsEntity(CrafterEntityType type)
@@ -425,125 +570,4 @@ int cost = generatorDef.stepCost;
     {
         return index >= 0 && index < gridState.Length;
     }
-
-    public void RecycleItemAt(int index)
-{
-    if (!IsValidIndex(index))
-        return;
-
-    CrafterEntityType type = gridState[index];
-    if (type == CrafterEntityType.None)
-        return;
-
-    CrafterEntityDefinition def = entityDatabase.Get(type);
-    if (def == null)
-        return;
-
-    // Only recycle movable crafted items, not generators/enemies.
-    if (!def.isMovable || def.isGenerator || def.isEnemy)
-        return;
-
-    // Award gold based on the item's base value.
-    if (PlayerData.Instance != null)
-        PlayerData.Instance.AddCopper(def.sellValueCopper);
-
-    Debug.Log($"Recycled: {def.displayName} for {def.sellValueCopper} gold");
-
-    gridState[index] = CrafterEntityType.None;
-
-    Save();
-    RefreshVisuals();
-}
-
-public bool TryMoveGridItemToInventory(int gridIndex)
-{
-    if (!IsValidIndex(gridIndex)) return false;
-
-    CrafterEntityType type = gridState[gridIndex];
-    if (type == CrafterEntityType.None) return false;
-
-    CrafterEntityDefinition def = entityDatabase.Get(type);
-    if (def == null || !def.isMovable || def.isGenerator || def.isEnemy) return false;
-
-    // You need a link from crafter item -> inventory itemID
-    int inventoryItemID = def.inventoryItemID;
-    if (inventoryItemID < 0) return false;
-
-    bool stored = GameManager.Instance.TryAddToInventory(inventoryItemID, 1);
-    if (!stored) return false;
-
-    gridState[gridIndex] = CrafterEntityType.None;
-    Save();
-    RefreshVisuals();
-    return true;
-}
-
-public bool TryMoveInventoryItemToGrid(int inventorySlotIndex, int targetGridIndex)
-{
-    if (!IsValidIndex(targetGridIndex))
-        return false;
-
-    if (gridState[targetGridIndex] != CrafterEntityType.None)
-        return false;
-
-    Item item = GameManager.Instance.GetItemInInventorySlot(inventorySlotIndex);
-    if (item == null)
-        return false;
-
-    CrafterEntityType type = MapInventoryItemToCrafterType(item.itemID);
-    if (type == CrafterEntityType.None)
-        return false;
-
-    if (!GameManager.Instance.TryRemoveFromInventorySlot(inventorySlotIndex, 1))
-        return false;
-
-    gridState[targetGridIndex] = type;
-    Save();
-    RefreshVisuals();
-    return true;
-}
-
-public bool TryMoveGridItemToInventory(int gridIndex, int inventorySlotIndex)
-{
-    if (!IsValidIndex(gridIndex))
-        return false;
-
-    CrafterEntityType type = gridState[gridIndex];
-    if (type == CrafterEntityType.None)
-        return false;
-
-    CrafterEntityDefinition def = entityDatabase.Get(type);
-    if (def == null || !def.isMovable || def.isGenerator || def.isEnemy)
-        return false;
-
-    // Requires a mapping field on the crafter definition.
-    int inventoryItemID = def.inventoryItemID;
-    if (inventoryItemID < 0)
-        return false;
-
-    bool stored = GameManager.Instance.TryAddToInventoryAtSlot(inventoryItemID, inventorySlotIndex, 1);
-    if (!stored)
-        return false;
-
-    gridState[gridIndex] = CrafterEntityType.None;
-    Save();
-    RefreshVisuals();
-    return true;
-}
-private CrafterEntityType MapInventoryItemToCrafterType(int itemID)
-{
-    if (entityDatabase == null)
-        return CrafterEntityType.None;
-
-    // Loop through all definitions
-    foreach (var def in entityDatabase.GetAll())
-    {
-        if (def.inventoryItemID == itemID)
-            return def.entityType;
-    }
-
-    return CrafterEntityType.None;
-}
-
-
 }
