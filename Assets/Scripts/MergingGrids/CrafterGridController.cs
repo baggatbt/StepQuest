@@ -570,4 +570,124 @@ public bool TryStoreGridItemInChestFirstOpen(int gridIndex)
     {
         return index >= 0 && index < gridState.Length;
     }
+
+    public bool HasGridItems(CrafterEntityType type, int amount)
+{
+    if (amount <= 0)
+        return true;
+
+    int count = 0;
+
+    for (int i = 0; i < gridState.Length; i++)
+    {
+        if (gridState[i] == type)
+            count++;
+    }
+
+    return count >= amount;
+}
+
+public bool RemoveGridItems(CrafterEntityType type, int amount)
+{
+    if (amount <= 0)
+        return true;
+
+    if (!HasGridItems(type, amount))
+        return false;
+
+    int remaining = amount;
+
+    for (int i = 0; i < gridState.Length; i++)
+    {
+        if (gridState[i] != type)
+            continue;
+
+        gridState[i] = CrafterEntityType.None;
+        remaining--;
+
+        if (remaining <= 0)
+            break;
+    }
+
+    Save();
+    RefreshVisuals();
+    return true;
+}
+
+public bool CanAffordUpgrade(BuildingUpgradeCost cost)
+{
+    if (cost == null || GameManager.Instance == null)
+    {
+        Debug.LogWarning("CanAffordUpgrade failed: cost or GameManager missing.");
+        return false;
+    }
+
+    foreach (var invReq in cost.inventoryCosts)
+    {
+        if (invReq == null || invReq.item == null)
+            continue;
+
+        int have = GameManager.Instance.GetItemCount(invReq.item.itemID);
+        Debug.Log($"Inventory check: need {invReq.quantity}x {invReq.item.itemName} (ID {invReq.item.itemID}), have {have}");
+
+        if (have < invReq.quantity)
+            return false;
+    }
+
+    foreach (var gridReq in cost.gridCosts)
+    {
+        if (gridReq == null)
+            continue;
+
+        int have = 0;
+        for (int i = 0; i < gridState.Length; i++)
+        {
+            if (gridState[i] == gridReq.entityType)
+                have++;
+        }
+
+        Debug.Log($"Grid check: need {gridReq.quantity}x {gridReq.entityType}, have {have}");
+
+        if (have < gridReq.quantity)
+            return false;
+    }
+
+    return true;
+}
+
+public bool TryPayUpgradeCost(BuildingUpgradeCost cost)
+{
+    if (!CanAffordUpgrade(cost))
+        return false;
+
+    // Remove inventory items first
+    foreach (var invReq in cost.inventoryCosts)
+    {
+        if (invReq == null || invReq.item == null)
+            continue;
+
+        bool removed = GameManager.Instance.RemoveItem(invReq.item.itemID, invReq.quantity);
+        if (!removed)
+        {
+            Debug.LogWarning($"Failed removing inventory item {invReq.item.itemName}");
+            return false;
+        }
+    }
+
+    // Remove grid items second
+    foreach (var gridReq in cost.gridCosts)
+    {
+        if (gridReq == null)
+            continue;
+
+        bool removed = RemoveGridItems(gridReq.entityType, gridReq.quantity);
+        if (!removed)
+        {
+            Debug.LogWarning($"Failed removing grid item {gridReq.entityType}");
+            return false;
+        }
+    }
+
+    return true;
+}
 }

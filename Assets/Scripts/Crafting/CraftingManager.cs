@@ -123,7 +123,7 @@ public class CraftingManager : MonoBehaviour
         // 1) check materials
         foreach (var req in recipe.materialRequirements)
         {
-            int have = gameManager.GetItemCount(req.material);
+            int have = gameManager.GetItemCount(req.material.itemID);
             int need = req.quantity * quantity;
             if (have < need)
             {
@@ -133,7 +133,7 @@ public class CraftingManager : MonoBehaviour
         }
         // 2) consume materials
         foreach (var req in recipe.materialRequirements)
-            gameManager.RemoveItem(req.material, req.quantity * quantity);
+            gameManager.RemoveItem(req.material.itemID, req.quantity * quantity);
 
         // 3) enqueue batch
         activeCrafts.Add(new ActiveCraftJob(recipe, quantity, 0f));

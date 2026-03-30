@@ -33,7 +33,7 @@ public class CraftQuantityDialog : MonoBehaviour
         maxQty = int.MaxValue;
         foreach (var req in recipe.materialRequirements)
         {
-            int have = GameManager.Instance.GetItemCount(req.material);
+            int have = GameManager.Instance.GetItemCount(req.material.itemID);
             maxQty = Mathf.Min(maxQty, have / req.quantity);
         }
         if (maxQty == int.MaxValue) maxQty = 0;

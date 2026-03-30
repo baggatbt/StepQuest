@@ -27,7 +27,7 @@ public class ConsumableItem : Item
         // If quantity falls below 1, it could be removed from the inventory.
         if (quantity < 1)
         {
-            GameManager.Instance.RemoveItem(this, 0);
+            GameManager.Instance.RemoveItem(itemID, 1);
         }
     }
 }
