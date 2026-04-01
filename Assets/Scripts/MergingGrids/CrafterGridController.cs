@@ -556,6 +556,60 @@ public bool TryStoreGridItemInChestFirstOpen(int gridIndex)
         return false;
     }
 
+    public int CountEntityOnBoardAndChest(CrafterEntityType type)
+{
+    int count = 0;
+
+    for (int i = 0; i < gridState.Length; i++)
+    {
+        if (gridState[i] == type)
+            count++;
+    }
+
+    for (int i = 0; i < chestSlots.Count; i++)
+    {
+        if (chestSlots[i].storedType == type)
+            count++;
+    }
+
+    return count;
+}
+
+public bool TryConsumeEntityFromBoardAndChest(CrafterEntityType type, int amount)
+{
+    if (amount <= 0)
+        return true;
+
+    int total = CountEntityOnBoardAndChest(type);
+    if (total < amount)
+        return false;
+
+    int remaining = amount;
+
+    // Consume from board first
+    for (int i = 0; i < gridState.Length && remaining > 0; i++)
+    {
+        if (gridState[i] == type)
+        {
+            gridState[i] = CrafterEntityType.None;
+            remaining--;
+        }
+    }
+
+    // Then consume from chest
+    for (int i = 0; i < chestSlots.Count && remaining > 0; i++)
+    {
+        if (chestSlots[i].storedType == type)
+        {
+            chestSlots[i].Clear();
+            remaining--;
+        }
+    }
+
+    Save();
+    return true;
+}
+
     private int GetFirstEmptyIndex()
     {
         for (int i = 0; i < gridState.Length; i++)
