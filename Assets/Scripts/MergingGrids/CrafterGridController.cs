@@ -503,6 +503,8 @@ public class CrafterGridController : MonoBehaviour
         if (PlayerData.Instance != null)
             PlayerData.Instance.AddCopper(def.sellValueCopper);
 
+        CrafterRequestSystem.Instance?.OnItemRecycled(type);
+
         gridState[index] = CrafterEntityType.None;
         Save();
         RefreshVisuals();

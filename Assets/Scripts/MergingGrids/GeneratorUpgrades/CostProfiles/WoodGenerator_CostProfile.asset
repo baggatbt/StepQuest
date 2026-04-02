@@ -12,5 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0c8d6f792911a74b80699e8a571665c, type: 3}
   m_Name: WoodGenerator_CostProfile
   m_EditorClassIdentifier: Assembly-CSharp::CrafterGeneratorUpgradeCostProfile
-  generatorType: 0
-  levelCosts: []
+  generatorType: 10
+  levelCosts:
+  - targetLevel: 2
+    inventoryCosts: []
+    gridCosts:
+    - entityType: 21
+      quantity: 3
+  - targetLevel: 3
+    inventoryCosts:
+    - item: {fileID: 11400000, guid: bc8b3d3b6e1dc2f44878fac4853cd49f, type: 2}
+      quantity: 1
+    gridCosts:
+    - entityType: 22
+      quantity: 3
