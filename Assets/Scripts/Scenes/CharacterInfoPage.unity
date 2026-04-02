@@ -3811,8 +3811,9 @@ MonoBehaviour:
   chestSlotCount: 4
   startWithOreGenerator: 0
   mergesPerEnemySpawn: 6
-  autoDefeatEnemyForNow: 1
   entityDatabase: {fileID: 11400000, guid: 80dafae88ec15144a870391fad87a63a, type: 2}
+  mergeRecipeDatabase: {fileID: 11400000, guid: 416372e0ba2d76c48a30b2acd6f41275, type: 2}
+  autoDefeatEnemyForNow: 1
 --- !u!114 &80894173
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -62560,11 +62561,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8dd29746d7d33d041851665114a58b1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CrafterRequestPanelUI
-  requestManager: {fileID: 1695980743}
-  itemIcon: {fileID: 0}
-  itemNameText: {fileID: 0}
-  progressText: {fileID: 0}
-  rewardText: {fileID: 0}
 --- !u!114 &885328272
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -114182,7 +114178,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.3943615, y: 0.381}
   m_AnchorMax: {x: 0.6038141, y: 0.61350626}
-  m_AnchoredPosition: {x: 426, y: -3047.8628}
+  m_AnchoredPosition: {x: 426, y: -3047.8623}
   m_SizeDelta: {x: 2378.3086, y: 2251.2532}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1077219933
@@ -141832,10 +141828,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c2cbd3433d089f4e8f843c7c4340971, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CrafterRequestManager
-  gridController: {fileID: 80894172}
-  requestPanelUI: {fileID: 885328271}
-  requestPool: []
-  activeRequestCount: 3
 --- !u!4 &1695980744
 Transform:
   m_ObjectHideFlags: 0

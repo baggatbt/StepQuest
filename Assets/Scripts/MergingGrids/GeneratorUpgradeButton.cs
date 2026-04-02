@@ -34,7 +34,7 @@ public class GeneratorUpgradeButton : MonoBehaviour
 
     private IEnumerator RefreshNextFrame()
     {
-        yield return null; // wait 1 frame
+        yield return null;
         RefreshUI();
     }
 
@@ -47,7 +47,6 @@ public class GeneratorUpgradeButton : MonoBehaviour
         {
             bool canAfford = crafterGrid.CanAffordUpgrade(upgradeCost);
             upgradeButton.interactable = canAfford;
-
             Debug.Log($"[GeneratorUpgradeButton] RefreshUI -> interactable = {canAfford}");
         }
     }
@@ -90,6 +89,6 @@ public class GeneratorUpgradeButton : MonoBehaviour
             sb.AppendLine($"{req.quantity}x {req.item.itemName}");
         }
 
-        return sb.ToString();
+        return sb.ToString().TrimEnd();
     }
 }

@@ -25,9 +25,12 @@ public class CrafterGridController : MonoBehaviour
     [SerializeField] private bool startWithOreGenerator = false;
     [SerializeField] private int mergesPerEnemySpawn = 6;
 
+    [Header("Data")]
+    [SerializeField] private CrafterEntityDatabase entityDatabase;
+    [SerializeField] private CrafterMergeRecipeDatabase mergeRecipeDatabase;
+
     [Header("Debug")]
     [SerializeField] private bool autoDefeatEnemyForNow = true;
-    [SerializeField] private CrafterEntityDatabase entityDatabase;
 
     private const string SaveKey = "CrafterBuilding_GridSave";
 
@@ -62,7 +65,7 @@ public class CrafterGridController : MonoBehaviour
     {
         if (entityDatabase != null)
             entityDatabase.BuildLookup();
-        
+
         EnsureChestSlots();
         BuildSlotObjects();
         LoadOrCreate();
@@ -148,43 +151,44 @@ public class CrafterGridController : MonoBehaviour
     }
 
     private void CreateFreshGrid()
-{
-    int total = columns * rows;
-    gridState = new CrafterEntityType[total];
-    mergeCounter = 0;
+    {
+        int total = columns * rows;
+        gridState = new CrafterEntityType[total];
+        mergeCounter = 0;
 
-    gridState[0] = CrafterEntityType.WoodGenerator;
+        gridState[0] = CrafterEntityType.WoodGenerator;
 
-    if (total > 1)
-        gridState[1] = CrafterEntityType.Chest;
+        if (total > 1)
+            gridState[1] = CrafterEntityType.Chest;
 
-    if (startWithOreGenerator && total > 2)
-        gridState[2] = CrafterEntityType.OreGenerator;
-    Debug.Log("Fresh grid created with chest at index 1");
-    EnsureChestSlots();
-    Save();
-}
+        if (startWithOreGenerator && total > 2)
+            gridState[2] = CrafterEntityType.OreGenerator;
 
-public bool TryMoveChestItemToFirstEmptyGrid(int chestSlotIndex)
-{
-    if (chestSlotIndex < 0 || chestSlotIndex >= chestSlots.Count)
-        return false;
+        Debug.Log("Fresh grid created with chest at index 1");
+        EnsureChestSlots();
+        Save();
+    }
 
-    int emptyIndex = GetFirstEmptyIndex();
-    if (emptyIndex < 0)
-        return false;
+    public bool TryMoveChestItemToFirstEmptyGrid(int chestSlotIndex)
+    {
+        if (chestSlotIndex < 0 || chestSlotIndex >= chestSlots.Count)
+            return false;
 
-    CrafterEntityType storedType = chestSlots[chestSlotIndex].storedType;
-    if (storedType == CrafterEntityType.None)
-        return false;
+        int emptyIndex = GetFirstEmptyIndex();
+        if (emptyIndex < 0)
+            return false;
 
-    chestSlots[chestSlotIndex].Clear();
-    gridState[emptyIndex] = storedType;
+        CrafterEntityType storedType = chestSlots[chestSlotIndex].storedType;
+        if (storedType == CrafterEntityType.None)
+            return false;
 
-    Save();
-    RefreshVisuals();
-    return true;
-}
+        chestSlots[chestSlotIndex].Clear();
+        gridState[emptyIndex] = storedType;
+
+        Save();
+        RefreshVisuals();
+        return true;
+    }
 
     public void Save()
     {
@@ -377,7 +381,7 @@ public bool TryMoveChestItemToFirstEmptyGrid(int chestSlotIndex)
             return;
         }
 
-        CrafterEntityType result = CrafterRules.GetMergeResult(from, to);
+        CrafterEntityType result = GetMergeResult(from, to);
         if (result != CrafterEntityType.None)
         {
             gridState[toIndex] = result;
@@ -399,6 +403,17 @@ public bool TryMoveChestItemToFirstEmptyGrid(int chestSlotIndex)
             Save();
             RefreshVisuals();
         }
+    }
+
+    private CrafterEntityType GetMergeResult(CrafterEntityType a, CrafterEntityType b)
+    {
+        if (mergeRecipeDatabase == null)
+        {
+            Debug.LogWarning("CrafterMergeRecipeDatabase is missing on CrafterGridController.");
+            return CrafterEntityType.None;
+        }
+
+        return mergeRecipeDatabase.GetMergeResult(a, b);
     }
 
     private void TrySpawnEnemy()
@@ -492,8 +507,6 @@ public bool TryMoveChestItemToFirstEmptyGrid(int chestSlotIndex)
         return true;
     }
 
-    
-
     public int GetChestSlotCount() => chestSlots.Count;
 
     public CrafterEntityType GetChestStoredType(int slotIndex)
@@ -505,110 +518,98 @@ public bool TryMoveChestItemToFirstEmptyGrid(int chestSlotIndex)
     }
 
     public bool IsChestAt(int gridIndex)
-{
-    if (!IsValidIndex(gridIndex))
-        return false;
-
-    return gridState[gridIndex] == CrafterEntityType.Chest;
-}
-
-public bool TryStoreGridItemInChestFirstOpen(int gridIndex)
-{
-    if (!IsValidIndex(gridIndex))
-        return false;
-
-    CrafterEntityType type = gridState[gridIndex];
-    if (type == CrafterEntityType.None)
-        return false;
-
-    CrafterEntityDefinition def = entityDatabase.Get(type);
-    if (def == null || !def.isMovable || def.isGenerator || def.isEnemy)
-        return false;
-
-    for (int i = 0; i < chestSlots.Count; i++)
     {
-        if (chestSlots[i].IsEmpty)
-        {
-            chestSlots[i].Set(type);
-            gridState[gridIndex] = CrafterEntityType.None;
+        if (!IsValidIndex(gridIndex))
+            return false;
 
-            Save();
-            RefreshVisuals();
-            return true;
-        }
+        return gridState[gridIndex] == CrafterEntityType.Chest;
     }
 
-    return false;
-}
+    public bool TryStoreGridItemInChestFirstOpen(int gridIndex)
+    {
+        if (!IsValidIndex(gridIndex))
+            return false;
+
+        CrafterEntityType type = gridState[gridIndex];
+        if (type == CrafterEntityType.None)
+            return false;
+
+        CrafterEntityDefinition def = entityDatabase.Get(type);
+        if (def == null || !def.isMovable || def.isGenerator || def.isEnemy)
+            return false;
+
+        for (int i = 0; i < chestSlots.Count; i++)
+        {
+            if (chestSlots[i].IsEmpty)
+            {
+                chestSlots[i].Set(type);
+                gridState[gridIndex] = CrafterEntityType.None;
+
+                Save();
+                RefreshVisuals();
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     public CrafterEntityDefinition GetDefinition(CrafterEntityType type)
     {
         return entityDatabase != null ? entityDatabase.Get(type) : null;
     }
 
-    private bool ContainsEntity(CrafterEntityType type)
+    public int CountEntityOnBoardAndChest(CrafterEntityType type)
     {
+        int count = 0;
+
         for (int i = 0; i < gridState.Length; i++)
         {
             if (gridState[i] == type)
-                return true;
+                count++;
         }
-        return false;
+
+        for (int i = 0; i < chestSlots.Count; i++)
+        {
+            if (chestSlots[i].storedType == type)
+                count++;
+        }
+
+        return count;
     }
 
-    public int CountEntityOnBoardAndChest(CrafterEntityType type)
-{
-    int count = 0;
-
-    for (int i = 0; i < gridState.Length; i++)
+    public bool TryConsumeEntityFromBoardAndChest(CrafterEntityType type, int amount)
     {
-        if (gridState[i] == type)
-            count++;
-    }
+        if (amount <= 0)
+            return true;
 
-    for (int i = 0; i < chestSlots.Count; i++)
-    {
-        if (chestSlots[i].storedType == type)
-            count++;
-    }
+        int total = CountEntityOnBoardAndChest(type);
+        if (total < amount)
+            return false;
 
-    return count;
-}
+        int remaining = amount;
 
-public bool TryConsumeEntityFromBoardAndChest(CrafterEntityType type, int amount)
-{
-    if (amount <= 0)
+        for (int i = 0; i < gridState.Length && remaining > 0; i++)
+        {
+            if (gridState[i] == type)
+            {
+                gridState[i] = CrafterEntityType.None;
+                remaining--;
+            }
+        }
+
+        for (int i = 0; i < chestSlots.Count && remaining > 0; i++)
+        {
+            if (chestSlots[i].storedType == type)
+            {
+                chestSlots[i].Clear();
+                remaining--;
+            }
+        }
+
+        Save();
         return true;
-
-    int total = CountEntityOnBoardAndChest(type);
-    if (total < amount)
-        return false;
-
-    int remaining = amount;
-
-    // Consume from board first
-    for (int i = 0; i < gridState.Length && remaining > 0; i++)
-    {
-        if (gridState[i] == type)
-        {
-            gridState[i] = CrafterEntityType.None;
-            remaining--;
-        }
     }
-
-    // Then consume from chest
-    for (int i = 0; i < chestSlots.Count && remaining > 0; i++)
-    {
-        if (chestSlots[i].storedType == type)
-        {
-            chestSlots[i].Clear();
-            remaining--;
-        }
-    }
-
-    Save();
-    return true;
-}
 
     private int GetFirstEmptyIndex()
     {
@@ -626,122 +627,116 @@ public bool TryConsumeEntityFromBoardAndChest(CrafterEntityType type, int amount
     }
 
     public bool HasGridItems(CrafterEntityType type, int amount)
-{
-    if (amount <= 0)
-        return true;
-
-    int count = 0;
-
-    for (int i = 0; i < gridState.Length; i++)
     {
-        if (gridState[i] == type)
-            count++;
-    }
+        if (amount <= 0)
+            return true;
 
-    return count >= amount;
-}
+        int count = 0;
 
-public bool RemoveGridItems(CrafterEntityType type, int amount)
-{
-    if (amount <= 0)
-        return true;
-
-    if (!HasGridItems(type, amount))
-        return false;
-
-    int remaining = amount;
-
-    for (int i = 0; i < gridState.Length; i++)
-    {
-        if (gridState[i] != type)
-            continue;
-
-        gridState[i] = CrafterEntityType.None;
-        remaining--;
-
-        if (remaining <= 0)
-            break;
-    }
-
-    Save();
-    RefreshVisuals();
-    return true;
-}
-
-public bool CanAffordUpgrade(BuildingUpgradeCost cost)
-{
-    if (cost == null || GameManager.Instance == null)
-    {
-        Debug.LogWarning("CanAffordUpgrade failed: cost or GameManager missing.");
-        return false;
-    }
-
-    foreach (var invReq in cost.inventoryCosts)
-    {
-        if (invReq == null || invReq.item == null)
-            continue;
-
-        int have = GameManager.Instance.GetItemCount(invReq.item.itemID);
-        Debug.Log($"Inventory check: need {invReq.quantity}x {invReq.item.itemName} (ID {invReq.item.itemID}), have {have}");
-
-        if (have < invReq.quantity)
-            return false;
-    }
-
-    foreach (var gridReq in cost.gridCosts)
-    {
-        if (gridReq == null)
-            continue;
-
-        int have = 0;
         for (int i = 0; i < gridState.Length; i++)
         {
-            if (gridState[i] == gridReq.entityType)
-                have++;
+            if (gridState[i] == type)
+                count++;
         }
 
-        Debug.Log($"Grid check: need {gridReq.quantity}x {gridReq.entityType}, have {have}");
-
-        if (have < gridReq.quantity)
-            return false;
+        return count >= amount;
     }
 
-    return true;
-}
-
-public bool TryPayUpgradeCost(BuildingUpgradeCost cost)
-{
-    if (!CanAffordUpgrade(cost))
-        return false;
-
-    // Remove inventory items first
-    foreach (var invReq in cost.inventoryCosts)
+    public bool RemoveGridItems(CrafterEntityType type, int amount)
     {
-        if (invReq == null || invReq.item == null)
-            continue;
+        if (amount <= 0)
+            return true;
 
-        bool removed = GameManager.Instance.RemoveItem(invReq.item.itemID, invReq.quantity);
-        if (!removed)
-        {
-            Debug.LogWarning($"Failed removing inventory item {invReq.item.itemName}");
+        if (!HasGridItems(type, amount))
             return false;
+
+        int remaining = amount;
+
+        for (int i = 0; i < gridState.Length; i++)
+        {
+            if (gridState[i] != type)
+                continue;
+
+            gridState[i] = CrafterEntityType.None;
+            remaining--;
+
+            if (remaining <= 0)
+                break;
         }
+
+        Save();
+        RefreshVisuals();
+        return true;
     }
 
-    // Remove grid items second
-    foreach (var gridReq in cost.gridCosts)
+    public bool CanAffordUpgrade(BuildingUpgradeCost cost)
     {
-        if (gridReq == null)
-            continue;
-
-        bool removed = RemoveGridItems(gridReq.entityType, gridReq.quantity);
-        if (!removed)
+        if (cost == null || GameManager.Instance == null)
         {
-            Debug.LogWarning($"Failed removing grid item {gridReq.entityType}");
+            Debug.LogWarning("CanAffordUpgrade failed: cost or GameManager missing.");
             return false;
         }
+
+        foreach (var invReq in cost.inventoryCosts)
+        {
+            if (invReq == null || invReq.item == null)
+                continue;
+
+            int have = GameManager.Instance.GetItemCount(invReq.item.itemID);
+            Debug.Log($"Inventory check: need {invReq.quantity}x {invReq.item.itemName} (ID {invReq.item.itemID}), have {have}");
+
+            if (have < invReq.quantity)
+                return false;
+        }
+
+        foreach (var gridReq in cost.gridCosts)
+        {
+            if (gridReq == null)
+                continue;
+
+            int have = CountEntityOnBoardAndChest(gridReq.entityType);
+            Debug.Log($"Grid+Chest check: need {gridReq.quantity}x {gridReq.entityType}, have {have}");
+
+            if (have < gridReq.quantity)
+                return false;
+        }
+
+        return true;
     }
 
-    return true;
-}
+    public bool TryPayUpgradeCost(BuildingUpgradeCost cost)
+    {
+        if (!CanAffordUpgrade(cost))
+            return false;
+
+        foreach (var invReq in cost.inventoryCosts)
+        {
+            if (invReq == null || invReq.item == null)
+                continue;
+
+            bool removed = GameManager.Instance.RemoveItem(invReq.item.itemID, invReq.quantity);
+            if (!removed)
+            {
+                Debug.LogWarning($"Failed removing inventory item {invReq.item.itemName}");
+                return false;
+            }
+        }
+
+        foreach (var gridReq in cost.gridCosts)
+        {
+            if (gridReq == null)
+                continue;
+
+            bool removed = TryConsumeEntityFromBoardAndChest(gridReq.entityType, gridReq.quantity);
+            if (!removed)
+            {
+                Debug.LogWarning($"Failed removing grid/chest item {gridReq.entityType}");
+                return false;
+            }
+        }
+
+        Save();
+        RefreshVisuals();
+        return true;
+    }
 }
