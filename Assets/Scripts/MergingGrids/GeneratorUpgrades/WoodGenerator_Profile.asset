@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7bd650f04860674b9dbd1bbe0209b93, type: 3}
+  m_Name: WoodGenerator_Profile
+  m_EditorClassIdentifier: Assembly-CSharp::CrafterGeneratorUpgradeProfile
+  generatorType: 10
+  levels:
+  - level: 1
+    outputs:
+    - entityType: 20
+      weight: 100
+  - level: 3
+    outputs:
+    - entityType: 20
+      weight: 60
+    - entityType: 21
+      weight: 40
+  - level: 3
+    outputs:
+    - entityType: 20
+      weight: 50
+    - entityType: 21
+      weight: 35
+    - entityType: 22
+      weight: 15

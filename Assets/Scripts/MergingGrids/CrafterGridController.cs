@@ -28,6 +28,8 @@ public class CrafterGridController : MonoBehaviour
     [Header("Data")]
     [SerializeField] private CrafterEntityDatabase entityDatabase;
     [SerializeField] private CrafterMergeRecipeDatabase mergeRecipeDatabase;
+    [SerializeField] private CrafterGeneratorUpgradeDatabase generatorUpgradeDatabase;
+    [SerializeField] private CrafterGeneratorUpgradeCostDatabase generatorUpgradeCostDatabase;
 
     [Header("Debug")]
     [SerializeField] private bool autoDefeatEnemyForNow = true;
@@ -41,12 +43,17 @@ public class CrafterGridController : MonoBehaviour
     private int mergeCounter;
     private List<CrafterChestSlotData> chestSlots = new();
 
+    private int woodGeneratorLevel = 1;
+    private int oreGeneratorLevel = 1;
+
     [Serializable]
     private class CrafterGridSaveData
     {
         public int columns;
         public int rows;
         public int mergeCounter;
+        public int woodGeneratorLevel = 1;
+        public int oreGeneratorLevel = 1;
         public int[] occupants;
         public int[] chestOccupants;
     }
@@ -65,6 +72,12 @@ public class CrafterGridController : MonoBehaviour
     {
         if (entityDatabase != null)
             entityDatabase.BuildLookup();
+
+        if (generatorUpgradeDatabase != null)
+            generatorUpgradeDatabase.BuildLookup();
+
+        if (generatorUpgradeCostDatabase != null)
+            generatorUpgradeCostDatabase.BuildLookup();
 
         EnsureChestSlots();
         BuildSlotObjects();
@@ -130,6 +143,9 @@ public class CrafterGridController : MonoBehaviour
             if (data != null && data.occupants != null && data.occupants.Length == columns * rows)
             {
                 mergeCounter = data.mergeCounter;
+                woodGeneratorLevel = Mathf.Max(1, data.woodGeneratorLevel);
+                oreGeneratorLevel = Mathf.Max(1, data.oreGeneratorLevel);
+
                 gridState = new CrafterEntityType[data.occupants.Length];
 
                 for (int i = 0; i < data.occupants.Length; i++)
@@ -155,6 +171,8 @@ public class CrafterGridController : MonoBehaviour
         int total = columns * rows;
         gridState = new CrafterEntityType[total];
         mergeCounter = 0;
+        woodGeneratorLevel = 1;
+        oreGeneratorLevel = 1;
 
         gridState[0] = CrafterEntityType.WoodGenerator;
 
@@ -197,6 +215,8 @@ public class CrafterGridController : MonoBehaviour
             columns = columns,
             rows = rows,
             mergeCounter = mergeCounter,
+            woodGeneratorLevel = woodGeneratorLevel,
+            oreGeneratorLevel = oreGeneratorLevel,
             occupants = new int[gridState.Length],
             chestOccupants = new int[chestSlots.Count]
         };
@@ -341,7 +361,15 @@ public class CrafterGridController : MonoBehaviour
             return;
         }
 
-        CrafterEntityType spawnType = generatorDef.generatedEntityType;
+        int generatorLevel = GetGeneratorLevel(generatorType);
+
+        CrafterEntityType spawnType = generatorUpgradeDatabase != null
+            ? generatorUpgradeDatabase.GetOutputForLevel(
+                generatorType,
+                generatorLevel,
+                generatorDef.generatedEntityType)
+            : generatorDef.generatedEntityType;
+
         if (spawnType == CrafterEntityType.None)
         {
             RefreshStepText();
@@ -683,8 +711,6 @@ public class CrafterGridController : MonoBehaviour
                 continue;
 
             int have = GameManager.Instance.GetItemCount(invReq.item.itemID);
-            Debug.Log($"Inventory check: need {invReq.quantity}x {invReq.item.itemName} (ID {invReq.item.itemID}), have {have}");
-
             if (have < invReq.quantity)
                 return false;
         }
@@ -695,8 +721,6 @@ public class CrafterGridController : MonoBehaviour
                 continue;
 
             int have = CountEntityOnBoardAndChest(gridReq.entityType);
-            Debug.Log($"Grid+Chest check: need {gridReq.quantity}x {gridReq.entityType}, have {have}");
-
             if (have < gridReq.quantity)
                 return false;
         }
@@ -738,5 +762,137 @@ public class CrafterGridController : MonoBehaviour
         Save();
         RefreshVisuals();
         return true;
+    }
+
+    public bool CanAffordUpgrade(CrafterGeneratorUpgradeCostEntry costEntry)
+    {
+        if (costEntry == null || GameManager.Instance == null)
+            return false;
+
+        if (costEntry.inventoryCosts != null)
+        {
+            for (int i = 0; i < costEntry.inventoryCosts.Length; i++)
+            {
+                InventoryRequirement invReq = costEntry.inventoryCosts[i];
+                if (invReq == null || invReq.item == null)
+                    continue;
+
+                int have = GameManager.Instance.GetItemCount(invReq.item.itemID);
+                if (have < invReq.quantity)
+                    return false;
+            }
+        }
+
+        if (costEntry.gridCosts != null)
+        {
+            for (int i = 0; i < costEntry.gridCosts.Length; i++)
+            {
+                GridRequirement gridReq = costEntry.gridCosts[i];
+                if (gridReq == null)
+                    continue;
+
+                int have = CountEntityOnBoardAndChest(gridReq.entityType);
+                if (have < gridReq.quantity)
+                    return false;
+            }
+        }
+
+        return true;
+    }
+
+    public bool TryPayUpgradeCost(CrafterGeneratorUpgradeCostEntry costEntry)
+    {
+        if (!CanAffordUpgrade(costEntry))
+            return false;
+
+        if (costEntry.inventoryCosts != null)
+        {
+            for (int i = 0; i < costEntry.inventoryCosts.Length; i++)
+            {
+                InventoryRequirement invReq = costEntry.inventoryCosts[i];
+                if (invReq == null || invReq.item == null)
+                    continue;
+
+                bool removed = GameManager.Instance.RemoveItem(invReq.item.itemID, invReq.quantity);
+                if (!removed)
+                {
+                    Debug.LogWarning($"Failed removing inventory item {invReq.item.itemName}");
+                    return false;
+                }
+            }
+        }
+
+        if (costEntry.gridCosts != null)
+        {
+            for (int i = 0; i < costEntry.gridCosts.Length; i++)
+            {
+                GridRequirement gridReq = costEntry.gridCosts[i];
+                if (gridReq == null)
+                    continue;
+
+                bool removed = TryConsumeEntityFromBoardAndChest(gridReq.entityType, gridReq.quantity);
+                if (!removed)
+                {
+                    Debug.LogWarning($"Failed removing grid/chest item {gridReq.entityType}");
+                    return false;
+                }
+            }
+        }
+
+        Save();
+        RefreshVisuals();
+        return true;
+    }
+
+    public int GetGeneratorLevel(CrafterEntityType generatorType)
+    {
+        switch (generatorType)
+        {
+            case CrafterEntityType.WoodGenerator:
+                return woodGeneratorLevel;
+            case CrafterEntityType.OreGenerator:
+                return oreGeneratorLevel;
+            default:
+                return 1;
+        }
+    }
+
+    public void SetGeneratorLevel(CrafterEntityType generatorType, int newLevel)
+    {
+        newLevel = Mathf.Max(1, newLevel);
+        int maxLevel = GetGeneratorMaxLevel(generatorType);
+        newLevel = Mathf.Min(newLevel, maxLevel);
+
+        switch (generatorType)
+        {
+            case CrafterEntityType.WoodGenerator:
+                woodGeneratorLevel = newLevel;
+                break;
+            case CrafterEntityType.OreGenerator:
+                oreGeneratorLevel = newLevel;
+                break;
+            default:
+                return;
+        }
+
+        Save();
+        RefreshVisuals();
+    }
+
+    public int GetGeneratorMaxLevel(CrafterEntityType generatorType)
+    {
+        if (generatorUpgradeDatabase == null)
+            return 1;
+
+        return Mathf.Max(1, generatorUpgradeDatabase.GetMaxLevel(generatorType));
+    }
+
+    public CrafterGeneratorUpgradeCostEntry GetNextGeneratorUpgradeCost(CrafterEntityType generatorType)
+    {
+        if (generatorUpgradeCostDatabase == null)
+            return null;
+
+        int currentLevel = GetGeneratorLevel(generatorType);
+        return generatorUpgradeCostDatabase.GetNextCost(generatorType, currentLevel);
     }
 }

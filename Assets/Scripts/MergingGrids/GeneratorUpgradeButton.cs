@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,13 +9,12 @@ public class GeneratorUpgradeButton : MonoBehaviour
     [Header("Refs")]
     [SerializeField] private CrafterGridController crafterGrid;
     [SerializeField] private Button upgradeButton;
+    [SerializeField] private TMP_Text levelText;
     [SerializeField] private TMP_Text costText;
+    [SerializeField] private TMP_Text buttonLabelText;
 
-    [Header("Upgrade Data")]
-    [SerializeField] private BuildingUpgradeCost upgradeCost;
-
-    [Header("Runtime")]
-    [SerializeField] private int currentLevel = 1;
+    [Header("Generator")]
+    [SerializeField] private CrafterEntityType generatorType = CrafterEntityType.WoodGenerator;
 
     private void OnEnable()
     {
@@ -40,55 +40,103 @@ public class GeneratorUpgradeButton : MonoBehaviour
 
     public void RefreshUI()
     {
-        if (costText != null)
-            costText.text = BuildCostString();
+        if (crafterGrid == null)
+            return;
 
-        if (upgradeButton != null && crafterGrid != null && upgradeCost != null)
+        int currentLevel = crafterGrid.GetGeneratorLevel(generatorType);
+        int maxLevel = crafterGrid.GetGeneratorMaxLevel(generatorType);
+        CrafterGeneratorUpgradeCostEntry nextCost = crafterGrid.GetNextGeneratorUpgradeCost(generatorType);
+
+        if (levelText != null)
+            levelText.text = $"Lv. {currentLevel}";
+
+        bool isMaxed = currentLevel >= maxLevel || nextCost == null;
+
+        if (buttonLabelText != null)
         {
-            bool canAfford = crafterGrid.CanAffordUpgrade(upgradeCost);
+            buttonLabelText.text = isMaxed
+                ? "MAX"
+                : $"Upgrade to Lv. {currentLevel + 1}";
+        }
+
+        if (costText != null)
+        {
+            costText.text = isMaxed
+                ? "Max level reached"
+                : BuildCostString(nextCost);
+        }
+
+        if (upgradeButton != null)
+        {
+            bool canAfford = !isMaxed && crafterGrid.CanAffordUpgrade(nextCost);
             upgradeButton.interactable = canAfford;
-            Debug.Log($"[GeneratorUpgradeButton] RefreshUI -> interactable = {canAfford}");
         }
     }
 
     private void OnUpgradePressed()
     {
-        if (crafterGrid == null || upgradeCost == null)
+        if (crafterGrid == null)
             return;
 
-        bool paid = crafterGrid.TryPayUpgradeCost(upgradeCost);
-        if (!paid)
+        int currentLevel = crafterGrid.GetGeneratorLevel(generatorType);
+        int maxLevel = crafterGrid.GetGeneratorMaxLevel(generatorType);
+
+        if (currentLevel >= maxLevel)
         {
-            Debug.Log("Not enough materials.");
             RefreshUI();
             return;
         }
 
-        currentLevel = upgradeCost.targetLevel;
-        Debug.Log($"Upgraded to level {currentLevel}");
+        CrafterGeneratorUpgradeCostEntry nextCost = crafterGrid.GetNextGeneratorUpgradeCost(generatorType);
+        if (nextCost == null)
+        {
+            RefreshUI();
+            return;
+        }
 
+        bool paid = crafterGrid.TryPayUpgradeCost(nextCost);
+        if (!paid)
+        {
+            RefreshUI();
+            return;
+        }
+
+        crafterGrid.SetGeneratorLevel(generatorType, nextCost.targetLevel);
         RefreshUI();
     }
 
-    private string BuildCostString()
+    private string BuildCostString(CrafterGeneratorUpgradeCostEntry costEntry)
     {
-        if (upgradeCost == null)
-            return "No cost set";
+        if (costEntry == null)
+            return "No upgrade cost";
 
-        System.Text.StringBuilder sb = new();
+        StringBuilder sb = new StringBuilder();
 
-        foreach (var req in upgradeCost.gridCosts)
+        if (costEntry.gridCosts != null)
         {
-            if (req == null) continue;
-            sb.AppendLine($"{req.quantity}x {req.entityType}");
+            for (int i = 0; i < costEntry.gridCosts.Length; i++)
+            {
+                GridRequirement req = costEntry.gridCosts[i];
+                if (req == null)
+                    continue;
+
+                sb.AppendLine($"{req.quantity}x {req.entityType}");
+            }
         }
 
-        foreach (var req in upgradeCost.inventoryCosts)
+        if (costEntry.inventoryCosts != null)
         {
-            if (req == null || req.item == null) continue;
-            sb.AppendLine($"{req.quantity}x {req.item.itemName}");
+            for (int i = 0; i < costEntry.inventoryCosts.Length; i++)
+            {
+                InventoryRequirement req = costEntry.inventoryCosts[i];
+                if (req == null || req.item == null)
+                    continue;
+
+                sb.AppendLine($"{req.quantity}x {req.item.itemName}");
+            }
         }
 
-        return sb.ToString().TrimEnd();
+        string result = sb.ToString().TrimEnd();
+        return string.IsNullOrEmpty(result) ? "Free" : result;
     }
 }
