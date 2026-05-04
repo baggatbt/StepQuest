@@ -28,13 +28,12 @@ public class TripleHitSkill : Skill
         // Behavior
         numberOfAttacksPossible = 3;
 
-        // Balance:
-        // Slash = 60 power, 2 hits, free
-        // Triple Slash should be noticeably better, but not too strong
-        // because it gets 3 timing chances.
-        power = 78;
+        // ✅ NEW ATK-BASED DAMAGE (replaces power = 78)
+        damageMultiplier = 1.3f;          // Slightly stronger than Slash overall
+        damageVarianceMin = 1.0f;
+        damageVarianceMax = 1.2f;
 
-        // Slightly less snappy than Slash, but still quick
+        // Speed
         speedMultiplier = 1.00f;
 
         priority = 0;
@@ -47,18 +46,14 @@ public class TripleHitSkill : Skill
         user.isAttacking = true;
         user.isAnimationDone = false;
 
-        // Total damage budget from Power system
-        int totalDamageBudget = CalculateBaseDamage(
-            userAttack: user.attackPower,
-            targetDefense: target.defensePower,
-            userLevel: user.level
-        );
+        // ✅ NEW: ATK-based total damage
+        int totalDamageBudget = RollBaseDamage(user);
 
         // Triple hit split:
         // 30% / 30% / 40%
         int firstHit = Mathf.Max(1, Mathf.RoundToInt(totalDamageBudget * 0.30f));
         int secondHit = Mathf.Max(1, Mathf.RoundToInt(totalDamageBudget * 0.30f));
-        int thirdHit = Mathf.Max(1, totalDamageBudget - firstHit - secondHit); // keeps total exact
+        int thirdHit = Mathf.Max(1, totalDamageBudget - firstHit - secondHit);
 
         int[] hits = { firstHit, secondHit, thirdHit };
 

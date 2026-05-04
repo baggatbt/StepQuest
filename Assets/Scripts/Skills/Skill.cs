@@ -57,32 +57,22 @@ public abstract class Skill
     public Sprite iconImage;
 
     [Header("Damage")]
-    public float skillDamageModifier = 1f; // keep: extra multiplier per skill
+    public float skillDamageModifier = 1f;
 
-    // ----------------------------
-    // NEW: Power + Speed Framework
-    // ----------------------------
-
-    [Header("Power + Speed")]
-    [Tooltip("How hard the skill hits. Think 'move power' like Pokémon/Nexomon. Typical: 30-120.")]
+    // Old power/speed fields kept so your other skills do not break
     public int power = 60;
-
-    [Tooltip("How fast the skill resolves relative to user's Speed. >1 = faster, <1 = slower.")]
-    public float speedMultiplier = 1.0f;
-
-    [Tooltip("Optional: breaks ties / nudges ordering. Higher priority goes first when very close.")]
+    public float speedMultiplier = 1f;
     public int priority = 0;
-
-    [Header("Variance (Optional)")]
-    [Tooltip("If enabled, applies a small random multiplier to damage AFTER all other multipliers.")]
     public bool useVariance = false;
+    public float varianceMin = 0.9f;
+    public float varianceMax = 1.1f;
 
-    [Tooltip("Pokémon-style is 0.85–1.00 (only downward). For gentler, use 0.90–1.00.")]
-    [Range(0.5f, 1f)] public float varianceMin = 0.90f;
+    // New ATK-based preview/damage fields
+    [Header("Damage Preview")]
+    public float damageMultiplier = 1.0f;
+    public float damageVarianceMin = 1.0f;
+    public float damageVarianceMax = 1.2f;
 
-    [Range(1f, 1.5f)] public float varianceMax = 1.00f;
-
-    // Section C additions
     public SkillType Type { get; set; }
     public TimingEventResult LastTimingResult { get; private set; }
 
@@ -97,72 +87,59 @@ public abstract class Skill
 
     public virtual void ApplyPassiveEffect(CharacterData characterData)
     {
-        // Default implementation can be empty
     }
 
-    // ==========================================================
-    // NEW HELPERS: Speed + Power plumbing (BattleManager uses these)
-    // ==========================================================
-
-    /// <summary>
-    /// Given a user's raw Speed stat (int), returns the effective speed for this skill.
-    /// BattleManager can use this for turn scheduling / action gauges.
-    /// </summary>
     public virtual int GetEffectiveSpeed(int userSpeed)
     {
-        // Clamp so a slow skill can't go to 0 speed.
         return Mathf.Max(1, Mathf.RoundToInt(userSpeed * speedMultiplier));
     }
 
-    /// <summary>
-    /// Optional: produce a "time cost" value from effective speed.
-    /// Lower time cost = acts sooner. Use whichever convention your timeline uses.
-    /// </summary>
     public virtual float GetActionTimeCost(int userSpeed, float baseTimeCost = 100f)
     {
         int eff = GetEffectiveSpeed(userSpeed);
-        // Example convention: time cost shrinks as speed rises.
         return baseTimeCost / eff;
     }
 
-    // ==========================================================
-    // NEW HELPERS: Damage calculation using Power (clean + readable)
-    // ==========================================================
+    public virtual Vector2Int GetBaseDamageRange(Character user)
+    {
+        if (user == null) return new Vector2Int(0, 0);
 
-    /// <summary>
-    /// A simple, readable damage model:
-    /// BaseDamage ≈ (Attack / Defense) * Power * LevelFactor * skillDamageModifier
-    /// This keeps numbers small and intuitive.
-    ///
-    /// You can call this from each skill if you have atk/def/level available.
-    /// </summary>
-   protected virtual int CalculateBaseDamage(int userAttack, int targetDefense, int userLevel)
-{
-    // NOTE: We intentionally IGNORE targetDefense here.
-    // Defense is applied exactly once in Character.TakeDamage().
+        int min = Mathf.Max(1, Mathf.RoundToInt(user.attackPower * damageMultiplier * damageVarianceMin));
+        int max = Mathf.Max(min, Mathf.RoundToInt(user.attackPower * damageMultiplier * damageVarianceMax));
 
-    float atk = Mathf.Max(1, userAttack);
+        return new Vector2Int(min, max);
+    }
 
-    // Gentle level scaling (won't explode)
-    float levelFactor = 1.0f + (Mathf.Clamp(userLevel, 1, 100) - 1) * 0.01f;
+    protected virtual int RollBaseDamage(Character user)
+    {
+        Vector2Int range = GetBaseDamageRange(user);
+        return UnityEngine.Random.Range(range.x, range.y + 1);
+    }
 
-    // Raw incoming damage BEFORE defense.
-    // "power" becomes the main knob; tune the globalScalar to hit your desired ranges.
-    const float globalScalar = 0.03f;  // <-- start here (0.02–0.05 range)
-    float raw = atk * power * levelFactor * skillDamageModifier * globalScalar;
+    public virtual string GetBattlePreviewText(Character user)
+    {
+        Vector2Int dmgRange = GetBaseDamageRange(user);
+        int finalSpeed = user != null ? GetEffectiveSpeed(user.speed) : 0;
 
-    int dmg = Mathf.Max(1, Mathf.RoundToInt(raw));
+        return $"MP: {energyCost}   SPD: {finalSpeed}   DMG: {dmgRange.x}-{dmgRange.y}";
+    }
 
-    if (useVariance)
-        dmg = ApplyVariance(dmg);
+    protected virtual int CalculateBaseDamage(int userAttack, int targetDefense, int userLevel)
+    {
+        float atk = Mathf.Max(1, userAttack);
+        float levelFactor = 1.0f + (Mathf.Clamp(userLevel, 1, 100) - 1) * 0.01f;
 
-    return dmg;
-}
+        const float globalScalar = 0.03f;
+        float raw = atk * power * levelFactor * skillDamageModifier * globalScalar;
 
-    /// <summary>
-    /// Keep your old hook for skills that still want "just return 5" etc.
-    /// If your derived skills override this, nothing breaks.
-    /// </summary>
+        int dmg = Mathf.Max(1, Mathf.RoundToInt(raw));
+
+        if (useVariance)
+            dmg = ApplyVariance(dmg);
+
+        return dmg;
+    }
+
     protected virtual int CalculateBaseDamage(Character user)
     {
         return 5;
@@ -179,19 +156,11 @@ public abstract class Skill
         return Mathf.Max(1, Mathf.RoundToInt(damage * roll));
     }
 
-    // ==========================================================
-    // Timing multipliers (keeps your existing behavior)
-    // ==========================================================
-
     protected virtual float GetPlayerTimingDamageMultiplier(TimingEventResult timingResult)
         => (timingResult == TimingEventResult.Good) ? 1.25f : 1.0f;
 
     protected virtual float GetEnemyTimingDamageMultiplier(TimingEventResult timingResult)
         => (timingResult == TimingEventResult.Good) ? 0.75f : 1.0f;
-
-    // ==========================================================
-    // YOUR EXISTING HANDLERS (kept, lightly centralized)
-    // ==========================================================
 
     public void HandleAoeAttack(Character user, List<Character> enemies, TimingEventResult timingResult, int baseDamage)
     {
@@ -282,6 +251,7 @@ public abstract class Skill
                 bonusGained = true;
                 user.GainEnergy(energyGainBonus);
             }
+
             user.PlayCriticalHitSound();
         }
         else

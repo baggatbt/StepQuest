@@ -175,13 +175,10 @@ public class ButtonController : MonoBehaviour
     }
 
     private string BuildSkillDescription(Skill s, Character user)
-    {
-        if (s == null) return "";
-
-        int finalSpeed = user != null ? s.GetEffectiveSpeed(user.speed) : 0;
-
-        return $"POW: {s.power}   SPD: {finalSpeed}   COST: {s.energyCost}";
-    }
+{
+    if (s == null) return "";
+    return s.GetBattlePreviewText(user);
+}
 
     public void OpenSkillPanel()
     {
