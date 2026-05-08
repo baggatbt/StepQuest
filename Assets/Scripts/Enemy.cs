@@ -6,6 +6,7 @@ public class Enemy : Character
 {
     [Header("Enemy Info")]
     public string enemyName;
+    public string enemyID;
 
     [Header("Rewards")]
     public int expReward;

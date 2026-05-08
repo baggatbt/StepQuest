@@ -1514,6 +1514,13 @@ Debug.Log($"[Popup] popupCanvas: {popupCanvas.name} id={popupCanvas.GetInstanceI
     private void ProcessVictory()
 {
     EndOfBattleRewards(enemies);
+    foreach (Character character in enemies)
+{
+    if (character is Enemy enemy)
+    {
+        GuildObjectiveManager.Instance?.RegisterEnemyDefeated(enemy);
+    }
+}
     KnightProgressionService.TryApply(GameManager.Instance.currentCompanionData);
 
     var sd = GameManager.Instance.currentStage;   // StageData of the battle you just won
