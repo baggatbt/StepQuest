@@ -654,7 +654,7 @@ public void PopulateInventoryList() {
     
      public void GoToBattle(string stageID)
 {
-    
+    /*
     // 1) (Optional) Stamina checks – keep/remove per your design
     foreach (var companion in GameManager.Instance.currentParty)
     {
@@ -664,6 +664,7 @@ public void PopulateInventoryList() {
             // return; // re-enable if you bring stamina back
         }
     }
+    */
 
     // 2) Find stage
     StageData selectedStage = GameManager.Instance.allStagesData.Find(s => s.stageID == stageID);

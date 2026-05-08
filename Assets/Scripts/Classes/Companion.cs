@@ -258,5 +258,28 @@ public void InitializeCharacterStats()
         }
     }
 
+    public void ValidateEquippedSkills()
+{
+    if (characterData == null)
+        return;
+
+    if (characterData.equippedSkills == null)
+        characterData.equippedSkills = new List<SkillType>();
+
+    // Remove equipped skills that are not actually unlocked yet.
+    characterData.equippedSkills.RemoveAll(skill => !AvailableSkills.Contains(skill));
+
+    // Always make sure the character has at least one usable skill.
+    if (characterData.equippedSkills.Count == 0 && AvailableSkills.Count > 0)
+    {
+        characterData.equippedSkills.Add(AvailableSkills[0]);
+    }
+
+    // Optional loadout limit.
+    while (characterData.equippedSkills.Count > characterData.maxEquippedSkills)
+    {
+        characterData.equippedSkills.RemoveAt(characterData.equippedSkills.Count - 1);
+    }
+}
     
 }

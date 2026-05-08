@@ -7,26 +7,27 @@ public class GoblinAttackSkill : Skill
 
     public GoblinAttackSkill()
     {
-        // Identity (optional but nice)
-        // If you added this enum value, set it; otherwise you can remove this line.
-        // Type = SkillType.GoblinAttack; 
         skillName = "Goblin Attack";
         description = "The Goblin attacks the player. The damage can be reduced by timely action.";
 
+        energyCost = 0;
+        energyGain = 0;
+        energyGainBonus = 0;
+
         requiresMovement = true;
+        skillExecutionComplete = false;
+
         numberOfAttacksPossible = 1;
 
-        // NEW: power + speed
-        // For a basic enemy poke, keep it near your "basic" power.
-        power = 60;
+        // NEW ATK-based damage system
+        damageMultiplier = 1.0f;      // 100% of Goblin ATK
+        damageVarianceMin = 1.0f;
+        damageVarianceMax = 1.2f;
 
-        // Goblin basic attack is fairly quick but not crazy.
+        // Goblin basic attack is fairly quick
         speedMultiplier = 1.05f;
 
-        // Optional
         priority = 0;
-
-        // Optional variance (usually off since you already have timing)
         useVariance = false;
     }
 
@@ -35,14 +36,9 @@ public class GoblinAttackSkill : Skill
         user.isAttacking = true;
         user.isAnimationDone = false;
 
-        // NEW: power-based damage
-        int baseDamage = CalculateBaseDamage(
-            userAttack: user.attackPower,
-            targetDefense: target.defensePower,
-            userLevel: user.level
-        );
+        // NEW: ATK-based damage instead of old power formula
+        int baseDamage = RollBaseDamage(user);
 
-        // Goblin attack animation
         user.animator.SetTrigger("GoblinAttack1Trigger");
 
         for (int i = 0; i < numberOfAttacksPossible; i++)
