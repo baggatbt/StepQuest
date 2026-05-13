@@ -28,9 +28,15 @@ public class MainMenuUIManager : MonoBehaviour
     public GameObject consumablesPanel;  // Assign in inspector
     public Transform consumableListContent;  // Assign the content transform of your scroll view in the consumables panel
     public MasteryBarUI masteryBarUI; // assign MasteryBarPanel in Inspector
+    [Header("Inventory Description Panel")]
+public GameObject itemDescriptionPanel;
+public TextMeshProUGUI itemNameText;
+public TextMeshProUGUI itemDescriptionText;
+public Image itemDescriptionIcon;
 
     // References to stat UI Text elements
     public TextMeshProUGUI levelText,atkText, hpText, spText, expText, spdText, defText; 
+    
 
     //KNIGHT 
     //public Knight knight;
@@ -69,6 +75,26 @@ public class MainMenuUIManager : MonoBehaviour
         if (!isActive)
             PopulateConsumablesList();  // Populate list when the panel is opened
     }
+
+    public void ShowItemDescription(Item item)
+{
+    if (item == null) return;
+
+    if (itemDescriptionPanel != null)
+        itemDescriptionPanel.SetActive(true);
+
+    if (itemNameText != null)
+        itemNameText.text = item.itemName;
+
+    if (itemDescriptionText != null)
+        itemDescriptionText.text = item.itemDescription;
+
+    if (itemDescriptionIcon != null)
+    {
+        itemDescriptionIcon.sprite = item.itemIcon;
+        itemDescriptionIcon.enabled = item.itemIcon != null;
+    }
+}
 
     void PopulateConsumablesList()
     {
@@ -557,38 +583,33 @@ public void PopulateInventoryList() {
     Debug.Log("[MainMenuUIManager] Cleared existing inventory items.");
 
     // Loop through all items in the GameManager's inventory list
-    foreach (Item item in GameManager.Instance.itemList) {
-        Debug.Log("[MainMenuUIManager] Creating inventory item slot for: " + item.itemName);
-        GameObject itemSlotObject = Instantiate(inventoryItemPrefab, inventoryItemContainer.transform); // Use the container as parent
+    foreach (Item item in GameManager.Instance.itemList)
+{
+    GameObject itemSlotObject = Instantiate(inventoryItemPrefab, inventoryItemContainer.transform);
 
-        if (itemSlotObject == null) {
-            Debug.LogError("[MainMenuUIManager] Failed to instantiate inventory item slot prefab.");
-            continue;
-        }
+    Button itemButton = itemSlotObject.GetComponent<Button>();
+    if (itemButton == null)
+    {
+        itemButton = itemSlotObject.AddComponent<Button>();
+    }
 
-        // Attempt to find and set the item icon
-        Image itemIconImage = itemSlotObject.transform.Find("ItemContainer").GetComponent<Image>();
-        if (itemIconImage == null) {
-            Debug.LogError("[MainMenuUIManager] Failed to find Image component on ItemContainer.");
-            continue;
-        }
+    Item capturedItem = item;
+    itemButton.onClick.RemoveAllListeners();
+    itemButton.onClick.AddListener(() => ShowItemDescription(capturedItem));
 
-        // Set up the item icon
-        if (item.itemIcon != null) {
-            itemIconImage.sprite = item.itemIcon;
-            itemIconImage.enabled = true;
-            Debug.Log("[MainMenuUIManager] Set item icon for: " + item.itemName);
-        } else {
-            itemIconImage.enabled = false; // No icon for this item, so disable the image
-            Debug.Log("[MainMenuUIManager] No icon found for item: " + item.itemName + "; disabling image component.");
-        }
+    Image itemIconImage = itemSlotObject.transform.Find("ItemContainer").GetComponent<Image>();
+    if (itemIconImage != null && item.itemIcon != null)
+    {
+        itemIconImage.sprite = item.itemIcon;
+        itemIconImage.enabled = true;
+    }
 
-        // Attempt to find and set the item count text
-        TextMeshProUGUI itemCountText = itemSlotObject.transform.Find("ItemCountText").GetComponent<TextMeshProUGUI>();
-        if (itemCountText == null) {
-            Debug.LogError("[MainMenuUIManager] Failed to find TextMeshProUGUI component on ItemCountText.");
-            continue;
-        }
+    TextMeshProUGUI itemCountText = itemSlotObject.transform.Find("ItemCountText").GetComponent<TextMeshProUGUI>();
+    if (itemCountText != null)
+    {
+        itemCountText.text = item.quantity.ToString();
+    }
+
 
         // Set up the item count text
         itemCountText.text = item.quantity.ToString();
