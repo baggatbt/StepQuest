@@ -388,44 +388,9 @@ private void OnCharacterDataSelected(CharacterData characterData)
 
 private void AddToParty(CharacterData characterData)
 {
-    GameManager gameManager = GameManager.Instance;
-    if (gameManager != null)
-    {
-        if (gameManager.currentParty.Count < 2) // Check if there is space in the party
-        {
-            if (!gameManager.currentParty.Any(companion => companion.characterData == characterData))
-            {
-                // Find the prefab associated with the characterData and instantiate the companion
-                GameObject characterPrefab = gameManager.GetCharacterPrefab(characterData.heroID);
-                if (characterPrefab != null)
-                {
-                    Companion instantiatedCompanion = Instantiate(characterPrefab).GetComponent<Companion>();
-                    instantiatedCompanion.SetCharacterData(characterData);
-
-                    gameManager.currentParty.Add(instantiatedCompanion);
-                    Debug.Log("Added to party: " + characterData.heroID);
-                    ShowPartyMembers(); // Update UI to reflect changes
-                    CheckPartyNotEmpty();
-                }
-                else
-                {
-                    Debug.LogError("Character prefab not found for heroID: " + characterData.heroID);
-                }
-            }
-            else
-            {
-                Debug.Log("Companion already in party: " + characterData.heroID);
-            }
-        }
-        else
-        {
-            Debug.LogError("Party is full. Cannot add more companions.");
-        }
-    }
-    else
-    {
-        Debug.LogError("GameManager instance is null.");
-    }
+    GameManager.Instance.AddCharacterDataToParty(characterData);
+    ShowPartyMembers();
+    CheckPartyNotEmpty();
 }
 
 //Add more as needed
@@ -446,7 +411,7 @@ public Button forestDungeonButton;
     public void ClearParty()
     {
         // Clear the current party in GameManager
-        GameManager.Instance.ClearCurrentParty();
+       // GameManager.Instance.ClearCurrentParty();
 
         // Reset hero icons back to default
         ShowPartyMembers();
@@ -498,24 +463,21 @@ private void ShowPartyMembers()
     Image heroSlotOneImage = heroSlotOne.GetComponent<Image>();
     Image heroSlotTwoImage = heroSlotTwo.GetComponent<Image>();
 
-    if (heroSlotOneImage == null || heroSlotTwoImage == null)
-    {
-        Debug.LogError("One or both hero slots do not have an Image component.");
-        return;
-    }
-
-    // Reset slot images to default sprite
     heroSlotOneImage.sprite = defaultHeroSprite;
     heroSlotTwoImage.sprite = defaultHeroSprite;
 
-    // Assign icons to slots based on current party members
-    if (GameManager.Instance.currentParty.Count > 0)
+    List<string> partyIDs = GameManager.Instance.currentPartyHeroIDs;
+
+    if (partyIDs.Count > 0 &&
+        GameManager.Instance.characterDataDictionary.TryGetValue(partyIDs[0], out CharacterData data1))
     {
-        heroSlotOneImage.sprite = GameManager.Instance.currentParty[0].heroIcon;
+        heroSlotOneImage.sprite = data1.heroIcon;
     }
-    if (GameManager.Instance.currentParty.Count > 1)
+
+    if (partyIDs.Count > 1 &&
+        GameManager.Instance.characterDataDictionary.TryGetValue(partyIDs[1], out CharacterData data2))
     {
-        heroSlotTwoImage.sprite = GameManager.Instance.currentParty[1].heroIcon;
+        heroSlotTwoImage.sprite = data2.heroIcon;
     }
 }
 
@@ -654,54 +616,27 @@ public void PopulateInventoryList() {
     
      public void GoToBattle(string stageID)
 {
-    /*
-    // 1) (Optional) Stamina checks – keep/remove per your design
-    foreach (var companion in GameManager.Instance.currentParty)
-    {
-        if (companion.stamina < 1)
-        {
-            Debug.LogWarning($"Companion {companion.heroID} does not have enough stamina to battle.");
-            // return; // re-enable if you bring stamina back
-        }
-    }
-    */
-
-    // 2) Find stage
     StageData selectedStage = GameManager.Instance.allStagesData.Find(s => s.stageID == stageID);
+
     if (selectedStage == null)
     {
         Debug.LogError($"Stage with ID {stageID} not found.");
         return;
     }
 
-    // 3) BLOCK if stage is locked
-    if (!selectedStage.isUnlocked)
+    if (!GameManager.Instance.IsStageUnlocked(selectedStage.stageID))
     {
         Debug.Log($"Stage '{selectedStage.stageID}' is locked. Cannot enter.");
-        // Optional: show a popup/toast here instead of just logging:
-        // ShowNodeInfo($"Stage locked. Complete prior stages or requirements to unlock.");
         return;
     }
 
-    // 4) Calculate & charge step cost
     int stepCost = GameManager.Instance.GetBattleStepCost(selectedStage);
     if (!GameManager.Instance.TryPaySteps(stepCost))
     {
         Debug.Log($"Not enough steps. Need {stepCost}, have {PlayerData.Instance.inGameSteps}.");
-        // Optional popup:
-        // ShowNodeInfo($"Need {stepCost} steps to enter.");
         return;
     }
-/*
-    // 5) Proceed to battle
-    GameManager.Instance.CurrentBattleConfig = selectedStage.stageBattleConfig;
-    GameManager.Instance.currentStage = selectedStage;
-    Debug.Log($"Going to battle {selectedStage.stageID} (cost {stepCost} steps)");
 
-    GameManager.Instance.SaveCurrentParty();
-    GameManager.Instance.StartDungeonRun(selectedStage.stageID);
-    SceneManager.LoadScene(selectedStage.battleSceneName);
-*/
     GameManager.Instance.EnterStageByID(stageID);
 }
 

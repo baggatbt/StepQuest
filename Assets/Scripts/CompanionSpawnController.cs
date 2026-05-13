@@ -29,26 +29,25 @@ public class CompanionSpawnController : MonoBehaviour
     {
         if (GameManager.Instance != null && GameManager.Instance.currentParty != null)
         {
+           
             int companionIndex = 0;
-            foreach (Companion companion in GameManager.Instance.currentParty)
-            {
-                Character instantiatedCompanion = GameManager.Instance.InstantiateSelectedCompanion(companion.heroID);
-                Companion instantiatedCompanionAsCompanion = instantiatedCompanion as Companion;
 
-                if (instantiatedCompanionAsCompanion != null)
-                {
-                    instantiatedCompanionAsCompanion.SetCharacterData(companion.characterData);
-                    instantiatedCompanionAsCompanion.InitializeSkillsBasedOnLevel();
-                    SetupCompanions(instantiatedCompanionAsCompanion, companionIndex);
-                    activeCompanions.Add(instantiatedCompanionAsCompanion);
-                    instantiatedCompanionAsCompanion.isSelected = true;
-                    instantiatedCompanionAsCompanion.originalPosition = companionSpawnPoints[companionIndex].position;
-                    
+foreach (string heroID in GameManager.Instance.currentPartyHeroIDs)
+{
+    Companion instantiatedCompanion = GameManager.Instance.InstantiateSelectedCompanion(heroID);
 
-                    Debug.Log($"Companion {companion.heroID} instantiated at index {companionIndex} and {instantiatedCompanionAsCompanion.originalPosition} location");
-                }
-                companionIndex++;
-            }
+    if (instantiatedCompanion != null)
+    {
+        SetupCompanions(instantiatedCompanion, companionIndex);
+        activeCompanions.Add(instantiatedCompanion);
+        instantiatedCompanion.isSelected = true;
+        instantiatedCompanion.originalPosition = companionSpawnPoints[companionIndex].position;
+
+        Debug.Log($"Companion {heroID} instantiated for battle.");
+    }
+
+    companionIndex++;
+}
             
         }
         else

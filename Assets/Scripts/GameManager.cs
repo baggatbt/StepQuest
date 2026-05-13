@@ -20,6 +20,9 @@ public class GameManager : MonoBehaviour
     private HashSet<string> runUnlockedStageIDs = new HashSet<string>();
     public event Action OnRunUnlocksChanged;
 
+    public List<string> currentPartyHeroIDs = new List<string>();
+   
+
 
 
     public StageData currentStage; // The current stage being played
@@ -90,6 +93,7 @@ public class GameManager : MonoBehaviour
         EnsureInventorySlots();
         Debug.Log("Initial item list count: " + itemList.Count);
         InitializeStageDictionary(); // Initialize dictionary at game start
+        LoadUnlockedStages();
 
         // Initialize character data dictionary here
         foreach (var data in allCharacterData)
@@ -116,13 +120,13 @@ public class GameManager : MonoBehaviour
                     GameObject characterPrefab = GetCharacterPrefab(knightData.heroID);
                     if (characterPrefab != null)
                     {
-                        // Instantiate the companion and set its character data
-                        Companion instantiatedCompanion = Instantiate(characterPrefab).GetComponent<Companion>();
-                        instantiatedCompanion.SetCharacterData(knightData);
-                        
-                        // Add the instantiated companion to the party
-                        currentParty.Add(instantiatedCompanion);
-                        Debug.Log("Added to party: " + knightData.heroID);
+                        LoadCurrentPartyIDs();
+
+if (currentPartyHeroIDs.Count == 0 && knightData != null)
+{
+    currentPartyHeroIDs.Add(knightData.heroID);
+    SaveCurrentPartyIDs();
+}
                     }
                     else
                     {
@@ -282,10 +286,7 @@ public class GameManager : MonoBehaviour
 
 
 
-    public void ClearCurrentParty()
-    {
-        currentParty.Clear();
-    }
+    
 
     private Companion InstantiateCompanion(CompanionData data)
 {
@@ -409,7 +410,7 @@ public event Action OnRunLootChanged;
     // Backwards-compatible: if old code calls EndDungeonRun(), treat it as a failure (lose loot)
 public void EndDungeonRun()
 {
-    EndDungeonRun(false);
+   // EndDungeonRun(false);
 }
 
     public void ClearRunLoot()
@@ -435,44 +436,33 @@ public void CommitRunLootToInventory()
 
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        ReassignInventoryComponent();
-        LoadAllCompanionData();
+{
+    ReassignInventoryComponent();
+    LoadAllCompanionData();
 
-        if (PlayerPrefs.HasKey("CurrentParty"))
-            LoadCurrentParty();      // Load saved party with saved HP/EN from CharacterData
-        else
-            LoadDefaultPartyCharacter(); // First time: spawn default Knight using knightData
+    LoadCurrentPartyIDs();
+
+    if (currentPartyHeroIDs.Count == 0 && knightData != null)
+    {
+        currentPartyHeroIDs.Add(knightData.heroID);
+        SaveCurrentPartyIDs();
     }
+}
 
 
 
     public void LoadDefaultPartyCharacter()
+{
+    LoadCurrentPartyIDs();
+
+    if (currentPartyHeroIDs.Count == 0 && knightData != null)
     {
-        if (!currentParty.Any(companion => companion.characterData == knightData))
-                {
-                    // Get the prefab associated with knightData.heroID
-                    GameObject characterPrefab = GetCharacterPrefab(knightData.heroID);
-                    if (characterPrefab != null)
-                    {
-                        // Instantiate the companion and set its character data
-                        Companion instantiatedCompanion = Instantiate(characterPrefab).GetComponent<Companion>();
-                        instantiatedCompanion.SetCharacterData(knightData);
-                        
-                        // Add the instantiated companion to the party
-                        currentParty.Add(instantiatedCompanion);
-                        Debug.Log("Added to party: " + knightData.heroID);
-                    }
-                    else
-                    {
-                        Debug.LogError("Character prefab not found for heroID: " + knightData.heroID);
-                    }
-                }
-                else
-                {
-                    Debug.Log("Companion already in party: " + knightData.heroID);
-                }
+        currentPartyHeroIDs.Add(knightData.heroID);
+        SaveCurrentPartyIDs();
+
+        Debug.Log("Default party added by ID: " + knightData.heroID);
     }
+}
     
 
     public void LoadStageData()
@@ -708,38 +698,39 @@ public int GetItemCount(int itemID)
 }
 
 
-    public Character InstantiateSelectedCompanion(string heroID)
+    public Companion InstantiateSelectedCompanion(string heroID)
+{
+    GameObject prefab = GetCharacterPrefab(heroID);
+
+    if (prefab == null)
     {
-        GameObject companionObject = null;
-
-        switch (heroID)
-        {
-            case "Knight":
-                companionObject = Instantiate(knightPrefab);
-                break;
-            case "Archer":
-                companionObject = Instantiate(archerPrefab);
-                break;
-            case "Wizard":
-                companionObject = Instantiate(wizardPrefab);
-                break;
-            case "TamedGoblin":
-                companionObject = Instantiate(tamedGoblinPrefab);
-                break;
-                // Add cases for other companions
-        }
-        if (companionObject != null)
-        {
-            Companion companion = companionObject.GetComponent<Companion>();
-            if (characterDataDictionary.TryGetValue(heroID, out CharacterData characterData))
-            {
-                companion.SetCharacterData(characterData);
-            }
-            return companion;
-        }
-
+        Debug.LogError("No prefab found for heroID: " + heroID);
         return null;
     }
+
+    GameObject obj = Instantiate(prefab);
+    Companion companion = obj.GetComponent<Companion>();
+
+    if (companion == null)
+    {
+        Debug.LogError("Prefab does not have Companion component: " + heroID);
+        Destroy(obj);
+        return null;
+    }
+
+    if (characterDataDictionary.TryGetValue(heroID, out CharacterData data))
+    {
+        data.LoadData();
+        companion.SetCharacterData(data);
+        companion.InitializeSkillsBasedOnLevel();
+    }
+    else
+    {
+        Debug.LogError("No CharacterData found for heroID: " + heroID);
+    }
+
+    return companion;
+}
 
     private void CreateAndLoadCompanion(GameObject prefab, string heroID)
     {
@@ -754,56 +745,76 @@ public int GetItemCount(int itemID)
     }
 
     public void UnlockConnectedStages(Stage completedStage)
+{
+    if (completedStage == null)
     {
-        Debug.Log($"Unlocking stages connected to: {completedStage.stageID}");
-        bool hasUnlockedAny = false; // Track if any new stages were unlocked
+        Debug.LogWarning("Completed stage is null.");
+        return;
+    }
 
-        foreach (Stage connectedStage in completedStage.connectedStages)
-        {
-            if (!UnlockedStageNames.Contains(connectedStage.stageID))
-            {
-                Debug.Log($"Unlocking connected stage: {connectedStage.stageID}");
-                UnlockedStageNames.Add(connectedStage.stageID);
-                connectedStage.isUnlocked = true;
-                //  connectedStage.UpdateButtonColor();
-                hasUnlockedAny = true; // Indicate that a new stage has been unlocked
-            }
-        }
+    bool unlockedAny = false;
 
-        if (hasUnlockedAny)
+    foreach (Stage connectedStage in completedStage.connectedStages)
+    {
+        if (connectedStage == null) continue;
+
+        if (!UnlockedStageNames.Contains(connectedStage.stageID))
         {
-            SaveUnlockedStages();
+            UnlockedStageNames.Add(connectedStage.stageID);
+            unlockedAny = true;
+
+            Debug.Log("Unlocked stage: " + connectedStage.stageID);
         }
     }
+
+    if (unlockedAny)
+    {
+        SaveUnlockedStages();
+    }
+}
 
     private void SaveUnlockedStages()
-    {
-        // Convert HashSet to a List to serialize
-        List<string> unlockedStagesList = new List<string>(UnlockedStageNames);
+{
+    List<string> unlockedStagesList = new List<string>(UnlockedStageNames);
+    string json = JsonUtility.ToJson(new StageList { Stages = unlockedStagesList });
 
-        // Convert the list to a JSON string
-        string json = JsonUtility.ToJson(new StageList { Stages = unlockedStagesList });
+    PlayerPrefs.SetString("UnlockedStages", json);
+    PlayerPrefs.Save();
 
-        // Save the JSON string to PlayerPrefs
-        PlayerPrefs.SetString("UnlockedStages", json);
-        PlayerPrefs.Save();
-        Debug.Log("Unlocked stages saved.");
-    }
+    Debug.Log("Unlocked stages saved: " + string.Join(", ", unlockedStagesList));
+}
 
     private void LoadUnlockedStages()
+{
+    string json = PlayerPrefs.GetString("UnlockedStages", "");
+
+    UnlockedStageNames.Clear();
+
+    if (!string.IsNullOrEmpty(json))
     {
-        string json = PlayerPrefs.GetString("UnlockedStages", "{}");
-        if (json != "{}")
+        StageList stageList = JsonUtility.FromJson<StageList>(json);
+
+        if (stageList != null && stageList.Stages != null)
         {
-            StageList stageList = JsonUtility.FromJson<StageList>(json);
-            UnlockedStageNames = new HashSet<string>(stageList.Stages);
+            foreach (string stageID in stageList.Stages)
+            {
+                UnlockedStageNames.Add(stageID);
+            }
         }
-        else
-        {
-            // Setup default unlocked stages
-            UnlockedStageNames.Add("0"); // Default first stage unlocked
-        }
+        if (UnlockedStageNames.Count == 0)
+{
+    UnlockedStageNames.Add("1.1");
+    SaveUnlockedStages();
+}
     }
+
+    // Default first stage unlocked
+    if (UnlockedStageNames.Count == 0)
+    {
+        UnlockedStageNames.Add("1.1"); // change this to your first stage ID
+        SaveUnlockedStages();
+    }
+}
 
     public void ResetStagesOnBossDefeat()
     {
@@ -1082,7 +1093,6 @@ public int GetItemCount(int itemID)
     Debug.LogError($"[GetStageData] No StageData for id: {stageID}");
     return null;
 }
-
 public void ClearAllStageUnlockedFlags()
 {
     foreach (var sd in allStagesData) sd.isUnlocked = false;
@@ -1154,6 +1164,11 @@ public bool IsStageUnlockedForRun(string stageID)
 {
     if (!InDungeonRun) return true; // outside a run, don't gate
     return runUnlockedStageIDs.Contains(stageID);
+}
+
+public bool IsStageUnlocked(string stageID)
+{
+    return UnlockedStageNames.Contains(stageID);
 }
 
 // GameManager.cs
@@ -1509,6 +1524,84 @@ private void EnsureInventorySlots()
 
     if (inventorySlots.Count > maxInventorySlots)
         inventorySlots.RemoveRange(maxInventorySlots, inventorySlots.Count - maxInventorySlots);
+}
+
+public void AddCharacterDataToParty(CharacterData characterData)
+{
+    if (characterData == null) return;
+
+    if (currentPartyHeroIDs.Count >= 2)
+    {
+        Debug.Log("Party is full.");
+        return;
+    }
+
+    if (currentPartyHeroIDs.Contains(characterData.heroID))
+    {
+        Debug.Log(characterData.heroID + " is already in the party.");
+        return;
+    }
+
+    currentPartyHeroIDs.Add(characterData.heroID);
+    SaveCurrentPartyIDs();
+
+    Debug.Log("Added to party: " + characterData.heroID);
+}
+
+public void RemoveCharacterDataFromParty(CharacterData characterData)
+{
+    if (characterData == null) return;
+
+    currentPartyHeroIDs.Remove(characterData.heroID);
+    SaveCurrentPartyIDs();
+
+    Debug.Log("Removed from party: " + characterData.heroID);
+}
+
+public void ClearCurrentPartyIDs()
+{
+    currentPartyHeroIDs.Clear();
+    SaveCurrentPartyIDs();
+}
+
+public void SaveCurrentPartyIDs()
+{
+    string json = JsonUtility.ToJson(new SerializableStringList(currentPartyHeroIDs));
+    PlayerPrefs.SetString("CurrentPartyHeroIDs", json);
+    PlayerPrefs.Save();
+}
+
+public void LoadCurrentPartyIDs()
+{
+    string json = PlayerPrefs.GetString("CurrentPartyHeroIDs", "");
+
+    if (string.IsNullOrEmpty(json))
+    {
+        currentPartyHeroIDs = new List<string>();
+
+        // Default starter party
+        if (knightData != null)
+            currentPartyHeroIDs.Add(knightData.heroID);
+
+        SaveCurrentPartyIDs();
+        return;
+    }
+
+    SerializableStringList loaded = JsonUtility.FromJson<SerializableStringList>(json);
+    currentPartyHeroIDs = loaded != null && loaded.items != null
+        ? loaded.items
+        : new List<string>();
+}
+
+[System.Serializable]
+public class SerializableStringList
+{
+    public List<string> items;
+
+    public SerializableStringList(List<string> items)
+    {
+        this.items = items;
+    }
 }
 
 
