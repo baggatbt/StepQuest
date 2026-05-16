@@ -34,6 +34,16 @@ public TextMeshProUGUI itemNameText;
 public TextMeshProUGUI itemDescriptionText;
 public Image itemDescriptionIcon;
 
+public GameObject goldGenPanel;
+public GameObject villageGatePanel;
+public GameObject crafterBuildingPanel;
+public GameObject darkCloseOverlay;
+
+
+
+
+
+
     // References to stat UI Text elements
     public TextMeshProUGUI levelText,atkText, hpText, spText, expText, spdText, defText; 
     
@@ -67,6 +77,45 @@ public Image itemDescriptionIcon;
        
 
     }
+
+    public void CloseAllPanels()
+{
+    if (goldGenPanel != null)
+        goldGenPanel.SetActive(false);
+
+    if (villageGatePanel != null)
+        villageGatePanel.SetActive(false);
+
+    if (crafterBuildingPanel != null)
+        crafterBuildingPanel.SetActive(false);
+
+    if (darkCloseOverlay != null)
+        darkCloseOverlay.SetActive(false);
+}
+
+    public void OpenGoldGenPanel()
+{
+    CloseAllPanels();
+
+    darkCloseOverlay.SetActive(true);
+    goldGenPanel.SetActive(true);
+}
+
+public void OpenGuildGatePanel()
+{
+    CloseAllPanels();
+
+    darkCloseOverlay.SetActive(true);
+    villageGatePanel.SetActive(true);
+}
+
+public void OpenCrafterBuildingPanel()
+{
+    CloseAllPanels();
+
+    darkCloseOverlay.SetActive(true);
+    crafterBuildingPanel.SetActive(true);
+}
 
     public void ToggleConsumablesPanel()
     {
@@ -120,6 +169,8 @@ public Image itemDescriptionIcon;
             }
         }
     }
+
+
 
     void UseItem(Item item)
     {
@@ -1008,7 +1059,7 @@ public void UnlockSkillTwoForHero()
     //companionStatsPanel.SetActive(false);
 }
 
-    public GameObject goldGeneratorPanel; // Assign your main panel in the Inspector
+    
     public GameObject closeGoldPanelOverlay; // Assign your overlay panel in the Inspector
     public GameObject closeVillageGatePanelOverlay;
 
