@@ -13,21 +13,21 @@ MonoBehaviour:
   m_Name: KnightData
   m_EditorClassIdentifier: 
   heroID: Knight
-  heroLevel: 2
+  heroLevel: 5
   heroExp: 7
   skillTreePanel: {fileID: 0}
   heroIcon: {fileID: 21300000, guid: 9f6d22b89f0bf7745b60a02d60a0fe65, type: 3}
   fullHeroImage: {fileID: 21300002, guid: 3a501bb3dcbdce54ba4b1f1dd4924979, type: 3}
-  heroStatPoints: 1
-  heroSkillPoints: 1
-  attackPower: 2
-  defensePower: 3
+  heroStatPoints: 3
+  heroSkillPoints: 3
+  attackPower: 4
+  defensePower: 5
   stamina: 5
   maxStamina: 10
-  maxHealth: 15
-  health: 15
-  maxEnergy: 5
-  energy: 5
+  maxHealth: 24
+  health: 0
+  maxEnergy: 123
+  energy: 123
   speed: 4
   isUnlocked: 1
   expToLevel: 0
@@ -38,20 +38,29 @@ MonoBehaviour:
   skillFour: 0
   skillFive: 0
   skillSix: 0
-  AvailableSkills: 0100000002000000
+  AvailableSkills: 010000000200000009000000
   LockedSkills: 
-  equippedSkills: 0100000002000000
+  equippedSkills: 010000000200000009000000
   maxEquippedSkills: 3
+  knightSlashModifier: 0
+  knightPassive: 0
+  knightPath: 0
+  hasChosenLevel6Modifier: 0
+  hasChosenLevel8Passive: 0
+  hasChosenLevel10Path: 0
   classMastery:
     knightLevel: 6
-    knightXP: 1172
+    knightXP: 1316
     skillRanks:
     - skill: 1
       rank: 5
-      xp: 882
+      xp: 986
     - skill: 2
       rank: 1
       xp: 68
+    - skill: 9
+      rank: 1
+      xp: 12
   equipped:
   - slot: 2
     item: {fileID: 0}

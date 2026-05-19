@@ -13,6 +13,7 @@ public class CharacterData : ScriptableObject
     public int     heroExp;
     public GameObject skillTreePanel;
 
+
     public Sprite  heroIcon;
     public Sprite  fullHeroImage;
 
@@ -41,7 +42,16 @@ public class CharacterData : ScriptableObject
     public List<SkillType> AvailableSkills;
     public List<SkillType> LockedSkills;
     public List<SkillType> equippedSkills = new List<SkillType>();
-    public int maxEquippedSkills = 3; // Optional limit
+    public int maxEquippedSkills = 3;
+
+    [Header("Knight Progression")]
+    public KnightSlashModifier knightSlashModifier = KnightSlashModifier.None;
+    public KnightPassive knightPassive = KnightPassive.None;
+    public KnightPath knightPath = KnightPath.None;
+
+    public bool hasChosenLevel6Modifier;
+    public bool hasChosenLevel8Passive;
+    public bool hasChosenLevel10Path;
 
     public ClassMastery classMastery = new ClassMastery();
 
