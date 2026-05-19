@@ -324,8 +324,11 @@ public class CrafterGridController : MonoBehaviour
             return;
         }
 
-        if (def.isMovable)
-            Debug.Log($"Clicked item: {def.displayName}");
+                if (def.isMovable)
+        {
+            SendItemToInventoryAt(index);
+            return;
+        }
     }
 
     private void TryGenerateFrom(int generatorIndex)
@@ -509,6 +512,58 @@ public class CrafterGridController : MonoBehaviour
         Save();
         RefreshVisuals();
     }
+
+    public void SendItemToInventoryAt(int index)
+{
+    if (!IsValidIndex(index))
+        return;
+
+    CrafterEntityType type = gridState[index];
+
+    if (type == CrafterEntityType.None)
+        return;
+
+    CrafterEntityDefinition def = entityDatabase.Get(type);
+
+    if (def == null)
+    {
+        Debug.LogWarning($"No CrafterEntityDefinition found for {type}.");
+        return;
+    }
+
+    // Do not allow generators, enemies, chest, etc. to be sent to inventory.
+    if (!def.isMovable || def.isGenerator || def.isEnemy)
+    {
+        Debug.Log($"Cannot send {def.displayName} to inventory.");
+        return;
+    }
+
+    if (!def.canExportToInventory)
+    {
+        Debug.Log($"{def.displayName} cannot be exported to inventory.");
+        return;
+    }
+
+    if (def.inventoryItem == null)
+    {
+        Debug.LogWarning($"{def.displayName} has no inventory item assigned.");
+        return;
+    }
+
+    int amountToAdd = Mathf.Max(1, def.inventoryAmount);
+
+    for (int i = 0; i < amountToAdd; i++)
+    {
+        GameManager.Instance.AddItem(def.inventoryItem);
+    }
+
+    gridState[index] = CrafterEntityType.None;
+
+    Save();
+    RefreshVisuals();
+
+    Debug.Log($"Sent {def.displayName} x{amountToAdd} to inventory.");
+}
 
     public bool TryStoreGridItemInChest(int gridIndex, int chestSlotIndex)
     {

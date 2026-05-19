@@ -387,6 +387,9 @@ public event Action OnRunLootChanged;
         return;
     }
 
+    if (amount <= 0)
+        return;
+
     if (InDungeonRun)
     {
         currentRunLoot.AddItem(item, amount);
@@ -395,15 +398,8 @@ public event Action OnRunLootChanged;
         return;
     }
 
-    bool success = TryAddToInventory(item.itemID, amount);
-
-    if (!success)
-    {
-        Debug.LogWarning($"[GameManager] Could not add loot item {item.itemName}; inventory full.");
-        return;
-    }
-
-    Debug.Log($"[GameManager] Added loot item to slot inventory: {item.itemName} x{amount}");
+    AddItem(item, amount);
+    Debug.Log($"[GameManager] Added loot item to inventory: {item.itemName} x{amount}");
 }
 
 
@@ -425,9 +421,7 @@ public void CommitRunLootToInventory()
     {
         if (stack.item == null) continue;
 
-        bool success = TryAddToInventory(stack.item.itemID, stack.quantity);
-        if (!success)
-            Debug.LogWarning($"[RunLoot] Failed to add {stack.item.itemName} x{stack.quantity} to inventory.");
+        AddItem(stack.item, stack.quantity);
     }
 
     currentRunLoot.Clear();
@@ -531,7 +525,17 @@ public void CommitRunLootToInventory()
 
     public void AddItem(Item newItem)
 {
-    Debug.Log("[GameManager] Adding item to inventory: " + (newItem != null ? newItem.itemName : "null"));
+    AddItem(newItem, 1);
+}
+
+/// <summary>
+/// Adds an item to the player's real inventory.
+/// itemList is now the source of truth.
+/// inventorySlots is kept only as a legacy mirror for older UI/scripts.
+/// </summary>
+public void AddItem(Item newItem, int amount)
+{
+    Debug.Log("[GameManager] Adding item to inventory: " + (newItem != null ? newItem.itemName : "null") + " x" + amount);
 
     if (newItem == null)
     {
@@ -539,29 +543,46 @@ public void CommitRunLootToInventory()
         return;
     }
 
+    if (amount <= 0)
+        return;
+
     if (itemList == null)
         itemList = new List<Item>();
 
-    if (itemList.Count >= maxInventorySlots)
-    {
-        Debug.Log("Inventory is full!");
-        return;
-    }
-
+    // Equipment is unique and never stacks.
     if (newItem is Equipment equipment)
     {
-        Equipment equipmentToAdd = equipment;
-
-        if (!equipmentToAdd.hasBeenRolled)
+        for (int i = 0; i < amount; i++)
         {
-            equipmentToAdd = Instantiate(equipment);
-            equipmentToAdd.RollNewStats();
+            if (itemList.Count >= maxInventorySlots)
+            {
+                Debug.LogWarning("Inventory is full! Could not add equipment: " + equipment.itemName);
+                break;
+            }
+
+            Equipment equipmentToAdd;
+
+            // If this is already a rolled instance, preserve it when adding one item.
+            // This matters when unequipping an item back into inventory.
+            if (equipment.hasBeenRolled && amount == 1)
+            {
+                equipmentToAdd = equipment;
+            }
+            else
+            {
+                equipmentToAdd = Instantiate(equipment);
+
+                if (!equipmentToAdd.hasBeenRolled)
+                    equipmentToAdd.RollNewStats();
+            }
+
+            equipmentToAdd.quantity = 1;
+            itemList.Add(equipmentToAdd);
         }
 
-        equipmentToAdd.quantity = 1;
-        itemList.Add(equipmentToAdd);
-
         SaveInventory();
+        SyncInventorySlotsFromItemList();
+        OnInventoryChanged?.Invoke();
 
         if (inventory != null)
             inventory.UpdateInventoryUI();
@@ -569,19 +590,29 @@ public void CommitRunLootToInventory()
         return;
     }
 
-    Item existingStack = itemList.Find(i => i.itemID == newItem.itemID && i.IsStackable());
+    // Stackable items should stack by itemID.
+    Item existingStack = itemList.Find(i => i != null && i.itemID == newItem.itemID && i.IsStackable());
 
     if (existingStack != null)
     {
-        existingStack.quantity++;
+        existingStack.quantity += amount;
     }
     else
     {
-        newItem.quantity = 1;
-        itemList.Add(newItem);
+        if (itemList.Count >= maxInventorySlots)
+        {
+            Debug.LogWarning("Inventory is full! Could not add item: " + newItem.itemName);
+            return;
+        }
+
+        Item itemToAdd = Instantiate(newItem);
+        itemToAdd.quantity = amount;
+        itemList.Add(itemToAdd);
     }
 
     SaveInventory();
+    SyncInventorySlotsFromItemList();
+    OnInventoryChanged?.Invoke();
 
     if (inventory != null)
         inventory.UpdateInventoryUI();
@@ -603,47 +634,61 @@ public void CommitRunLootToInventory()
     if (amount <= 0)
         return true;
 
-    if (!HasItem(itemID, amount))
-        return false;
+    if (itemList == null)
+        itemList = new List<Item>();
 
     int remaining = amount;
 
-    for (int i = 0; i < inventorySlots.Count; i++)
+    for (int i = itemList.Count - 1; i >= 0; i--)
     {
-        InventorySlotData slot = inventorySlots[i];
-        if (slot.IsEmpty || slot.itemID != itemID)
+        Item item = itemList[i];
+
+        if (item == null || item.itemID != itemID)
             continue;
 
-        int take = Mathf.Min(slot.quantity, remaining);
-        slot.quantity -= take;
-        remaining -= take;
+        if (item is Equipment)
+        {
+            // Equipment is unique. Removing 1 removes the whole item.
+            itemList.RemoveAt(i);
+            remaining -= 1;
+        }
+        else
+        {
+            int take = Mathf.Min(item.quantity, remaining);
+            item.quantity -= take;
+            remaining -= take;
 
-        if (slot.quantity <= 0)
-            slot.Clear();
+            if (item.quantity <= 0)
+                itemList.RemoveAt(i);
+        }
 
         if (remaining <= 0)
             break;
     }
 
+    if (remaining > 0)
+    {
+        Debug.LogWarning($"[GameManager] Tried to remove item ID {itemID} x{amount}, but only removed {amount - remaining}.");
+        return false;
+    }
+
     SaveInventory();
-    inventory?.UpdateInventoryUI();
+    SyncInventorySlotsFromItemList();
+    OnInventoryChanged?.Invoke();
+
+    if (inventory != null)
+        inventory.UpdateInventoryUI();
+
     return true;
 }
-
 
 public bool HasItem(int itemID, int amount)
 {
     if (amount <= 0)
         return true;
 
-    int total = 0;
-
-    for (int i = 0; i < inventorySlots.Count; i++)
-    {
-        InventorySlotData slot = inventorySlots[i];
-        if (!slot.IsEmpty && slot.itemID == itemID)
-            total += slot.quantity;
-    }
+    int total = GetItemCount(itemID);
+    Debug.Log($"[GameManager] HasItem check | Needed ID: {itemID} | Needed Qty: {amount} | Found Qty: {total}");
 
     return total >= amount;
 }
@@ -660,6 +705,8 @@ public void RemoveItem(Item item, int quantity)
     RemoveItem(item.itemID, quantity);
 }
 
+
+
     [Serializable]
 private class InventorySlotContainer
 {
@@ -670,6 +717,9 @@ public void SaveInventory()
 {
     InventorySaveData saveData = new InventorySaveData();
 
+    if (itemList == null)
+        itemList = new List<Item>();
+
     foreach (Item item in itemList)
     {
         if (item == null)
@@ -678,7 +728,7 @@ public void SaveInventory()
         InventoryItemSaveData itemData = new InventoryItemSaveData
         {
             itemID = item.itemID,
-            quantity = item.quantity
+            quantity = Mathf.Max(1, item.quantity)
         };
 
         if (item is Equipment equipment)
@@ -706,9 +756,12 @@ public void SaveInventory()
 {
     string filePath = $"{Application.persistentDataPath}/inventory.json";
 
+    itemList.Clear();
+
     if (!System.IO.File.Exists(filePath))
     {
         Debug.Log("No inventory save file found at: " + filePath);
+        SyncInventorySlotsFromItemList();
 
         if (inventory != null)
             inventory.UpdateInventoryUI();
@@ -722,10 +775,9 @@ public void SaveInventory()
     if (saveData == null || saveData.items == null)
     {
         Debug.LogError("Failed to parse inventory data.");
+        SyncInventorySlotsFromItemList();
         return;
     }
-
-    itemList.Clear();
 
     foreach (InventoryItemSaveData itemData in saveData.items)
     {
@@ -750,17 +802,23 @@ public void SaveInventory()
                 itemData.speedBonus
             );
 
+            loadedEquipment.quantity = 1;
             itemList.Add(loadedEquipment);
         }
         else
         {
-            template.quantity = itemData.quantity;
-            itemList.Add(template);
+            Item loadedItem = Instantiate(template);
+            loadedItem.quantity = Mathf.Max(1, itemData.quantity);
+            itemList.Add(loadedItem);
         }
     }
 
+    SyncInventorySlotsFromItemList();
+
     if (inventory != null)
         inventory.UpdateInventoryUI();
+
+    OnInventoryChanged?.Invoke();
 
     Debug.Log("Inventory loaded.");
 }
@@ -780,13 +838,17 @@ public void SaveInventory()
     /// <summary>Return how many of this item the player has.</summary>
 public int GetItemCount(int itemID)
 {
+    if (itemList == null)
+        return 0;
+
     int total = 0;
 
-    for (int i = 0; i < inventorySlots.Count; i++)
+    foreach (Item item in itemList)
     {
-        var slot = inventorySlots[i];
-        if (!slot.IsEmpty && slot.itemID == itemID)
-            total += slot.quantity;
+        if (item == null) continue;
+
+        if (item.itemID == itemID)
+            total += Mathf.Max(1, item.quantity);
     }
 
     return total;
@@ -961,7 +1023,12 @@ public int GetItemCount(int itemID)
         {
             System.IO.File.Delete(filePath);
             itemList.Clear();
-            inventory.UpdateInventoryUI();
+            SyncInventorySlotsFromItemList();
+
+            if (inventory != null)
+                inventory.UpdateInventoryUI();
+
+            OnInventoryChanged?.Invoke();
             Debug.Log("Saved inventory data deleted.");
         }
         else
@@ -1506,50 +1573,32 @@ private void SetCanvasGroupInteractable(Scene scene, bool enable)
 
 public bool TryAddToInventory(int itemID, int amount = 1)
 {
-    if (amount <= 0) return false;
+    Item template = FindItemInMasterList(itemID);
 
-    // stack first
-    for (int i = 0; i < inventorySlots.Count; i++)
+    if (template == null)
     {
-        if (!inventorySlots[i].IsEmpty && inventorySlots[i].itemID == itemID)
-        {
-            inventorySlots[i].quantity += amount;
-            SaveInventory();
-            OnInventoryChanged?.Invoke();
-            inventory?.UpdateInventoryUI();
-            return true;
-        }
+        Debug.LogWarning("[GameManager] TryAddToInventory failed. No item with ID: " + itemID);
+        return false;
     }
 
-    // then empty slot
-    for (int i = 0; i < inventorySlots.Count; i++)
-    {
-        if (inventorySlots[i].IsEmpty)
-        {
-            inventorySlots[i].itemID = itemID;
-            inventorySlots[i].quantity = amount;
-            SaveInventory();
-            OnInventoryChanged?.Invoke();
-            inventory?.UpdateInventoryUI();
-            return true;
-        }
-    }
-
-    return false;
+    AddItem(template, amount);
+    return true;
 }
 
 
 
 public Item GetItemInInventorySlot(int slotIndex)
 {
-    if (slotIndex < 0 || slotIndex >= inventorySlots.Count) return null;
-    var slot = inventorySlots[slotIndex];
-    if (slot.IsEmpty) return null;
-    return FindItemInMasterList(slot.itemID);
+    if (itemList == null) return null;
+    if (slotIndex < 0 || slotIndex >= itemList.Count) return null;
+
+    return itemList[slotIndex];
 }
 
 public InventorySlotData GetInventorySlot(int index)
 {
+    SyncInventorySlotsFromItemList();
+
     if (index < 0 || index >= inventorySlots.Count)
         return null;
 
@@ -1558,67 +1607,83 @@ public InventorySlotData GetInventorySlot(int index)
 
 public bool TryAddToInventoryAtSlot(int itemID, int slotIndex, int amount = 1)
 {
-    if (slotIndex < 0 || slotIndex >= inventorySlots.Count)
+    // itemList is now the source of truth. Slot index is treated as a UI preference only.
+    // For now, this adds normally and then mirrors the result to inventorySlots.
+    Item template = FindItemInMasterList(itemID);
+
+    if (template == null)
         return false;
 
-    if (amount <= 0)
-        return false;
-
-    InventorySlotData slot = inventorySlots[slotIndex];
-
-    // Empty slot
-    if (slot.IsEmpty)
-    {
-        slot.Set(itemID, amount);
-        SaveInventory();
-        inventory?.UpdateInventoryUI();
-        return true;
-    }
-
-    // Matching stack
-    if (slot.itemID == itemID)
-    {
-        slot.quantity += amount;
-        SaveInventory();
-        inventory?.UpdateInventoryUI();
-        return true;
-    }
-
-    return false;
+    AddItem(template, amount);
+    return true;
 }
 
 public bool TryRemoveFromInventorySlot(int slotIndex, int amount = 1)
 {
-    if (slotIndex < 0 || slotIndex >= inventorySlots.Count)
+    if (itemList == null) return false;
+    if (slotIndex < 0 || slotIndex >= itemList.Count) return false;
+    if (amount <= 0) return false;
+
+    Item item = itemList[slotIndex];
+
+    if (item == null)
         return false;
 
-    if (amount <= 0)
-        return false;
+    if (item is Equipment)
+    {
+        itemList.RemoveAt(slotIndex);
+    }
+    else
+    {
+        if (item.quantity < amount)
+            return false;
 
-    InventorySlotData slot = inventorySlots[slotIndex];
-    if (slot.IsEmpty || slot.quantity < amount)
-        return false;
+        item.quantity -= amount;
 
-    slot.quantity -= amount;
-
-    if (slot.quantity <= 0)
-        slot.Clear();
+        if (item.quantity <= 0)
+            itemList.RemoveAt(slotIndex);
+    }
 
     SaveInventory();
-    inventory?.UpdateInventoryUI();
+    SyncInventorySlotsFromItemList();
+    OnInventoryChanged?.Invoke();
+
+    if (inventory != null)
+        inventory.UpdateInventoryUI();
+
     return true;
 }
 
 private void EnsureInventorySlots()
 {
+    if (itemList == null)
+        itemList = new List<Item>();
+
+    SyncInventorySlotsFromItemList();
+}
+
+private void SyncInventorySlotsFromItemList()
+{
     if (inventorySlots == null)
         inventorySlots = new List<InventorySlotData>();
 
+    inventorySlots.Clear();
+
+    if (itemList != null)
+    {
+        foreach (Item item in itemList)
+        {
+            InventorySlotData slot = new InventorySlotData();
+
+            if (item != null)
+                slot.Set(item.itemID, Mathf.Max(1, item.quantity));
+
+            inventorySlots.Add(slot);
+        }
+    }
+
     while (inventorySlots.Count < maxInventorySlots)
         inventorySlots.Add(new InventorySlotData());
-
-    if (inventorySlots.Count > maxInventorySlots)
-        inventorySlots.RemoveRange(maxInventorySlots, inventorySlots.Count - maxInventorySlots);
 }
 
 public void AddCharacterDataToParty(CharacterData characterData)

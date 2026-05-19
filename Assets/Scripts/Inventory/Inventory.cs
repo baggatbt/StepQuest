@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+
 public class Inventory : MonoBehaviour
 {
     [Header("Inventory UI")]
@@ -7,6 +8,9 @@ public class Inventory : MonoBehaviour
     [SerializeField] private GameObject slotPrefab;
     [SerializeField] private Canvas rootCanvas;
     [SerializeField] private GameObject inventoryPanel;
+
+    [Header("Canvas Group Optional")]
+    [SerializeField] private CanvasGroup inventoryCanvasGroup;
 
     [Header("Optional Equip Support")]
     [SerializeField] private EquipmentManager equipmentManager;
@@ -17,14 +21,26 @@ public class Inventory : MonoBehaviour
     {
         if (GameManager.Instance != null)
             GameManager.Instance.inventory = this;
+
+        if (inventoryCanvasGroup == null && inventoryPanel != null)
+            inventoryCanvasGroup = inventoryPanel.GetComponent<CanvasGroup>();
     }
 
     private void Start()
     {
-        if (GameManager.Instance != null)
-            GameManager.Instance.LoadInventory();
+        // Important:
+        // GameManager should already load inventory in its own Start.
+        // This small delayed refresh helps avoid script execution order issues.
+        Invoke(nameof(DelayedRefresh), 0.05f);
+    }
 
-        HideInventory();
+    private void OnEnable()
+    {
+        Invoke(nameof(DelayedRefresh), 0.05f);
+    }
+
+    private void DelayedRefresh()
+    {
         UpdateInventoryUI();
     }
 
@@ -51,29 +67,66 @@ public class Inventory : MonoBehaviour
     {
         if (inventoryPanel != null)
             inventoryPanel.SetActive(true);
+
+        if (inventoryCanvasGroup != null)
+        {
+            inventoryCanvasGroup.alpha = 1f;
+            inventoryCanvasGroup.interactable = true;
+            inventoryCanvasGroup.blocksRaycasts = true;
+        }
         else if (inventoryUIRoot != null)
+        {
             inventoryUIRoot.gameObject.SetActive(true);
+        }
     }
 
     private void HideInventory()
     {
-        /*
-        if (inventoryPanel != null)
+        // Since your inventory uses CanvasGroup alpha instead of SetActive,
+        // we hide it this way.
+        if (inventoryCanvasGroup != null)
+        {
+            inventoryCanvasGroup.alpha = 0f;
+            inventoryCanvasGroup.interactable = false;
+            inventoryCanvasGroup.blocksRaycasts = false;
+        }
+        else if (inventoryPanel != null)
+        {
             inventoryPanel.SetActive(false);
+        }
         else if (inventoryUIRoot != null)
+        {
             inventoryUIRoot.gameObject.SetActive(false);
-            */
+        }
     }
 
     public void UpdateInventoryUI()
     {
-        if (inventoryUIRoot == null || GameManager.Instance == null)
+        if (inventoryUIRoot == null)
+        {
+            Debug.LogWarning("[Inventory] inventoryUIRoot is not assigned.");
             return;
+        }
+
+        if (slotPrefab == null)
+        {
+            Debug.LogWarning("[Inventory] slotPrefab is not assigned.");
+            return;
+        }
+
+        if (GameManager.Instance == null)
+        {
+            Debug.LogWarning("[Inventory] GameManager.Instance is null.");
+            return;
+        }
 
         foreach (Transform child in inventoryUIRoot)
+        {
             Destroy(child.gameObject);
+        }
 
         int totalSlots = GameManager.Instance.maxInventorySlots;
+        int itemCount = GameManager.Instance.itemList != null ? GameManager.Instance.itemList.Count : 0;
 
         for (int i = 0; i < totalSlots; i++)
         {
@@ -81,6 +134,7 @@ public class Inventory : MonoBehaviour
             slotObj.SetActive(true);
 
             InventorySlotUI slotUI = slotObj.GetComponent<InventorySlotUI>();
+
             if (slotUI == null)
             {
                 Debug.LogError($"Inventory slot prefab missing InventorySlotUI on {slotObj.name}");
@@ -89,66 +143,48 @@ public class Inventory : MonoBehaviour
 
             slotUI.Setup(this, i);
 
-            InventorySlotData slotData = GameManager.Instance.GetInventorySlot(i);
-            if (slotData == null || slotData.IsEmpty)
+            // Empty slot
+            if (i >= itemCount)
             {
                 slotUI.ClearVisual();
                 continue;
             }
 
-            Item item = GameManager.Instance.FindItemInMasterList(slotData.itemID);
+            Item item = GameManager.Instance.itemList[i];
+
             if (item == null)
             {
                 slotUI.ClearVisual();
                 continue;
             }
 
-            slotUI.Bind(item, slotData.quantity, rootCanvas);
+            slotUI.Bind(item, item.quantity, rootCanvas);
 
-            // Optional: if inventory slot prefab has a button on the root, let tap equip in equip mode
+            // Optional equip mode
             if (pendingEquipSlot.HasValue && equipmentManager != null && item is Equipment eq)
             {
-                Button button = slotObj.GetComponent<UnityEngine.UI.Button>();
+                Button button = slotObj.GetComponent<Button>();
+
                 if (button != null)
                 {
                     button.onClick.RemoveAllListeners();
 
                     if (eq.equipmentType == pendingEquipSlot.Value)
                     {
+                        Equipment equipmentToEquip = eq;
+
                         button.onClick.AddListener(() =>
                         {
-                            equipmentManager.Equip(eq);
+                            equipmentManager.Equip(equipmentToEquip);
                             pendingEquipSlot = null;
                             HideInventory();
+                            UpdateInventoryUI();
                         });
                     }
                 }
             }
         }
+
+        Debug.Log($"[Inventory] UI refreshed. Items shown: {itemCount}");
     }
-
-    /*
-    public bool TryStoreGridItemInInventory(int gridIndex, int inventorySlotIndex)
-    {
-        
-        if (GameManager.Instance == null)
-            return false;
-
-        CrafterGridController crafterGrid = FindObjectOfType<CrafterGridController>();
-        if (crafterGrid == null)
-        {
-            Debug.LogWarning("No CrafterGridController found in scene.");
-            return false;
-        }
-
-        bool success = crafterGrid.TryMoveGridItemToInventory(gridIndex, inventorySlotIndex);
-
-        if (success)
-            UpdateInventoryUI();
-
-        return success;
-        
-    }
-    */
-    
 }

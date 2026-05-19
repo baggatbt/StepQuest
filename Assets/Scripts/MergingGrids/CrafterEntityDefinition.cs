@@ -8,6 +8,11 @@ public class CrafterEntityDefinition : ScriptableObject
     public string displayName;
     public int inventoryItemID = -1;
 
+    [Header("Inventory Export")]
+    public Item inventoryItem;
+    public int inventoryAmount = 1;
+    public bool canExportToInventory = true;
+
     [Header("Visuals")]
     public Sprite iconSprite;
 
