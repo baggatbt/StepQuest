@@ -8,8 +8,6 @@ public enum ItemType
     Quest,
     MaterialItem,
     CraftableItem,
-
-    // Add other types as needed
 }
 
 [CreateAssetMenu(fileName = "New Item", menuName = "Inventory/Item")]
@@ -19,13 +17,18 @@ public class Item : ScriptableObject
     public string itemName;
     public Sprite itemIcon;
     public int itemID;
-    public string itemDescription;
-    public int quantity = 1; // Default quantity
+    [TextArea] public string itemDescription;
+
+    public int quantity = 1;
+
     public int stepCostToProduce;
     public List<MaterialRequirement> materialRequirements;
+
+    public virtual bool IsStackable()
+    {
+        return itemType != ItemType.Equipment;
+    }
 }
-
-
 
 [System.Serializable]
 public class MaterialRequirement
@@ -33,4 +36,3 @@ public class MaterialRequirement
     public MaterialItem material;
     public int quantity;
 }
-

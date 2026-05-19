@@ -531,23 +531,60 @@ public void CommitRunLootToInventory()
 
     public void AddItem(Item newItem)
 {
+    Debug.Log("[GameManager] Adding item to inventory: " + (newItem != null ? newItem.itemName : "null"));
+
     if (newItem == null)
     {
         Debug.LogError("Attempted to add a null item to the inventory.");
         return;
     }
 
-    EnsureInventorySlots();
+    if (itemList == null)
+        itemList = new List<Item>();
 
-    bool success = TryAddToInventory(newItem.itemID, 1);
-
-    if (!success)
+    if (itemList.Count >= maxInventorySlots)
     {
         Debug.Log("Inventory is full!");
         return;
     }
 
-    Debug.Log($"[GameManager] Added item to slot inventory: {newItem.itemName} (ID {newItem.itemID})");
+    if (newItem is Equipment equipment)
+    {
+        Equipment equipmentToAdd = equipment;
+
+        if (!equipmentToAdd.hasBeenRolled)
+        {
+            equipmentToAdd = Instantiate(equipment);
+            equipmentToAdd.RollNewStats();
+        }
+
+        equipmentToAdd.quantity = 1;
+        itemList.Add(equipmentToAdd);
+
+        SaveInventory();
+
+        if (inventory != null)
+            inventory.UpdateInventoryUI();
+
+        return;
+    }
+
+    Item existingStack = itemList.Find(i => i.itemID == newItem.itemID && i.IsStackable());
+
+    if (existingStack != null)
+    {
+        existingStack.quantity++;
+    }
+    else
+    {
+        newItem.quantity = 1;
+        itemList.Add(newItem);
+    }
+
+    SaveInventory();
+
+    if (inventory != null)
+        inventory.UpdateInventoryUI();
 }
 
     public Item FindItemInMasterList(int id)
@@ -611,6 +648,18 @@ public bool HasItem(int itemID, int amount)
     return total >= amount;
 }
 
+public bool HasItem(Item item, int quantity)
+{
+    if (item == null) return false;
+    return HasItem(item.itemID, quantity);
+}
+
+public void RemoveItem(Item item, int quantity)
+{
+    if (item == null) return;
+    RemoveItem(item.itemID, quantity);
+}
+
     [Serializable]
 private class InventorySlotContainer
 {
@@ -619,55 +668,101 @@ private class InventorySlotContainer
 
 public void SaveInventory()
 {
-    EnsureInventorySlots();
+    InventorySaveData saveData = new InventorySaveData();
 
-    InventorySlotContainer container = new InventorySlotContainer
+    foreach (Item item in itemList)
     {
-        Slots = inventorySlots
-    };
+        if (item == null)
+            continue;
 
-    string json = JsonUtility.ToJson(container, true);
+        InventoryItemSaveData itemData = new InventoryItemSaveData
+        {
+            itemID = item.itemID,
+            quantity = item.quantity
+        };
+
+        if (item is Equipment equipment)
+        {
+            itemData.isEquipment = true;
+            itemData.uniqueInstanceId = equipment.uniqueInstanceId;
+
+            itemData.attackBonus = equipment.attackBonus;
+            itemData.defenseBonus = equipment.defenseBonus;
+            itemData.maxHealthBonus = equipment.maxHealthBonus;
+            itemData.maxEnergyBonus = equipment.maxEnergyBonus;
+            itemData.speedBonus = equipment.speedBonus;
+        }
+
+        saveData.items.Add(itemData);
+    }
+
+    string json = JsonUtility.ToJson(saveData, true);
     System.IO.File.WriteAllText($"{Application.persistentDataPath}/inventory.json", json);
+
     Debug.Log("Inventory saved.");
 }
 
     public void LoadInventory()
 {
-    EnsureInventorySlots();
-
     string filePath = $"{Application.persistentDataPath}/inventory.json";
 
-    if (System.IO.File.Exists(filePath))
-    {
-        string json = System.IO.File.ReadAllText(filePath);
-        InventorySlotContainer container = JsonUtility.FromJson<InventorySlotContainer>(json);
-
-        if (container != null && container.Slots != null)
-        {
-            inventorySlots = container.Slots;
-            EnsureInventorySlots();
-
-            Debug.Log("[GameManager] Loaded slot-based inventory:");
-            for (int i = 0; i < inventorySlots.Count; i++)
-            {
-                var slot = inventorySlots[i];
-                Debug.Log($"Slot {i}: itemID={slot.itemID}, qty={slot.quantity}");
-            }
-
-            OnInventoryChanged?.Invoke();
-            inventory?.UpdateInventoryUI();
-            return;
-        }
-
-        Debug.LogError("Failed to parse slot-based inventory data.");
-    }
-    else
+    if (!System.IO.File.Exists(filePath))
     {
         Debug.Log("No inventory save file found at: " + filePath);
+
+        if (inventory != null)
+            inventory.UpdateInventoryUI();
+
+        return;
     }
 
-    EnsureInventorySlots();
-    inventory?.UpdateInventoryUI();
+    string json = System.IO.File.ReadAllText(filePath);
+    InventorySaveData saveData = JsonUtility.FromJson<InventorySaveData>(json);
+
+    if (saveData == null || saveData.items == null)
+    {
+        Debug.LogError("Failed to parse inventory data.");
+        return;
+    }
+
+    itemList.Clear();
+
+    foreach (InventoryItemSaveData itemData in saveData.items)
+    {
+        Item template = FindItemInMasterList(itemData.itemID);
+
+        if (template == null)
+        {
+            Debug.LogWarning("Could not find item with ID: " + itemData.itemID);
+            continue;
+        }
+
+        if (itemData.isEquipment && template is Equipment equipmentTemplate)
+        {
+            Equipment loadedEquipment = Instantiate(equipmentTemplate);
+
+            loadedEquipment.LoadRolledData(
+                itemData.uniqueInstanceId,
+                itemData.attackBonus,
+                itemData.defenseBonus,
+                itemData.maxHealthBonus,
+                itemData.maxEnergyBonus,
+                itemData.speedBonus
+            );
+
+            itemList.Add(loadedEquipment);
+        }
+        else
+        {
+            template.quantity = itemData.quantity;
+            itemList.Add(template);
+        }
+    }
+
+    if (inventory != null)
+        inventory.UpdateInventoryUI();
+
+    Debug.Log("Inventory loaded.");
 }
 
     [Serializable]
@@ -1588,6 +1683,7 @@ public void LoadCurrentPartyIDs()
     }
 
     SerializableStringList loaded = JsonUtility.FromJson<SerializableStringList>(json);
+
     currentPartyHeroIDs = loaded != null && loaded.items != null
         ? loaded.items
         : new List<string>();
@@ -1604,5 +1700,26 @@ public class SerializableStringList
     }
 }
 
+[System.Serializable]
+private class InventorySaveData
+{
+    public List<InventoryItemSaveData> items = new List<InventoryItemSaveData>();
+}
+
+[System.Serializable]
+private class InventoryItemSaveData
+{
+    public int itemID;
+    public int quantity;
+
+    public bool isEquipment;
+    public string uniqueInstanceId;
+
+    public int attackBonus;
+    public int defenseBonus;
+    public int maxHealthBonus;
+    public int maxEnergyBonus;
+    public int speedBonus;
+}
 
 }

@@ -1,10 +1,29 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Craftable Item", menuName = "Inventory/Craftable Item")]
+[CreateAssetMenu(fileName = "New Craftable Item", menuName = "Crafting/Craftable Item")]
 public class CraftableItem : Item
 {
-   // public List<MaterialRequirement> materialRequirements;
-    // Other properties specific to the craftable item...
+    [Header("Craft Result")]
+    public Item craftedItemResult;
+    public Equipment craftedEquipmentResult;
+
+    private void OnValidate()
+    {
+        itemType = ItemType.CraftableItem;
+    }
+
+    public bool CraftsEquipment()
+    {
+        return craftedEquipmentResult != null;
+    }
+
+    public Item GetNormalCraftResult()
+    {
+        return craftedItemResult;
+    }
+
+    public Equipment GetEquipmentCraftResult()
+    {
+        return craftedEquipmentResult;
+    }
 }

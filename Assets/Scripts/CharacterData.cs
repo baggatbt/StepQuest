@@ -103,17 +103,32 @@ public class CharacterData : ScriptableObject
     }
 
     private void ApplyStatBonuses(Equipment eq)
-    {
-        attackPower  += eq.attackBonus;
-        defensePower += eq.defenseBonus;
-        // add more stats here if your Equipment supplies them
-    }
+{
+    attackPower += eq.attackBonus;
+    defensePower += eq.defenseBonus;
 
-    private void RemoveStatBonuses(Equipment eq)
-    {
-        attackPower  -= eq.attackBonus;
-        defensePower -= eq.defenseBonus;
-    }
+    maxHealth += eq.maxHealthBonus;
+    health += eq.maxHealthBonus;
+
+    maxEnergy += eq.maxEnergyBonus;
+    energy += eq.maxEnergyBonus;
+
+    speed += eq.speedBonus;
+}
+
+private void RemoveStatBonuses(Equipment eq)
+{
+    attackPower -= eq.attackBonus;
+    defensePower -= eq.defenseBonus;
+
+    maxHealth -= eq.maxHealthBonus;
+    health = Mathf.Clamp(health - eq.maxHealthBonus, 1, maxHealth);
+
+    maxEnergy -= eq.maxEnergyBonus;
+    energy = Mathf.Clamp(energy - eq.maxEnergyBonus, 0, maxEnergy);
+
+    speed -= eq.speedBonus;
+}
 
     #endregion
     //────────────────────────────────────────────────────────────────

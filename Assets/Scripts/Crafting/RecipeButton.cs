@@ -1,3 +1,4 @@
+/*
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -122,3 +123,4 @@ public class RecipeButton : MonoBehaviour
         return minCount;
     }
 }
+*/

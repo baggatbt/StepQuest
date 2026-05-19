@@ -35,33 +35,55 @@ public class EquipmentManager : MonoBehaviour
     #region Public API (called by inventory buttons, etc.)
 
     public void Equip(Equipment equipment)
+{
+    if (Current == null)
     {
-        if (Current == null)
-        {
-            Debug.LogWarning("No CharacterData selected – can’t equip.");
-            return;
-        }
-
-        Debug.Log($"Equip {equipment.itemName}");
-        Current.EquipItem(equipment);                     // NEW: goes straight to CharacterData
-        GameManager.Instance.itemList.Remove(equipment); // remove from inventory
-        UpdateUI();
-        OnEquipmentChanged?.Invoke(Current); //Updates hero stats right away
+        Debug.LogWarning("No CharacterData selected – can’t equip.");
+        return;
     }
+
+    if (equipment == null)
+    {
+        Debug.LogWarning("Tried to equip null equipment.");
+        return;
+    }
+
+    Debug.Log($"Equip {equipment.itemName}");
+
+    Current.EquipItem(equipment);
+
+    GameManager.Instance.itemList.Remove(equipment);
+
+    Current.SaveData();
+    GameManager.Instance.SaveInventory();
+
+    UpdateUI();
+    OnEquipmentChanged?.Invoke(Current);
+}
 
     public void Unequip(EquipmentType slot)
+{
+    if (Current == null)
     {
-        if (Current == null) { Debug.LogWarning("No CharacterData selected."); return; }
-
-        Equipment toUnequip = Current.GetEquipped(slot);
-        if (toUnequip == null) return;
-
-        Debug.Log($"Unequip {slot}");
-        Current.UnequipItem(slot);
-        GameManager.Instance.AddItem(toUnequip);          // back to inventory
-        UpdateUI();
-        OnEquipmentChanged?.Invoke(Current);
+        Debug.LogWarning("No CharacterData selected.");
+        return;
     }
+
+    Equipment toUnequip = Current.GetEquipped(slot);
+    if (toUnequip == null)
+        return;
+
+    Debug.Log($"Unequip {slot}");
+
+    Current.UnequipItem(slot);
+    GameManager.Instance.AddItem(toUnequip);
+
+    Current.SaveData();
+    GameManager.Instance.SaveInventory();
+
+    UpdateUI();
+    OnEquipmentChanged?.Invoke(Current);
+}
 
     #endregion
     //────────────────────────────────────────────────────────────────

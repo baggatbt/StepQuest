@@ -1,43 +1,51 @@
 using UnityEngine;
-using UnityEngine.UI;  // needed for Button
+using UnityEngine.UI;
 
 [RequireComponent(typeof(Button))]
 public class CraftButton : MonoBehaviour
 {
+    [Header("References")]
     [Tooltip("Drag your CraftingManager here")]
     public CraftingManager craftingManager;
 
-    [Tooltip("Drag the Recipe asset you want this button to trigger")]
-    public Recipe recipe;
+    [Tooltip("Drag the CraftableItem recipe asset you want this button to craft")]
+    public CraftableItem craftableItem;
 
-    private Button _button;
+    private Button button;
 
     private void Awake()
     {
-        _button = GetComponent<Button>();
-        if (_button == null)
+        button = GetComponent<Button>();
+
+        if (button == null)
         {
             Debug.LogError("CraftButton requires a Button component on the same GameObject.");
             return;
         }
-        _button.onClick.AddListener(OnClicked);
+
+        button.onClick.AddListener(OnClicked);
     }
 
     private void OnDestroy()
     {
-        if (_button != null)
-            _button.onClick.RemoveListener(OnClicked);
+        if (button != null)
+            button.onClick.RemoveListener(OnClicked);
     }
 
     private void OnClicked()
     {
-        if (craftingManager == null || recipe == null)
+        if (craftingManager == null)
         {
-            Debug.LogWarning("CraftingManager or Recipe is not assigned on CraftButton.");
+            Debug.LogWarning("CraftingManager is not assigned on CraftButton.");
             return;
         }
 
-        // Call the new StartCrafting(...) method
-        craftingManager.StartCrafting(recipe);
+        if (craftableItem == null)
+        {
+            Debug.LogWarning("CraftableItem is not assigned on CraftButton.");
+            return;
+        }
+
+        craftingManager.OnCraftButtonClicked(craftableItem);
     }
 }

@@ -1,293 +1,221 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// A step-driven crafting system that:
-///  • Queues recipes as ActiveCraftJob batches (up to ‘MaxActiveSlots’ at once).
-///  • Listens to PlayerData.OnStepsAdded to advance each job’s progress.
-///  • Automatically grants output when sufficient steps accumulate, handling batch quantities.
-///  • Persists active jobs + crafting level + slot upgrades via PlayerPrefs (JSON).
-///  • Supports a "crafting level" that reduces required steps, and a "slots level" that increases max concurrent slots.
-/// </summary>
 public class CraftingManager : MonoBehaviour
 {
-    [Header("All Recipe assets (drag your Recipe ScriptableObjects here)")]
-    public List<Recipe> allRecipes = new List<Recipe>();
-
     [Header("References")]
-    [Tooltip("Drag your GameManager (with AddItem/HasItem/RemoveItem) here")]
     public GameManager gameManager;
 
-    // Events
-    public event Action OnCraftingLevelChanged;
-    public event Action OnActiveJobsChanged;
+    private Dictionary<string, CraftableItem> activeCrafts = new Dictionary<string, CraftableItem>();
 
-    // Public API for UI
-    /// <summary>Current crafting level (for display).</summary>
-    public int GetCraftingLevel()       => craftingLevel;
-    /// <summary>Current slots-upgrade level (for display).</summary>
-    public int GetSlotsUpgradeLevel()   => slotsUpgradeLevel;
-    /// <summary>Current number of active slots in use.</summary>
-    public int GetUsedSlots()           => activeCrafts.Count;
-    /// <summary>Maximum concurrent slots allowed.</summary>
-    public int GetMaxActiveSlots()      => baseActiveSlots + slotsUpgradeLevel * slotsPerUpgrade;
-    /// <summary>Returns how many steps this recipe requires at current craftingLevel.</summary>
-    public float GetStepsRequired(Recipe recipe)
+    private void Start()
     {
-        float baseRequired = recipe.craftDuration;
-        float factor       = Mathf.Pow(1f - reductionPerLevel, craftingLevel);
-        return baseRequired * factor;
+        if (gameManager == null)
+            gameManager = GameManager.Instance;
+
+        if (TimerManager.Instance != null)
+            TimerManager.Instance.OnTimerCompleted += HandleTimerCompleted;
+        else
+            Debug.LogError("TimerManager.Instance is null. Crafting timers will not work.");
     }
 
-    /// <summary>Recipe for slot #i.</summary>
-    public Recipe GetActiveRecipe(int i)          => activeCrafts[i].recipe;
-    /// <summary>Quantity remaining in batch for slot #i.</summary>
-    public int    GetActiveJobQuantity(int i)     => activeCrafts[i].quantity;
-    /// <summary>Progress toward next item in slot #i.</summary>
-    public float  GetActiveJobProgress(int i)     => activeCrafts[i].stepProgress;
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Internals
-    // ─────────────────────────────────────────────────────────────────────────
-
-    [Serializable]
-    private class ActiveCraftJob
+    private void OnDestroy()
     {
-        public Recipe recipe;
-        public int    quantity;
-        public float  stepProgress;
+        if (TimerManager.Instance != null)
+            TimerManager.Instance.OnTimerCompleted -= HandleTimerCompleted;
+    }
 
-        public ActiveCraftJob(Recipe recipe, int quantity, float initialProgress)
+    public void OnCraftButtonClicked(CraftableItem craftableItem)
+    {
+        if (craftableItem == null)
         {
-            this.recipe       = recipe;
-            this.quantity     = quantity;
-            this.stepProgress = initialProgress;
-        }
-    }
-
-    private List<ActiveCraftJob> activeCrafts = new List<ActiveCraftJob>();
-
-    [Header("Crafting Level Settings (reduces step cost)")]
-    [Tooltip("Each level reduces required steps by this fraction. 0.1 = 10% per level")]
-    [Range(0f, 0.5f)]
-    public float reductionPerLevel = 0.10f;
-
-    [Header("Crafting Slots Settings (limits concurrent batches)")]
-    [Tooltip("Base number of slots at level 0.")]
-    public int baseActiveSlots = 1;
-    [Tooltip("Additional slots per upgrade level.")]
-    public int slotsPerUpgrade = 1;
-
-    // Persistence keys
-    private const string PREFS_JOBS_KEY      = "CraftJobsData";
-    private const string PREFS_CRAFT_LVL_KEY = "CraftingLevel";
-    private const string PREFS_SLOT_LVL_KEY  = "CraftingSlotsLevel";
-
-    [SerializeField] private int craftingLevel     = 0;
-    [SerializeField] private int slotsUpgradeLevel = 0;
-
-    private void Awake()
-    {
-        LoadCraftingLevel();
-        LoadSlotsUpgradeLevel();
-        LoadActiveJobs();
-    }
-
-    private void OnEnable()
-    {
-        PlayerData.OnStepsAdded += OnSteps;
-    }
-
-    private void OnDisable()
-    {
-        PlayerData.OnStepsAdded -= OnSteps;
-    }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Starting a batch
-    // ─────────────────────────────────────────────────────────────────────────
-
-    /// <summary>
-    /// Begin crafting 'quantity' copies of this recipe in one slot.
-    /// Consumes all materials up front.
-    /// </summary>
-    public void StartCrafting(Recipe recipe, int quantity)
-    {
-        if (activeCrafts.Count >= GetMaxActiveSlots())
-        {
-            Debug.LogWarning($"[Crafting] All {GetMaxActiveSlots()} slots in use.");
+            Debug.LogWarning("Tried to craft a null CraftableItem.");
             return;
         }
 
-        // 1) check materials
-        foreach (var req in recipe.materialRequirements)
+        if (gameManager == null)
         {
-            int have = gameManager.GetItemCount(req.material.itemID);
-            int need = req.quantity * quantity;
-            if (have < need)
+            Debug.LogError("CraftingManager has no GameManager reference.");
+            return;
+        }
+
+        if (!HasAllMaterials(craftableItem))
+        {
+            Debug.LogWarning("Not enough materials to craft: " + craftableItem.itemName);
+            return;
+        }
+
+        ConsumeMaterials(craftableItem);
+
+        string timerId = GenerateCraftTimerId(craftableItem);
+        float craftDuration = Mathf.Max(0.1f, craftableItem.stepCostToProduce);
+
+        TimerManager.Instance.SetTimer(timerId, craftDuration);
+        activeCrafts[timerId] = craftableItem;
+
+        Debug.Log($"Started crafting {craftableItem.itemName} for {craftDuration} seconds.");
+    }
+
+    private void HandleTimerCompleted(string timerId)
+    {
+        if (!activeCrafts.ContainsKey(timerId))
+            return;
+
+        CraftableItem craftableItem = activeCrafts[timerId];
+        activeCrafts.Remove(timerId);
+
+        CompleteCraft(craftableItem);
+    }
+
+    private void CompleteCraft(CraftableItem craftableItem)
+    {
+        if (craftableItem.CraftsEquipment())
+        {
+            Equipment equipmentTemplate = craftableItem.GetEquipmentCraftResult();
+
+            if (equipmentTemplate == null)
             {
-                Debug.LogWarning($"[Crafting] Not enough {req.material.itemName}. Need {need}, have {have}.");
+                Debug.LogError("CraftableItem was set to craft equipment, but no equipment result was assigned.");
                 return;
             }
+
+            Equipment rolledEquipment = Instantiate(equipmentTemplate);
+            rolledEquipment.RollNewStats();
+
+            gameManager.AddItem(rolledEquipment);
+
+            Debug.Log($"Crafting complete: {rolledEquipment.itemName}\n{rolledEquipment.GetStatDescription()}");
+            return;
         }
-        // 2) consume materials
-        foreach (var req in recipe.materialRequirements)
-            gameManager.RemoveItem(req.material.itemID, req.quantity * quantity);
 
-        // 3) enqueue batch
-        activeCrafts.Add(new ActiveCraftJob(recipe, quantity, 0f));
-        SaveActiveJobs();
-        OnActiveJobsChanged?.Invoke();
+        Item normalResult = craftableItem.GetNormalCraftResult();
 
-        Debug.Log($"[Crafting] Started '{recipe.outputItem.itemName}' ×{quantity} in 1 slot.");
-    }
-
-    /// <summary>Convenience: queue 1 if you only call single-arg.</summary>
-    public void StartCrafting(Recipe recipe) => StartCrafting(recipe, 1);
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Leveling and Slots Upgrades
-    // ─────────────────────────────────────────────────────────────────────────
-
-    public void IncreaseCraftingLevel(int delta = 1)
-    {
-        craftingLevel = Mathf.Max(0, craftingLevel + delta);
-        SaveCraftingLevel();
-        OnCraftingLevelChanged?.Invoke();
-        Debug.Log($"[Crafting] Level now {craftingLevel}.");
-    }
-
-    public void IncreaseSlotsUpgradeLevel(int delta = 1)
-    {
-        slotsUpgradeLevel = Mathf.Max(0, slotsUpgradeLevel + delta);
-        SaveSlotsUpgradeLevel();
-        OnCraftingLevelChanged?.Invoke();
-        Debug.Log($"[Crafting] Slots-level now {slotsUpgradeLevel} (Max={GetMaxActiveSlots()}).");
-    }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Step Tick Handler
-    // ─────────────────────────────────────────────────────────────────────────
-
-    private void OnSteps(int added)
-    {
-        if (added <= 0 || activeCrafts.Count == 0) return;
-
-        bool changed = false;
-        
-        // iterate backwards for safe removal
-        for (int i = activeCrafts.Count - 1; i >= 0; i--)
+        if (normalResult == null)
         {
-            var job = activeCrafts[i];
-            job.stepProgress += added;
-            float needed = GetStepsRequired(job.recipe);
+            Debug.LogError($"CraftableItem {craftableItem.itemName} has no craft result assigned.");
+            return;
+        }
 
-            // how many items completed this tick?
-            int done = Mathf.FloorToInt(job.stepProgress / needed);
-            if (done > 0)
+        gameManager.AddItem(normalResult);
+
+        Debug.Log($"Crafting complete. {normalResult.itemName} added to inventory.");
+    }
+
+    private bool HasAllMaterials(CraftableItem craftableItem)
+    {
+        if (craftableItem.materialRequirements == null || craftableItem.materialRequirements.Count == 0)
+        {
+            Debug.LogWarning($"Recipe {craftableItem.itemName} has no material requirements assigned.");
+            return false;
+        }
+
+        Debug.Log($"Checking materials for recipe: {craftableItem.itemName}");
+
+        foreach (Item item in gameManager.itemList)
+        {
+            if (item == null) continue;
+
+            Debug.Log($"Inventory has: {item.itemName} | ID: {item.itemID} | Qty: {item.quantity}");
+        }
+
+        foreach (MaterialRequirement requirement in craftableItem.materialRequirements)
+        {
+            if (requirement.material == null)
             {
-                int take = Mathf.Min(done, job.quantity);
-                for (int k = 0; k < take; k++)
-                {
-                    gameManager.AddItem(job.recipe.outputItem);
-                    TaskSkillManager.Instance.AddXP(
-                        job.recipe.skillID, job.recipe.expForCraft
-                    );
-                }
-                job.quantity     -= take;
-                job.stepProgress -= take * needed;
-                changed = true;
+                Debug.LogWarning($"Recipe {craftableItem.itemName} has a null material requirement.");
+                return false;
             }
 
-            if (job.quantity <= 0)
+            int requiredItemID = requirement.material.itemID;
+            int requiredQuantity = requirement.quantity;
+            int foundQuantity = GetItemQuantityInItemList(requiredItemID);
+
+            Debug.Log($"Recipe needs: {requirement.material.itemName} | ID: {requiredItemID} | Qty: {requiredQuantity} | Found: {foundQuantity}");
+
+            if (foundQuantity < requiredQuantity)
             {
-                activeCrafts.RemoveAt(i);
-                changed = true;
+                Debug.LogWarning(
+                    $"Missing material: {requirement.material.itemName} | Needed ID: {requiredItemID} | Needed Qty: {requiredQuantity} | Found Qty: {foundQuantity}"
+                );
+
+                return false;
             }
         }
 
-        if (changed)
-        {
-            SaveActiveJobs();
-            OnActiveJobsChanged?.Invoke();
-        }
+        return true;
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Persistence: Active Jobs
-    // ─────────────────────────────────────────────────────────────────────────
-
-    [Serializable]
-    private class ActiveCraftJobData
+    private void ConsumeMaterials(CraftableItem craftableItem)
     {
-        public string recipeName;
-        public int    quantity;
-        public float  stepProgress;
-    }
-    
-    [Serializable]
-    private class ActiveCraftJobDataList { public List<ActiveCraftJobData> jobs = new List<ActiveCraftJobData>(); }
-
-    private void SaveActiveJobs()
-    {
-        var wrapper = new ActiveCraftJobDataList();
-        foreach (var job in activeCrafts)
+        foreach (MaterialRequirement requirement in craftableItem.materialRequirements)
         {
-            wrapper.jobs.Add(new ActiveCraftJobData
+            if (requirement.material == null)
             {
-                recipeName   = job.recipe.name,
-                quantity     = job.quantity,
-                stepProgress = job.stepProgress
-            });
+                Debug.LogWarning($"Recipe {craftableItem.itemName} has a null material requirement.");
+                continue;
+            }
+
+            RemoveItemFromItemList(requirement.material.itemID, requirement.quantity);
+
+            Debug.Log($"Consumed {requirement.quantity}x {requirement.material.itemName}");
         }
-        string json = JsonUtility.ToJson(wrapper);
-        PlayerPrefs.SetString(PREFS_JOBS_KEY, json);
-        PlayerPrefs.Save();
+
+        gameManager.SaveInventory();
+
+        if (gameManager.inventory != null)
+            gameManager.inventory.UpdateInventoryUI();
     }
 
-    private void LoadActiveJobs()
+    private int GetItemQuantityInItemList(int itemID)
     {
-        activeCrafts.Clear();
-        if (!PlayerPrefs.HasKey(PREFS_JOBS_KEY)) return;
+        int total = 0;
 
-        string json = PlayerPrefs.GetString(PREFS_JOBS_KEY);
-        if (string.IsNullOrEmpty(json)) return;
-
-        var wrapper = JsonUtility.FromJson<ActiveCraftJobDataList>(json);
-        if (wrapper?.jobs == null) return;
-
-        foreach (var d in wrapper.jobs)
+        foreach (Item item in gameManager.itemList)
         {
-            var found = allRecipes.Find(r => r.name == d.recipeName);
-            if (found != null)
-                activeCrafts.Add(new ActiveCraftJob(found, d.quantity, d.stepProgress));
+            if (item == null) continue;
+
+            if (item.itemID == itemID)
+                total += item.quantity;
+        }
+
+        return total;
+    }
+
+    private void RemoveItemFromItemList(int itemID, int quantityToRemove)
+    {
+        int remainingToRemove = quantityToRemove;
+
+        for (int i = gameManager.itemList.Count - 1; i >= 0; i--)
+        {
+            Item item = gameManager.itemList[i];
+
+            if (item == null) continue;
+            if (item.itemID != itemID) continue;
+
+            if (item.quantity > remainingToRemove)
+            {
+                item.quantity -= remainingToRemove;
+                remainingToRemove = 0;
+                break;
+            }
             else
-                Debug.LogWarning($"[Crafting] Missing recipe '{d.recipeName}' on load.");
+            {
+                remainingToRemove -= item.quantity;
+                gameManager.itemList.RemoveAt(i);
+            }
+
+            if (remainingToRemove <= 0)
+                break;
+        }
+
+        if (remainingToRemove > 0)
+        {
+            Debug.LogWarning($"Tried to remove item ID {itemID}, but was short by {remainingToRemove}.");
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Persistence: Levels
-    // ─────────────────────────────────────────────────────────────────────────
-
-    private void SaveCraftingLevel()
+    private string GenerateCraftTimerId(CraftableItem item)
     {
-        PlayerPrefs.SetInt(PREFS_CRAFT_LVL_KEY, craftingLevel);
-        PlayerPrefs.Save();
-    }
-    private void LoadCraftingLevel()
-    {
-        craftingLevel = PlayerPrefs.GetInt(PREFS_CRAFT_LVL_KEY, 0);
-    }
-
-    private void SaveSlotsUpgradeLevel()
-    {
-        PlayerPrefs.SetInt(PREFS_SLOT_LVL_KEY, slotsUpgradeLevel);
-        PlayerPrefs.Save();
-    }
-    private void LoadSlotsUpgradeLevel()
-    {
-        slotsUpgradeLevel = PlayerPrefs.GetInt(PREFS_SLOT_LVL_KEY, 0);
+        return $"Craft_{item.itemID}_{Time.realtimeSinceStartup}_{Random.Range(0, 999999)}";
     }
 }
