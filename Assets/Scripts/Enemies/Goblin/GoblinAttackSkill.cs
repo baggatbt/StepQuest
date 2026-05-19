@@ -7,8 +7,10 @@ public class GoblinAttackSkill : Skill
 
     public GoblinAttackSkill()
     {
+        Type = SkillType.None;
+
         skillName = "Goblin Attack";
-        description = "The Goblin attacks the player. The damage can be reduced by timely action.";
+        description = "The Goblin lunges forward with a quick strike. Time your block to reduce the damage.";
 
         energyCost = 0;
         energyGain = 0;
@@ -19,27 +21,40 @@ public class GoblinAttackSkill : Skill
 
         numberOfAttacksPossible = 1;
 
-        // NEW ATK-based damage system
-        damageMultiplier = 1.0f;      // 100% of Goblin ATK
-        damageVarianceMin = 1.0f;
-        damageVarianceMax = 1.2f;
+        // Level 1 Goblin ATK is about 5.
+        // 0.90x keeps the basic hit around 4-5 damage before defense/block.
+        damageMultiplier = 0.90f;
 
-        // Goblin basic attack is fairly quick
-        speedMultiplier = 1.05f;
+        // Keep enemy damage predictable for now.
+        damageVarianceMin = 1.0f;
+        damageVarianceMax = 1.0f;
+        useVariance = false;
+
+        // Goblin is a little faster than Knight.
+        speedMultiplier = 1.10f;
 
         priority = 0;
-        useVariance = false;
+
+        iconImage = null;
     }
 
     public override IEnumerator Execute(Character user, Character target, BattleManager battleManager)
     {
         user.isAttacking = true;
         user.isAnimationDone = false;
+        user.damageApplied = false;
 
-        // NEW: ATK-based damage instead of old power formula
         int baseDamage = RollBaseDamage(user);
+        baseDamage = Mathf.Max(1, baseDamage);
 
-        user.animator.SetTrigger("GoblinAttack1Trigger");
+        if (user.animator != null)
+        {
+            user.animator.SetTrigger("GoblinAttack1Trigger");
+        }
+        else
+        {
+            Debug.LogWarning("[GoblinAttackSkill] User has no animator.");
+        }
 
         for (int i = 0; i < numberOfAttacksPossible; i++)
         {
@@ -50,14 +65,24 @@ public class GoblinAttackSkill : Skill
                 (TimingEventResult result) =>
                 {
                     HandleTimingResultForEnemyAttack(user, target, result, baseDamage);
-                    battleManager.CameraShakeMagnitude(result);
+
+                    if (battleManager != null)
+                        battleManager.CameraShakeMagnitude(result);
                 });
         }
 
-        yield return new WaitUntil(() => user.isAnimationDone);
+        if (user.animator != null)
+        {
+            yield return new WaitUntil(() => user.isAnimationDone);
+        }
+        else
+        {
+            yield return new WaitForSeconds(0.35f);
+        }
 
         user.isAnimationDone = false;
         user.isAttacking = false;
+        user.damageApplied = false;
 
         target.CheckForDeath();
     }

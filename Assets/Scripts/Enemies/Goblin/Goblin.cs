@@ -3,28 +3,33 @@ using UnityEngine;
 
 public class Goblin : Enemy
 {
-    private const int BASE_HEALTH = 12;
-    private const int HEALTH_GROWTH = 3;
+    [Header("Goblin Stat Growth")]
+    private const int BASE_HEALTH = 18;
+    private const int HEALTH_GROWTH = 4;
 
-    private const int BASE_ATTACK = 6;
-    private const float ATTACK_GROWTH_FACTOR = 1.5f;
+    private const int BASE_ATTACK = 5;
+    private const float ATTACK_GROWTH_FACTOR = 0.9f;
 
     private const int BASE_DEFENSE = 0;
-    private const int DEFENSE_GROWTH = 0;
+    private const float DEFENSE_GROWTH_FACTOR = 0.25f;
 
-    // Slightly faster than Knight curve
-    private const int BASE_SPEED = 10;
+    // Slightly faster than Knight's base speed of 4.
+    private const int BASE_SPEED = 5;
+    private const float SPEED_GROWTH_FACTOR = 0.25f;
 
-    private const int BASE_GOLD = 5;
+    [Header("Goblin Rewards")]
+    private const int BASE_GOLD = 4;
     private const int GOLD_PER_LEVEL = 2;
 
-    private const int BASE_EXP = 10;
-    private const float EXP_GROWTH_FACTOR = 1.1f;
+    private const int BASE_EXP = 8;
+    private const float EXP_GROWTH_FACTOR = 1.12f;
 
     protected override void Awake()
     {
-        // ✅ Set level BEFORE base.Awake()
-        level = 1;
+        // Do not force level to 1 if something already assigned it.
+        // This lets your spawner/config set enemy levels cleanly.
+        if (level <= 0)
+            level = 1;
 
         baseExp = BASE_EXP;
         growthFactor = EXP_GROWTH_FACTOR;
@@ -55,23 +60,20 @@ public class Goblin : Enemy
 
         int lvl = Mathf.Max(level, 1);
 
-        // HP scaling (weaker than Knight)
-        maxHealth = BASE_HEALTH + (lvl - 1) * HEALTH_GROWTH;
+        maxHealth = BASE_HEALTH + ((lvl - 1) * HEALTH_GROWTH);
         health = maxHealth;
 
-        // ATK scaling (slightly weaker curve than Knight)
         attackPower = BASE_ATTACK + Mathf.FloorToInt((lvl - 1) * ATTACK_GROWTH_FACTOR);
 
-        // DEF scaling (currently flat)
-        defensePower = BASE_DEFENSE + (lvl - 1) * DEFENSE_GROWTH;
+        defensePower = BASE_DEFENSE + Mathf.FloorToInt((lvl - 1) * DEFENSE_GROWTH_FACTOR);
 
-        // SPEED scaling (same growth rhythm as Knight, but starts higher)
-        speed = BASE_SPEED + Mathf.FloorToInt((lvl - 1) / 3f);
+        speed = BASE_SPEED + Mathf.FloorToInt((lvl - 1) * SPEED_GROWTH_FACTOR);
 
-        // Rewards
-        goldReward = BASE_GOLD + GOLD_PER_LEVEL * lvl;
+        goldReward = BASE_GOLD + (GOLD_PER_LEVEL * lvl);
         expReward = Mathf.RoundToInt(BASE_EXP * Mathf.Pow(EXP_GROWTH_FACTOR, lvl - 1));
 
         energy = Mathf.Clamp(energy, 0, maxEnergy);
+
+        Debug.Log($"[Goblin] Lv {lvl} Stats | HP {maxHealth} | ATK {attackPower} | DEF {defensePower} | SPD {speed} | EXP {expReward} | Gold {goldReward}");
     }
 }

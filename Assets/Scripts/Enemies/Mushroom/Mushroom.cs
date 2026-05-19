@@ -3,29 +3,34 @@ using UnityEngine;
 
 public class Mushroom : Enemy
 {
-    // Beefier than goblin: more HP + more DEF, slower speed
-    private const int BASE_HEALTH = 26;
-    private const int HEALTH_GROWTH = 5;
+    [Header("Mushroom Stat Growth")]
+    private const int BASE_HEALTH = 30;
+    private const int HEALTH_GROWTH = 6;
 
-    private const int BASE_ATTACK = 9;
-    private const float ATTACK_GROWTH_FACTOR = 1.3f;
+    private const int BASE_ATTACK = 6;
+    private const float ATTACK_GROWTH_FACTOR = 1.0f;
 
-    private const int BASE_DEFENSE = 3;
-    private const int DEFENSE_GROWTH = 1;
+    private const int BASE_DEFENSE = 2;
+    private const float DEFENSE_GROWTH_FACTOR = 0.5f;
 
-    // Slower than goblin/knight, but does grow slowly
-    private const int BASE_SPEED = 6;
+    // Slower than Knight and Goblin.
+    // Knight = 4, Goblin = 5, Mushroom = 3.
+    private const int BASE_SPEED = 3;
+    private const float SPEED_GROWTH_FACTOR = 0.20f;
 
+    [Header("Mushroom Rewards")]
     private const int BASE_GOLD = 6;
     private const int GOLD_PER_LEVEL = 2;
 
-    private const int BASE_EXP = 14;
-    private const float EXP_GROWTH_FACTOR = 1.1f;
+    private const int BASE_EXP = 12;
+    private const float EXP_GROWTH_FACTOR = 1.12f;
 
     protected override void Awake()
     {
-        // ✅ Set level & reward curve BEFORE base.Awake() (same pattern as Goblin)
-        level = 1;
+        // Do not force level to 1 if spawner/config already assigned a level.
+        if (level <= 0)
+            level = 1;
+
         baseExp = BASE_EXP;
         growthFactor = EXP_GROWTH_FACTOR;
 
@@ -53,20 +58,22 @@ public class Mushroom : Enemy
     {
         base.UpdateStats();
 
-        maxHealth = BASE_HEALTH + (level - 1) * HEALTH_GROWTH;
+        int lvl = Mathf.Max(level, 1);
+
+        maxHealth = BASE_HEALTH + ((lvl - 1) * HEALTH_GROWTH);
         health = maxHealth;
 
-        attackPower = BASE_ATTACK + Mathf.FloorToInt((level - 1) * ATTACK_GROWTH_FACTOR);
+        attackPower = BASE_ATTACK + Mathf.FloorToInt((lvl - 1) * ATTACK_GROWTH_FACTOR);
 
-        defensePower = BASE_DEFENSE + (level - 1) * DEFENSE_GROWTH;
+        defensePower = BASE_DEFENSE + Mathf.FloorToInt((lvl - 1) * DEFENSE_GROWTH_FACTOR);
 
-        // Slow-ish growth that keeps it behind goblin/knight curves
-        // Example: +1 speed every 4 levels
-        speed = BASE_SPEED + Mathf.FloorToInt((level - 1) / 4f);
+        speed = BASE_SPEED + Mathf.FloorToInt((lvl - 1) * SPEED_GROWTH_FACTOR);
 
-        goldReward = BASE_GOLD + GOLD_PER_LEVEL * level;
-        expReward = Mathf.RoundToInt(BASE_EXP * Mathf.Pow(EXP_GROWTH_FACTOR, level - 1));
+        goldReward = BASE_GOLD + (GOLD_PER_LEVEL * lvl);
+        expReward = Mathf.RoundToInt(BASE_EXP * Mathf.Pow(EXP_GROWTH_FACTOR, lvl - 1));
 
         energy = Mathf.Clamp(energy, 0, maxEnergy);
+
+        Debug.Log($"[Mushroom] Lv {lvl} Stats | HP {maxHealth} | ATK {attackPower} | DEF {defensePower} | SPD {speed} | EXP {expReward} | Gold {goldReward}");
     }
 }

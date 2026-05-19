@@ -5,13 +5,16 @@ using UnityEngine;
 [Serializable]
 public class Knight : Companion
 {
-    private const int BASE_HEALTH = 12;
-    private const int HEALTH_GROWTH = 3;
+    private const int BASE_HEALTH = 24;
+    private const int HEALTH_GROWTH = 5;
 
-    private const int BASE_ATTACK = 2;
-    private const float ATTACK_GROWTH_FACTOR = 0.5f;
+    private const int BASE_ATTACK = 5;
+    private const float ATTACK_GROWTH_FACTOR = 1.1f;
 
-    private const int BASE_SPEED = 4;
+    private const int BASE_DEFENSE = 2;
+    private const float DEFENSE_GROWTH_FACTOR = 0.5f;
+
+private const int BASE_SPEED = 4;
 
     protected override void Awake()
     {
@@ -89,17 +92,38 @@ public class Knight : Companion
     }
 
     public void UpdateStats()
+{
+    int previousMaxHealth = maxHealth;
+
+    maxHealth = BASE_HEALTH + ((heroLevel - 1) * HEALTH_GROWTH);
+
+    attackPower = BASE_ATTACK + Mathf.FloorToInt((heroLevel - 1) * ATTACK_GROWTH_FACTOR);
+
+    defensePower = BASE_DEFENSE + Mathf.FloorToInt((heroLevel - 1) * DEFENSE_GROWTH_FACTOR);
+
+    speed = BASE_SPEED;
+
+    ApplyKnightPathStatBonuses();
+    ApplyKnightPassiveStatBonuses();
+
+    // If this is a brand-new character or health is invalid, fill health.
+    if (health <= 0)
     {
-        maxHealth = BASE_HEALTH + (heroLevel - 1) * HEALTH_GROWTH;
-        attackPower = BASE_ATTACK + Mathf.FloorToInt((heroLevel - 1) * ATTACK_GROWTH_FACTOR);
-        speed = BASE_SPEED;
-
-        ApplyKnightPathStatBonuses();
-        ApplyKnightPassiveStatBonuses();
-
-        if (health <= 0 || health > maxHealth)
-            health = maxHealth;
+        health = maxHealth;
     }
+    // If max HP increased from leveling, add the difference to current HP.
+    else if (maxHealth > previousMaxHealth && previousMaxHealth > 0)
+    {
+        int hpGained = maxHealth - previousMaxHealth;
+        health += hpGained;
+        health = Mathf.Clamp(health, 1, maxHealth);
+    }
+    // If max HP somehow went down, clamp current HP.
+    else if (health > maxHealth)
+    {
+        health = maxHealth;
+    }
+}
 
     private void ApplyKnightPathStatBonuses()
     {
