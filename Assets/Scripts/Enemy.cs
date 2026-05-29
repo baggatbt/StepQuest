@@ -22,6 +22,9 @@ public class Enemy : Character
     public MaterialItem[] possibleDrops;     // Assign in Inspector
     public int dropChancePercentage = 50;    // 0-100
 
+    [Header("Objective Tracking")]
+    public bool objectiveKillRegistered = false;
+
     protected override void Awake()
     {
         base.Awake();

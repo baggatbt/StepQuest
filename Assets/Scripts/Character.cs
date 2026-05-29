@@ -453,21 +453,29 @@ if (bm != null && this.CompareTag("Enemy"))
     // ---------------------------
 
     public void CheckForDeath()
-    {
-        Debug.Log("Checking for death");
-        if (health > 0) return;
+{
+    Debug.Log("Checking for death");
+    if (health > 0) return;
 
-        if (this is Enemy enemy)
+    if (this is Enemy enemy)
+    {
+        if (!enemy.objectiveKillRegistered)
         {
-            if (enemy.enemyDeathEffect != null) enemy.enemyDeathEffect.TriggerExplosion();
-            StartCoroutine(enemy.FadeOutSprite());
-            enemy.DropMaterial();
+            enemy.objectiveKillRegistered = true;
+            GuildObjectiveManager.Instance?.RegisterEnemyDefeated(enemy);
         }
-        else if (this.gameObject.CompareTag("Companion"))
-        {
-            StartCoroutine(this.FadeOutSprite());
-        }
+
+        if (enemy.enemyDeathEffect != null)
+            enemy.enemyDeathEffect.TriggerExplosion();
+
+        StartCoroutine(enemy.FadeOutSprite());
+        enemy.DropMaterial();
     }
+    else if (this.gameObject.CompareTag("Companion"))
+    {
+        StartCoroutine(this.FadeOutSprite());
+    }
+}
 
     public IEnumerator FadeOutSprite()
     {

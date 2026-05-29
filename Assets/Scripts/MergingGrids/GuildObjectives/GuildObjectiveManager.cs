@@ -28,39 +28,42 @@ public class GuildObjectiveManager : MonoBehaviour
     public event Action<GuildObjective> OnObjectiveCompleted;
 
     private void Awake()
+{
+    if (Instance == null)
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
+    else
+    {
+        Destroy(gameObject);
+    }
+}
 
     public void RegisterEnemyDefeated(Enemy enemy)
+{
+    if (enemy == null) return;
+
+    GuildObjective objective = CurrentObjective;
+    if (objective == null) return;
+    if (objective.isComplete) return;
+
+    string defeatedEnemyID = enemy.enemyID;
+
+    Debug.Log($"[Objective] Defeated enemy ID: {defeatedEnemyID}, Required ID: {objective.requiredEnemyID}");
+
+    if (defeatedEnemyID != objective.requiredEnemyID)
+        return;
+
+    objective.currentKills++;
+
+    if (objective.currentKills >= objective.requiredKills)
     {
-        if (enemy == null) return;
-
-        GuildObjective objective = CurrentObjective;
-        if (objective == null) return;
-        if (objective.isComplete) return;
-
-        string defeatedEnemyID = enemy.enemyID;
-
-        if (defeatedEnemyID != objective.requiredEnemyID)
-            return;
-
-        objective.currentKills++;
-
-        if (objective.currentKills >= objective.requiredKills)
-        {
-            CompleteCurrentObjective();
-        }
-
-        OnObjectiveUpdated?.Invoke();
+        CompleteCurrentObjective();
     }
+
+    OnObjectiveUpdated?.Invoke();
+}
 
     private void CompleteCurrentObjective()
     {

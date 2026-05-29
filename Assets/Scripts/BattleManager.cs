@@ -985,7 +985,7 @@ private void SetAllEnemyHpBarsVisible(bool visible)
                 ProgressionEvents.OnKnightSkillUsed(activePlayer, usedSkill.Type, usedSkill.LastTimingResult);
             }
         }
-           // CheckBattleEnd();
+           CheckBattleEnd();
         }
         if (activePlayer.currentSkill.requiresMovement == true)
         {
@@ -1474,7 +1474,7 @@ Debug.Log($"[Popup] popupCanvas: {popupCanvas.name} id={popupCanvas.GetInstanceI
             if (allEnemiesDefeated)
             {
                 ProcessVictory();
-                GameManager.Instance.currentStageIndex++;
+               // GameManager.Instance.currentStageIndex++;
             }
             else if (allAlliesDefeated)
             {
@@ -1534,13 +1534,7 @@ Debug.Log($"[Popup] popupCanvas: {popupCanvas.name} id={popupCanvas.GetInstanceI
     private void ProcessVictory()
 {
     EndOfBattleRewards(enemies);
-    foreach (Character character in enemies)
-{
-    if (character is Enemy enemy)
-    {
-        GuildObjectiveManager.Instance?.RegisterEnemyDefeated(enemy);
-    }
-}
+    
     KnightProgressionService.TryApply(GameManager.Instance.currentCompanionData);
 
     var sd = GameManager.Instance.currentStage;   // StageData of the battle you just won

@@ -34,6 +34,7 @@ private const int BASE_SPEED = 4;
         availableSkills.Clear();
 
         AddAvailableSkill(SkillType.Slash);
+        TryAutoEquipSkill(SkillType.Slash);
         
 
         // Level 3 unlock CHANGED TO DEFAULT FOR TESTING
