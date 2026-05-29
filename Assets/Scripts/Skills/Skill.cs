@@ -28,7 +28,8 @@ public enum SkillType
     MeleeCombo,
     ReflectDamagePassive,
     SpeedBreak,
-    TamedGoblinAttackSkill
+    TamedGoblinAttackSkill,
+    HeavySlash
 }
 
 public abstract class Skill

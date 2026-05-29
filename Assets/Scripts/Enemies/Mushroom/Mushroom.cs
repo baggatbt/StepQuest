@@ -4,14 +4,14 @@ using UnityEngine;
 public class Mushroom : Enemy
 {
     [Header("Mushroom Stat Growth")]
-    private const int BASE_HEALTH = 30;
-    private const int HEALTH_GROWTH = 6;
+    private const int BASE_HEALTH = 22;
+    private const int HEALTH_GROWTH = 5;
 
     private const int BASE_ATTACK = 6;
     private const float ATTACK_GROWTH_FACTOR = 1.0f;
 
-    private const int BASE_DEFENSE = 2;
-    private const float DEFENSE_GROWTH_FACTOR = 0.5f;
+    private const int BASE_DEFENSE = 0;
+    private const float DEFENSE_GROWTH_FACTOR = 0.25f;
 
     // Slower than Knight and Goblin.
     // Knight = 4, Goblin = 5, Mushroom = 3.

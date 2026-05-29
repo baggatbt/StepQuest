@@ -4,14 +4,14 @@ using UnityEngine;
 public class Goblin : Enemy
 {
     [Header("Goblin Stat Growth")]
-    private const int BASE_HEALTH = 18;
+    private const int BASE_HEALTH = 15;
     private const int HEALTH_GROWTH = 4;
 
     private const int BASE_ATTACK = 5;
     private const float ATTACK_GROWTH_FACTOR = 0.9f;
 
     private const int BASE_DEFENSE = 0;
-    private const float DEFENSE_GROWTH_FACTOR = 0.25f;
+    private const float DEFENSE_GROWTH_FACTOR = 0.1f;
 
     // Slightly faster than Knight's base speed of 4.
     private const int BASE_SPEED = 5;

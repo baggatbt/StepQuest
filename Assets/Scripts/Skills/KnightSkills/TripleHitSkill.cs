@@ -29,7 +29,7 @@ public class TripleHitSkill : Skill
         numberOfAttacksPossible = 3;
 
         // ✅ NEW ATK-BASED DAMAGE (replaces power = 78)
-        damageMultiplier = 1.3f;          // Slightly stronger than Slash overall
+        damageMultiplier = 1.5f;          // Slightly stronger than Slash overall
         damageVarianceMin = 1.0f;
         damageVarianceMax = 1.2f;
 

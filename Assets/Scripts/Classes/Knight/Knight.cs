@@ -21,7 +21,8 @@ private const int BASE_SPEED = 4;
         base.Awake();
 
         skillOne = SkillType.Slash;
-        skillTwo = SkillType.TripleHit;
+        
+        
 
         InitializeSkillsBasedOnLevel();
         UpdateStats();
@@ -33,19 +34,20 @@ private const int BASE_SPEED = 4;
         availableSkills.Clear();
 
         AddAvailableSkill(SkillType.Slash);
+        
 
-        // Level 3 unlock
-        if (heroLevel >= 3)
+        // Level 3 unlock CHANGED TO DEFAULT FOR TESTING
+        if (heroLevel >= 1)
+        {
+            AddAvailableSkill(SkillType.HeavySlash);
+            TryAutoEquipSkill(SkillType.HeavySlash);
+        }
+
+        // Level 2 unlock
+        if (heroLevel >= 2)
         {
             AddAvailableSkill(SkillType.TripleHit);
             TryAutoEquipSkill(SkillType.TripleHit);
-        }
-
-        // Level 5 unlock
-        if (heroLevel >= 5)
-        {
-            AddAvailableSkill(SkillType.Taunt);
-            TryAutoEquipSkill(SkillType.Taunt);
         }
 
         ValidateEquippedSkills();
@@ -301,20 +303,22 @@ private const int BASE_SPEED = 4;
     };
 
     public override List<SkillType> AllSkills => new List<SkillType>
-    {
-        SkillType.Slash,
-        SkillType.TripleHit,
-        SkillType.Taunt,
-        SkillType.SpeedBreak,
-    };
+{
+    SkillType.Slash,
+    SkillType.HeavySlash,
+    SkillType.TripleHit,
+    SkillType.Taunt,
+    SkillType.SpeedBreak,
+};
 
     private List<SkillType> mainSkills = new List<SkillType>
-    {
-        SkillType.Slash,
-        SkillType.TripleHit,
-        SkillType.Taunt,
-        SkillType.SpeedBreak,
-    };
+{
+    SkillType.Slash,
+    SkillType.HeavySlash,
+    SkillType.TripleHit,
+    SkillType.Taunt,
+    SkillType.SpeedBreak,
+};
 
     public override List<SkillType> MainSkills => mainSkills;
 
@@ -330,6 +334,9 @@ private const int BASE_SPEED = 4;
 
             case SkillType.Taunt:
                 return new Taunt();
+                
+            case SkillType.HeavySlash:
+                return new HeavySlash();
 
             case SkillType.ReflectDamagePassive:
                 return new ReflectDamagePassive();

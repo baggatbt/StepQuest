@@ -1293,13 +1293,23 @@ Debug.Log($"[Popup] popupCanvas: {popupCanvas.name} id={popupCanvas.GetInstanceI
     }
 
     public IEnumerator PlayerHoldReleaseTimeEvent(float holdStart, float holdEnd, Action<TimingEventResult> callback)
+{
+    float totalHoldDuration = Mathf.Max(0.01f, holdEnd - holdStart);
+    float holdTimer = 0f;
+    bool released = false;
+
+    if (holdReleaseSlider == null)
     {
-        float totalHoldDuration = holdEnd - holdStart;
-        float holdTimer = 0;
+        Debug.LogError("[BattleManager] HoldReleaseSlider is not assigned.");
+        callback?.Invoke(TimingEventResult.Late);
+        yield break;
+    }
 
-        holdReleaseSlider.ResetSlider();
-        holdReleaseSlider.gameObject.SetActive(true);
+    holdReleaseSlider.ResetSlider();
+    holdReleaseSlider.gameObject.SetActive(true);
 
+    try
+    {
         while (holdTimer < totalHoldDuration)
         {
             if (Input.GetMouseButton(0))
@@ -1310,7 +1320,7 @@ Debug.Log($"[Popup] popupCanvas: {popupCanvas.name} id={popupCanvas.GetInstanceI
 
             if (Input.GetMouseButtonUp(0))
             {
-                holdReleaseSlider.gameObject.SetActive(false);
+                released = true;
                 break;
             }
 
@@ -1320,7 +1330,12 @@ Debug.Log($"[Popup] popupCanvas: {popupCanvas.name} id={popupCanvas.GetInstanceI
         TimingEventResult result;
         float perfectThreshold = totalHoldDuration * 0.1f;
 
-        if (Mathf.Abs(holdTimer - totalHoldDuration) <= perfectThreshold)
+        if (!released)
+        {
+            Debug.Log("[HoldRelease] Player held too long / no release detected.");
+            result = TimingEventResult.Late;
+        }
+        else if (Mathf.Abs(holdTimer - totalHoldDuration) <= perfectThreshold)
         {
             result = TimingEventResult.Good;
         }
@@ -1334,9 +1349,14 @@ Debug.Log($"[Popup] popupCanvas: {popupCanvas.name} id={popupCanvas.GetInstanceI
         }
 
         ShowTimingResult(result.ToString());
-        callback(result);
-        holdReleaseSlider.ResetSlider();
+        callback?.Invoke(result);
     }
+    finally
+    {
+        holdReleaseSlider.ResetSlider();
+        holdReleaseSlider.gameObject.SetActive(false);
+    }
+}
 
     public BattleState GetState()
     {

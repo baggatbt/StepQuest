@@ -20,12 +20,12 @@ MonoBehaviour:
   fullHeroImage: {fileID: 21300002, guid: 3a501bb3dcbdce54ba4b1f1dd4924979, type: 3}
   heroStatPoints: 0
   heroSkillPoints: 0
-  attackPower: 2
-  defensePower: 1
+  attackPower: 5
+  defensePower: 2
   stamina: 10
   maxStamina: 10
-  maxHealth: 12
-  health: 12
+  maxHealth: 24
+  health: 24
   maxEnergy: 10
   energy: 10
   speed: 4
@@ -38,9 +38,9 @@ MonoBehaviour:
   skillFour: 0
   skillFive: 0
   skillSix: 0
-  AvailableSkills: 01000000
+  AvailableSkills: 0100000010000000
   LockedSkills: 02000000090000000d0000000e000000
-  equippedSkills: 
+  equippedSkills: 0100000010000000
   maxEquippedSkills: 3
   knightSlashModifier: 0
   knightPassive: 0
@@ -50,8 +50,11 @@ MonoBehaviour:
   hasChosenLevel10Path: 0
   classMastery:
     knightLevel: 1
-    knightXP: 0
-    skillRanks: []
+    knightXP: 8
+    skillRanks:
+    - skill: 16
+      rank: 1
+      xp: 6
   equipped:
   - slot: 1
     item: {fileID: 0}
