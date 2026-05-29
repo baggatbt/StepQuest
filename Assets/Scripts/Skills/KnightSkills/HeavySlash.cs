@@ -4,7 +4,10 @@ using UnityEngine;
 public class HeavySlash : Skill
 {
     private readonly float chargeStart = 0f;
-    private readonly float chargeEnd = 0.85f;
+    private readonly float chargeEnd = 1.25f;
+
+    private const string ChargeBool = "isChargingHeavySlash";
+    private const string ReleaseTrigger = "HeavySlashReleaseTrigger";
 
     public HeavySlash()
     {
@@ -56,11 +59,11 @@ public class HeavySlash : Skill
         int baseDamage = RollBaseDamage(user);
         baseDamage = Mathf.Max(1, baseDamage);
 
+        // Start the looping charge animation.
         if (user.animator != null)
         {
-            // Reuse your current slash animation for now.
-            // Later, you can replace this with "HeavySlashTrigger".
-            user.animator.SetTrigger("Attack1Trigger");
+            user.animator.ResetTrigger(ReleaseTrigger);
+            user.animator.SetBool(ChargeBool, true);
         }
         else
         {
@@ -74,10 +77,17 @@ public class HeavySlash : Skill
                 chargeEnd,
                 (TimingEventResult result) =>
                 {
+                    // Stop the charge loop and play the actual slash animation.
+                    if (user.animator != null)
+                    {
+                        user.animator.SetBool(ChargeBool, false);
+                        user.animator.SetTrigger(ReleaseTrigger);
+                    }
+
                     HandleTimingResultForPlayerAttack(user, target, result, baseDamage);
 
                     battleManager.CameraShakeMagnitude(result);
-                
+                    battleManager.ShowTimingResult(result.ToString());
 
                     if (result == TimingEventResult.Good)
                     {
@@ -88,10 +98,17 @@ public class HeavySlash : Skill
         else
         {
             // Fallback if somehow called without a BattleManager.
+            if (user.animator != null)
+            {
+                user.animator.SetBool(ChargeBool, false);
+                user.animator.SetTrigger(ReleaseTrigger);
+            }
+
             target.TakeDamage(baseDamage, user);
             user.damageApplied = true;
         }
 
+        // Wait for HeavySlashRelease animation event to call Character.AnimationEnded().
         if (user.animator != null)
         {
             yield return new WaitUntil(() => user.isAnimationDone);
