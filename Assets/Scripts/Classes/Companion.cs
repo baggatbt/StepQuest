@@ -171,18 +171,26 @@ public void InitializeCharacterStats()
     }
 
     public void DeleteCharacterData()
+{
+    if (characterData == null)
     {
-        string key = "CharacterData_" + this.name;
-        if (PlayerPrefs.HasKey(key))
-        {
-            PlayerPrefs.DeleteKey(key);
-            Debug.Log("Deleted data for " + this.name);
-        }
-        else
-        {
-            Debug.Log("No data found for " + this.name);
-        }
+        Debug.LogWarning("No characterData assigned. Cannot delete character data.");
+        return;
     }
+
+    string key = "CharacterData_" + characterData.heroID;
+
+    if (PlayerPrefs.HasKey(key))
+    {
+        PlayerPrefs.DeleteKey(key);
+        PlayerPrefs.Save();
+        Debug.Log("Deleted saved data for " + characterData.heroID);
+    }
+    else
+    {
+        Debug.Log("No saved data found for " + characterData.heroID);
+    }
+}
 
 
     public int baseExp = 30; // Starting value for experience points

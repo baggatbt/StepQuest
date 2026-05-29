@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e5c2ebce5bc136345ba6d9a14ec32383, type: 3}
-  m_Name: KnightData
+  m_Name: KnightDefaultData
   m_EditorClassIdentifier: 
-  heroID: Knight
+  heroID: Knight_Default
   heroLevel: 1
   heroExp: 0
   skillTreePanel: {fileID: 0}
@@ -39,8 +39,8 @@ MonoBehaviour:
   skillFive: 0
   skillSix: 0
   AvailableSkills: 01000000
-  LockedSkills: 02000000090000000d0000000e000000
-  equippedSkills: 
+  LockedSkills: 0200000009000000
+  equippedSkills: 01000000
   maxEquippedSkills: 3
   knightSlashModifier: 0
   knightPassive: 0
@@ -49,11 +49,20 @@ MonoBehaviour:
   hasChosenLevel8Passive: 0
   hasChosenLevel10Path: 0
   classMastery:
-    knightLevel: 1
+    knightLevel: 0
     knightXP: 0
-    skillRanks: []
+    skillRanks:
+    - skill: 1
+      rank: 0
+      xp: 0
+    - skill: 2
+      rank: 0
+      xp: 0
+    - skill: 9
+      rank: 0
+      xp: 0
   equipped:
-  - slot: 1
+  - slot: 2
     item: {fileID: 0}
   baseExp: 30
   growthFactor: 1.1

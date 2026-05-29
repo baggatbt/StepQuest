@@ -188,42 +188,82 @@ private void RemoveStatBonuses(Equipment eq)
     //────────────────────────────────────────────────────────────────
 
     // ────────────────────────────────────────────────────────────────
-    #region Save / Load
+    #region Save / Load / Reset
 
-    /// <remarks>
-    ///  JsonUtility will serialise object references inside <see cref="EquipSlot"/>.
-    ///  If you plan to load data across sessions or platforms, consider saving an
-    ///  item ID (string) instead of the object reference, then look it up in an
-    ///  ItemDatabase when loading.
-    /// </remarks>
-    public void SaveData()
-    {
-        string jsonData = JsonUtility.ToJson(this);
-        PlayerPrefs.SetString("CharacterData_" + heroID, jsonData);
-        PlayerPrefs.Save();
-    }
-
-    public void LoadData()
+public void SaveData()
 {
-    Sprite savedHeroIcon      = heroIcon;
+    string jsonData = JsonUtility.ToJson(this);
+    PlayerPrefs.SetString("CharacterData_" + heroID, jsonData);
+    PlayerPrefs.Save();
+}
+
+public void LoadData()
+{
+    Sprite savedHeroIcon = heroIcon;
     Sprite savedFullHeroImage = fullHeroImage;
+    GameObject savedSkillTreePanel = skillTreePanel;
 
     string jsonData = PlayerPrefs.GetString("CharacterData_" + heroID, null);
+
     if (!string.IsNullOrEmpty(jsonData))
     {
         JsonUtility.FromJsonOverwrite(jsonData, this);
     }
 
-    // restore anything you don’t want overwritten by saved JSON
-    heroIcon      = savedHeroIcon;
+    // Restore references you do not want saved JSON to break.
+    heroIcon = savedHeroIcon;
     fullHeroImage = savedFullHeroImage;
+    skillTreePanel = savedSkillTreePanel;
 
-    // enforce minimum sane defaults
     EnsureValidLevel();
 }
 
+public void ResetFromDefault(CharacterData defaultData)
+{
+    if (defaultData == null)
+    {
+        Debug.LogError($"No default CharacterData provided for {heroID}.");
+        return;
+    }
 
-    public void EnsureValidLevel()
+    string oldHeroID = heroID;
+
+    Sprite savedHeroIcon = heroIcon;
+    Sprite savedFullHeroImage = fullHeroImage;
+    GameObject savedSkillTreePanel = skillTreePanel;
+
+    // Delete old save before changing heroID.
+    PlayerPrefs.DeleteKey("CharacterData_" + oldHeroID);
+
+    string defaultJson = JsonUtility.ToJson(defaultData);
+    JsonUtility.FromJsonOverwrite(defaultJson, this);
+
+    heroIcon = savedHeroIcon;
+    fullHeroImage = savedFullHeroImage;
+    skillTreePanel = savedSkillTreePanel;
+
+    if (AvailableSkills == null) AvailableSkills = new List<SkillType>();
+    if (LockedSkills == null) LockedSkills = new List<SkillType>();
+    if (equippedSkills == null) equippedSkills = new List<SkillType>();
+    if (classMastery == null) classMastery = new ClassMastery();
+
+    EnsureValidLevel();
+
+    // Delete save again after copying in case heroID changed.
+    PlayerPrefs.DeleteKey("CharacterData_" + heroID);
+
+    // Save the clean reset version.
+    SaveData();
+
+#if UNITY_EDITOR
+    UnityEditor.EditorUtility.SetDirty(this);
+    UnityEditor.AssetDatabase.SaveAssets();
+#endif
+
+    Debug.Log($"Reset CharacterData from default: {oldHeroID} -> {heroID}");
+}
+
+public void EnsureValidLevel()
 {
     if (heroLevel < 1)
     {
@@ -233,8 +273,84 @@ private void RemoveStatBonuses(Equipment eq)
         heroStatPoints = 0;
     }
 }
+public void ResetKnightToDefaults()
+{
+    // Core identity
+    heroID = "Knight";
 
+    // Level / EXP
+    heroLevel = 1;
+    heroExp = 0;
+    heroStatPoints = 0;
+    heroSkillPoints = 0;
 
-    #endregion
-    //────────────────────────────────────────────────────────────────
+    // Stats
+    attackPower = 2;
+    defensePower = 1;
+
+    maxHealth = 12;
+    health = 12;
+
+    maxEnergy = 10;
+    energy = 10;
+
+    maxStamina = 10;
+    stamina = 10;
+
+    speed = 4;
+
+    // Progression
+    isUnlocked = true;
+    expToLevel = 30;
+    damageReflectionPercentage = 0f;
+
+    // Skill slots
+    skillOne = SkillType.TripleHit;
+    skillTwo = SkillType.Taunt;
+    skillThree = SkillType.None;
+    skillFour = SkillType.None;
+    skillFive = SkillType.None;
+    skillSix = SkillType.None;
+
+    // Skill lists
+    AvailableSkills = new List<SkillType>
+    {
+        SkillType.Slash
+    };
+
+    LockedSkills = new List<SkillType>
+    {
+        SkillType.TripleHit,
+        SkillType.Taunt,
+        SkillType.ReflectDamagePassive,
+        SkillType.SpeedBreak
+    };
+
+    equippedSkills = new List<SkillType>();
+
+    // Knight progression choices
+    knightSlashModifier = KnightSlashModifier.None;
+    knightPassive = KnightPassive.None;
+    knightPath = KnightPath.None;
+
+    hasChosenLevel6Modifier = false;
+    hasChosenLevel8Passive = false;
+    hasChosenLevel10Path = false;
+
+    classMastery = new ClassMastery();
+
+    
+
+    // Delete old save and write the clean one.
+    PlayerPrefs.DeleteKey("CharacterData_" + heroID);
+    SaveData();
+
+#if UNITY_EDITOR
+    UnityEditor.EditorUtility.SetDirty(this);
+    UnityEditor.AssetDatabase.SaveAssets();
+#endif
+
+    Debug.Log("[CharacterData] Knight reset to hardcoded defaults.");
+}
+#endregion
 }
