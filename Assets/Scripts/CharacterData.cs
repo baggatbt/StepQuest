@@ -6,30 +6,29 @@ using UnityEngine;
 public class CharacterData : ScriptableObject
 {
     // ────────────────────────────────────────────────────────────────
-    #region Core fields (unchanged)
+    #region Core fields
 
-    public string  heroID;
-    public int     heroLevel;
-    public int     heroExp;
+    public string heroID;
+    public int heroLevel;
+    public int heroExp;
     public GameObject skillTreePanel;
 
+    public Sprite heroIcon;
+    public Sprite fullHeroImage;
 
-    public Sprite  heroIcon;
-    public Sprite  fullHeroImage;
-
-    public int  heroStatPoints;
-    public int  heroSkillPoints;
-    public int  attackPower;
-    public int  defensePower;
-    public int  stamina;
-    public int  maxStamina;
-    public int  maxHealth;
-    public int  health;
-    public int  maxEnergy;
-    public int  energy;
-    public int  speed;
+    public int heroStatPoints;
+    public int heroSkillPoints;
+    public int attackPower;
+    public int defensePower;
+    public int stamina;
+    public int maxStamina;
+    public int maxHealth;
+    public int health;
+    public int maxEnergy;
+    public int energy;
+    public int speed;
     public bool isUnlocked;
-    public int  expToLevel;
+    public int expToLevel;
     public float damageReflectionPercentage;
 
     public SkillType skillOne;
@@ -55,102 +54,266 @@ public class CharacterData : ScriptableObject
 
     public ClassMastery classMastery = new ClassMastery();
 
-
     #endregion
-    //────────────────────────────────────────────────────────────────
 
     // ────────────────────────────────────────────────────────────────
-    #region Equipment support (NEW)
+    #region Equipment support
 
-    /// <summary>Serializable “slot → item” pair.</summary>
     [System.Serializable]
     public struct EquipSlot
     {
         public EquipmentType slot;
-        public Equipment     item;   // reference to the Equipment ScriptableObject / prefab
+        public Equipment item;
     }
 
-    // All currently-equipped items.
-    [SerializeField] private List<EquipSlot> equipped = new();
+    [System.Serializable]
+    public class EquippedEquipmentSaveData
+    {
+        public bool hasItem;
 
-    /// <summary>Returns the item in a slot, or null.</summary>
+        public EquipmentType slot;
+        public int itemID;
+        public string uniqueInstanceId;
+
+        public int attackBonus;
+        public int defenseBonus;
+        public int maxHealthBonus;
+        public int maxEnergyBonus;
+        public int speedBonus;
+    }
+
+    [Header("Runtime Equipped Items")]
+    [SerializeField] private List<EquipSlot> equipped = new List<EquipSlot>();
+
+    [Header("Saved Equipped Items")]
+    [SerializeField] private List<EquippedEquipmentSaveData> savedEquippedItems = new List<EquippedEquipmentSaveData>();
+
     public Equipment GetEquipped(EquipmentType slot)
     {
-        var index = equipped.FindIndex(s => s.slot == slot);
+        EnsureEquipmentLists();
+
+        int index = equipped.FindIndex(s => s.slot == slot);
         return index >= 0 ? equipped[index].item : null;
     }
 
-    /// <summary>Equip an item and apply its stat bonuses. Replaces anything in the same slot.</summary>
     public void EquipItem(Equipment eq)
     {
-        if (eq == null) { Debug.LogWarning("Tried to equip NULL."); return; }
+        if (eq == null)
+        {
+            Debug.LogWarning("[CharacterData] Tried to equip NULL.");
+            return;
+        }
 
-        // Remove current item (if any)
+        EnsureEquipmentLists();
+
+        // Remove current item from this slot first.
         UnequipItem(eq.equipmentType);
 
-        // Store new item
+        // Store new item.
         equipped.RemoveAll(s => s.slot == eq.equipmentType);
-        equipped.Add(new EquipSlot { slot = eq.equipmentType, item = eq });
+        equipped.Add(new EquipSlot
+        {
+            slot = eq.equipmentType,
+            item = eq
+        });
 
         ApplyStatBonuses(eq);
+        SaveEquippedGearToSaveFields();
     }
 
-    /// <summary>Unequip whatever is in the slot.</summary>
     public void UnequipItem(EquipmentType slot)
     {
-        var current = GetEquipped(slot);
-        if (current != null) RemoveStatBonuses(current);
+        EnsureEquipmentLists();
+
+        Equipment current = GetEquipped(slot);
+
+        if (current != null)
+            RemoveStatBonuses(current);
 
         equipped.RemoveAll(s => s.slot == slot);
+        SaveEquippedGearToSaveFields();
     }
 
-    /// <summary>Handy helper if UI needs a dictionary.</summary>
     public Dictionary<EquipmentType, Equipment> GetEquippedDictionary()
     {
-        var dict = new Dictionary<EquipmentType, Equipment>();
-        foreach (var es in equipped) dict[es.slot] = es.item;
+        EnsureEquipmentLists();
+
+        Dictionary<EquipmentType, Equipment> dict = new Dictionary<EquipmentType, Equipment>();
+
+        foreach (EquipSlot es in equipped)
+        {
+            if (es.item == null)
+                continue;
+
+            dict[es.slot] = es.item;
+        }
+
         return dict;
     }
 
     private void ApplyStatBonuses(Equipment eq)
-{
-    attackPower += eq.attackBonus;
-    defensePower += eq.defenseBonus;
+    {
+        if (eq == null)
+            return;
 
-    maxHealth += eq.maxHealthBonus;
-    health += eq.maxHealthBonus;
+        attackPower += eq.attackBonus;
+        defensePower += eq.defenseBonus;
 
-    maxEnergy += eq.maxEnergyBonus;
-    energy += eq.maxEnergyBonus;
+        maxHealth += eq.maxHealthBonus;
+        health += eq.maxHealthBonus;
 
-    speed += eq.speedBonus;
-}
+        maxEnergy += eq.maxEnergyBonus;
+        energy += eq.maxEnergyBonus;
 
-private void RemoveStatBonuses(Equipment eq)
-{
-    attackPower -= eq.attackBonus;
-    defensePower -= eq.defenseBonus;
+        speed += eq.speedBonus;
+    }
 
-    maxHealth -= eq.maxHealthBonus;
-    health = Mathf.Clamp(health - eq.maxHealthBonus, 1, maxHealth);
+    private void RemoveStatBonuses(Equipment eq)
+    {
+        if (eq == null)
+            return;
 
-    maxEnergy -= eq.maxEnergyBonus;
-    energy = Mathf.Clamp(energy - eq.maxEnergyBonus, 0, maxEnergy);
+        attackPower -= eq.attackBonus;
+        defensePower -= eq.defenseBonus;
 
-    speed -= eq.speedBonus;
-}
+        maxHealth -= eq.maxHealthBonus;
+        health = Mathf.Clamp(health - eq.maxHealthBonus, 1, Mathf.Max(1, maxHealth));
+
+        maxEnergy -= eq.maxEnergyBonus;
+        energy = Mathf.Clamp(energy - eq.maxEnergyBonus, 0, Mathf.Max(0, maxEnergy));
+
+        speed -= eq.speedBonus;
+    }
+
+    private void EnsureEquipmentLists()
+    {
+        if (equipped == null)
+            equipped = new List<EquipSlot>();
+
+        if (savedEquippedItems == null)
+            savedEquippedItems = new List<EquippedEquipmentSaveData>();
+    }
+
+    private void SaveEquippedGearToSaveFields()
+    {
+        EnsureEquipmentLists();
+
+        savedEquippedItems.Clear();
+
+        foreach (EquipSlot slot in equipped)
+        {
+            if (slot.item == null)
+                continue;
+
+            Equipment eq = slot.item;
+
+            EquippedEquipmentSaveData data = new EquippedEquipmentSaveData
+            {
+                hasItem = true,
+                slot = slot.slot,
+                itemID = eq.itemID,
+                uniqueInstanceId = eq.uniqueInstanceId,
+
+                attackBonus = eq.attackBonus,
+                defenseBonus = eq.defenseBonus,
+                maxHealthBonus = eq.maxHealthBonus,
+                maxEnergyBonus = eq.maxEnergyBonus,
+                speedBonus = eq.speedBonus
+            };
+
+            savedEquippedItems.Add(data);
+        }
+    }
+
+    private void LoadEquippedGearFromSaveFields()
+    {
+        EnsureEquipmentLists();
+
+        equipped.Clear();
+
+        if (savedEquippedItems == null || savedEquippedItems.Count == 0)
+            return;
+
+        foreach (EquippedEquipmentSaveData data in savedEquippedItems)
+        {
+            Equipment loadedEquipment = LoadEquipmentFromSaveData(data);
+
+            if (loadedEquipment == null)
+                continue;
+
+            equipped.Add(new EquipSlot
+            {
+                slot = data.slot,
+                item = loadedEquipment
+            });
+        }
+
+        Debug.Log($"[CharacterData] Loaded equipped gear for {heroID}. Count: {equipped.Count}");
+    }
+
+    private Equipment LoadEquipmentFromSaveData(EquippedEquipmentSaveData data)
+    {
+        if (data == null || !data.hasItem)
+            return null;
+
+        if (GameManager.Instance == null)
+        {
+            Debug.LogWarning("[CharacterData] Cannot load equipped gear because GameManager.Instance is null.");
+            return null;
+        }
+
+        Item template = GameManager.Instance.FindItemInMasterList(data.itemID);
+
+        if (template == null)
+        {
+            Debug.LogWarning("[CharacterData] Could not find equipped item template with ID: " + data.itemID);
+            return null;
+        }
+
+        Equipment equipmentTemplate = template as Equipment;
+
+        if (equipmentTemplate == null)
+        {
+            Debug.LogWarning("[CharacterData] Saved equipped item is not Equipment. Item ID: " + data.itemID);
+            return null;
+        }
+
+        Equipment loadedEquipment = Instantiate(equipmentTemplate);
+
+        loadedEquipment.LoadRolledData(
+            data.uniqueInstanceId,
+            data.attackBonus,
+            data.defenseBonus,
+            data.maxHealthBonus,
+            data.maxEnergyBonus,
+            data.speedBonus
+        );
+
+        loadedEquipment.quantity = 1;
+
+        return loadedEquipment;
+    }
+
+    public void ClearEquippedGear()
+    {
+        EnsureEquipmentLists();
+
+        equipped.Clear();
+        savedEquippedItems.Clear();
+    }
 
     #endregion
-    //────────────────────────────────────────────────────────────────
 
     // ────────────────────────────────────────────────────────────────
-    #region Skills (unchanged)
-     public int baseExp = 30; // Starting value for experience points
-    public float growthFactor = 1.1f; // Growth factor for exponential increase
+    #region Skills
+
+    public int baseExp = 30;
+    public float growthFactor = 1.1f;
+
     public int ExpToNextLevel(int heroLevel)
     {
         int exp = Mathf.RoundToInt(baseExp * Mathf.Pow(growthFactor, heroLevel));
-         Debug.Log($"EXP to next level (Level {heroLevel}): {exp} current EXP: {heroExp}");
+        Debug.Log($"EXP to next level (Level {heroLevel}): {exp} current EXP: {heroExp}");
         return exp;
     }
 
@@ -161,196 +324,211 @@ private void RemoveStatBonuses(Equipment eq)
             LockedSkills.Remove(skillType);
             AvailableSkills.Add(skillType);
 
-            // Find the skill instance and apply its passive effect if applicable
             Skill skillInstance = GetSkillInstance(skillType);
+
             if (skillInstance != null && !skillInstance.isActiveSkill)
                 skillInstance.ApplyPassiveEffect(this);
 
             Debug.Log(skillType + " unlocked.");
         }
-        else { Debug.LogError(skillType + " is not in the LockedSkills list."); }
+        else
+        {
+            Debug.LogError(skillType + " is not in the LockedSkills list.");
+        }
     }
 
     public Skill GetSkillInstance(SkillType skillType)
     {
         return skillType switch
         {
-            SkillType.Slash               => new Slash(),
-            SkillType.TripleHit           => new TripleHitSkill(),
-            SkillType.Taunt               => new Taunt(),
-            SkillType.ReflectDamagePassive=> new ReflectDamagePassive(),
-            SkillType.SpeedBreak          => new SpeedBreak(),
+            SkillType.Slash => new Slash(),
+            SkillType.TripleHit => new TripleHitSkill(),
+            SkillType.Taunt => new Taunt(),
+            SkillType.ReflectDamagePassive => new ReflectDamagePassive(),
+            SkillType.SpeedBreak => new SpeedBreak(),
             _ => null
         };
     }
 
     #endregion
-    //────────────────────────────────────────────────────────────────
 
     // ────────────────────────────────────────────────────────────────
     #region Save / Load / Reset
 
-public void SaveData()
-{
-    string jsonData = JsonUtility.ToJson(this);
-    PlayerPrefs.SetString("CharacterData_" + heroID, jsonData);
-    PlayerPrefs.Save();
-}
-
-public void LoadData()
-{
-    Sprite savedHeroIcon = heroIcon;
-    Sprite savedFullHeroImage = fullHeroImage;
-    GameObject savedSkillTreePanel = skillTreePanel;
-
-    string jsonData = PlayerPrefs.GetString("CharacterData_" + heroID, null);
-
-    if (!string.IsNullOrEmpty(jsonData))
+    public void SaveData()
     {
-        JsonUtility.FromJsonOverwrite(jsonData, this);
+        SaveEquippedGearToSaveFields();
+
+        string jsonData = JsonUtility.ToJson(this);
+        PlayerPrefs.SetString("CharacterData_" + heroID, jsonData);
+        PlayerPrefs.Save();
     }
 
-    // Restore references you do not want saved JSON to break.
-    heroIcon = savedHeroIcon;
-    fullHeroImage = savedFullHeroImage;
-    skillTreePanel = savedSkillTreePanel;
-
-    EnsureValidLevel();
-}
-
-public void ResetFromDefault(CharacterData defaultData)
-{
-    if (defaultData == null)
+    public void LoadData()
     {
-        Debug.LogError($"No default CharacterData provided for {heroID}.");
-        return;
+        Sprite savedHeroIcon = heroIcon;
+        Sprite savedFullHeroImage = fullHeroImage;
+        GameObject savedSkillTreePanel = skillTreePanel;
+
+        string jsonData = PlayerPrefs.GetString("CharacterData_" + heroID, null);
+
+        if (!string.IsNullOrEmpty(jsonData))
+        {
+            JsonUtility.FromJsonOverwrite(jsonData, this);
+        }
+
+        // Restore references you do not want saved JSON to break.
+        heroIcon = savedHeroIcon;
+        fullHeroImage = savedFullHeroImage;
+        skillTreePanel = savedSkillTreePanel;
+
+        EnsureValidLevel();
+        EnsureListsAfterLoad();
+
+        // Important:
+        // Rebuild equipped runtime ScriptableObject instances from saved plain data.
+        // Do not apply stat bonuses here because the saved CharacterData stats already include them.
+        LoadEquippedGearFromSaveFields();
     }
 
-    string oldHeroID = heroID;
+    private void EnsureListsAfterLoad()
+    {
+        if (AvailableSkills == null)
+            AvailableSkills = new List<SkillType>();
 
-    Sprite savedHeroIcon = heroIcon;
-    Sprite savedFullHeroImage = fullHeroImage;
-    GameObject savedSkillTreePanel = skillTreePanel;
+        if (LockedSkills == null)
+            LockedSkills = new List<SkillType>();
 
-    // Delete old save before changing heroID.
-    PlayerPrefs.DeleteKey("CharacterData_" + oldHeroID);
+        if (equippedSkills == null)
+            equippedSkills = new List<SkillType>();
 
-    string defaultJson = JsonUtility.ToJson(defaultData);
-    JsonUtility.FromJsonOverwrite(defaultJson, this);
+        if (classMastery == null)
+            classMastery = new ClassMastery();
 
-    heroIcon = savedHeroIcon;
-    fullHeroImage = savedFullHeroImage;
-    skillTreePanel = savedSkillTreePanel;
+        EnsureEquipmentLists();
+    }
 
-    if (AvailableSkills == null) AvailableSkills = new List<SkillType>();
-    if (LockedSkills == null) LockedSkills = new List<SkillType>();
-    if (equippedSkills == null) equippedSkills = new List<SkillType>();
-    if (classMastery == null) classMastery = new ClassMastery();
+    public void ResetFromDefault(CharacterData defaultData)
+    {
+        if (defaultData == null)
+        {
+            Debug.LogError($"No default CharacterData provided for {heroID}.");
+            return;
+        }
 
-    EnsureValidLevel();
+        string oldHeroID = heroID;
 
-    // Delete save again after copying in case heroID changed.
-    PlayerPrefs.DeleteKey("CharacterData_" + heroID);
+        Sprite savedHeroIcon = heroIcon;
+        Sprite savedFullHeroImage = fullHeroImage;
+        GameObject savedSkillTreePanel = skillTreePanel;
 
-    // Save the clean reset version.
-    SaveData();
+        PlayerPrefs.DeleteKey("CharacterData_" + oldHeroID);
+
+        string defaultJson = JsonUtility.ToJson(defaultData);
+        JsonUtility.FromJsonOverwrite(defaultJson, this);
+
+        heroIcon = savedHeroIcon;
+        fullHeroImage = savedFullHeroImage;
+        skillTreePanel = savedSkillTreePanel;
+
+        EnsureListsAfterLoad();
+        ClearEquippedGear();
+        EnsureValidLevel();
+
+        PlayerPrefs.DeleteKey("CharacterData_" + heroID);
+
+        SaveData();
 
 #if UNITY_EDITOR
-    UnityEditor.EditorUtility.SetDirty(this);
-    UnityEditor.AssetDatabase.SaveAssets();
+        UnityEditor.EditorUtility.SetDirty(this);
+        UnityEditor.AssetDatabase.SaveAssets();
 #endif
 
-    Debug.Log($"Reset CharacterData from default: {oldHeroID} -> {heroID}");
-}
+        Debug.Log($"Reset CharacterData from default: {oldHeroID} -> {heroID}");
+    }
 
-public void EnsureValidLevel()
-{
-    if (heroLevel < 1)
+    public void EnsureValidLevel()
     {
+        if (heroLevel < 1)
+        {
+            heroLevel = 1;
+            heroExp = 0;
+            heroSkillPoints = 0;
+            heroStatPoints = 0;
+        }
+    }
+
+    public void ResetKnightToDefaults()
+    {
+        heroID = "Knight";
+
         heroLevel = 1;
         heroExp = 0;
-        heroSkillPoints = 0;
         heroStatPoints = 0;
-    }
-}
-public void ResetKnightToDefaults()
-{
-    // Core identity
-    heroID = "Knight";
+        heroSkillPoints = 0;
 
-    // Level / EXP
-    heroLevel = 1;
-    heroExp = 0;
-    heroStatPoints = 0;
-    heroSkillPoints = 0;
+        attackPower = 2;
+        defensePower = 1;
 
-    // Stats
-    attackPower = 2;
-    defensePower = 1;
+        maxHealth = 12;
+        health = 12;
 
-    maxHealth = 12;
-    health = 12;
+        maxEnergy = 10;
+        energy = 10;
 
-    maxEnergy = 10;
-    energy = 10;
+        maxStamina = 10;
+        stamina = 10;
 
-    maxStamina = 10;
-    stamina = 10;
+        speed = 4;
 
-    speed = 4;
+        isUnlocked = true;
+        expToLevel = 30;
+        damageReflectionPercentage = 0f;
 
-    // Progression
-    isUnlocked = true;
-    expToLevel = 30;
-    damageReflectionPercentage = 0f;
+        skillOne = SkillType.TripleHit;
+        skillTwo = SkillType.Taunt;
+        skillThree = SkillType.None;
+        skillFour = SkillType.None;
+        skillFive = SkillType.None;
+        skillSix = SkillType.None;
 
-    // Skill slots
-    skillOne = SkillType.TripleHit;
-    skillTwo = SkillType.Taunt;
-    skillThree = SkillType.None;
-    skillFour = SkillType.None;
-    skillFive = SkillType.None;
-    skillSix = SkillType.None;
+        AvailableSkills = new List<SkillType>
+        {
+            SkillType.Slash
+        };
 
-    // Skill lists
-    AvailableSkills = new List<SkillType>
-    {
-        SkillType.Slash
-    };
+        LockedSkills = new List<SkillType>
+        {
+            SkillType.TripleHit,
+            SkillType.Taunt,
+            SkillType.ReflectDamagePassive,
+            SkillType.SpeedBreak
+        };
 
-    LockedSkills = new List<SkillType>
-    {
-        SkillType.TripleHit,
-        SkillType.Taunt,
-        SkillType.ReflectDamagePassive,
-        SkillType.SpeedBreak
-    };
+        equippedSkills = new List<SkillType>();
 
-    equippedSkills = new List<SkillType>();
+        knightSlashModifier = KnightSlashModifier.None;
+        knightPassive = KnightPassive.None;
+        knightPath = KnightPath.None;
 
-    // Knight progression choices
-    knightSlashModifier = KnightSlashModifier.None;
-    knightPassive = KnightPassive.None;
-    knightPath = KnightPath.None;
+        hasChosenLevel6Modifier = false;
+        hasChosenLevel8Passive = false;
+        hasChosenLevel10Path = false;
 
-    hasChosenLevel6Modifier = false;
-    hasChosenLevel8Passive = false;
-    hasChosenLevel10Path = false;
+        classMastery = new ClassMastery();
 
-    classMastery = new ClassMastery();
+        ClearEquippedGear();
 
-    
-
-    // Delete old save and write the clean one.
-    PlayerPrefs.DeleteKey("CharacterData_" + heroID);
-    SaveData();
+        PlayerPrefs.DeleteKey("CharacterData_" + heroID);
+        SaveData();
 
 #if UNITY_EDITOR
-    UnityEditor.EditorUtility.SetDirty(this);
-    UnityEditor.AssetDatabase.SaveAssets();
+        UnityEditor.EditorUtility.SetDirty(this);
+        UnityEditor.AssetDatabase.SaveAssets();
 #endif
 
-    Debug.Log("[CharacterData] Knight reset to hardcoded defaults.");
-}
-#endregion
+        Debug.Log("[CharacterData] Knight reset to hardcoded defaults.");
+    }
+
+    #endregion
 }
