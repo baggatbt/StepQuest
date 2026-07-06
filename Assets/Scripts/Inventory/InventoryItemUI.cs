@@ -64,23 +64,21 @@ public class InventoryItemUI : MonoBehaviour,
     }
 
     public void OnPointerClick(PointerEventData eventData)
-{
-    if (itemData == null)
     {
-        Debug.LogWarning("[InventoryItemUI] Clicked slot, but itemData is null.");
-        return;
+        if (itemData == null)
+        {
+            Debug.LogWarning("[InventoryItemUI] Clicked slot, but itemData is null.");
+            return;
+        }
+
+        if (owner == null)
+        {
+            Debug.LogWarning("[InventoryItemUI] Owner inventory is null.");
+            return;
+        }
+
+        owner.HandleItemClicked(itemData);
     }
-
-    MainMenuUIManager uiManager = FindObjectOfType<MainMenuUIManager>();
-
-    if (uiManager == null)
-    {
-        Debug.LogWarning("[InventoryItemUI] No MainMenuUIManager found.");
-        return;
-    }
-
-    uiManager.ShowItemDescription(itemData);
-}
 
     public void OnInitializePotentialDrag(PointerEventData eventData)
     {

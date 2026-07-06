@@ -15,6 +15,9 @@ public class Inventory : MonoBehaviour
     [Header("Optional Equip Support")]
     [SerializeField] private EquipmentManager equipmentManager;
 
+    [Header("Item Detail Panel")]
+    [SerializeField] private EquipmentDetailPanelUI equipmentDetailPanel;
+
     private EquipmentType? pendingEquipSlot = null;
 
     private void Awake()
@@ -28,9 +31,6 @@ public class Inventory : MonoBehaviour
 
     private void Start()
     {
-        // Important:
-        // GameManager should already load inventory in its own Start.
-        // This small delayed refresh helps avoid script execution order issues.
         Invoke(nameof(DelayedRefresh), 0.05f);
     }
 
@@ -60,7 +60,80 @@ public class Inventory : MonoBehaviour
 
     public void CloseInventory()
     {
+        pendingEquipSlot = null;
+
+        if (equipmentDetailPanel != null)
+            equipmentDetailPanel.Hide();
+
         HideInventory();
+    }
+
+    public void HandleItemClicked(Item item)
+    {
+        if (item == null)
+        {
+            Debug.LogWarning("[Inventory] Clicked null item.");
+            return;
+        }
+
+        // Equip-slot mode:
+        // Used when OpenInventoryForEquip(slot) is active.
+        if (pendingEquipSlot.HasValue)
+        {
+            if (item is Equipment equipmentToEquip)
+            {
+                if (equipmentManager == null)
+                {
+                    Debug.LogWarning("[Inventory] EquipmentManager is not assigned.");
+                    return;
+                }
+
+                if (equipmentToEquip.equipmentType != pendingEquipSlot.Value)
+                {
+                    Debug.Log($"[Inventory] {equipmentToEquip.itemName} cannot go in {pendingEquipSlot.Value} slot.");
+                    return;
+                }
+
+                equipmentManager.Equip(equipmentToEquip);
+                pendingEquipSlot = null;
+
+                if (equipmentDetailPanel != null)
+                    equipmentDetailPanel.Hide();
+
+                HideInventory();
+                UpdateInventoryUI();
+                return;
+            }
+
+            Debug.Log("[Inventory] Clicked non-equipment item while trying to equip.");
+            return;
+        }
+
+        // Normal inventory mode:
+        // Equipment opens the new equipment detail panel.
+        if (item is Equipment equipment)
+        {
+            if (equipmentDetailPanel == null)
+            {
+                Debug.LogWarning("[Inventory] EquipmentDetailPanelUI is not assigned.");
+                return;
+            }
+
+            equipmentDetailPanel.Show(equipment);
+            return;
+        }
+
+        // Non-equipment items can still use your old item detail panel if you want.
+        MainMenuUIManager uiManager = FindObjectOfType<MainMenuUIManager>();
+
+        if (uiManager != null)
+        {
+            uiManager.ShowItemDescription(item);
+        }
+        else
+        {
+            Debug.Log("[Inventory] Clicked non-equipment item: " + item.itemName);
+        }
     }
 
     private void ShowInventory()
@@ -82,8 +155,6 @@ public class Inventory : MonoBehaviour
 
     private void HideInventory()
     {
-        // Since your inventory uses CanvasGroup alpha instead of SetActive,
-        // we hide it this way.
         if (inventoryCanvasGroup != null)
         {
             inventoryCanvasGroup.alpha = 0f;
@@ -143,7 +214,6 @@ public class Inventory : MonoBehaviour
 
             slotUI.Setup(this, i);
 
-            // Empty slot
             if (i >= itemCount)
             {
                 slotUI.ClearVisual();
@@ -159,30 +229,6 @@ public class Inventory : MonoBehaviour
             }
 
             slotUI.Bind(item, item.quantity, rootCanvas);
-
-            // Optional equip mode
-            if (pendingEquipSlot.HasValue && equipmentManager != null && item is Equipment eq)
-            {
-                Button button = slotObj.GetComponent<Button>();
-
-                if (button != null)
-                {
-                    button.onClick.RemoveAllListeners();
-
-                    if (eq.equipmentType == pendingEquipSlot.Value)
-                    {
-                        Equipment equipmentToEquip = eq;
-
-                        button.onClick.AddListener(() =>
-                        {
-                            equipmentManager.Equip(equipmentToEquip);
-                            pendingEquipSlot = null;
-                            HideInventory();
-                            UpdateInventoryUI();
-                        });
-                    }
-                }
-            }
         }
 
         Debug.Log($"[Inventory] UI refreshed. Items shown: {itemCount}");
