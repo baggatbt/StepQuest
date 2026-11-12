@@ -19,6 +19,8 @@ public class Node : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        // The quest location button owns this interaction until its story is complete.
+        if (StepQuest.Adventure.AdventureScreen.OwnsQuestNode(this)) return;
         if (uiManager != null)
         {
             uiManager.ShowNodeInfo(nodeName);

@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8fecf719a7f492a8f41042cc73bf6a7, type: 3}
+  m_Name: FirstAdventure
+  m_EditorClassIdentifier: 
+  forestBackdrop: {fileID: 21300000, guid: 48cc0caf94c215a44ba5d9abd3e4a7ad, type: 3}
+  npcPortrait: {fileID: 21300000, guid: 852272c82b25d83478161ae0e0fa9a1f, type: 3}
+  questIcon: {fileID: 21300000, guid: 069b3439ce068c042b7b82088694ff4c, type: 3}
+  questTitle: A Sign of Trouble
+  encounterStageId: 1.1
+  copperReward: 50
+  offerNode: offer
+  activeNode: active
+  victoryNode: victory
+  completeNode: complete
+  nodes:
+  - id: offer
+    speaker: Mayor Bramble
+    text: "The road signs have gone missing. Without them, our village is technically nowhere. Please investigate before the tax office notices."
+    replies:
+    - text: "I will investigate. This sounds almost like a job."
+      nextNode: "active"
+      action: 1
+  - id: active
+    speaker: Mayor Bramble
+    text: "Try the forest road. If anything attacks you, please ask whether it has seen our signs. Before or after the stabbing. Your discretion."
+    replies:
+    - text: "Back to the village."
+      nextNode: ""
+      action: 0
+  - id: victory
+    speaker: Mayor Bramble
+    text: "Excellent work! We can put the village back on the map. The cartographer charges by the letter, so we may become Bram."
+    replies:
+    - text: "Collect my reward."
+      nextNode: "complete"
+      action: 2
+  - id: complete
+    speaker: Mayor Bramble
+    text: "The road is open and your guild has its first success. I have filed it under Unexpected Developments."
+    replies:
+    - text: "A proud day for administration."
+      nextNode: ""
+      action: 0

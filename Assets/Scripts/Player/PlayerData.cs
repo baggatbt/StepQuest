@@ -197,7 +197,7 @@ public class PlayerData : MonoBehaviour
 
     public bool UseSteps(int amountToUse)
 {
-    if (inGameSteps >= amountToUse)
+    if (amountToUse > 0 && inGameSteps >= amountToUse)
     {
         inGameSteps -= amountToUse;
         SavePlayerData();

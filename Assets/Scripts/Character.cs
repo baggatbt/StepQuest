@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class Character : MonoBehaviour
+public partial class Character : MonoBehaviour
 {
     [Header("Identity")]
     public string characterIDNumber;
@@ -452,7 +452,7 @@ if (bm != null && this.CompareTag("Enemy"))
     // Death
     // ---------------------------
 
-    public void CheckForDeath()
+    public virtual void CheckForDeath()
 {
     Debug.Log("Checking for death");
     if (health > 0) return;

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System;
 using UnityEngine.SceneManagement;
 using UnityEngine;
@@ -8,7 +8,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 
-public class BattleManager : MonoBehaviour
+public partial class BattleManager : MonoBehaviour
 {
     public Character companion1;
     public Character companion2;
@@ -56,6 +56,7 @@ public class BattleManager : MonoBehaviour
     private int currentStageIndex = 0;
     public bool isBattleStarted;
     private bool battleLost = false;
+    private bool battleFinished;
 
     [Header("Enemy HP Bar Popup")]
 [SerializeField] private float hpBarVisibleTime = 0.8f;
@@ -230,6 +231,7 @@ public void ResetAndSetupForStage(BattleConfig config)
 
     Debug.Log($"[Battle] Resetting for new stage config: {config.poolName}");
 
+    CancelTimedAction();
     // Stop battle coroutines
     StopAllCoroutines();
 
@@ -239,6 +241,7 @@ public void ResetAndSetupForStage(BattleConfig config)
 
     // reset list/state
     battleLost = false;
+    battleFinished = false;
     isBattleStarted = false;
     state = BattleState.PlayerTurn;
     currentTarget = null;
@@ -359,6 +362,9 @@ private void ResetCharacterRuntime(Character c)
 
     // Character is a MonoBehaviour in your project, so this is valid
     c.StopAllCoroutines();
+    c.ClearSkillCooldowns();
+    c.GetComponent<BuffmagePresentation>()?.ResetPresentation();
+    c.GetComponent<BuffmageAnimationDriver>()?.ResetForBattle();
 
     c.isAttacking = false;
     c.isMoving = false;
@@ -469,6 +475,7 @@ private void ResetCharacterRuntime(Character c)
     private void ChangeState(BattleState newState)
     {
         CheckBattleEnd();
+        if (battleFinished) return;
         turnOrderList.RemoveAll(character => character.health <= 0);
         State = newState;
         if (State == BattleState.PlayerTurn)
@@ -501,7 +508,9 @@ private int GetEffectiveSpeedForTurnOrder(Character c)
 [SerializeField] private bool resolvingPhase = false;
 private void BeginPlanningPhase()
 {
-    if (battleLost) return;
+    CheckBattleEnd();
+    if (battleLost || battleFinished) return;
+    foreach (var player in playerParty) if (player != null) player.TickSkillCooldowns();
     planningPhase = true;
     resolvingPhase = false;
     SetAllEnemyHpBarsVisible(true);
@@ -680,13 +689,16 @@ private class PlannedAction
 
     public void StartTurn()
 {
+    CheckBattleEnd();
+    if (battleFinished) return;
     
     if (battleLost != true)
     {
     // Now check if there are characters left to take a turn
     if (turnOrderList.Count > 0)
     {
-        turnOrderList.RemoveAll(character => character.health <= 0);
+        turnOrderList.RemoveAll(character => character == null || character.health <= 0);
+        if (turnOrderList.Count == 0) { BeginPlanningPhase(); return; }
         var nextCharacter = turnOrderList[0];
         ExecuteTurn(nextCharacter);
     }
@@ -730,6 +742,8 @@ private class PlannedAction
 
     public void EndTurn()
 {
+    CheckBattleEnd();
+    if (battleFinished) return;
     if (turnOrderList.Count > 0)
         turnOrderList.RemoveAt(0);
 
@@ -773,6 +787,7 @@ private class PlannedAction
     // Only show UI when the player is actively PLANNING a move.
     return isBattleStarted
         && !battleLost
+        && !battleFinished
         && planningPhase
         && !resolvingPhase
         && state == BattleState.PlayerTurn
@@ -853,6 +868,7 @@ private void SetAllEnemyHpBarsVisible(bool visible)
         }
 
         Skill skill = skillQueue.Dequeue();
+        if (!CanPlanAction(activePlayer) || !activePlayer.IsSkillReady(skill) || activePlayer.energy < skill.energyCost) return;
         activePlayer.currentSkill = skill;
         activePlayer.attackTarget = currentTarget.transform;
 
@@ -908,6 +924,7 @@ private void SetAllEnemyHpBarsVisible(bool visible)
             {
                 
                 Skill skill = skillQueue.Dequeue();
+                if (!activePlayer.IsSkillReady(skill) || activePlayer.energy < skill.energyCost) break;
                 activePlayer.currentSkill = skill;
                 activePlayer.SpendEnergy(skill.energyCost);
                 skillsExecuted++;
@@ -974,6 +991,7 @@ private void SetAllEnemyHpBarsVisible(bool visible)
         {
             
             yield return activePlayer.currentSkill.Execute(activePlayer, targetEnemy, this);
+            activePlayer.StartSkillCooldown(activePlayer.currentSkill);
         // Award Knight mastery/progression (Section C)
         if (activePlayer is Companion c && c.heroID == "Knight")
         {
@@ -1368,31 +1386,21 @@ Debug.Log($"[Popup] popupCanvas: {popupCanvas.name} id={popupCanvas.GetInstanceI
     public TextMeshProUGUI[] expTexts;
     public TextMeshProUGUI[] heroIDTexts;
 
-    private void DisplayExpToLevel(List<Character> playerParty)
+    private void DisplayExpToLevel(List<Character> party)
     {
-        foreach (var slider in expSliders) slider.gameObject.SetActive(false);
-        foreach (var text in expTexts) text.gameObject.SetActive(false);
-        foreach (var text in heroIDTexts) text.gameObject.SetActive(false);
-
-        for (int i = 0; i < playerParty.Count; i++)
+        foreach (var slider in expSliders) if (slider != null) slider.gameObject.SetActive(false);
+        foreach (var text in expTexts) if (text != null) text.gameObject.SetActive(false);
+        foreach (var text in heroIDTexts) if (text != null) text.gameObject.SetActive(false);
+        for (int i = 0; i < party.Count; i++)
         {
-            if (playerParty[i] is Companion companion)
-            {
-                int expToLevel = companion.ExpToNextLevel(companion.heroLevel);
-
-                if (i < expSliders.Length && i < expTexts.Length)
-                {
-                    expSliders[i].maxValue = companion.ExpToNextLevel(companion.heroLevel);
-                    expSliders[i].value = companion.heroExp;
-                    expTexts[i].text = "Exp to level: " + (expToLevel - companion.heroExp).ToString();
-                    heroIDTexts[i].text = companion.heroID;
-
-                    expSliders[i].gameObject.SetActive(true);
-                    expTexts[i].gameObject.SetActive(true);
-                    heroIDTexts[i].gameObject.SetActive(true);
-                }
-                Debug.Log(expTexts[i].text);
-            }
+            if (!(party[i] is Companion hero)) continue;
+            int target = hero.ExpToNextLevel(hero.heroLevel);
+            if (i < expSliders.Length && expSliders[i] != null)
+            { expSliders[i].maxValue = target; expSliders[i].value = hero.heroExp; expSliders[i].gameObject.SetActive(true); }
+            if (i < expTexts.Length && expTexts[i] != null)
+            { expTexts[i].text = "Exp to level: " + Mathf.Max(0, target - hero.heroExp); expTexts[i].gameObject.SetActive(true); }
+            if (i < heroIDTexts.Length && heroIDTexts[i] != null)
+            { heroIDTexts[i].text = hero.heroID; heroIDTexts[i].gameObject.SetActive(true); }
         }
     }
 
@@ -1406,6 +1414,8 @@ Debug.Log($"[Popup] popupCanvas: {popupCanvas.name} id={popupCanvas.GetInstanceI
     private void Update()
 {
     if (!isBattleStarted) return;
+    CheckBattleEnd();
+    if (battleFinished) return;
 
     MoveRadialMenuToActivePlayer();
 
@@ -1466,21 +1476,18 @@ Debug.Log($"[Popup] popupCanvas: {popupCanvas.name} id={popupCanvas.GetInstanceI
 
     public void CheckBattleEnd()
     {
-        bool allEnemiesDefeated = enemies.All(enemy => enemy.health <= 0);
-        bool allAlliesDefeated = playerParty.All(hero => hero.health <= 0);
-
-        if (allEnemiesDefeated || allAlliesDefeated)
-        {
-            if (allEnemiesDefeated)
-            {
-                ProcessVictory();
-               // GameManager.Instance.currentStageIndex++;
-            }
-            else if (allAlliesDefeated)
-            {
-                ProcessDefeat();
-            }
-        }
+        if (battleFinished || !isBattleStarted || enemies.Count == 0 || playerParty.Count == 0) return;
+        bool allEnemiesDefeated = enemies.All(enemy => enemy == null || enemy.health <= 0);
+        bool allAlliesDefeated = playerParty.All(hero => hero == null || hero.health <= 0);
+        if (!allEnemiesDefeated && !allAlliesDefeated) return;
+        // Latch before rewards or UI: late animation callbacks must not resolve twice.
+        battleFinished = true;
+        CancelTimedAction();
+        planningPhase = false;
+        resolvingPhase = false;
+        DisableAllButtons();
+        if (activePlayerIndicator != null) activePlayerIndicator.SetActive(false);
+        if (allEnemiesDefeated) ProcessVictory(); else ProcessDefeat();
     }
 
     private void DeductStaminaFromParticipants()
@@ -1503,7 +1510,7 @@ Debug.Log($"[Popup] popupCanvas: {popupCanvas.name} id={popupCanvas.GetInstanceI
         int totalExp = 0;
         int totalCopper = 0;
 
-        foreach (Enemy enemy in enemies)
+        foreach (Enemy enemy in enemies.OfType<Enemy>())
         {
             totalExp += enemy.expReward;
             totalCopper += enemy.goldReward;
@@ -1522,18 +1529,42 @@ Debug.Log($"[Popup] popupCanvas: {popupCanvas.name} id={popupCanvas.GetInstanceI
             }
         }
 
-        TextMeshProUGUI expGainedTextComponent = ExpGainedText.GetComponent<TextMeshProUGUI>();
-        expGainedTextComponent.text = totalExp.ToString();
+        if (ExpGainedText != null) ExpGainedText.GetComponent<TextMeshProUGUI>().text = totalExp.ToString();
 
-        TextMeshProUGUI goldGainedTextComponent = GoldGainedText.GetComponent<TextMeshProUGUI>();
-        goldGainedTextComponent.text = totalCopper.ToString();
+        if (GoldGainedText != null) GoldGainedText.GetComponent<TextMeshProUGUI>().text = totalCopper.ToString();
 
         DisplayExpToLevel(playerParty);
     }
 
     private void ProcessVictory()
 {
+    if (StepQuest.Adventure.AdventureProgress.InStoryBattle &&
+        StepQuest.Adventure.AdventureProgress.State == StepQuest.Adventure.StoryQuestState.Won) return;
     EndOfBattleRewards(enemies);
+    if (StepQuest.Adventure.AdventureProgress.InStandaloneBattle)
+    {
+        StepQuest.Adventure.AdventureProgress.Victory();
+        RevealVictoryPanel();
+        if (nextBattleButton != null)
+        {
+            nextBattleButton.gameObject.SetActive(true);
+            nextBattleButton.onClick = new Button.ButtonClickedEvent();
+            nextBattleButton.onClick.AddListener(StepQuest.Adventure.AdventureProgress.ReturnToVillage);
+            var label = nextBattleButton.GetComponentInChildren<TMP_Text>(true);
+            if (label == null)
+            {
+                var go = new GameObject("Return label", typeof(RectTransform));
+                go.transform.SetParent(nextBattleButton.transform, false);
+                var rect = go.GetComponent<RectTransform>(); rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one;
+                rect.offsetMin = new Vector2(4, 4); rect.offsetMax = new Vector2(-4, -4);
+                label = go.AddComponent<TextMeshProUGUI>(); label.fontSize = 22; label.enableAutoSizing = true;
+                label.fontSizeMin = 14; label.fontSizeMax = 22; label.alignment = TextAlignmentOptions.Center;
+                label.raycastTarget = false;
+            }
+            label.text = StepQuest.Adventure.AdventureProgress.InRandomBattle ? "Return to town" : "Return to map";
+        }
+        return;
+    }
     
     KnightProgressionService.TryApply(GameManager.Instance.currentCompanionData);
 
@@ -1547,16 +1578,27 @@ Debug.Log($"[Popup] popupCanvas: {popupCanvas.name} id={popupCanvas.GetInstanceI
         Debug.LogError("[ProcessVictory] GameManager.currentStage is null; cannot unlock neighbors.");
     }
 
-    endOfBattlePanel.SetActive(true);
-    FindObjectOfType<RunLootPanelUI>(true).Show();
+    RevealVictoryPanel();
 
     DisplayExpToLevel(playerParty);
 }
 
 
 
+    private void RevealVictoryPanel()
+    {
+        endOfBattlePanel.SetActive(true);
+        var lootPanel = endOfBattlePanel.GetComponent<RunLootPanelUI>();
+        if (lootPanel != null) lootPanel.Show();
+        foreach (var group in endOfBattlePanel.GetComponentsInParent<CanvasGroup>(true))
+        { group.alpha = 1; group.interactable = true; group.blocksRaycasts = true; }
+        DisplayExpToLevel(playerParty);
+    }
+
     public void GoToNextStage()
     {
+        if (StepQuest.Adventure.AdventureProgress.InStandaloneBattle)
+        { StepQuest.Adventure.AdventureProgress.ReturnToVillage(); return; }
         
           
          GameManager.Instance.GetNextStage(0); // Transitions to the first connected stage
@@ -1572,17 +1614,42 @@ Debug.Log($"[Popup] popupCanvas: {popupCanvas.name} id={popupCanvas.GetInstanceI
     StopAllCoroutines();
     battleLost = true;
 
+    float presentationDelay = 0;
+    foreach (var mage in playerParty.OfType<Buffmage>())
+    {
+        mage.CheckForDeath();
+        var driver = mage.GetComponent<BuffmageAnimationDriver>();
+        if (driver != null) presentationDelay = Mathf.Max(presentationDelay, driver.DeathPresentationRemaining);
+    }
+    if (presentationDelay > 0) StartCoroutine(FinishDefeatAfterPresentation(presentationDelay));
+    else CompleteDefeatTransition();
+}
+
+    private IEnumerator FinishDefeatAfterPresentation(float seconds)
+    {
+        yield return new WaitForSecondsRealtime(seconds);
+        CompleteDefeatTransition();
+    }
+
+    private void CompleteDefeatTransition()
+{
+
+    if (StepQuest.Adventure.AdventureProgress.InStandaloneBattle)
+    { StepQuest.Adventure.AdventureProgress.ReturnToVillage(); return; }
+
     // End run on defeat
     GameManager.Instance.EndDungeonRun(false);
 
     
+    if (endOfBattleLossPanel != null) endOfBattleLossPanel.SetActive(true);
     GameManager.Instance.ReturnToTownFromBattle();
-    endOfBattleLossPanel.SetActive(true);
 }
 
 // BattleManager.cs
 public void ReturnToMapAfterVictory()
 {
+    if (StepQuest.Adventure.AdventureProgress.InStandaloneBattle)
+    { StepQuest.Adventure.AdventureProgress.ReturnToVillage(); return; }
     // neighbors already unlocked in ProcessVictory()
     //Scoop up rewards
     GameManager.Instance.EndDungeonRun(true);

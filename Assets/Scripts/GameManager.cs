@@ -10,7 +10,7 @@ using UnityEngine.EventSystems;
 
 
 //Storing and managing game states across scenes
-public class GameManager : MonoBehaviour
+public partial class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
      public List<StageData> allStagesData = new List<StageData>(); // List of all stages
@@ -95,6 +95,7 @@ public class GameManager : MonoBehaviour
         InitializeStageDictionary(); // Initialize dictionary at game start
         LoadUnlockedStages();
 
+        RegisterAdditionalHeroes();
         // Initialize character data dictionary here
         foreach (var data in allCharacterData)
         {
@@ -162,6 +163,7 @@ if (currentPartyHeroIDs.Count == 0 && knightData != null)
 
     public GameObject GetCharacterPrefab(string heroID)
 {
+    if (registeredHeroes.TryGetValue(heroID, out var registered)) return registered.prefab;
     switch (heroID)
     {
         case "Knight":
@@ -857,6 +859,8 @@ public int GetItemCount(int itemID)
 
     public Companion InstantiateSelectedCompanion(string heroID)
 {
+    if (registeredHeroes.ContainsKey(heroID) &&
+        (!characterDataDictionary.TryGetValue(heroID, out var heroData) || !IsHeroAvailable(heroData))) return null;
     GameObject prefab = GetCharacterPrefab(heroID);
 
     if (prefab == null)
@@ -1170,6 +1174,12 @@ public int GetItemCount(int itemID)
     void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
+        if (Instance == this)
+        {
+            Application.quitting -= SaveAllCharacterData;
+            foreach (var data in runtimeHeroData) if (data != null) Destroy(data);
+            Instance = null;
+        }
     }
 
     private void OnApplicationQuit()
@@ -1688,7 +1698,7 @@ private void SyncInventorySlotsFromItemList()
 
 public void AddCharacterDataToParty(CharacterData characterData)
 {
-    if (characterData == null) return;
+    if (!IsHeroAvailable(characterData)) return;
 
     if (currentPartyHeroIDs.Count >= 2)
     {
@@ -1752,6 +1762,7 @@ public void LoadCurrentPartyIDs()
     currentPartyHeroIDs = loaded != null && loaded.items != null
         ? loaded.items
         : new List<string>();
+    FilterUnavailablePartyMembers();
 }
 
 [System.Serializable]

@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d66ecaadf644f779ea0009c2ac0621d, type: 3}
+  m_Name: BuffmageSettings
+  m_EditorClassIdentifier:
+  startingHealth: 28
+  startingAttack: 6
+  startingDefense: 1
+  startingSpeed: 3
+  startingEnergy: 3
+  healthPerLevel: 6
+  attackPerLevel: 1
+  defensePerLevel: 0.4
+  energyEveryLevels: 5
+  fireballCharge:
+    perfectStartSeconds: 0.9
+    perfectEndSeconds: 1.4
+    maximumHoldSeconds: 2.2
+    inputWaitTimeoutSeconds: 6
+    earlyMinimumMultiplier: 0.55
+    earlyMaximumMultiplier: 0.95
+    perfectMultiplier: 1.55
+    overchargedMultiplier: 0.7
+  fireballDamage: 1.45
+  fireballSpeed: 0.8
+  fireballEnergyCost: 0
+  fireballEnergyGain: 1
+  fireballCooldown: 0
+  barrageSeconds: 2.2
+  punchDamage: 0.43
+  minimumPunchInterval: 0.12
+  maximumPunches: 6
+  barrageEnergyCost: 2
+  barrageCooldown: 1
+  meteorTiming:
+    durationSeconds: 1.6
+    perfectStart: 0.58
+    perfectEnd: 0.82
+  meteorDamage: 1.65
+  meteorPerfectMultiplier: 1.5
+  meteorMissMultiplier: 0.7
+  meteorEnergyCost: 3
+  meteorCooldown: 2
+  animations: {fileID: 11400000, guid: 4880d590f5624efba067ac5f13187cd5, type: 2}
+  bookSprite: {fileID: 21300000, guid: ab47b5c39bff66d4aa93504c118af7b9, type: 3}
+  fireballIcon: {fileID: 21300000, guid: f8a75b4ead65d2f4080d173e283a7bb8, type: 3}
+  punchIcon: {fileID: 21300000, guid: ec7f47e0f3f3886458a999df05cd766b, type: 3}
+  meteorIcon: {fileID: 21300000, guid: 07534b3547e860e418ad16611d922b76, type: 3}
+  impactSprite: {fileID: 21300000, guid: 1f1dd43465ce1eb40b64394363beae90, type: 3}
+  impactFrame: {x: 64, y: 0, z: 16, w: 32}
+  flameFrames:
+  - {fileID: 921276720, guid: 27c7c35002144a04e861e6bb57f6db8c, type: 3}
+  - {fileID: -871376893, guid: 27c7c35002144a04e861e6bb57f6db8c, type: 3}
+  - {fileID: -1749336052, guid: 27c7c35002144a04e861e6bb57f6db8c, type: 3}
+  - {fileID: -2055236763, guid: 27c7c35002144a04e861e6bb57f6db8c, type: 3}
+  - {fileID: -1249909840, guid: 27c7c35002144a04e861e6bb57f6db8c, type: 3}
+  - {fileID: 2002573385, guid: 27c7c35002144a04e861e6bb57f6db8c, type: 3}
+  hitSound: {fileID: 8300000, guid: 6cf83724a179e418e9c0fd0f17384fcc, type: 3}
+  perfectSound: {fileID: 8300000, guid: 94f827a27b434434d85138f924464fe7, type: 3}
+  throwSeconds: 0.42
+  punchSeconds: 0.13
+  leapSeconds: 0.55
+  leapHeight: 2.5

@@ -346,6 +346,10 @@ public class CharacterData : ScriptableObject
             SkillType.Taunt => new Taunt(),
             SkillType.ReflectDamagePassive => new ReflectDamagePassive(),
             SkillType.SpeedBreak => new SpeedBreak(),
+            SkillType.HeavySlash => new HeavySlash(),
+            SkillType.BuffmageFireball => BuffmageSkills.Create(skillType),
+            SkillType.BuffmageMagicMissile => BuffmageSkills.Create(skillType),
+            SkillType.BuffmageMeteor => BuffmageSkills.Create(skillType),
             _ => null
         };
     }

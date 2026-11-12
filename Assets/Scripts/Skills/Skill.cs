@@ -29,7 +29,11 @@ public enum SkillType
     ReflectDamagePassive,
     SpeedBreak,
     TamedGoblinAttackSkill,
-    HeavySlash
+    HeavySlash,
+    // Append only: old saves serialize these enum values as integers.
+    BuffmageFireball,
+    BuffmageMagicMissile,
+    BuffmageMeteor
 }
 
 public abstract class Skill
@@ -46,6 +50,7 @@ public abstract class Skill
     public int requiredLevel;
     public int skillLevel;
     public int skillPointCost;
+    public int cooldownTurns;
 
     [Header("Energy")]
     public int energyCost;
@@ -78,6 +83,7 @@ public abstract class Skill
     public TimingEventResult LastTimingResult { get; private set; }
 
     protected TimingEventResult result;
+    protected void RecordTiming(TimingEventResult value) { result = value; LastTimingResult = value; }
 
     public Sprite LoadIconImage(string path)
     {

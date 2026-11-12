@@ -216,7 +216,7 @@ public void OpenCrafterBuildingPanel()
 
         Debug.Log($"Processing character: {characterData.heroID}, isUnlocked: {characterData.isUnlocked}");
 
-        if (characterData.isUnlocked && addedCompanions.Add(characterData.heroID)) // Checks if heroID is not already added
+        if (GameManager.Instance.IsHeroAvailable(characterData) && addedCompanions.Add(characterData.heroID))
         {
             // Instantiate the button within the container
             GameObject buttonObject = Instantiate(companionButtonPrefab, companionButtonContainer.transform);
@@ -418,7 +418,7 @@ private void OnCharacterDataSelected(CharacterData characterData)
     // Iterate over the CharacterData list from GameManager
     foreach (CharacterData characterData in GameManager.Instance.allCharacterData)
     {
-        if (characterData.isUnlocked && addedCompanions.Add(characterData.heroID)) // Check if unlocked and not already added
+        if (GameManager.Instance.IsHeroAvailable(characterData) && addedCompanions.Add(characterData.heroID))
         {
             // Instantiate the button within the container
             GameObject buttonObject = Instantiate(heroSpriteIconButtonPrefab, companionButtonContainer.transform);

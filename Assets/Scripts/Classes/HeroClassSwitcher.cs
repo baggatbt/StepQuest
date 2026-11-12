@@ -11,7 +11,7 @@ public class HeroClassEntry {
     public bool unlocked = true;       // Use your existing flags if you have them
 }
 
-public enum ClassType { Knight, Archer /*, Mage, etc. */ }
+public enum ClassType { Knight, Archer, Buffmage }
 
 
 public class HeroClassSwitcher : MonoBehaviour
@@ -35,6 +35,7 @@ public class HeroClassSwitcher : MonoBehaviour
 
     void Start()
     {
+        RegisterBuffmageForm();
         // Spawn default if nothing is active
         if (_activeHero == null)
             SwitchTo(defaultClass);
@@ -43,20 +44,42 @@ public class HeroClassSwitcher : MonoBehaviour
 
     public ClassType CurrentType { get; private set; }  
 
+    void RegisterBuffmageForm()
+    {
+        var gm = GameManager.Instance;
+        if (gm == null || !gm.characterDataDictionary.TryGetValue(Buffmage.HeroID, out var data)) return;
+        if (_map.ContainsKey(ClassType.Buffmage)) return;
+        var prefab = gm.GetCharacterPrefab(Buffmage.HeroID);
+        if (prefab == null) return;
+        var entry = new HeroClassEntry { classType = ClassType.Buffmage, prefab = prefab.GetComponent<Companion>(), data = data, unlocked = false };
+        if (entries == null) entries = new List<HeroClassEntry>();
+        entries.Add(entry); _map[ClassType.Buffmage] = entry;
+    }
+
+    bool IsAvailable(HeroClassEntry entry)
+    {
+        if (entry == null) return false;
+        if (entry.classType == ClassType.Buffmage)
+            return GameManager.Instance != null && GameManager.Instance.IsHeroAvailable(entry.data);
+        return entry.unlocked || (entry.data != null && entry.data.isUnlocked);
+    }
+
     public IEnumerable<HeroClassEntry> UnlockedEntries() // helper for UI
     {
+        RegisterBuffmageForm();
         foreach (var e in entries)
-            if (e != null && (e.unlocked || (e.data != null && e.data.isUnlocked)))
+            if (IsAvailable(e))
                 yield return e;
     }
 
     public void SwitchTo(ClassType target)
     {
+        RegisterBuffmageForm();
         if (!_map.TryGetValue(target, out var entry)) {
             Debug.LogError($"[HeroClassSwitcher] No entry for {target}.");
             return;
         }
-        if (!entry.unlocked && !(entry.data?.isUnlocked ?? false)) {
+        if (!IsAvailable(entry)) {
             Debug.Log("[HeroClassSwitcher] Target class is locked.");
             return;
         }
@@ -118,4 +141,5 @@ public class HeroClassSwitcher : MonoBehaviour
     // Convenience (wire these to buttons if you like)
     public void SwitchToKnight() => SwitchTo(ClassType.Knight);
     public void SwitchToArcher() => SwitchTo(ClassType.Archer);
+    public void SwitchToBuffmage() => SwitchTo(ClassType.Buffmage);
 }
