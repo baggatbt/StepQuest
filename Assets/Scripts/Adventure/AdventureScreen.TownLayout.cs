@@ -6,78 +6,96 @@ namespace StepQuest.Adventure
 {
     public partial class AdventureScreen
     {
-        // Normalized town coordinates keep the hub usable on portrait aspect ratios.
+        RectTransform townArtwork;
+        // AdventureQuest-style scenic hub: the buildings themselves are tap targets.
         void BuildAdventureTown()
         {
             if (townView == null) return;
-            var scenery = Rect("Town paths", townView.transform);
-            scenery.SetAsFirstSibling();
-            Path(scenery, new Vector2(.46f, .24f), new Vector2(.54f, .77f));
-            Path(scenery, new Vector2(.23f, .49f), new Vector2(.77f, .54f));
-            Path(scenery, new Vector2(.23f, .50f), new Vector2(.29f, .63f));
-            Path(scenery, new Vector2(.71f, .40f), new Vector2(.77f, .53f));
-            Path(scenery, new Vector2(.39f, .47f), new Vector2(.61f, .57f));
+            var canvas = townView.GetComponentInParent<Canvas>();
+            if (canvas != null) canvas.pixelPerfect = true;
+            var scenery = Rect("Bramble village scenery", townView.transform);
+            // Cover retained prototype artwork/controls; the four live service
+            // buttons are moved above this surface below. Legacy objects stay intact.
+            scenery.SetAsLastSibling();
+            scenery.gameObject.AddComponent<RectMask2D>();
+            var viewport = Rect("Village viewport", scenery);
+            Place(viewport, new Vector2(0, .205f), new Vector2(1, .89f));
+            viewport.gameObject.AddComponent<RectMask2D>();
+            var backdrop = Image("Village panorama", viewport, Resources.Load<Sprite>("SQ Assets/UI/townPNG"));
+            townArtwork = backdrop.rectTransform;
+            backdrop.raycastTarget = true;
+            if (backdrop.sprite != null)
+            {
+                var fit = backdrop.gameObject.AddComponent<AspectRatioFitter>();
+                fit.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+                fit.aspectRatio = backdrop.sprite.rect.width / backdrop.sprite.rect.height;
+            }
+            else backdrop.color = new Color32(64, 77, 52, 255);
+            TownBand(scenery, "Resource surround", .89f, 1);
+            TownBand(scenery, "Gate and navigation surround", 0, .205f);
 
             var header = ui.Panel(scenery, "Village heading"); header.raycastTarget = false;
-            Place(header.rectTransform, new Vector2(.08f, .78f), new Vector2(.92f, .875f));
-            var title = Text(header.transform, "BRAMBLE VILLAGE", 28);
-            Place(title.rectTransform, new Vector2(.02f, .42f), new Vector2(.98f, .93f));
-            title.alignment = TextAlignmentOptions.Center;
-            var hint = Text(header.transform, "Tap a building to enter", 19);
-            hint.color = ui.Theme.muted;
-            Place(hint.rectTransform, new Vector2(.02f, .08f), new Vector2(.98f, .46f));
-            hint.alignment = TextAlignmentOptions.Center;
+            Place(header.rectTransform, new Vector2(.035f, .83f), new Vector2(.965f, .885f));
+            var title = Text(header.transform, "BRAMBLE VILLAGE", 44);
+            StyleTownText(title, 44);
+            Place(title.rectTransform, new Vector2(.025f, .10f), new Vector2(.975f, .90f));
 
-            TownBuilding(heroesBuilding, "GUILD HALL", "Heroes & gear", new Vector2(.10f, .54f), new Vector2(.41f, .75f));
-            TownBuilding(equipmentBuilding, "BLACKSMITH", "Equipment shop", new Vector2(.59f, .54f), new Vector2(.90f, .75f));
-            TownBuilding(innBuilding, "THE INN", "Rest your party", new Vector2(.59f, .29f), new Vector2(.90f, .49f));
-            TownBuilding(travelBuilding, "TRAVEL", "Explore the world", new Vector2(.10f, .29f), new Vector2(.41f, .49f));
+            // Artwork-space coordinates keep signs attached to the same roofs
+            // when the portrait viewport crops the illustration differently.
+            TownBuilding(heroesBuilding, "GUILD HALL", new Vector2(.035f, .43f), new Vector2(.46f, .74f));
+            TownBuilding(equipmentBuilding, "BLACKSMITH", new Vector2(.55f, .43f), new Vector2(.98f, .63f));
+            TownBuilding(innBuilding, "THE INN", new Vector2(.64f, .10f), new Vector2(.99f, .365f));
+            TownBuilding(travelBuilding, "WORLD MAP", new Vector2(.035f, .10f), new Vector2(.47f, .275f));
 
             if (randomBattleButton != null)
             {
                 var r = randomBattleButton.GetComponent<RectTransform>();
                 r.SetParent(townView.transform, false);
-                Place(r, new Vector2(.19f, .16f), new Vector2(.81f, .25f));
+                r.SetAsLastSibling();
+                Place(r, new Vector2(.035f, .105f), new Vector2(.965f, .195f));
                 ui.ApplyButton(randomBattleButton, RpgButtonKind.Primary);
-                StyleTownText(randomBattleLabel, 25);
+                ui.ApplyNameplate(randomBattleButton.image, true);
+                StyleTownText(randomBattleLabel, 38);
+                if (randomBattleLabel != null)
+                {
+                    RpgUi.Stretch(randomBattleLabel.rectTransform);
+                    randomBattleLabel.rectTransform.offsetMin = new Vector2(12, 5) * UiScale;
+                    randomBattleLabel.rectTransform.offsetMax = new Vector2(-12, -5) * UiScale;
+                }
             }
         }
 
-        void Path(Transform parent, Vector2 min, Vector2 max)
+        void TownBand(Transform parent, string name, float min, float max)
         {
-            var edge = Image("Path edge", parent, null);
-            edge.color = new Color(.48f, .38f, .20f); edge.raycastTarget = false;
-            Place(edge.rectTransform, min, max);
-            var fill = Image("Packed earth", edge.transform, null);
-            fill.color = new Color(.76f, .65f, .39f); fill.raycastTarget = false;
-            fill.rectTransform.offsetMin = Vector2.one * 4 * UiScale;
-            fill.rectTransform.offsetMax = Vector2.one * -4 * UiScale;
+            var band = Image(name, parent, null); band.color = ui.Theme.inset; band.raycastTarget = false;
+            Place(band.rectTransform, new Vector2(0, min), new Vector2(1, max));
         }
 
-        void TownBuilding(Button button, string title, string subtitle, Vector2 min, Vector2 max)
+        void TownBuilding(Button button, string title, Vector2 min, Vector2 max)
         {
             if (button == null || button.image == null) return;
             foreach (var oldLabel in button.GetComponentsInChildren<TMP_Text>(true)) oldLabel.gameObject.SetActive(false);
             var rect = button.GetComponent<RectTransform>();
-            rect.SetParent(townView.transform, false); Place(rect, min, max);
-            // A transparent button covers both the sprite and its sign, giving a generous tap target.
-            var sprite = button.image.sprite;
-            button.image.sprite = null; button.image.color = Color.clear;
-            var art = Image("Building artwork", rect, sprite);
-            art.preserveAspect = true; art.raycastTarget = false;
-            Place(art.rectTransform, new Vector2(.12f, .30f), new Vector2(.88f, 1));
-            var sign = ui.Panel(rect, "Service sign"); sign.raycastTarget = false;
-            Place(sign.rectTransform, new Vector2(-.04f, 0), new Vector2(1.04f, .32f));
-            var label = Text(sign.transform, title + "\n<size=75%>" + subtitle + "</size>", 23);
-            StyleTownText(label, 23);
-            label.rectTransform.offsetMin = new Vector2(6, 4) * UiScale;
-            label.rectTransform.offsetMax = new Vector2(-6, -4) * UiScale;
-            button.targetGraphic = art;
-            button.transition = Selectable.Transition.ColorTint;
+            rect.SetParent(townArtwork, false); Place(rect, min, max); rect.SetAsLastSibling();
+            button.image.sprite = null; button.image.color = Color.clear; button.image.raycastTarget = true;
+            var plaque = ui.Nameplate(rect, "Building title - " + title);
+            // The plaque itself is clickable even where it extends above the
+            // generous building hit area. The existing service opens directly.
+            plaque.raycastTarget = true;
+            plaque.rectTransform.anchorMin = plaque.rectTransform.anchorMax = new Vector2(.5f, 1);
+            plaque.rectTransform.pivot = new Vector2(.5f, 0);
+            plaque.rectTransform.anchoredPosition = new Vector2(0, Mathf.Round(4 * UiScale));
+            var label = Text(plaque.transform, title, 36); StyleTownText(label, 36);
+            label.color = new Color32(255, 235, 193, 255);
+            label.textWrappingMode = TextWrappingModes.NoWrap;
+            float availableWidth = rect.rect.width > 0 ? rect.rect.width * .98f : 205 * UiScale;
+            plaque.rectTransform.sizeDelta = new Vector2(Mathf.Round(Mathf.Min(160 * UiScale, availableWidth)), Mathf.Round(30 * UiScale));
+            label.rectTransform.offsetMin = new Vector2(Mathf.Round(5 * UiScale), Mathf.Round(UiScale));
+            label.rectTransform.offsetMax = -label.rectTransform.offsetMin;
+            button.targetGraphic = plaque; button.transition = Selectable.Transition.ColorTint;
             var colors = button.colors;
-            colors.highlightedColor = new Color(1, .94f, .75f);
-            colors.pressedColor = new Color(.75f, .65f, .45f);
-            button.colors = colors;
+            colors.normalColor = Color.white; colors.highlightedColor = new Color(1, .94f, .75f);
+            colors.pressedColor = new Color(.65f, .64f, .48f); colors.fadeDuration = 0; button.colors = colors;
         }
 
         void StyleTownText(TMP_Text label, float size)
@@ -85,10 +103,9 @@ namespace StepQuest.Adventure
             if (label == null) return;
             if (font != null) label.font = font;
             label.fontStyle = FontStyles.Normal; label.color = textColor;
-            label.alignment = TextAlignmentOptions.Center;
-            label.enableAutoSizing = false; label.fontSize = size * UiScale;
-            label.characterSpacing = 0; label.lineSpacing = 6;
-            label.raycastTarget = false;
+            label.alignment = TextAlignmentOptions.Midline;
+            label.enableAutoSizing = false; label.fontSize = Mathf.Round(size * UiScale);
+            label.characterSpacing = 0; label.lineSpacing = 3; label.raycastTarget = false;
         }
     }
 }

@@ -16,6 +16,37 @@ public static class RpgUiPreview
 {
     const BindingFlags Private = BindingFlags.Instance | BindingFlags.NonPublic;
 
+    // Lets a developer request an isolated capture from the workspace while
+    // Unity is already open. It never enters Play mode or changes the open scene.
+    [InitializeOnLoadMethod]
+    static void CaptureWorkspaceRequest()
+    {
+        EditorApplication.update += CaptureWhenReady;
+        void CaptureWhenReady()
+        {
+            const string request = "Temp/StepQuestTownPreview.request";
+            if (EditorApplication.isCompiling || EditorApplication.isUpdating) return;
+            if (EditorApplication.isPlayingOrWillChangePlaymode && !EditorApplication.isPlaying) return;
+            EditorApplication.update -= CaptureWhenReady;
+            if (!File.Exists(request)) return;
+            File.Delete(request);
+            try
+            {
+                // The disabled preview controller cannot run Start/Update, even
+                // if gameplay is open. Only its pure town builder is invoked.
+                CapturePortrait(1080, 1920, true);
+                CapturePortrait(720, 1600, true);
+                File.WriteAllText("Logs/TownUiPreviewResult.txt", "PASS: both town resolutions rendered and validated.");
+            }
+            catch (Exception error)
+            {
+                Directory.CreateDirectory("Logs");
+                File.WriteAllText("Logs/TownUiPreviewResult.txt", error.ToString());
+                Debug.LogException(error);
+            }
+        }
+    }
+
     [MenuItem("StepQuest/UI/Capture exploration previews")]
     public static void Capture()
     {
@@ -28,7 +59,16 @@ public static class RpgUiPreview
     static void Set(AdventureScreen screen, string name, object value)
     { typeof(AdventureScreen).GetField(name, Private).SetValue(screen, value); }
 
-    static void CapturePortrait(int width, int height)
+    [MenuItem("StepQuest/UI/Capture town previews")]
+    public static void CaptureTown()
+    {
+        if (EditorApplication.isPlaying) throw new InvalidOperationException("Stop Play mode before capturing previews.");
+        CapturePortrait(1080, 1920, true);
+        CapturePortrait(720, 1600, true);
+        Debug.Log("Town previews saved to Logs/TownUi-1080x1920.png and Logs/TownUi-720x1600.png. Existing global HUD/navigation are outside this isolated town preview.");
+    }
+
+    static void CapturePortrait(int width, int height, bool town = false)
     {
         var scene = EditorSceneManager.NewPreviewScene();
         var pipeline = GraphicsSettings.defaultRenderPipeline;
@@ -62,21 +102,40 @@ public static class RpgUiPreview
 
             var root = RpgUi.Rect("Adventure capture", canvasGo.transform);
             screen = root.gameObject.AddComponent<AdventureScreen>();
+            screen.enabled = false;
             ui = new RpgUi(width / 480f);
             Set(screen, "ui", ui);
             Set(screen, "dialogue", Resources.Load<AdventureDialogue>("Adventure/FirstAdventure"));
             Set(screen, "townHub", Resources.Load<TownHubDefinition>("Adventure/TownHub"));
-            typeof(AdventureScreen).GetMethod("ShowRandomBattle", Private).Invoke(screen, null);
-            var safe = root.GetComponentInChildren<RpgSafeWindow>();
-            safe.enabled = false;
-            var window = safe.GetComponent<RectTransform>();
-            window.anchorMin = new Vector2(.035f, .14f); window.anchorMax = new Vector2(.965f, .855f);
-            window.offsetMin = window.offsetMax = Vector2.zero;
+            RectTransform window;
+            if (town)
+            {
+                Set(screen, "font", ui.Font); Set(screen, "textColor", ui.Theme.light);
+                Set(screen, "townView", root.gameObject);
+                foreach (string field in new[] { "heroesBuilding", "equipmentBuilding", "innBuilding", "travelBuilding", "randomBattleButton" })
+                {
+                    var button = ui.Button(root, field, () => { });
+                    Set(screen, field, button);
+                    if (field == "randomBattleButton") Set(screen, "randomBattleLabel", button.GetComponentInChildren<TMP_Text>());
+                }
+                typeof(AdventureScreen).GetMethod("BuildAdventureTown", Private).Invoke(screen, null);
+                typeof(AdventureScreen).GetMethod("RefreshTownBalance", Private).Invoke(screen, null);
+                window = root;
+            }
+            else
+            {
+                typeof(AdventureScreen).GetMethod("ShowRandomBattle", Private).Invoke(screen, null);
+                var safe = root.GetComponentInChildren<RpgSafeWindow>();
+                safe.enabled = false;
+                window = safe.GetComponent<RectTransform>();
+                window.anchorMin = new Vector2(.035f, .14f); window.anchorMax = new Vector2(.965f, .855f);
+                window.offsetMin = window.offsetMax = Vector2.zero;
+            }
             Canvas.ForceUpdateCanvases();
             foreach (var text in root.GetComponentsInChildren<TMP_Text>()) text.ForceMeshUpdate();
             LayoutRebuilder.ForceRebuildLayoutImmediate(window);
             Canvas.ForceUpdateCanvases();
-            VerifyFooter(window);
+            if (town) VerifyTown(window); else VerifyFooter(window);
 
             // Built-in rendering is used only for this off-screen UI capture;
             // restore both pipeline overrides even if rendering fails.
@@ -88,7 +147,7 @@ public static class RpgUiPreview
             capture = new Texture2D(width, height, TextureFormat.RGB24, false);
             capture.ReadPixels(new Rect(0, 0, width, height), 0, 0); capture.Apply();
             Directory.CreateDirectory("Logs");
-            File.WriteAllBytes("Logs/RpgUi-" + width + "x" + height + ".png", capture.EncodeToPNG());
+            File.WriteAllBytes("Logs/" + (town ? "TownUi-" : "RpgUi-") + width + "x" + height + ".png", capture.EncodeToPNG());
         }
         finally
         {
@@ -121,5 +180,23 @@ public static class RpgUiPreview
         }
         if (footer.GetComponentsInChildren<Button>().Length != 3)
             throw new InvalidOperationException("Exploration must retain battle, heroes, and town actions.");
+    }
+
+    static void VerifyTown(RectTransform root)
+    {
+        var buttons = root.GetComponentsInChildren<Button>();
+        if (root.Find("Bramble village scenery/Travel party") != null)
+            throw new InvalidOperationException("The main village must not display a party plate.");
+        if (buttons.Length != 5) throw new InvalidOperationException("Town must retain four directly accessible services and the gates.");
+        if (root.Find("Bramble village scenery/Village viewport/Village panorama").GetComponent<Image>().sprite == null)
+            throw new InvalidOperationException("Village artwork is missing.");
+        foreach (var button in buttons)
+        {
+            var rect = button.GetComponent<RectTransform>();
+            if (rect.rect.width < 100 || rect.rect.height < 60)
+                throw new InvalidOperationException("Town tap target is too small: " + button.name);
+        }
+        foreach (var label in root.GetComponentsInChildren<TMP_Text>())
+            if (label.isTextOverflowing) throw new InvalidOperationException("Town text overflows: " + label.text);
     }
 }

@@ -106,6 +106,25 @@ namespace StepQuest.Adventure
             image.type = Image.Type.Sliced;
             image.pixelsPerUnitMultiplier = 1f / ((sprite == Window && usesExistingWindow ? 1 : 2) * Scale);
         }
+
+        // Village signs deliberately use a single flat tan rim instead of the
+        // multi-layer window frame. Border is 1-2 units at the home reference size.
+        public Image Nameplate(Transform parent, string name)
+        {
+            var plate = Rect(name, parent).gameObject.AddComponent<Image>();
+            ApplyNameplate(plate); return plate;
+        }
+        public void ApplyNameplate(Image plate, bool primaryAction = false)
+        {
+            plate.sprite = null; plate.type = Image.Type.Simple;
+            plate.color = primaryAction ? new Color32(210, 174, 106, 255) : new Color32(175, 143, 98, 255);
+            var fill = Rect("Dark wood", plate.transform).gameObject.AddComponent<Image>();
+            fill.transform.SetAsFirstSibling(); fill.raycastTarget = false;
+            fill.color = primaryAction ? new Color32(85, 55, 33, 255) : new Color32(57, 38, 29, 255);
+            float border = Mathf.Clamp(Mathf.Round(Scale), 1, 2);
+            fill.rectTransform.offsetMin = Vector2.one * border;
+            fill.rectTransform.offsetMax = Vector2.one * -border;
+        }
         public TMP_Text Text(Transform parent, string value, float size, Color? color = null)
         {
             var label = Rect("Text", parent).gameObject.AddComponent<TextMeshProUGUI>();

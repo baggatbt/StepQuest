@@ -36,7 +36,7 @@ namespace StepQuest.Adventure
         {
             if (randomBattleLabel == null || townHub == null) return;
             int steps = PlayerData.Instance != null ? PlayerData.Instance.inGameSteps : 0;
-            string balance = "TOWN GATES\n" + townHub.randomBattleStepCost + " steps / " + steps + " owned";
+            string balance = "TOWN GATES  >\n<size=80%>" + townHub.randomBattleStepCost + " steps  |  " + steps.ToString("N0") + " available</size>";
             if (randomBattleLabel.text != balance) randomBattleLabel.text = balance;
         }
         void ShowRandomBattle()
@@ -77,15 +77,50 @@ namespace StepQuest.Adventure
             player.totalCopper -= offer.copperPrice; player.SavePlayerData();
             ShowShop("Purchased " + item.itemName + ": " + item.GetStatDescription());
         }
+        Sprite[] menuPortraits;
+        Button HeroMenuCard(CharacterData hero, string status, UnityEngine.Events.UnityAction action = null)
+        {
+            if (menuPortraits == null) menuPortraits = Resources.LoadAll<Sprite>("Adventure/Portraits/HeroPortraits");
+            string identity = hero.heroID == Buffmage.HeroID ? "Buffmage" : hero.heroID.StartsWith("Knight") ? "Knight" : hero.heroID;
+            var portrait = menuPortraits.FirstOrDefault(s => s.name == "HeroPortrait_" + identity);
+            var row = ui.Panel(content, "Hero portrait - " + hero.heroID, action == null);
+            ui.Height(row, 112);
+            Button button = null;
+            if (action != null)
+            {
+                button = row.gameObject.AddComponent<Button>();
+                ui.ApplyButton(button, RpgButtonKind.Secondary); button.onClick.AddListener(action);
+            }
+            var frame = ui.Panel(row.transform, "Portrait frame", true);
+            var rect = frame.rectTransform;
+            rect.anchorMin = rect.anchorMax = new Vector2(0, .5f);
+            rect.pivot = new Vector2(0, .5f); rect.anchoredPosition = new Vector2(10, 0) * UiScale;
+            rect.sizeDelta = Vector2.one * 92 * UiScale;
+            frame.raycastTarget = false;
+            var image = Image("Hero portrait", frame.transform, portrait != null ? portrait : hero.heroIcon);
+            image.preserveAspect = true; image.raycastTarget = false;
+            image.rectTransform.offsetMin = Vector2.one * 5 * UiScale;
+            image.rectTransform.offsetMax = Vector2.one * -5 * UiScale;
+            var title = Text(row.transform, (identity == "Buffmage" ? "Buff Mage" : hero.heroID) + "  Lv " + hero.heroLevel, 34);
+            Place(title.rectTransform, new Vector2(0, .48f), new Vector2(1, .89f));
+            title.rectTransform.offsetMin = new Vector2(114, 0) * UiScale;
+            title.rectTransform.offsetMax = new Vector2(-12, 0) * UiScale;
+            var detail = Text(row.transform, status, 25); detail.color = ui.Theme.muted;
+            Place(detail.rectTransform, new Vector2(0, .10f), new Vector2(1, .48f));
+            detail.rectTransform.offsetMin = new Vector2(114, 0) * UiScale;
+            detail.rectTransform.offsetMax = new Vector2(-12, 0) * UiScale;
+            return button;
+        }
+
         void ShowRoster()
         {
             OpenPanel(); Label("Guild hall", 32); Label("Choose up to two heroes. Prepare their gear and skills before venturing out.", 25);
             var gm = GameManager.Instance;
             foreach (var hero in gm.allCharacterData.Where(h => h != null).GroupBy(h => h.heroID).Select(g => g.First()))
             {
-                var selected = hero; Art(hero.heroIcon, 85);
-                var entry = MakeButton(content, hero.heroID + " - Lv " + hero.heroLevel +
-                    (gm.currentPartyHeroIDs.Contains(hero.heroID) ? " - In party" : "") + "\n" + gm.GetHeroUnlockStatus(hero), () => ShowHero(selected));
+                var selected = hero;
+                var entry = HeroMenuCard(hero, gm.GetHeroUnlockStatus(hero) +
+                    (gm.currentPartyHeroIDs.Contains(hero.heroID) ? " | In party" : ""), () => ShowHero(selected));
                 entry.interactable = gm.IsHeroAvailable(hero) || gm.currentPartyHeroIDs.Contains(hero.heroID);
             }
             MakeButton(content, "Back to town", Close);
@@ -93,8 +128,7 @@ namespace StepQuest.Adventure
         void ShowHero(CharacterData hero, string notice = null)
         {
             OpenPanel(); var gm = GameManager.Instance; gm.currentCompanionData = hero;
-            Art(hero.heroIcon, 95); Label(hero.heroID + " - Level " + hero.heroLevel, 32);
-            Label(gm.GetHeroUnlockStatus(hero), 22);
+            HeroMenuCard(hero, gm.GetHeroUnlockStatus(hero));
             if (hero.heroID == Buffmage.HeroID) Label("Strength in place of sorcery. High ATK and HP; slower actions and lighter defense.", 22);
             Label("HP " + hero.health + "/" + hero.maxHealth + " - XP " + hero.heroExp + "/" + hero.ExpToNextLevel(hero.heroLevel)
                 + "\nATK " + hero.attackPower + "  DEF " + hero.defensePower + "  SPD " + hero.speed, 25);
