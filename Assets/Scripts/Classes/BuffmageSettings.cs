@@ -31,6 +31,9 @@ public sealed class BuffmageSettings : ScriptableObject
     public Sprite[] flameFrames;
     public AudioClip hitSound, perfectSound;
     public float throwSeconds = .42f, punchSeconds = .13f, leapSeconds = .55f, leapHeight = 2.5f;
+    [Header("Spellbook size and burning impact (world units)")]
+    public float bookHeight = 1.3f, bookFlameScale = .55f;
+    public float bookBurstRadius = 1.5f, bookBurnSeconds = .65f;
 
     public static BuffmageSettings Load() => Resources.Load<BuffmageSettings>("Heroes/Buffmage/Settings");
 }

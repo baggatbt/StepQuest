@@ -12,13 +12,17 @@ from BuffmageAtlas import inspect, read_png
 ROOT = Path(__file__).resolve().parents[1]
 HERO = ROOT / "Assets/Resources/Heroes/Buffmage"
 OUT = HERO / "Animations"
-SHEET = OUT / "BuffmageSheet-v2.png"
+ACTION_NAMES = ["Idle", "Book", "Punch", "Meteor", "Hurt", "Death"]
+SHEETS = [OUT / ("BuffmageApproved-" + name + ".png") for name in ACTION_NAMES]
+SHEET = SHEETS[0]
+SOURCE_FRAMES = list(range(48))
+BOOK_GRIPS = [(163,250),(172,239),(150,200),(130,144),(130,145),(347,150),(321,206),(323,214)]
 KNIGHT_HEIGHT_MULTIPLIER = 1.05
 CLIPS = {
     "Idle":       (list(range(0, 8)) + list(range(6, 0, -1)), 8, True),
     "BookWindup": (list(range(8, 12)), 10, False),
     "BookHold":   ([11], 4, True),
-    "BookThrow":  ([11, 12, 13, 14, 15], 12, False),
+    "BookThrow":  ([12, 13, 14, 15, 15], 12, False),
     "PunchLeft":  ([16, 17, 18, 19], 24, False),
     "PunchRight": ([20, 21, 22, 23], 24, False),
     "MeteorReady": ([24], 4, True),
@@ -70,10 +74,14 @@ set_script = ROOT / "Assets/Scripts/VisualEffects/BuffmageAnimationSet.cs"
 driver_script = ROOT / "Assets/Scripts/VisualEffects/BuffmageAnimationDriver.cs"
 set_guid = metadata(set_script, "MonoImporter:\n  externalObjects: {}\n")
 driver_guid = metadata(driver_script, "MonoImporter:\n  externalObjects: {}\n")
-sheet_guid = metadata(SHEET)
-report = inspect(SHEET)
+sheet_guids = [metadata(path) for path in SHEETS]
+sheet_guid = sheet_guids[0]
+reports = [inspect(path) for path in SHEETS]
+report = dict(reports[0])
+report["cells"] = [dict(cell, sheetIndex=si) for si,r in enumerate(reports) for cell in r["cells"]]
 cw, ch = report["cellWidth"], report["cellHeight"]
-assert cw == ch and sum(c["red"] for c in report["cells"]) == 0
+assert all(r["cellWidth"] == r["cellHeight"] for r in reports)
+assert sum(c["red"] for c in report["cells"]) == 0
 # Compare opaque bodies, not the transparent dimensions of the two atlases.
 knight_path = ROOT / "Assets/Knight/Sprites/HeroKnight.png"
 kw, kh, knight_rows = read_png(knight_path)
@@ -91,67 +99,74 @@ knight_height = (max(opaque_y)-min(opaque_y)+1) / knight_ppu * knight_scale
 world_height = knight_height * KNIGHT_HEIGHT_MULTIPLIER
 idle_body_pixels = statistics.median(c["bounds"][3]-c["bounds"][1]+1 for c in report["cells"][:8])
 pixels_per_unit = idle_body_pixels / world_height
-punch_reach = statistics.mean(report["cells"][i]["bounds"][2] - cw*.5 for i in (18,21)) / pixels_per_unit
+# Normalize standing guard stature per source sheet, not pose bounding boxes.
+reference_heights = [idle_body_pixels] + [r["cells"][7 if i < 5 else 0]["bounds"][3]-r["cells"][7 if i < 5 else 0]["bounds"][1]+1 for i,r in enumerate(reports[1:],1)]
+sheet_ppus = [height/world_height for height in reference_heights]
+punch_reach = statistics.mean(report["cells"][i]["bounds"][2] - reports[2]["cellWidth"]*.5 for i in (18,21)) / sheet_ppus[2]
 frame_ids = [21310000 + i for i in range(48)]
 rows = ["Idle", "Book", "Punch", "Meteor", "Hurt", "Death"]
 frames = []
 idle_ground = statistics.median(ch - 1 - c["bounds"][3] for c in report["cells"][:8])
 for i, cell in enumerate(report["cells"]):
     row, column = divmod(i, 8)
-    # Feet stay on the ground in standing, hurt, crouch and corpse frames.
-    # Airborne poses retain their internal lift as the root follows its arc.
-    ground = idle_ground if row == 3 and column in (1, 2, 3, 4) else ch - 1 - cell["bounds"][3]
+    r = reports[row]
+    fcw, fch = r["cellWidth"], r["cellHeight"]
+    ground = idle_ground / pixels_per_unit * sheet_ppus[row] if row == 3 and column in (1,2,3,4) else fch-1-cell["bounds"][3]
+    # Stabilize idle horizontally against planted feet, not moving fists.
+    pivot_x = .5
+    if row == 0:
+        _,_,image_rows = read_png(SHEETS[0]) if column == 0 else (0,0,image_rows)
+        foot_y = cell["pixelY"] + cell["bounds"][3]
+        foot_x = [x for y in range(foot_y-8, foot_y+1) for x in range(fcw) if image_rows[y][(cell["pixelX"]+x)*4+3] >= 192]
+        pivot_x = (min(foot_x)+max(foot_x))*.5/fcw
     frames.append(dict(name=f"Buffmage_{rows[row]}_{column:02}", id=frame_ids[i],
-        x=column*cw, y=(5-row)*ch, width=cw, height=ch, pivot=[.5, ground/ch], bounds=cell["bounds"]))
+        sheet=SHEETS[row].name, guid=sheet_guids[row], pixelsPerUnit=sheet_ppus[row],
+        x=cell["pixelX"], y=r["height"]-cell["pixelY"]-fch, width=fcw, height=fch,
+        pivot=[pivot_x,ground/fch], bounds=cell["bounds"]))
 
-source_meta = Path(str(HERO / "BuffmageIdle.png") + ".meta").read_text()
-source_meta = re.sub(r"^guid: \w+", "guid: " + sheet_guid, source_meta, count=1, flags=re.M)
-name_table = "  internalIDToNameTable:\n" + "".join(
-    f"  - first:\n      213: {f['id']}\n    second: {f['name']}\n" for f in frames)
-source_meta = source_meta.replace("  internalIDToNameTable: []\n", name_table)
-source_meta = source_meta.replace("  spriteMode: 1", "  spriteMode: 2")
-source_meta = re.sub(r"spritePixelsToUnits: [^\n]+", f"spritePixelsToUnits: {pixels_per_unit:.9g}", source_meta)
-source_meta = source_meta.replace("filterMode: 1", "filterMode: 0").replace("textureCompression: 1", "textureCompression: 0")
-sprite_sheet = "  spriteSheet:\n    serializedVersion: 2\n    sprites:\n"
-for f in frames:
-    sprite_guid = uuid.uuid5(uuid.UUID(sheet_guid), f["name"]).hex
-    sprite_sheet += f"""    - serializedVersion: 2
-      name: {f['name']}
-      rect:
-        serializedVersion: 2
-        x: {f['x']}
-        y: {f['y']}
-        width: {cw}
-        height: {ch}
-      alignment: 9
-      pivot: {{x: 0.5, y: {f['pivot'][1]:.9g}}}
-      border: {{x: 0, y: 0, z: 0, w: 0}}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: {sprite_guid}
-      internalID: {f['id']}
-      vertices: []
-      indices:
-      edges: []
-      weights: []
-"""
-sprite_sheet += """    outline: []
-    physicsShape: []
-    bones: []
-    spriteID: """ + uuid.uuid5(uuid.UUID(sheet_guid), "sheet").hex + """
-    internalID: 0
-    vertices: []
-    indices:
-    edges: []
-    weights: []
-    secondaryTextures: []
-    nameFileIdTable:
-"""
-sprite_sheet += "".join(f"      {f['name']}: {f['id']}\n" for f in frames)
-source_meta = re.sub(r"  spriteSheet:\n.*?(?=  spritePackingTag:)", sprite_sheet, source_meta, flags=re.S)
-Path(str(SHEET) + ".meta").write_text(source_meta)
+_,_,book_rows = read_png(SHEETS[1])
+for i,(gx,gy) in enumerate(BOOK_GRIPS):
+    c = reports[1]["cells"][i]
+    candidates = []
+    for y in range(max(0,gy-12),min(ch,gy+13)):
+        for x in range(max(0,gx-12),min(cw,gx+13)):
+            pixel = book_rows[c["pixelY"]+y][(c["pixelX"]+x)*4:(c["pixelX"]+x)*4+4]
+            if pixel[3] >= 192 and pixel[0]>180 and pixel[1]>110 and pixel[2]<200 and pixel[0]>pixel[1]>pixel[2]:
+                candidates.append(((x-gx)**2+(y-gy)**2,x,y))
+    assert candidates, f"No hand skin near grip {i}"
+    _,x,y = min(candidates)
+    BOOK_GRIPS[i] = (x,y)
+
+for si, source_path in enumerate(SHEETS):
+    sheet_guid = sheet_guids[si]
+    selected_frames = frames[si*8:(si+1)*8]
+    source_meta = Path(str(HERO / "BuffmageIdle.png") + ".meta").read_text()
+    source_meta = re.sub(r"^guid: \w+", "guid: " + sheet_guid, source_meta, count=1, flags=re.M)
+    name_table = "  internalIDToNameTable:\n" + "".join(
+        f"  - first:\n      213: {f['id']}\n    second: {f['name']}\n" for f in selected_frames)
+    source_meta = source_meta.replace("  internalIDToNameTable: []\n", name_table)
+    source_meta = source_meta.replace("  spriteMode: 1", "  spriteMode: 2")
+    source_meta = re.sub(r"spritePixelsToUnits: [^\n]+", f"spritePixelsToUnits: {sheet_ppus[si]:.9g}", source_meta)
+    source_meta = source_meta.replace("filterMode: 1", "filterMode: 0").replace("textureCompression: 1", "textureCompression: 0")
+    sprite_sheet = "  spriteSheet:\n    serializedVersion: 2\n    sprites:\n"
+    for f in selected_frames:
+        sprite_guid = uuid.uuid5(uuid.UUID(sheet_guid), f["name"]).hex
+        fields = ["    - serializedVersion: 2", f"      name: {f['name']}", "      rect:",
+            "        serializedVersion: 2", f"        x: {f['x']}", f"        y: {f['y']}",
+            f"        width: {f['width']}", f"        height: {f['height']}", "      alignment: 9",
+            f"      pivot: {{x: {f['pivot'][0]:.9g}, y: {f['pivot'][1]:.9g}}}",
+            "      border: {x: 0, y: 0, z: 0, w: 0}", "      outline: []", "      physicsShape: []",
+            "      tessellationDetail: 0", "      bones: []", f"      spriteID: {sprite_guid}",
+            f"      internalID: {f['id']}", "      vertices: []", "      indices:", "      edges: []", "      weights: []"]
+        sprite_sheet += "\n".join(fields) + "\n"
+    fields = ["    outline: []", "    physicsShape: []", "    bones: []",
+        "    spriteID: " + uuid.uuid5(uuid.UUID(sheet_guid), "sheet").hex, "    internalID: 0",
+        "    vertices: []", "    indices:", "    edges: []", "    weights: []", "    secondaryTextures: []", "    nameFileIdTable:"]
+    sprite_sheet += "\n".join(fields) + "\n"
+    sprite_sheet += "".join(f"      {f['name']}: {f['id']}\n" for f in selected_frames)
+    source_meta = re.sub(r"  spriteSheet:\n.*?(?=  spritePackingTag:)", sprite_sheet, source_meta, flags=re.S)
+    Path(str(source_path) + ".meta").write_text(source_meta)
+sheet_guid = sheet_guids[0]
 
 clip_guids = {}
 for name, (indices, fps, loop) in CLIPS.items():
@@ -160,6 +175,7 @@ for name, (indices, fps, loop) in CLIPS.items():
     # A terminal key makes the actual Unity clip length exact and preserves the
     # final corpse pose. Looping clips join back to their opening pose.
     mapping = [frame_ids[i] for i in indices] + [frame_ids[indices[0] if loop else indices[-1]]]
+    mapping_guids = [frames[i]["guid"] for i in indices] + [frames[indices[0] if loop else indices[-1]]["guid"]]
     text = yaml_start() + object_start(74, 7400000, "AnimationClip") + f"""  m_Name: Buffmage_{name}
   serializedVersion: 6
   m_Legacy: 0
@@ -174,7 +190,7 @@ for name, (indices, fps, loop) in CLIPS.items():
   m_PPtrCurves:
   - curve:
 """
-    text += "".join(f"    - time: {i/fps:.9g}\n      value: {{fileID: {fileid}, guid: {sheet_guid}, type: 3}}\n" for i, fileid in enumerate(mapping))
+    text += "".join(f"    - time: {i/fps:.9g}\n      value: {{fileID: {fileid}, guid: {mapping_guids[i]}, type: 3}}\n" for i, fileid in enumerate(mapping))
     text += f"""    attribute: m_Sprite
     path:
     classID: 212
@@ -195,7 +211,7 @@ for name, (indices, fps, loop) in CLIPS.items():
       isPPtrCurve: 1
     pptrCurveMapping:
 """
-    text += "".join(f"    - {{fileID: {fileid}, guid: {sheet_guid}, type: 3}}\n" for fileid in mapping)
+    text += "".join(f"    - {{fileID: {fileid}, guid: {mapping_guids[i]}, type: 3}}\n" for i,fileid in enumerate(mapping))
     text += f"""  m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {{fileID: 0}}
@@ -328,6 +344,7 @@ animation_set = OUT / "AnimationSet.asset"
 animation_set_guid = native(animation_set, 11400000)
 text = scriptable(set_guid, "BuffmageAnimations") + f"  controller: {{fileID: 9100000, guid: {controller_guid}, type: 2}}\n"
 text += f"  authoredWorldHeight: {world_height:.9g}\n  punchReach: {punch_reach:.9g}\n"
+text += "  bookGripPixels:\n" + "".join(f"  - {{x: {x}, y: {y}}}\n" for x,y in BOOK_GRIPS)
 for name in CLIPS:
     if name != "Block":
         field = name[0].lower() + name[1:]
@@ -405,7 +422,10 @@ text = text[:start] + collider + text[end:]
 prefab.write_text(text)
 
 manifest = dict(sheet=SHEET.name, facing="right", sourceSha256=hashlib.sha256(SHEET.read_bytes()).hexdigest(),
-    width=report["width"], height=report["height"], columns=8, rows=6, sourceAlphaCutoff=.75,
+    sourceFrames=SOURCE_FRAMES,
+    sheets=[dict(sheet=path.name, guid=sheet_guids[i], sha256=hashlib.sha256(path.read_bytes()).hexdigest(), pixelsPerUnit=sheet_ppus[i]) for i,path in enumerate(SHEETS)],
+    bookGripPixels=BOOK_GRIPS,
+    width=report["width"], height=report["height"], columns=report["columns"], rows=report["rows"], sourceAlphaCutoff=.75,
     pixelsPerUnit=pixels_per_unit, authoredWorldHeight=world_height, knightReferenceHeight=knight_height,
     knightHeightMultiplier=KNIGHT_HEIGHT_MULTIPLIER, punchReach=punch_reach, frames=frames,
     clips={name: dict(frames=indices, fps=fps, loop=loop, duration=len(indices)/fps)

@@ -14,10 +14,11 @@ public sealed class BuffmagePresentation : MonoBehaviour
     Vector3 origin;
     Quaternion rotation;
     GameObject book;
-    SpriteRenderer bookSprite, flame;
+    SpriteRenderer bookSprite;
+    readonly List<SpriteRenderer> flames = new List<SpriteRenderer>();
     Coroutine punch;
     bool active, punchRunning;
-    float windupStarted, landingRecovery;
+    float landingRecovery;
     float direction = 1;
     Sprite impactFrame;
     bool Animated => driver != null && driver.Available;
@@ -44,7 +45,6 @@ public sealed class BuffmagePresentation : MonoBehaviour
     }
     public void PrepareBook()
     {
-        windupStarted = Time.unscaledTime;
         if (Animated) driver.Play("BookWindup");
         if (config.bookSprite == null) return;
         book = new GameObject("A highly flammable spellbook");
@@ -52,18 +52,25 @@ public sealed class BuffmagePresentation : MonoBehaviour
         book.transform.localPosition = HandOffset(.3f, 1.25f);
         bookSprite = book.AddComponent<SpriteRenderer>(); bookSprite.sprite = config.bookSprite;
         CopySorting(bookSprite, 3);
-        // The held book is drawn in windup/hold frames. Only the flame is a
-        // separate prop until the release frame, when the projectile appears.
-        bookSprite.enabled = !Animated;
+        // Overlay the small book in the authored pose with a readable spellbook.
+        bookSprite.enabled = true;
         float size = Mathf.Max(.01f, bookSprite.sprite.bounds.size.y);
-        book.transform.localScale = Vector3.one * (.5f * VisualScale / size);
+        book.transform.localScale = Vector3.one * (Mathf.Max(.5f, config.bookHeight) / size);
         bookSprite.flipX = direction < 0;
+        AttachBookToHand();
         if (config.flameFrames != null && config.flameFrames.Length > 0)
         {
-            var fire = new GameObject("This counts as fire magic"); fire.transform.SetParent(book.transform, false);
-            flame = fire.AddComponent<SpriteRenderer>(); flame.sprite = config.flameFrames[0]; CopySorting(flame, 4);
-            fire.transform.localPosition = new Vector3(0, size * .4f, -.01f);
-            fire.transform.localScale = Vector3.one * (size / Mathf.Max(.01f, flame.sprite.bounds.size.y));
+            float width = bookSprite.sprite.bounds.size.x;
+            for (int i = 0; i < 3; i++)
+            {
+                var fire = new GameObject("Burning page edge"); fire.transform.SetParent(book.transform, false);
+                var tongue = fire.AddComponent<SpriteRenderer>();
+                tongue.sprite = config.flameFrames[(i * 3) % config.flameFrames.Length]; CopySorting(tongue, 4);
+                flames.Add(tongue);
+                fire.transform.localPosition = new Vector3((i - 1) * width * .3f, size * .35f, -.01f);
+                fire.transform.localScale = Vector3.one * (size * config.bookFlameScale * (i == 1 ? 1 : .8f)
+                    / Mathf.Max(.01f, tongue.sprite.bounds.size.y));
+            }
         }
     }
     void CopySorting(SpriteRenderer renderer, int offset)
@@ -80,14 +87,34 @@ public sealed class BuffmagePresentation : MonoBehaviour
     }
     void Update()
     {
-        if (flame != null && config != null && config.flameFrames != null && config.flameFrames.Length > 0)
-            flame.sprite = config.flameFrames[(int)(Time.unscaledTime * 10) % config.flameFrames.Length];
-        if (active && Animated && book != null && book.transform.parent == transform && !bookSprite.enabled)
-        {
-            float duration = Clips.Duration(Clips.bookWindup, .4f);
-            book.transform.localPosition = Vector3.Lerp(HandOffset(.3f, 1.25f),
-                HandOffset(-.75f, 2.1f), Mathf.Clamp01((Time.unscaledTime - windupStarted) / duration));
-        }
+        if (config != null && config.flameFrames != null && config.flameFrames.Length > 0)
+            for (int i = 0; i < flames.Count; i++)
+                if (flames[i] != null) flames[i].sprite = config.flameFrames[((int)(Time.unscaledTime * 12) + i * 3) % config.flameFrames.Length];
+    }
+    // Animator updates the sprite before LateUpdate. Follow that exact pose,
+    // including its pivot and mirroring, instead of interpolating above the head.
+    void LateUpdate()
+    {
+        if (active && book != null && book.transform.parent == transform) AttachBookToHand();
+    }
+    void AttachBookToHand()
+    {
+        if (!Animated || book == null || bookSprite == null) return;
+        var owner = GetComponent<Character>().spriteRenderer;
+        var pose = owner != null ? owner.sprite : null;
+        const string prefix = "Buffmage_Book_";
+        if (pose == null || !pose.name.StartsWith(prefix)
+            || !int.TryParse(pose.name.Substring(prefix.Length), out int index)
+            || Clips.bookGripPixels == null || index >= Clips.bookGripPixels.Length) return;
+        Vector2 pixel = Clips.bookGripPixels[index];
+        Vector3 hand = new Vector3((pixel.x - pose.pivot.x) / pose.pixelsPerUnit,
+            (pose.rect.height - pixel.y - pose.pivot.y) / pose.pixelsPerUnit, 0);
+        if (owner.flipX) hand.x = -hand.x;
+        if (owner.flipY) hand.y = -hand.y;
+        // Grip near the bottom of the cover: the book rests in the fist.
+        Vector3 grip = bookSprite.sprite.bounds.center + Vector3.down * bookSprite.sprite.bounds.size.y * .35f;
+        Vector3 offset = book.transform.TransformVector(grip);
+        book.transform.position = owner.transform.TransformPoint(hand) - offset + Vector3.back * .1f;
     }
     IEnumerator WaitActive(float seconds)
     {
@@ -104,7 +131,7 @@ public sealed class BuffmagePresentation : MonoBehaviour
         }
         if (!active || book == null || target == null) yield break;
         if (Animated) driver.PoseAt("BookThrow", Clips.bookReleaseSeconds / Clips.Duration(Clips.bookThrow, .42f));
-        book.transform.localPosition = HandOffset(1.05f, 1.85f);
+        AttachBookToHand();
         bookSprite.enabled = true; book.transform.SetParent(null, true);
         Vector3 start = book.transform.position;
         Vector3 end = target.position + Vector3.up * 1.2f;
@@ -118,7 +145,11 @@ public sealed class BuffmagePresentation : MonoBehaviour
             if (overcharged) book.transform.localScale *= 1 - Time.unscaledDeltaTime * .4f;
             yield return null;
         }
-        Destroy(book); book = null; bookSprite = null;
+        book.transform.position = end;
+        var burst = new GameObject("Spellbook burns apart");
+        burst.transform.position = end;
+        burst.AddComponent<BuffmageBookBurst>().Play(config, bookSprite);
+        Destroy(book); book = null; bookSprite = null; flames.Clear();
     }
     public void Punch(Transform target, int count, Action onImpact)
     {
@@ -212,7 +243,7 @@ public sealed class BuffmagePresentation : MonoBehaviour
         if (punch != null) StopCoroutine(punch);
         punch = null; punchRunning = false; punches.Clear();
         if (book != null) Destroy(book);
-        book = null; bookSprite = flame = null;
+        book = null; bookSprite = null; flames.Clear();
         if (active) { transform.position = origin; transform.rotation = rotation; }
         active = false; driver?.ReturnToIdle();
     }
@@ -222,4 +253,62 @@ public sealed class BuffmagePresentation : MonoBehaviour
         ResetPresentation();
         if (impactFrame != null && config != null && impactFrame != config.impactSprite) Destroy(impactFrame);
     }
+}
+
+// Owns its short lifetime so the burn finishes after the skill returns to idle.
+// Uses the actual book's quarters and existing pixel flames, not smooth particles.
+public sealed class BuffmageBookBurst : MonoBehaviour
+{
+    readonly List<Sprite> fragments = new List<Sprite>();
+    public void Play(BuffmageSettings settings, SpriteRenderer source)
+    { StartCoroutine(Burn(settings, source.sprite, source.sortingLayerID, source.sortingOrder)); }
+
+    IEnumerator Burn(BuffmageSettings settings, Sprite book, int layer, int order)
+    {
+        const int count = 10;
+        var pieces = new SpriteRenderer[count];
+        var fireFrames = settings.flameFrames;
+        bool hasFire = fireFrames != null && fireFrames.Length > 0;
+        float duration = Mathf.Clamp(settings.bookBurnSeconds, .25f, 2);
+        float radius = Mathf.Max(.5f, settings.bookBurstRadius);
+        for (int i = 0; i < count; i++)
+        {
+            var part = new GameObject(i < 4 ? "Scorched book fragment" : "Bursting ember");
+            part.transform.SetParent(transform, false);
+            var renderer = pieces[i] = part.AddComponent<SpriteRenderer>();
+            renderer.sortingLayerID = layer; renderer.sortingOrder = order + 1;
+            if (i < 4)
+            {
+                var rect = book.rect;
+                float halfW = Mathf.Floor(rect.width / 2), halfH = Mathf.Floor(rect.height / 2);
+                var fragment = Sprite.Create(book.texture,
+                    new Rect(rect.x + (i % 2) * halfW, rect.y + (i / 2) * halfH, halfW, halfH),
+                    Vector2.one * .5f, book.pixelsPerUnit, 0, SpriteMeshType.FullRect);
+                fragments.Add(fragment); renderer.sprite = fragment;
+            }
+            else renderer.sprite = hasFire ? fireFrames[0] : book;
+        }
+        for (float elapsed = 0; elapsed < duration; elapsed += Time.unscaledDeltaTime)
+        {
+            float u = elapsed / duration;
+            // Deliberately stepped motion/scale keeps the burst crisp and chunky.
+            float step = Mathf.Floor(u * 12) / 12;
+            for (int i = 0; i < count; i++)
+            {
+                var sprite = pieces[i];
+                float angle = (i * 137.5f + 20) * Mathf.Deg2Rad;
+                sprite.transform.localPosition = new Vector3(Mathf.Cos(angle) * radius * step,
+                    Mathf.Sin(angle) * radius * step + step * .65f, -.02f);
+                sprite.transform.localRotation = Quaternion.Euler(0, 0, Mathf.Floor(step * 8) * (i % 2 == 0 ? 45 : -45));
+                if (i >= 4 && hasFire) sprite.sprite = fireFrames[(i + (int)(elapsed * 14)) % fireFrames.Length];
+                float height = i < 4 ? settings.bookHeight * .55f : settings.bookHeight * (i == 4 ? 1.9f : .8f);
+                sprite.transform.localScale = Vector3.one * (height * (1 - step) / Mathf.Max(.01f, sprite.sprite.bounds.size.y));
+                if (i < 4) sprite.color = Color.Lerp(Color.white, new Color(.22f, .12f, .08f), Mathf.Clamp01(u * 2));
+                sprite.enabled = u < (i < 4 ? .7f : 1);
+            }
+            yield return null;
+        }
+        Destroy(gameObject);
+    }
+    void OnDestroy() { foreach (var sprite in fragments) if (sprite != null) Destroy(sprite); }
 }

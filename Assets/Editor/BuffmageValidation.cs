@@ -48,7 +48,8 @@ public static class BuffmageValidation
         var driver = definition.prefab.GetComponent<BuffmageAnimationDriver>();
         Require(driver != null && driver.animations == set && BuffmageSettings.Load().animations == set, "Animation driver/settings are not wired.");
         Require(definition.prefab.GetComponent<Animator>().runtimeAnimatorController == set.controller, "Prefab still uses a fallback controller.");
-        var sprites = Resources.LoadAll<Sprite>("Heroes/Buffmage/Animations/BuffmageSheet-v2");
+        var sprites = new[] { "Idle", "Book", "Punch", "Meteor", "Hurt", "Death" }
+            .SelectMany(action => Resources.LoadAll<Sprite>("Heroes/Buffmage/Animations/BuffmageApproved-" + action)).ToArray();
         Require(sprites.Length == 48 && sprites.All(s => s != null), "Atlas must import as 48 separate sprites.");
         Require(set.controller.animationClips.Length == 14, "Controller must retain every action and recovery clip.");
         var binding = new EditorCurveBinding { path = "", type = typeof(SpriteRenderer), propertyName = "m_Sprite" };

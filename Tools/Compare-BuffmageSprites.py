@@ -48,11 +48,14 @@ def sprite(path,rect,ppu,root_scale,panel):
 knight=ROOT/"Assets/Knight/Sprites/HeroKnight.png"
 km=Path(str(knight)+".meta").read_text().split("name: HeroKnight_0")[1].split("alignment:")[0]
 kr=[int(re.search(r'\b'+key+r': (\d+)',km)[1]) for key in ("x","y","width","height")]
-for i,label in enumerate(("KNIGHT","PREVIOUS","BUFFMAGE")):
+goblin=ROOT/"Assets/Leohpaz/RPG_Essentials_Free/Monsters Creatures Fantasy/Sprites/Mushroom/Idle.png"
+gm=Path(str(goblin)+".meta").read_text().split("name: Idle_0")[1].split("alignment:")[0]
+gr=[int(re.search(r'\b'+key+r': (\d+)',gm)[1]) for key in ("x","y","width","height")]
+for i,label in enumerate(("KNIGHT","MUSHROOM","BUFFMAGE")):
  rectangle(i*220+4,4,212,h-8,[43,36,33,255]);text(label,i*220+110,20)
 heights=[
  sprite(knight,kr,32,3,0),
- sprite(OUT/"BuffmageSheet-v1.png",[0,905,181,181],56,1,1),
+ sprite(goblin,gr,100,8,1),
  sprite(OUT/m["sheet"],[m["frames"][0][k] for k in ("x","y","width","height")],m["pixelsPerUnit"],1,2)
 ]
 def chunk(kind,data):

@@ -13,8 +13,9 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "Assets/Resources/Heroes/Buffmage/Animations"
 manifest = json.loads((OUT / "BuffmageAtlas.json").read_text())
 width, height, source = read_png(OUT / manifest.get("sheet", "BuffmageSheet-v1.png"))
-cw = width // 8
-ch = height // 6
+source_images = {s["sheet"]: read_png(OUT/s["sheet"]) for s in manifest.get("sheets",[])}
+cw = width // manifest["columns"]
+ch = height // manifest["rows"]
 preview_ppu = 56
 render_scale = preview_ppu / manifest["pixelsPerUnit"]
 render_width, render_height = round(cw*render_scale), round(ch*render_scale)
@@ -60,18 +61,22 @@ for i,label in enumerate(panels):
 # Precompute opaque row runs after the material's 0.75 alpha cutoff.
 runs = []
 for i,f in enumerate(manifest["frames"]):
-    row,col = divmod(i,8)
+    width,height,source = source_images.get(f.get("sheet"), (width,height,source))
+    cw,ch = f["width"],f["height"]
+    render_scale = preview_ppu / f.get("pixelsPerUnit",manifest["pixelsPerUnit"])
+    render_width,render_height = round(cw*render_scale),round(ch*render_scale)
+    source_x,source_y = f["x"],height-f["y"]-ch
     frame_runs = []
     for y in range(render_height):
-        line = source[row*ch+min(ch-1,int(y/render_scale))]; x=0
+        line = source[source_y+min(ch-1,int(y/render_scale))]; x=0
         while x<render_width:
             sx=min(cw-1,int(x/render_scale))
-            if line[(col*cw+sx)*4+3]<192:
+            if line[(source_x+sx)*4+3]<192:
                 x+=1; continue
             start=x; pixels=bytearray()
             while x<render_width:
                 sx=min(cw-1,int(x/render_scale))
-                k=(col*cw+sx)*4
+                k=(source_x+sx)*4
                 if line[k+3]<192: break
                 pixels.extend(line[k:k+3]); pixels.append(255); x+=1
             frame_runs.append((y,start,bytes(pixels)))
@@ -110,7 +115,9 @@ def render(t):
         if panel==3 and .4<=phase<=.95:
             u=(phase-.4)/.55
             lift=round(4*u*(1-u)*2.5*preview_ppu)
-        ox=panel%3*tilew+tilew//2-round(cw*.5*render_scale)
+        render_scale = preview_ppu / f.get("pixelsPerUnit",manifest["pixelsPerUnit"])
+        cw,ch = f["width"],f["height"]
+        ox=panel%3*tilew+tilew//2-round(cw*f["pivot"][0]*render_scale)
         oy=panel//3*tileh+458-round((ch-f["pivot"][1]*ch)*render_scale)-lift
         for sy,sx,pixels in runs[index]:
             yy=oy+sy;xx=ox+sx

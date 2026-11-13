@@ -7,6 +7,8 @@ public sealed class BuffmageAnimationSet : ScriptableObject
     [Header("Generated calibration against the Knight battle sprite")]
     public float authoredWorldHeight = 3.9375f;
     public float punchReach = 2.2f;
+    [Tooltip("Book-frame hand points in source pixels, measured from each slice's top-left.")]
+    public Vector2[] bookGripPixels;
     public AnimationClip idle, bookWindup, bookHold, bookThrow, punchLeft, punchRight;
     public AnimationClip meteorReady, meteorLaunch, meteorAir, meteorSlam, meteorRecover, hurt, death;
     [Header("Contact timings, in seconds within the corresponding clip")]
